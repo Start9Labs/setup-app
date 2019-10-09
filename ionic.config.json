@@ -1,5 +1,7 @@
 {
   "name": "start-9-companion",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }

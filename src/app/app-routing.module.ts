@@ -14,6 +14,10 @@ const routes: Routes = [
   {
     path: 'list',
     loadChildren: () => import('./list/list.module').then(m => m.ListPageModule)
+  },
+  {
+    path: 'wifi',
+    loadChildren: () => import('./wifi/wifi.module').then(m => m.WifiPageModule)
   }
 ];
 
