@@ -13,9 +13,16 @@ export class WifiPage implements OnInit {
 
   async ngOnInit() {
     try {
-      const listed = WifiWizard2.listNetworks().then(console.log).catch(console.error)
-      const scanned = WifiWizard2.scan().then(console.log).catch(console.error)
-      const enabled = WifiWizard2.isWifiEnabled().then(console.log).catch(console.error)
+      WifiWizard2.listNetworks().then(console.log).catch(console.error)
+      WifiWizard2.getConnectedSSID().then(console.log).catch(console.error)
+      WifiWizard2.getConnectedNetworkID().then(console.log).catch(console.error)
+
+      WifiWizard2.requestPermission().then(p => {
+        console.log(p)
+        WifiWizard2.scan().then(console.log).catch(console.error)
+      })
+
+      WifiWizard2.isWifiEnabled().then(console.log).catch(console.error)
     } catch (e) {
       console.error(e)
     }
