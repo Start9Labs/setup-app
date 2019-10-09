@@ -8,7 +8,7 @@ declare var WifiWizard2: any;
   styleUrls: ['./wifi.page.scss'],
 })
 export class WifiPage implements OnInit {
-  private readonly networks: any
+  private networks: any
 
   constructor() { }
 
