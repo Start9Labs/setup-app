@@ -23,6 +23,5 @@ const routes: Routes = [
     RouterModule.forChild(routes)
   ],
   declarations: [WifiPage]
-  // providers: [ WifiWizard2 ]
 })
 export class WifiPageModule {}
