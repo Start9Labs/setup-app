@@ -8,7 +8,7 @@ declare var WifiWizard2: any;
   styleUrls: ['./wifi.page.scss'],
 })
 export class WifiPage implements OnInit {
-  readonly defaultRouterIp: 192.168.0.1
+  readonly defaultRouterIp: "192.168.0.1"
   readonly nodeSetupPort: 1776
   private network: any
   private secondNetwork: any
