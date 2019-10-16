@@ -10,8 +10,6 @@ import { IonicStorageModule } from '@ionic/storage'
 import { AppComponent } from './app.component'
 import { AppRoutingModule } from './app-routing.module'
 
-export const APP_VERSION = '1.0.0'
-
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -19,13 +17,13 @@ export const APP_VERSION = '1.0.0'
     BrowserModule,
     IonicModule.forRoot(),
     IonicStorageModule.forRoot(),
-    AppRoutingModule,
+    DashboardRoutingModule,
   ],
   providers: [
     StatusBar,
     SplashScreen,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
   ],
-  bootstrap: [AppComponent],
+  bootstrap: [DashboardComponent],
 })
-export class AppModule { }
+export class DashboardModule { }
