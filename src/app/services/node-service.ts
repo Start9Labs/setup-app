@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core'
 import { HttpClient, HttpEventType, HttpErrorResponse, HttpHeaders, HttpEvent } from '@angular/common/http'
 import { Storage } from '@ionic/storage'
-import { Method } from '../types/enums'
-import { SessionDirective } from '../components/session'
+import { Method } from '../../types/enums'
+import { SessionStore } from '../components/session'
 import { Platform, LoadingController } from '@ionic/angular'
 import { APP_VERSION } from 'src/app/app.module'
 import { Observable } from 'rxjs'
@@ -17,7 +17,7 @@ export class NodeService {
     public http: HttpClient,
     public storage: Storage,
     public loadingCtrl: LoadingController,
-    public session: SessionDirective,
+    public session: SessionStore,
   ) { }
 
   async request<T> (method: Method, path: string, showLoader: boolean = false, httpOptions: HttpOptions = { }, body: any = { }): Promise<T> {

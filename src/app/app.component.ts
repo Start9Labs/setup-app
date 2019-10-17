@@ -3,40 +3,53 @@ import { Platform } from '@ionic/angular'
 import { SplashScreen } from '@ionic-native/splash-screen/ngx'
 import { StatusBar } from '@ionic-native/status-bar/ngx'
 import { Storage } from '@ionic/storage'
-import { SessionDirective } from '../components/session'
-import { DashboardPage } from 'pages/dashboard/dashboard'
+import { SessionStore } from './components/session'
 
 @Component({
-  template: '<ion-nav [root]="rootPage"></ion-nav>',
+  selector: 'app-root',
+  templateUrl: 'app.component.html',
+  styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
-  rootPage: any
+  public appPages = [
+    {
+      title: 'Home',
+      url: '/home',
+      icon: 'home',
+    },
+    {
+      title: 'List',
+      url: '/list',
+      icon: 'list',
+    },
+    {
+      title: 'Setup',
+      url: '/setup',
+      icon: 'setup',
+    },
+  ]
 
   constructor (
-    private platform: Platform,
-    private splashScreen: SplashScreen,
-    private statusBar: StatusBar,
-    private storage: Storage,
-    private session: SessionDirective,
+    public platform: Platform,
+    public splashScreen: SplashScreen,
+    public statusBar: StatusBar,
+    public storage: Storage,
+    public session: SessionStore,
   ) {
     this.initializeApp()
   }
 
   initializeApp () {
     this.platform.ready().then(async () => {
-      const torAddress = await this.storage.get('torAddress')
-      if (torAddress) {
-        this.session.torAddress = torAddress
-        this.rootPage = DashboardPage
-      } else {
-        this.rootPage = SetupPage
-      }
+      // load session data into memory
+      await this.extractFromStorage()
 
       this.statusBar.styleDefault()
       this.splashScreen.hide()
     })
   }
-}
 
-// setup mode : we don't have anything. No tor address, not connected to start9 ssid
-//
+  async extractFromStorage () {
+    const session = await this.storage.get('session')
+  }
+}
