@@ -17,6 +17,7 @@ export class SetupPage implements OnInit {
 
   async ngOnInit () {
     try {
+      
       const x2 = await WifiWizard2.getConnectedSSID()
       const x3 = await WifiWizard2.getConnectedBSSID()
       this.network = x2

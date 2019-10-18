@@ -9,7 +9,7 @@ import { Observable } from 'rxjs'
 import 'rxjs/add/operator/toPromise'
 
 @Injectable()
-export class NodeService {
+export class HttpService {
   loader: HTMLIonLoadingElement // do we want to block the screen
 
   constructor (
@@ -18,10 +18,26 @@ export class NodeService {
     public storage: Storage,
     public loadingCtrl: LoadingController,
     public session: SessionStore,
+    private rootUrl: string = 'http://192.168.0.1/v0',
   ) { }
 
-  async request<T> (method: Method, path: string, showLoader: boolean = false, httpOptions: HttpOptions = { }, body: any = { }): Promise<T> {
-    const url = `${this.session.torAddress}/v0/${path}`
+  withRootUrl (rootUrl : string): HttpService {
+    return Object.assign(this, { rootUrl })
+  }
+
+  async submitWifiCredentials (ssid: string, password: string): Promise<void> {
+    return await this.request(Method.post, 'wifi', true, undefined, {
+      ssid,
+      password,
+    })
+  }
+
+  async getTorAddress (): Promise<{ torAddress: string}> {
+    return this.request(Method.get, 'tor', false)
+  }
+
+  private async request<T> (method: Method, path: string, showLoader: boolean = false, httpOptions: HttpOptions = { }, body: any = { }): Promise<T> {
+    const url = `${this.rootUrl}/${path}`
 
     if (showLoader && !this.loader) {
       this.loader = await this.loadingCtrl.create()

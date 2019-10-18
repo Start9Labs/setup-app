@@ -11,6 +11,7 @@ import { SessionStore } from './components/session'
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
+
   public appPages = [
     {
       title: 'Home',
@@ -25,31 +26,22 @@ export class AppComponent {
     {
       title: 'Setup',
       url: '/setup',
-      icon: 'setup',
+      icon: 'construct',
     },
   ]
 
   constructor (
-    public platform: Platform,
-    public splashScreen: SplashScreen,
-    public statusBar: StatusBar,
-    public storage: Storage,
-    public session: SessionStore,
+    private readonly platform: Platform,
+    private readonly splashScreen: SplashScreen,
+    private readonly statusBar: StatusBar,
   ) {
     this.initializeApp()
   }
 
   initializeApp () {
     this.platform.ready().then(async () => {
-      // load session data into memory
-      await this.extractFromStorage()
-
       this.statusBar.styleDefault()
       this.splashScreen.hide()
     })
-  }
-
-  async extractFromStorage () {
-    const session = await this.storage.get('session')
   }
 }
