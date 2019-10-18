@@ -2,8 +2,6 @@ import { Component } from '@angular/core'
 import { Platform } from '@ionic/angular'
 import { SplashScreen } from '@ionic-native/splash-screen/ngx'
 import { StatusBar } from '@ionic-native/status-bar/ngx'
-import { Storage } from '@ionic/storage'
-import { SessionStore } from './components/session'
 
 @Component({
   selector: 'app-root',
@@ -31,17 +29,17 @@ export class AppComponent {
   ]
 
   constructor (
-    private readonly platform: Platform,
-    private readonly splashScreen: SplashScreen,
-    private readonly statusBar: StatusBar,
+    platform: Platform,
+    splashScreen: SplashScreen,
+    statusBar: StatusBar,
   ) {
-    this.initializeApp()
-  }
-
-  initializeApp () {
-    this.platform.ready().then(async () => {
-      this.statusBar.styleDefault()
-      this.splashScreen.hide()
+    platform.ready().then(async () => {
+      if (platform.is('ios')) {
+        statusBar.styleDefault()
+      } else {
+        statusBar.styleLightContent()
+      }
+      splashScreen.hide()
     })
   }
 }

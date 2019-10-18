@@ -6,11 +6,11 @@ import { SessionStore } from '../components/session'
 import { Platform, LoadingController } from '@ionic/angular'
 import { APP_VERSION } from 'src/app/app.module'
 import { Observable } from 'rxjs'
-import 'rxjs/add/operator/toPromise'
 
 @Injectable()
 export class HttpService {
   loader: HTMLIonLoadingElement // do we want to block the screen
+  rootUrl = 'http://192.168.12.1/v0'
 
   constructor (
     public platform: Platform,
@@ -18,7 +18,6 @@ export class HttpService {
     public storage: Storage,
     public loadingCtrl: LoadingController,
     public session: SessionStore,
-    private rootUrl: string = 'http://192.168.12.1/v0',
   ) { }
 
   withRootUrl (rootUrl : string): HttpService {

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms'
 import { IonicModule } from '@ionic/angular'
 import { RouterModule, Routes } from '@angular/router'
 import { HomePage } from './home.page'
+import { HttpService } from 'src/app/services/node-service'
 
 const routes: Routes = [
   {
@@ -20,5 +21,6 @@ const routes: Routes = [
     RouterModule.forChild(routes),
   ],
   declarations: [HomePage],
+  providers: [HttpService],
 })
 export class HomePageModule { }
