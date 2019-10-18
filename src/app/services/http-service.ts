@@ -25,23 +25,29 @@ export class HttpService {
   }
 
   async submitWifiCredentials (ssid: string, password: string): Promise<void> {
-    return await this.request(Method.post, 'wifi', true, undefined, {
+    return await this.request(Method.post, 'wifi', 'Connecting to WIFI...', undefined, {
       ssid,
       password,
     })
   }
 
   async getTorAddress (): Promise<{ torAddress: string}> {
-    return this.request(Method.get, 'tor', false)
+    return this.request(Method.get, 'tor', 'Fetching Tor address...')
   }
 
-  private async request<T> (method: Method, path: string, showLoader: boolean = false, httpOptions: HttpOptions = { }, body: any = { }): Promise<T> {
+  private async request<T> (method: Method, path: string, loaderMessage?: string, httpOptions: HttpOptions = { }, body: any = { }): Promise<T> {
     const url = `${this.rootUrl}/${path}`
 
-    if (showLoader && !this.loader) {
-      this.loader = await this.loadingCtrl.create()
-      this.loader.onWillDismiss().then(() => { this.loader = undefined })
-      await this.loader.present()
+    if (loaderMessage !== undefined) {
+      if (!this.loader) {
+        this.loader = await this.loadingCtrl.create({
+          message: loaderMessage,
+        })
+        this.loader.onWillDismiss().then(() => { this.loader = undefined })
+        await this.loader.present()
+      } else {
+        this.loader.message = loaderMessage
+      }
     }
 
     this.setDefaultOptions(httpOptions) // mutates httpOptions
@@ -73,7 +79,7 @@ export class HttpService {
       console.error(message)
       throw new Error(message)
     } finally {
-      if (showLoader && this.loader) {
+      if (loaderMessage && this.loader) {
         this.loader.dismiss()
       }
     }

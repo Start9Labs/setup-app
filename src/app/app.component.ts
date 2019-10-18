@@ -34,12 +34,16 @@ export class AppComponent {
     statusBar: StatusBar,
   ) {
     platform.ready().then(async () => {
-      if (platform.is('ios')) {
-        statusBar.styleDefault()
-      } else {
-        statusBar.styleLightContent()
+      // do Cordova things if Cordova
+      if (platform.is('cordova')) {
+        // style status bar for iOS and Android
+        if (platform.is('ios')) {
+          statusBar.styleDefault()
+        } else {
+          statusBar.styleLightContent()
+        }
+        splashScreen.hide()
       }
-      splashScreen.hide()
     })
   }
 }

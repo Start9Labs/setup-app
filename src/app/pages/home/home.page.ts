@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { Events, Platform } from '@ionic/angular'
 import { Storage } from '@ionic/storage'
-import { HttpService } from 'src/app/services/node-service'
+import { HttpService } from 'src/app/services/http-service'
 
 declare var WifiWizard2: any
 
@@ -12,17 +12,17 @@ declare var WifiWizard2: any
 })
 export class HomePage implements OnInit {
   private readonly start9WifiPrefix: string = 'start9-'
-  public torAddress: string | undefined
   public error: string | undefined
-  public wifiSSIDInput: string | undefined
-  public wifiSSID: string | undefined
-  public wifiSSIDPassword: string | undefined
   public loading: boolean = true
+  public torAddress: string | undefined
+  public wifiSSID: string | undefined
+  public SSIDInput: string | undefined
+  public passwordInput: string | undefined
 
   constructor (
     private readonly storage: Storage,
     private readonly platform: Platform,
-    private readonly service: HttpService,
+    private readonly httpService: HttpService,
   ) { }
 
   async ngOnInit () {
@@ -35,16 +35,16 @@ export class HomePage implements OnInit {
     })
   }
 
-  async submitWifiCredentials (ssid: string, password: string) {
+  async submitWifiCredentials () {
     try {
-      await this.service.submitWifiCredentials(ssid, password)
+      await this.httpService.submitWifiCredentials(this.SSIDInput, this.passwordInput)
     } catch (e) {
       this.error = e.message
       return
     }
 
     try {
-      const { torAddress } = await this.service.getTorAddress()
+      const { torAddress } = await this.httpService.getTorAddress()
       this.torAddress = torAddress
     } catch (e) {
       this.error = e.message
@@ -53,9 +53,9 @@ export class HomePage implements OnInit {
 
   async searchWifi () {
     this.loading = true
-    this.wifiSSID = this.platform.is('cordova') ? await WifiWizard2.getConnectedSSID() : 'start9-1234'
+    this.wifiSSID = this.platform.is('cordova') ? await WifiWizard2.getConnectedSSID() : 'start9-BrowserDetected'
     if (this.wifiSSID.startsWith(this.start9WifiPrefix)) {
-      this.wifiSSIDInput = this.wifiSSIDInput || await this.storage.get('lastWifiSSID')
+      this.SSIDInput = this.SSIDInput || await this.storage.get('lastWifiSSID')
     } else {
       await this.storage.set('lastWifiSSID', this.wifiSSID)
     }
