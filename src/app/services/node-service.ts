@@ -18,7 +18,7 @@ export class HttpService {
     public storage: Storage,
     public loadingCtrl: LoadingController,
     public session: SessionStore,
-    private rootUrl: string = 'http://192.168.0.1/v0',
+    private rootUrl: string = 'http://192.168.12.1/v0',
   ) { }
 
   withRootUrl (rootUrl : string): HttpService {
