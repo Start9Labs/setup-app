@@ -7,6 +7,8 @@ import { Platform, LoadingController } from '@ionic/angular'
 import { APP_VERSION } from 'src/app/app.module'
 import { Observable } from 'rxjs'
 
+declare var WifiWizard2: any
+
 @Injectable()
 export class HttpService {
   loader: HTMLIonLoadingElement // do we want to block the screen

@@ -11,38 +11,51 @@
 
 <ion-content class="ion-padding">
 
-  <ion-spinner *ngIf="loading" name="dots" color="secondary" class="center">searching wifi...</ion-spinner>
+  <div *ngIf="loading" class="loading">
+    <ion-spinner name="dots" color="secondary"></ion-spinner>
+    <ion-text color="secondary">
+      <p>searching wifi</p>
+    </ion-text>
+  </div>
   
   <div *ngIf="!loading">
 
-    <ion-card *ngIf="torAddress"> 
+    <p *ngIf="torAddress"> 
       {{torAddress}}
-    </ion-card>
+    </p>
 
     <div *ngIf="!torAddress">
 
-      <p *ngIf="!wifiSSID.startsWith(start9WifiPrefix)"> 
-        Go to phone settings and connect to the wifi network beginning with "{{start9WifiPrefix}}".
-      </p>
-
-      <ion-item-group *ngIf="wifiSSID.startsWith(start9WifiPrefix)">
-        <ion-item>
-          <ion-label position="floating" color="medium">Wifi Network Name</ion-label>          
-          <ion-input type="text" [(ngModel)]="SSIDInput"></ion-input>
-        </ion-item>
+      <ion-item-group *ngIf="!connectedSSID.startsWith(start9WifiPrefix)">
         <ion-item style="margin-bottom: 40px;">
-          <ion-label position="floating" color="medium">Wifi Password</ion-label>          
-          <ion-input type="password" [(ngModel)]="passwordInput"></ion-input>
+          <ion-label position="floating" color="medium">Start 9 Password</ion-label>          
+          <ion-input type="password" [(ngModel)]="start9PasswordInput"></ion-input>
         </ion-item>
-        <ion-button [disabled]="!SSIDInput" expand="block" fill="outline" (click)="submitWifiCredentials()">
+        <ion-button [disabled]="start9PasswordInput.length < 6" expand="block" fill="outline" (click)="submitStart9Password()">
           Submit
         </ion-button>
       </ion-item-group>
+
+      <ion-item-group *ngIf="connectedSSID.startsWith(start9WifiPrefix)">
+        <ion-item>
+          <ion-label position="floating" color="medium">Wifi Network Name</ion-label>          
+          <ion-input type="text" [(ngModel)]="wifiNameInput"></ion-input>
+        </ion-item>
+        <ion-item style="margin-bottom: 40px;">
+          <ion-label position="floating" color="medium">Wifi Password</ion-label>          
+          <ion-input type="password" [(ngModel)]="wifiPasswordInput"></ion-input>
+        </ion-item>
+        <ion-button [disabled]="!wifiNameInput" expand="block" fill="outline" (click)="submitWifiCredentials()">
+          Submit
+        </ion-button>
+      </ion-item-group>
+
       <ion-item class="ion-text-wrap" *ngIf="error">
         <span class="ion-text" color="danger">{{error}}</span>
       </ion-item>
 
     </div>
+
   </div>
   
 </ion-content>
