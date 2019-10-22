@@ -9,7 +9,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content padding>
+<ion-content class="ion-padding">
 
   <ion-spinner *ngIf="loading" name="dots" color="secondary" class="center">searching wifi...</ion-spinner>
   
@@ -34,7 +34,7 @@
           <ion-label position="floating" color="medium">Wifi Password</ion-label>          
           <ion-input type="password" [(ngModel)]="passwordInput"></ion-input>
         </ion-item>
-        <ion-button expand="block" fill="outline" (click)="submitWifiCredentials()">
+        <ion-button [disabled]="!SSIDInput" expand="block" fill="outline" (click)="submitWifiCredentials()">
           Submit
         </ion-button>
       </ion-item-group>

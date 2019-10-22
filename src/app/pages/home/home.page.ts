@@ -6,7 +6,7 @@ import { HttpService } from 'src/app/services/http-service'
 declare var WifiWizard2: any
 
 @Component({
-  selector: 'app-home',
+  selector: 'page-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })

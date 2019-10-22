@@ -25,7 +25,7 @@ export class HttpService {
   }
 
   async submitWifiCredentials (ssid: string, password: string): Promise<void> {
-    return await this.request(Method.post, 'wifi', 'Connecting to WIFI...', undefined, {
+    return this.request(Method.post, 'wifi', `Connecting to ${ssid}...`, undefined, {
       ssid,
       password,
     })
