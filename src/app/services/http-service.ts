@@ -7,11 +7,9 @@ import { Platform, LoadingController } from '@ionic/angular'
 import { APP_VERSION } from 'src/app/app.module'
 import { Observable } from 'rxjs'
 
-declare var WifiWizard2: any
-
 @Injectable()
 export class HttpService {
-  loader: HTMLIonLoadingElement // do we want to block the screen
+  loader: HTMLIonLoadingElement
   rootUrl = 'http://192.168.12.1/v0'
 
   constructor (
@@ -33,7 +31,7 @@ export class HttpService {
     })
   }
 
-  async getTorAddress (): Promise<{ torAddress: string}> {
+  async getTorAddress (): Promise<string> {
     return this.request(Method.get, 'tor', 'Fetching Tor address...')
   }
 

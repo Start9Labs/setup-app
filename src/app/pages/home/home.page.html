@@ -50,9 +50,9 @@
         </ion-button>
       </ion-item-group>
 
-      <ion-item class="ion-text-wrap" *ngIf="error">
-        <span class="ion-text" color="danger">{{error}}</span>
-      </ion-item>
+      <div style="margin-top: 20px;">
+        <ion-text *ngIf="error" class="ion-text-wrap" color="danger">{{error}}</ion-text>
+      </div>
 
     </div>
 
