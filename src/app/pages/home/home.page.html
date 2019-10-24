@@ -26,7 +26,7 @@
 
     <div *ngIf="!torAddress">
 
-      <ion-item-group *ngIf="!connectedSSID.startsWith(start9WifiPrefix)">
+      <ion-item-group *ngIf="!connectedSSID || !connectedSSID.startsWith(start9WifiPrefix)">
         <ion-item style="margin-bottom: 40px;">
           <ion-label position="floating" color="medium">Start 9 Password</ion-label>          
           <ion-input type="password" [(ngModel)]="start9PasswordInput"></ion-input>
@@ -36,7 +36,7 @@
         </ion-button>
       </ion-item-group>
 
-      <ion-item-group *ngIf="connectedSSID.startsWith(start9WifiPrefix)">
+      <ion-item-group *ngIf="connectedSSID && connectedSSID.startsWith(start9WifiPrefix)">
         <ion-item>
           <ion-label position="floating" color="medium">Wifi Network Name</ion-label>          
           <ion-input type="text" [(ngModel)]="wifiNameInput"></ion-input>

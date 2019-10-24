@@ -67,10 +67,12 @@ export class HomePage implements OnInit {
   async searchWifi () {
     this.loading = true
     this.connectedSSID = this.platform.is('cordova') ? await WifiWizard2.getConnectedSSID() : 'browser_detected'
-    if (this.connectedSSID.startsWith(this.start9WifiPrefix)) {
-      this.wifiNameInput = this.wifiNameInput || await this.storage.get('lastConnectedSSID')
-    } else {
-      await this.storage.set('lastConnectedSSID', this.connectedSSID)
+    if (this.connectedSSID) {
+      if (this.connectedSSID.startsWith(this.start9WifiPrefix)) {
+        this.wifiNameInput = this.wifiNameInput || await this.storage.get('lastConnectedSSID')
+      } else {
+        await this.storage.set('lastConnectedSSID', this.connectedSSID)
+      }
     }
     this.loading = false
   }
@@ -95,7 +97,7 @@ export class HomePage implements OnInit {
         this.wifiNameInput = await this.storage.get('lastConnectedSSID')
       }
     } catch (e) {
-      this.error = e.message
+      this.error = e
     }
 
     await loader.dismiss()
