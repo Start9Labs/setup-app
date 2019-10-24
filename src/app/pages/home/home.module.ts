@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms'
 import { IonicModule } from '@ionic/angular'
 import { RouterModule, Routes } from '@angular/router'
 import { HomePage } from './home.page'
-import { HttpService } from 'src/app/services/http-service'
+import { HttpService } from 'src/app/services/tor-service'
 
 const routes: Routes = [
   {

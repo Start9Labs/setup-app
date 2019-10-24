@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core'
 import { Platform, LoadingController } from '@ionic/angular'
 import { Storage } from '@ionic/storage'
-import { HttpService } from 'src/app/services/http-service'
+import { APService } from 'src/app/services/ap-service'
+import { TorService } from 'src/app/services/tor-service'
 import * as CryptoJS from 'crypto-js'
 
 declare var WifiWizard2: any
@@ -15,7 +16,7 @@ export class HomePage implements OnInit {
   private readonly start9WifiPrefix: string = 'start9'
   public loading = true
   public error = ''
-  public torAddress: string | undefined
+  public handshake: boolean
   public connectedSSID: string | undefined
   public start9AccessPoint = ''
   public start9PasswordInput = ''
@@ -23,44 +24,31 @@ export class HomePage implements OnInit {
   public wifiPasswordInput = ''
 
   constructor (
-    private storage: Storage,
-    private platform: Platform,
-    private httpService: HttpService,
-    private loadingCtrl: LoadingController,
+    public storage: Storage,
+    public platform: Platform,
+    public APService: APService,
+    public torService: TorService,
+    public loadingCtrl: LoadingController,
   ) { }
 
   async ngOnInit () {
-    this.torAddress = await this.storage.get('torAddress')
+    await this.startup()
 
-    if (!this.torAddress) {
+    this.platform.resume.subscribe(async () => {
+      await this.startup()
+    })
+  }
+
+  async startup () {
+    const [torAddress, handshake] = await Promise.all([
+      this.storage.get('torAddress'),
+      this.storage.get('handshake'),
+    ])
+    this.torService.torAddress = torAddress
+    this.handshake = handshake
+
+    if (!this.torService.torAddress || !this.handshake) {
       await this.searchWifi()
-      this.platform.resume.subscribe( async () => {
-        await this.searchWifi()
-      })
-    }
-  }
-
-  async submitStart9Password () {
-    const first4 = CryptoJS.SHA256(this.start9PasswordInput).toString().substr(0, 4)
-    this.start9AccessPoint = `${this.start9WifiPrefix}-${first4}`
-    await this.connectToWifi(this.start9AccessPoint, this.start9PasswordInput)
-  }
-
-  async submitWifiCredentials () {
-    try {
-      await this.connectToWifi(this.wifiNameInput, this.wifiPasswordInput)
-      await this.connectToWifi(this.start9AccessPoint, this.start9PasswordInput)
-      await this.httpService.submitWifiCredentials(this.wifiNameInput, this.wifiPasswordInput)
-    } catch (e) {
-      this.error = e.message
-      return
-    }
-
-    try {
-      const torAddress = await this.httpService.getTorAddress()
-      this.torAddress = torAddress
-    } catch (e) {
-      this.error = e.message
     }
   }
 
@@ -77,30 +65,110 @@ export class HomePage implements OnInit {
     this.loading = false
   }
 
-  private async connectToWifi (SSID: string, password: string) {
+  async submitStart9Password () {
+    const first4 = CryptoJS.SHA256(this.start9PasswordInput).toString().substr(0, 4)
+
     const loader = await this.loadingCtrl.create({
-      message: `Connecting to ${SSID}...`,
+      message: `Connecting to server...`,
     })
     await loader.present()
 
     try {
-      if (this.platform.is('cordova')) {
-        if (this.platform.is('ios')) {
-          await WifiWizard2.iOSConnectNetwork(SSID, password)
-        } else {
-          await WifiWizard2.connect(SSID, true, password, 'WPA', true)
-        }
-        this.connectedSSID = await WifiWizard2.getConnectedSSID()
-        this.wifiNameInput = await this.storage.get('lastConnectedSSID')
-      } else {
-        this.connectedSSID = SSID
-        this.wifiNameInput = await this.storage.get('lastConnectedSSID')
-      }
+      // connect to server
+      await this.connectToWifi(`${this.start9WifiPrefix}-${first4}`, this.start9PasswordInput)
+        .catch((e) => {
+          throw new Error(`Error connecting to server: ${e} Please make sure your server is plaugged in and in setup mode.`)
+        })
+      // register pubkey
+      loader.message = 'Registering pubkey with server...'
+      await this.APService.registerPubkey('fakePubKey')
+        .catch((e) => {
+          throw new Error(`Error registering pubkey: ${e}`)
+        })
+      // fetch server Tor address
+      loader.message = 'Getting Tor address from server...'
+      await this.APService.getTorAddress()
+        .catch((e) => {
+          throw new Error(`Error getting Tor address: ${e}`)
+        })
     } catch (e) {
-      this.error = e
+      this.error = e.message
+    } finally {
+      await loader.dismiss()
     }
+  }
 
-    await loader.dismiss()
+  async submitWifiCredentials () {
+    const loader = await this.loadingCtrl.create({
+      message: `Testing wifi credentials...`,
+    })
+    await loader.present()
+
+    try {
+      // connect to wifi
+      await this.connectToWifi(this.wifiNameInput, this.wifiPasswordInput)
+        .catch((e) => {
+          throw new Error(`Error testing credentials: ${e}`)
+        })
+      // reconnect to server
+      loader.message = 'Reconnecting to server...'
+      await this.connectToWifi(this.start9AccessPoint, this.start9PasswordInput)
+        .catch((e) => {
+          throw new Error(`Error reconnecting to server: ${e}`)
+        })
+      // send wifi creds to server
+      loader.message = 'Sending wifi credentials to server...'
+      await this.APService.submitWifiCredentials(this.wifiNameInput, this.wifiPasswordInput)
+        .catch((e) => {
+          throw new Error(`Error sending wifi credentials to server: ${e}`)
+        })
+      // enable wifi on server
+      loader.message = 'Enabling wifi on server...'
+      await this.APService.enableWifi(this.wifiNameInput)
+        .catch((e) => {
+          throw new Error(`Error enabling wifi on server: ${e}`)
+        })
+      // reconnect to wifi
+      loader.message = 'Connecting to wifi'
+      await this.connectToWifi(this.wifiNameInput, this.wifiPasswordInput)
+        .catch((e) => {
+          throw new Error(`Error connecting to wifi: ${e}`)
+        })
+      // handshake with server over Tor
+      loader.message = 'Testing Tor connection'
+      let attempts = 1
+      let keepGoing = true
+      while (keepGoing) {
+        await this.torService.handshake()
+          .then(() => keepGoing = false)
+          .catch((e) => {
+            if (attempts === 3) {
+              throw new Error(`Error testing Tor connection: ${e}`)
+            }
+          })
+      }
+      // set handshake = true in storage
+      await this.storage.set('handshake', true)
+    } catch (e) {
+      this.error = e.message
+    } finally {
+      await loader.dismiss()
+    }
+  }
+
+  async connectToWifi (SSID: string, password: string) {
+    if (this.platform.is('cordova')) {
+      if (this.platform.is('ios')) {
+        await WifiWizard2.iOSConnectNetwork(SSID, password)
+      } else {
+        await WifiWizard2.connect(SSID, true, password, 'WPA', true)
+      }
+      this.connectedSSID = await WifiWizard2.getConnectedSSID()
+      this.wifiNameInput = await this.storage.get('lastConnectedSSID')
+    } else {
+      this.connectedSSID = SSID
+      this.wifiNameInput = await this.storage.get('lastConnectedSSID')
+    }
   }
 }
 
