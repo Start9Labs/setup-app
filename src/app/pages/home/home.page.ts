@@ -41,7 +41,7 @@ export class HomePage implements OnInit {
   }
 
   async submitStart9Password () {
-    const first4 = CryptoJS.SHA256(this.start9PasswordInput).toString().substr(0, 8)
+    const first4 = CryptoJS.SHA256(this.start9PasswordInput).toString().substr(0, 4)
     this.start9AccessPoint = `${this.start9WifiPrefix}-${first4}`
     await this.connectToWifi(this.start9AccessPoint, this.start9PasswordInput)
   }
