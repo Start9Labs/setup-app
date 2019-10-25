@@ -151,7 +151,7 @@ export class HomePage implements OnInit {
         })
       // discover server on LAN
       loader.message = 'Discovering server on LAN...'
-      await this.LANService.discover()
+      await this.LANService.discover(this.hostname)
       // handshake with server on LAN
       loader.message = 'Testing server connectivity...'
       let attempts = 1
