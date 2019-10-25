@@ -27,8 +27,7 @@
     "@ionic/angular": "^4.7.1",
     "@ionic/storage": "^2.2.0",
     "@types/crypto-js": "^3.1.43",
-    "cordova-android": "8.1.0",
-    "cordova-ios": "5.0.1",
+    "cordova-android": "^8.1.0",
     "cordova-plugin-add-swift-support": "^2.0.1",
     "cordova-plugin-wifiwizard2": "git+https://github.com/tripflex/wifiwizard2.git",
     "cordova-plugin-zeroconf": "^1.4.0",
@@ -87,7 +86,6 @@
       "cordova-plugin-zeroconf": {}
     },
     "platforms": [
-      "ios",
       "android"
     ]
   }

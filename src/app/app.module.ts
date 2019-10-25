@@ -8,12 +8,12 @@ import { HttpClientModule } from '@angular/common/http'
 import { AppComponent } from './app.component'
 import { AppRoutingModule } from './app-routing.module'
 // directives
+import { HttpService } from './services/http-service'
 import { SessionStore } from './components/session'
 // native
 import { SplashScreen } from '@ionic-native/splash-screen/ngx'
 import { StatusBar } from '@ionic-native/status-bar/ngx'
-
-export const APP_VERSION = '1.0.0'
+import { Zeroconf } from '@ionic-native/zeroconf/ngx'
 
 @NgModule({
   declarations: [AppComponent],
@@ -26,9 +26,11 @@ export const APP_VERSION = '1.0.0'
     AppRoutingModule,
   ],
   providers: [
+    HttpService,
     SessionStore,
     StatusBar,
     SplashScreen,
+    Zeroconf,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
   ],
   bootstrap: [AppComponent],

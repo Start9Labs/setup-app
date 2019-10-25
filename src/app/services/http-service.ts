@@ -1,20 +1,15 @@
 import { Injectable } from '@angular/core'
 import { HttpClient, HttpEventType, HttpErrorResponse, HttpHeaders, HttpEvent } from '@angular/common/http'
-import { Storage } from '@ionic/storage'
 import { Method } from '../../types/enums'
-import { SessionStore } from '../components/session'
-import { Platform } from '@ionic/angular'
-import { APP_VERSION } from 'src/app/app.module'
 import { Observable } from 'rxjs'
+
+const APP_VERSION = '1.0.0'
 
 @Injectable()
 export class HttpService {
 
   constructor (
-    public platform: Platform,
     public http: HttpClient,
-    public storage: Storage,
-    public session: SessionStore,
   ) { }
 
   async request<T> (method: Method, url: string, httpOptions: HttpOptions = { }, body: any = { }): Promise<T> {
