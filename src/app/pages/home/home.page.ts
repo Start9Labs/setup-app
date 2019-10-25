@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { Platform, LoadingController } from '@ionic/angular'
 import { Storage } from '@ionic/storage'
 import { APService } from 'src/app/services/ap-service'
-import { TorService } from 'src/app/services/tor-service'
+import { LANService } from 'src/app/services/lan-service'
 import * as CryptoJS from 'crypto-js'
 
 declare var WifiWizard2: any
@@ -17,6 +17,7 @@ export class HomePage implements OnInit {
   public loading = true
   public error = ''
   public handshake: boolean
+  public torAddress: string | undefined
   public connectedSSID: string | undefined
   public start9AccessPoint = ''
   public start9PasswordInput = ''
@@ -27,7 +28,7 @@ export class HomePage implements OnInit {
     public storage: Storage,
     public platform: Platform,
     public APService: APService,
-    public torService: TorService,
+    public LANService: LANService,
     public loadingCtrl: LoadingController,
   ) { }
 
@@ -40,14 +41,16 @@ export class HomePage implements OnInit {
   }
 
   async startup () {
-    const [torAddress, handshake] = await Promise.all([
+    const [macAddress, torAddress, handshake] = await Promise.all([
+      this.storage.get('macAddress'),
       this.storage.get('torAddress'),
       this.storage.get('handshake'),
     ])
-    this.torService.torAddress = torAddress
+    this.LANService.macAddress = macAddress
+    this.torAddress = torAddress
     this.handshake = handshake
 
-    if (!this.torService.torAddress || !this.handshake) {
+    if (!this.LANService.macAddress || !this.torAddress || !this.handshake) {
       await this.searchWifi()
     }
   }
@@ -129,17 +132,20 @@ export class HomePage implements OnInit {
           throw new Error(`Error enabling wifi on server: ${e}`)
         })
       // reconnect to wifi
-      loader.message = 'Connecting to wifi'
+      loader.message = 'Reconnecting to wifi...'
       await this.connectToWifi(this.wifiNameInput, this.wifiPasswordInput)
         .catch((e) => {
           throw new Error(`Error connecting to wifi: ${e}`)
         })
-      // handshake with server over Tor
-      loader.message = 'Testing Tor connection'
+      // discover server on LAN
+      loader.message = 'Discovering server on LAN...'
+      await this.LANService.discover()
+      // handshake with server on LAN
+      loader.message = 'Testing server connectivity...'
       let attempts = 1
       let keepGoing = true
       while (keepGoing) {
-        await this.torService.handshake()
+        await this.LANService.handshake()
           .then(() => keepGoing = false)
           .catch((e) => {
             if (attempts === 3) {
