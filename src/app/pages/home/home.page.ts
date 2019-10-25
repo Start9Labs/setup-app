@@ -16,8 +16,9 @@ export class HomePage implements OnInit {
   private readonly start9WifiPrefix: string = 'start9'
   public loading = true
   public error = ''
-  public handshake: boolean
+  public hostname: string | undefined
   public torAddress: string | undefined
+  public handshake: boolean
   public connectedSSID: string | undefined
   public start9AccessPoint = ''
   public start9PasswordInput = ''
@@ -41,16 +42,16 @@ export class HomePage implements OnInit {
   }
 
   async startup () {
-    const [macAddress, torAddress, handshake] = await Promise.all([
-      this.storage.get('macAddress'),
+    const [hostname, torAddress, handshake] = await Promise.all([
+      this.storage.get('hostname'),
       this.storage.get('torAddress'),
       this.storage.get('handshake'),
     ])
-    this.LANService.macAddress = macAddress
+    this.hostname = hostname
     this.torAddress = torAddress
     this.handshake = handshake
 
-    if (!this.LANService.macAddress || !this.torAddress || !this.handshake) {
+    if (!this.hostname || !this.torAddress || !this.handshake) {
       await this.searchWifi()
     }
   }
@@ -88,12 +89,23 @@ export class HomePage implements OnInit {
         .catch((e) => {
           throw new Error(`Error registering pubkey: ${e}`)
         })
+      // fetch server Hostname address
+      loader.message = 'Getting Hostname from server...'
+      this.hostname = await this.APService.getHostname()
+        .catch((e) => {
+          throw new Error(`Error getting Hostname: ${e}`)
+        })
       // fetch server Tor address
       loader.message = 'Getting Tor address from server...'
-      await this.APService.getTorAddress()
+      this.torAddress = await this.APService.getTorAddress()
         .catch((e) => {
           throw new Error(`Error getting Tor address: ${e}`)
         })
+      // save Mac address and Tor address to storage
+      await Promise.all([
+        this.storage.set('hostname', this.hostname),
+        this.storage.set('torAddress', this.torAddress),
+      ])
     } catch (e) {
       this.error = e.message
     } finally {

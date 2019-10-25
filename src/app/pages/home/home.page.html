@@ -20,11 +20,11 @@
   
   <div *ngIf="!loading">
 
-    <p *ngIf="LANService.macAddress && torAddress && handshake"> 
-      Tor Address: {{torAddress}}
+    <p *ngIf="hostname && torAddress && handshake"> 
+      Tor Address: {{ torAddress }}
     </p>
 
-    <div *ngIf="!LANService.macAddress || !torAddress || !handshake">
+    <div *ngIf="!hostname || !torAddress || !handshake">
       <ion-item-group *ngIf="!connectedSSID || !connectedSSID.startsWith(start9WifiPrefix)">
         <ion-item style="margin-bottom: 40px;">
           <ion-label position="floating" color="medium">Start 9 Password</ion-label>          
