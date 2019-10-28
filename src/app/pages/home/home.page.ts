@@ -3,9 +3,8 @@ import { Platform, LoadingController } from '@ionic/angular'
 import { Storage } from '@ionic/storage'
 import { APService } from 'src/app/services/ap-service'
 import { LANService } from 'src/app/services/lan-service'
+import { WifiWizard } from 'src/app/services/wifi-wizard'
 import * as CryptoJS from 'crypto-js'
-
-declare var WifiWizard2: any
 
 @Component({
   selector: 'page-home',
@@ -30,6 +29,7 @@ export class HomePage implements OnInit {
     public platform: Platform,
     public APService: APService,
     public LANService: LANService,
+    public wifiWizard: WifiWizard,
     public loadingCtrl: LoadingController,
   ) { }
 
@@ -58,7 +58,8 @@ export class HomePage implements OnInit {
 
   async searchWifi () {
     this.loading = true
-    this.connectedSSID = this.platform.is('cordova') ? await WifiWizard2.getConnectedSSID() : 'browser_detected'
+    this.connectedSSID = await this.wifiWizard.getConnectedSSID()
+
     if (this.connectedSSID) {
       if (this.connectedSSID.startsWith(this.start9WifiPrefix)) {
         this.wifiNameInput = this.wifiNameInput || await this.storage.get('lastConnectedSSID')
@@ -79,9 +80,9 @@ export class HomePage implements OnInit {
 
     try {
       // connect to server
-      await this.connectToWifi(`${this.start9WifiPrefix}-${first4}`, this.start9PasswordInput)
+      await this.wifiWizard.connect(`${this.start9WifiPrefix}-${first4}`, this.start9PasswordInput)
         .catch((e) => {
-          throw new Error(`Error connecting to server: ${e} Please make sure your server is plaugged in and in setup mode.`)
+          throw new Error(`Error connecting to server: ${e.message} Please make sure your server is plaugged in and in setup mode.`)
         })
       // register pubkey
       loader.message = 'Registering pubkey with server...'
@@ -101,7 +102,7 @@ export class HomePage implements OnInit {
         .catch((e) => {
           throw new Error(`Error getting Tor address: ${e}`)
         })
-      // save Mac address and Tor address to storage
+      // save Hostname and Tor address
       await Promise.all([
         this.storage.set('hostname', this.hostname),
         this.storage.set('torAddress', this.torAddress),
@@ -121,13 +122,13 @@ export class HomePage implements OnInit {
 
     try {
       // connect to wifi
-      await this.connectToWifi(this.wifiNameInput, this.wifiPasswordInput)
+      await this.wifiWizard.connect(this.wifiNameInput, this.wifiPasswordInput)
         .catch((e) => {
           throw new Error(`Error testing credentials: ${e}`)
         })
       // reconnect to server
       loader.message = 'Reconnecting to server...'
-      await this.connectToWifi(this.start9AccessPoint, this.start9PasswordInput)
+      await this.wifiWizard.connect(this.start9AccessPoint, this.start9PasswordInput)
         .catch((e) => {
           throw new Error(`Error reconnecting to server: ${e}`)
         })
@@ -145,7 +146,7 @@ export class HomePage implements OnInit {
         })
       // reconnect to wifi
       loader.message = 'Reconnecting to wifi...'
-      await this.connectToWifi(this.wifiNameInput, this.wifiPasswordInput)
+      await this.wifiWizard.connect(this.wifiNameInput, this.wifiPasswordInput)
         .catch((e) => {
           throw new Error(`Error connecting to wifi: ${e}`)
         })
@@ -171,21 +172,6 @@ export class HomePage implements OnInit {
       this.error = e.message
     } finally {
       await loader.dismiss()
-    }
-  }
-
-  async connectToWifi (SSID: string, password: string) {
-    if (this.platform.is('cordova')) {
-      if (this.platform.is('ios')) {
-        await WifiWizard2.iOSConnectNetwork(SSID, password)
-      } else {
-        await WifiWizard2.connect(SSID, true, password, 'WPA', true)
-      }
-      this.connectedSSID = await WifiWizard2.getConnectedSSID()
-      this.wifiNameInput = await this.storage.get('lastConnectedSSID')
-    } else {
-      this.connectedSSID = SSID
-      this.wifiNameInput = await this.storage.get('lastConnectedSSID')
     }
   }
 }

@@ -6,6 +6,7 @@ import { RouterModule, Routes } from '@angular/router'
 import { HomePage } from './home.page'
 import { APService } from 'src/app/services/ap-service'
 import { LANService } from 'src/app/services/lan-service'
+import { WifiWizard } from 'src/app/services/wifi-wizard'
 
 const routes: Routes = [
   {
@@ -22,6 +23,6 @@ const routes: Routes = [
     RouterModule.forChild(routes),
   ],
   declarations: [HomePage],
-  providers: [APService, LANService],
+  providers: [APService, LANService, WifiWizard],
 })
 export class HomePageModule { }
