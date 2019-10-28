@@ -9,8 +9,8 @@ export class LANService {
   ipAddress = ''
 
   constructor (
-    private zeroconf: Zeroconf,
-    private httpService: HttpService,
+    public zeroconf: Zeroconf,
+    public httpService: HttpService,
   ) { }
 
   async discover (hostname: string): Promise<void> {

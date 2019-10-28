@@ -6,7 +6,7 @@ declare var WifiWizard2: any
 export class WifiWizard {
 
   constructor (
-    private platform: Platform,
+    public platform: Platform,
   ) { }
 
   async getConnectedSSID (): Promise<string | undefined> {

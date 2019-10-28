@@ -12,7 +12,7 @@ import * as CryptoJS from 'crypto-js'
   styleUrls: ['home.page.scss'],
 })
 export class HomePage implements OnInit {
-  private readonly start9WifiPrefix: string = 'start9'
+  public start9WifiPrefix: string = 'start9'
   public loading = true
   public error = ''
   public hostname: string | undefined
@@ -72,6 +72,7 @@ export class HomePage implements OnInit {
 
   async submitStart9Password () {
     const first4 = CryptoJS.SHA256(this.start9PasswordInput).toString().substr(0, 4)
+    this.hostname = `${this.start9WifiPrefix}-${first4}`
 
     const loader = await this.loadingCtrl.create({
       message: `Connecting to server...`,
@@ -80,21 +81,15 @@ export class HomePage implements OnInit {
 
     try {
       // connect to server
-      await this.wifiWizard.connect(`${this.start9WifiPrefix}-${first4}`, this.start9PasswordInput)
+      await this.wifiWizard.connect(this.hostname, this.start9PasswordInput)
         .catch((e) => {
-          throw new Error(`Error connecting to server: ${e.message} Please make sure your server is plaugged in and in setup mode.`)
+          throw new Error(`Error connecting to server: ${e} Please make sure your server is plaugged in and in setup mode.`)
         })
       // register pubkey
       loader.message = 'Registering pubkey with server...'
       await this.APService.registerPubkey('fakePubKey')
         .catch((e) => {
           throw new Error(`Error registering pubkey: ${e}`)
-        })
-      // fetch server Hostname address
-      loader.message = 'Getting Hostname from server...'
-      this.hostname = await this.APService.getHostname()
-        .catch((e) => {
-          throw new Error(`Error getting Hostname: ${e}`)
         })
       // fetch server Tor address
       loader.message = 'Getting Tor address from server...'
