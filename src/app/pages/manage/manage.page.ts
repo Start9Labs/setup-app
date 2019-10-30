@@ -20,8 +20,10 @@ export class ManagePage {
   ) { }
 
   ngOnInit() {
-    const zeroconfHostname = this.route.snapshot.paramMap.get('zeroconfHostname')
-    this.server = this.dataService.getServer(zeroconfHostname)
+    const ssid = this.route.snapshot.paramMap.get('ssid')
+    console.log('made it!')
+    console.log(ssid)
+    this.server = this.dataService.getServer(ssid)
   }
 
   async ionViewWillLeave() {
@@ -32,7 +34,7 @@ export class ManagePage {
 
   async forget() {
     this.edited = false
-    await this.dataService.forgetServer(this.server.zeroconfHostname)
+    await this.dataService.forgetServer(this.server.ssid)
     await this.navController.navigateRoot(['/dashboard'])
   }
 

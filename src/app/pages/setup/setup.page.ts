@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { Platform, NavController } from '@ionic/angular'
-import * as CryptoJS from 'crypto-js'
 import { DataService } from 'src/app/services/data-service'
-import { Start9Server } from 'src/types/misc'
+import { identifiersFromSecret } from 'src/types/misc'
 
 @Component({
   selector: 'page-setup',
@@ -21,14 +20,11 @@ export class SetupPage {
   ) { }
 
   async submit(): Promise<void> {
-    const first4 = CryptoJS.SHA256(this.serverPasscodeInput).toString().substr(0, 4)
-    const serverSSID = `start9-${first4}`
+    const identifiers = identifiersFromSecret(this.serverPasscodeInput)
 
     this.dataService.saveServer({
-      secret: this.serverPasscodeInput,
-      SSID: serverSSID,
-      zeroconfHostname: `${serverSSID}.local`,
-      friendlyName: this.friendlyName || serverSSID
+      ...identifiers,
+      friendlyName: this.friendlyName
     })
 
     this.navController.navigateRoot(['/dashboard'])

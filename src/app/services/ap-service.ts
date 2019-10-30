@@ -1,29 +1,25 @@
 import { Injectable } from '@angular/core'
 import { Method } from '../../types/enums'
 import { HttpService } from './http-service'
+import { Ap } from '../../types/api-types'
 
 @Injectable()
 export class APService {
   private readonly url = 'http://192.168.12.1/v0'
 
-  constructor (
+  constructor(
     public httpService: HttpService,
   ) { }
 
-  async getTorAddress (): Promise<string> {
+  async getTorAddress(): Promise<Ap.GetTorRes> {
     return this.httpService.request(Method.get, this.url + '/tor')
   }
 
-  async submitWifiCredentials (ssid: string, password: string): Promise<void> {
-    return this.httpService.request(Method.post, this.url + '/wifi', undefined, {
-      ssid,
-      password,
-    })
+  async submitWifiCredentials(body: Ap.PostSubmitWifiReq): Promise<Ap.PostSubmitWifiRes> {
+    return this.httpService.request(Method.post, this.url + '/wifi', undefined, body)
   }
 
-  async enableWifi (ssid: string): Promise<void> {
-    return this.httpService.request(Method.post, this.url + '/wifi/enable', undefined, {
-      ssid,
-    })
+  async enableWifi(body: Ap.PostEnableWifiReq): Promise<Ap.PostEnableWifiRes> {
+    return this.httpService.request(Method.post, this.url + '/wifi/enable', undefined, body)
   }
 }

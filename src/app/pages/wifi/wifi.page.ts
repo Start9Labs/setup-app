@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { Platform, NavController, LoadingController } from '@ionic/angular';
 import { DataService } from 'src/app/services/data-service';
 import { APService } from 'src/app/services/ap-service'
-import { LANService } from 'src/app/services/lan-service'
 import { WifiWizard } from 'src/app/services/wifi-wizard';
 import { ActivatedRoute } from '@angular/router';
 import { Start9Server } from 'src/types/misc';
@@ -38,8 +37,8 @@ export class WifiPage {
       await this.detectWifi()
     })
 
-    const zeroconfHostname = this.route.snapshot.paramMap.get('zeroconfHostname')
-    this.server = this.dataService.getServer(zeroconfHostname)
+    const ssid = this.route.snapshot.paramMap.get('ssid')
+    this.server = this.dataService.getServer(ssid)
   }
 
   async ngOnDestroy() {
@@ -58,25 +57,25 @@ export class WifiPage {
 
     try {
       // AP - connect to server
-      await this.wifiWizard.connect(this.server.SSID, this.server.secret)
+      await this.wifiWizard.connect(this.server.ssid, this.server.secret)
         .catch((e) => {
           throw new Error(`Error connecting to server: ${e} Please make sure your server is in setup mode.`)
         })
       // AP - get Tor address
       loader.message = 'Getting Tor address...'
-      const torAddress = await this.APService.getTorAddress()
+      const { torAddress } = await this.APService.getTorAddress()
         .catch((e) => {
           throw new Error(`Error getting Tor address: ${e}`)
         })
       // AP - send wifi creds to server
       loader.message = 'Sending wifi credentials to server...'
-      await this.APService.submitWifiCredentials(this.connectedSSID, this.wifiPasswordInput)
+      await this.APService.submitWifiCredentials({ ssid: this.connectedSSID, password: this.wifiPasswordInput })
         .catch((e) => {
           throw new Error(`Error sending wifi credentials to server: ${e}`)
         })
       // AP - enable wifi on server
       loader.message = 'Enabling wifi on server...'
-      await this.APService.enableWifi(this.connectedSSID)
+      await this.APService.enableWifi({ ssid: this.connectedSSID })
         .catch((e) => {
           throw new Error(`Error enabling wifi on server: ${e}`)
         })
