@@ -19,6 +19,10 @@ const routes: Routes = [
     path: 'manage/:zeroconfHostname',
     loadChildren: () => import('./pages/manage/manage.module').then(m => m.ManagePageModule),
   },
+  {
+    path: 'manage/:zeroconfHostname/wifi',
+    loadChildren: () => import('./pages/wifi/wifi.module').then(m => m.WifiPageModule),
+  },
 ]
 
 @NgModule({

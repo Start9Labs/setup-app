@@ -13,7 +13,7 @@ import { LANService } from './services/lan-service'
 })
 export class AppComponent {
 
-  constructor (
+  constructor(
     public platform: Platform,
     public splashScreen: SplashScreen,
     public statusBar: StatusBar,
@@ -29,7 +29,7 @@ export class AppComponent {
       if (!this.dataService.servers.length) {
         await this.dataService.saveServer({
           secret: '1234abcd',
-          SID: 'start9-abcd',
+          SSID: 'start9-abcd',
           friendlyName: 'My First Server',
           zeroconfHostname: 'start9-abcd.local',
           torAddress: 'hgfjandkhasjdbfkljamxjkasbnc.onion',

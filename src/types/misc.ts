@@ -1,9 +1,9 @@
 export interface Start9Server {
-  secret: string
-  SID: string
-  zeroconfHostname: string
+  secret: string // ap mode secret
+  SSID: string // ap mode ssid
+  zeroconfHostname: string //ssid.local
   friendlyName: string
-  torAddress: string
+  torAddress?: string
   ipAddress?: string
   connected?: boolean
 }
