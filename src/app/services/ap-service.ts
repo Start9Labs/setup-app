@@ -10,16 +10,6 @@ export class APService {
     public httpService: HttpService,
   ) { }
 
-  async registerPubkey (publicKey: string): Promise<void> {
-    return this.httpService.request(Method.post, this.url + '/device', undefined, {
-      publicKey,
-    })
-  }
-
-  async getHostname (): Promise<string> {
-    return this.httpService.request(Method.get, this.url + '/hostname')
-  }
-
   async getTorAddress (): Promise<string> {
     return this.httpService.request(Method.get, this.url + '/tor')
   }

@@ -1,34 +1,59 @@
 import { Injectable } from '@angular/core'
 import { Method } from '../../types/enums'
-import { HttpHeaders } from '@angular/common/http'
-import { Zeroconf } from '@ionic-native/zeroconf/ngx'
 import { HttpService } from './http-service'
+import { Start9Server } from 'src/types/misc'
+import { ZeroconfService, Zeroconf } from '@ionic-native/zeroconf/ngx'
+import { DataService } from './data-service'
 
 @Injectable()
 export class LANService {
-  ipAddress = ''
+  services: ZeroconfService[] = []
+  currentServer: Start9Server
 
   constructor (
-    public zeroconf: Zeroconf,
     public httpService: HttpService,
+    public zeroconf: Zeroconf,
+    public dataService: DataService,
   ) { }
 
-  async discover (hostname: string): Promise<void> {
-    this.zeroconf.watch('_http._tcp.', 'local.').subscribe(result => {
-      const service = result.service
-      if (result.action === 'added') {
-        console.log('service added', service)
-        if (service.hostname === hostname) {
-          this.ipAddress = service.ipv4Addresses[0]
-        }
+  watch () {
+    this.zeroconf.watch('_http._tcp.', 'local.').subscribe(async result => {
+      const { action, service } = result
+
+      const index = this.services.findIndex(s => s.hostname === service.hostname)
+      if (index === -1) {
+        this.services.push(service)
       } else {
-        console.log('service removed', service)
+        this.services[index] = service
+      }
+
+      console.log(this.services)
+
+      if (service.hostname.startsWith('start9-')) {
+        const server = this.dataService.getServer(service.hostname)
+        if (server) {
+          switch (action) {
+            case 'added':
+            case 'resolved':
+              server.ipAddress = service.ipv4Addresses[0]
+              await this.dataService.saveServer(server)
+              if (await this.handshake(server)) {
+                server.connected = true
+              }
+              break
+            case 'removed':
+              server.connected = false
+              break
+          }
+        }
       }
     })
   }
 
-  async handshake (): Promise<void> {
-    const headers: HttpHeaders = new HttpHeaders({ 'timeout': '3000' })
-    return this.httpService.request(Method.post, this.ipAddress + '/handshake', { headers })
+  private async handshake (server?: Start9Server): Promise<boolean> {
+    const ipAddress = server ? server.ipAddress : this.currentServer.ipAddress
+    return this.httpService.request(Method.post, ipAddress + '/handshake')
+      .then(() => true)
+      .catch(() => false)
   }
 }

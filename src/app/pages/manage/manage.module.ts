@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import { IonicModule } from '@ionic/angular'
 import { RouterModule, Routes } from '@angular/router'
-import { ListPage } from './list.page'
+import { ManagePage } from './manage.page'
 
 const routes: Routes = [
   {
     path: '',
-    component: ListPage,
+    component: ManagePage,
   },
 ]
 
@@ -19,6 +19,6 @@ const routes: Routes = [
     IonicModule,
     RouterModule.forChild(routes),
   ],
-  declarations: [ListPage],
+  declarations: [ManagePage],
 })
-export class ListPageModule { }
+export class ManagePageModule { }

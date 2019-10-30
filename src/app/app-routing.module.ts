@@ -4,20 +4,20 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router'
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'dashboard',
     pathMatch: 'full',
   },
   {
-    path: 'home',
-    loadChildren: () => import('./pages/home/home.module').then(m => m.HomePageModule),
-  },
-  {
-    path: 'list',
-    loadChildren: () => import('./pages/list/list.module').then(m => m.ListPageModule),
+    path: 'dashboard',
+    loadChildren: () => import('./pages/dashboard/dashboard.module').then(m => m.DashboardPageModule),
   },
   {
     path: 'setup',
     loadChildren: () => import('./pages/setup/setup.module').then(m => m.SetupPageModule),
+  },
+  {
+    path: 'manage/:zeroconfHostname',
+    loadChildren: () => import('./pages/manage/manage.module').then(m => m.ManagePageModule),
   },
 ]
 

@@ -1,0 +1,32 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      Server
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-item-group style="margin-bottom: 40px;">
+    <ion-item>
+      <ion-label position="stacked" color="medium">Friendly Name</ion-label>          
+      <ion-input [(ngModel)]="server.friendlyName" (ionChange)="edited = true"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked" color="medium">Zeroconf Hostname</ion-label>          
+      <ion-input disabled [ngModel]="server.zeroconfHostname"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked" color="medium">Tor Address</ion-label>          
+      <ion-input disabled [ngModel]="server.torAddress"></ion-input>
+    </ion-item>
+  </ion-item-group>
+  <ion-button expand="block" fill="outline" color="danger" (click)="forget()">
+    Forget
+  </ion-button>
+
+</ion-content>

@@ -1,0 +1,13 @@
+.top-center {
+  text-align: center;
+  margin-top: 25%;
+}
+
+.fab-button {
+  --background: transparent;
+  --border-width: 2px;
+  --border-style: solid;
+  --border-color: var(--ion-color-primary);
+  --color: var(--ion-color-primary);
+  margin: 20px;
+}

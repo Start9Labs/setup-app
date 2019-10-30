@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
+      <ion-back-button defaultHref="dashboard"></ion-back-button>
     </ion-buttons>
     <ion-title>
       Setup
@@ -9,10 +9,39 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-list>
-    <ion-item>
-      {{network}}
-    </ion-item>
-  </ion-list>
+<ion-content class="ion-padding">
+  
+  <div *ngIf="!loading">
+
+    <p *ngIf="!connectedSSID">Please connect to wifi.</p>
+
+    <div *ngIf="connectedSSID">
+      <ion-item-group style="margin-bottom: 40px;">
+        <ion-item>
+          <ion-label position="stacked" color="medium">Server Friendly Name (optional)</ion-label>          
+          <ion-input [(ngModel)]="friendlyName"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked" color="medium">Server Passcode</ion-label>          
+          <ion-input type="password" [(ngModel)]="serverPasscodeInput"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked" color="medium">Wifi Network</ion-label>          
+          <ion-input readonly [ngModel]="connectedSSID"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked" color="medium">Wifi Password</ion-label>          
+          <ion-input type="password" [(ngModel)]="wifiPasswordInput"></ion-input>
+        </ion-item>
+      </ion-item-group>
+      <ion-button [disabled]="serverPasscodeInput.length < 6" expand="block" fill="outline" (click)="connect()">
+        Connect
+      </ion-button>
+      <div style="margin-top: 20px;">
+        <ion-text *ngIf="error" class="ion-text-wrap" color="danger">{{error}}</ion-text>
+      </div>
+    </div>
+
+  </div>
+
 </ion-content>

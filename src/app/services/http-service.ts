@@ -40,7 +40,6 @@ export class HttpService {
     } catch (e) {
       const error: HttpErrorResponse = e
       const message = error.error
-      console.error(message)
       throw new Error(message)
     }
   }

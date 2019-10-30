@@ -7,13 +7,17 @@ import { IonicStorageModule } from '@ionic/storage'
 import { HttpClientModule } from '@angular/common/http'
 import { AppComponent } from './app.component'
 import { AppRoutingModule } from './app-routing.module'
-// directives
+// services
+import { APService } from './services/ap-service'
+import { DataService } from './services/data-service'
 import { HttpService } from './services/http-service'
-import { SessionStore } from './components/session'
+import { LANService } from './services/lan-service'
+import { WifiWizard } from './services/wifi-wizard'
 // native
 import { SplashScreen } from '@ionic-native/splash-screen/ngx'
 import { StatusBar } from '@ionic-native/status-bar/ngx'
 import { Zeroconf } from '@ionic-native/zeroconf/ngx'
+import { SecureStorage } from '@ionic-native/secure-storage/ngx'
 
 @NgModule({
   declarations: [AppComponent],
@@ -22,12 +26,18 @@ import { Zeroconf } from '@ionic-native/zeroconf/ngx'
     HttpClientModule,
     BrowserModule,
     IonicModule.forRoot(),
-    IonicStorageModule.forRoot(),
     AppRoutingModule,
+    IonicStorageModule.forRoot(),
   ],
   providers: [
+    // services
+    APService,
+    DataService,
     HttpService,
-    SessionStore,
+    LANService,
+    WifiWizard,
+    // native
+    SecureStorage,
     StatusBar,
     SplashScreen,
     Zeroconf,

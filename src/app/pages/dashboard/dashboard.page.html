@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Servers
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <div *ngIf="!dataService.servers.length" class="top-center">
+    <ion-button size="large" fill="outline" [routerLink]="['/setup']">
+      <ion-icon name="add"></ion-icon>
+    </ion-button>
+    <p>Add Server</p>
+  </div>
+
+  <ion-item-group>
+    <ion-item *ngFor="let server of dataService.servers" [routerLink]="['/manage/' + server.zeroconfHostname]">
+      <ion-icon slot="start" size="large" name="cube"></ion-icon>
+      {{ server.friendlyName }}
+      <ion-note slot="end"><ion-icon size="large" name="wifi" [color]="server.connected ? 'success' : 'danger'"></ion-icon></ion-note>
+    </ion-item>
+  </ion-item-group>
+
+  <ion-fab *ngIf="dataService.servers.length" vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button [routerLink]="['/setup']" class="fab-button">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>
