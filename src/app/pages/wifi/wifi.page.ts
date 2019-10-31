@@ -5,6 +5,7 @@ import { APService } from 'src/app/services/ap-service'
 import { WifiWizard } from 'src/app/services/wifi-wizard'
 import { ActivatedRoute } from '@angular/router'
 import { Start9Server } from 'src/types/misc'
+import { Subscription } from 'rxjs'
 
 @Component({
   selector: 'app-wifi',
@@ -18,6 +19,7 @@ export class WifiPage {
   wifiPasswordInput = ''
   serverPasscodeInput = ''
   server: Start9Server
+  resumeSubscription: Subscription
 
   constructor (
     public platform: Platform,
@@ -33,7 +35,7 @@ export class WifiPage {
     await this.detectWifi()
     this.loading = false
 
-    this.platform.resume.subscribe(async () => {
+    this.resumeSubscription = this.platform.resume.subscribe(async () => {
       await this.detectWifi()
     })
 
@@ -42,7 +44,7 @@ export class WifiPage {
   }
 
   async ngOnDestroy () {
-    this.platform.resume.unsubscribe()
+    this.resumeSubscription.unsubscribe()
   }
 
   async detectWifi (): Promise<void> {

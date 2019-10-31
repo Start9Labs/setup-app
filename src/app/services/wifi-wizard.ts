@@ -1,4 +1,4 @@
-import { Platform, AlertController } from '@ionic/angular'
+import { Platform } from '@ionic/angular'
 import { Injectable } from '@angular/core'
 
 declare var WifiWizard2: any

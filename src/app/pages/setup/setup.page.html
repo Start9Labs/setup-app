@@ -21,7 +21,7 @@
     </ion-item>
   </ion-item-group>
   <ion-button [disabled]="serverPasscodeInput.length < 8" expand="block" fill="outline" (click)="submit()">
-    Connect
+    Save
   </ion-button>
   <div *ngIf="error" style="margin-top: 20px;">
     <ion-text class="ion-text-wrap" color="danger">{{error}}</ion-text>
