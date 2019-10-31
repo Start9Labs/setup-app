@@ -9,6 +9,10 @@ export class LANService {
     public httpService: HttpService,
   ) { }
 
+  async getTorAddress (server: LANStart9Server): Promise<string> {
+    return this.httpService.request<{ torAddress: string }>(Method.get, server.ipAddress + '/tor').then(r => r.torAddress)
+  }
+
   async handshake (server: LANStart9Server): Promise<boolean> {
     return this.httpService.request(Method.post, server.ipAddress + '/handshake')
       .then(() => true)

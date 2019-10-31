@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { Platform, NavController } from '@ionic/angular'
 import { DataService } from 'src/app/services/data-service'
 import { identifiersFromSecret } from 'src/types/misc'
+import { HandshakeDaemon } from 'src/app/services/handshake-daemon'
 
 @Component({
   selector: 'page-setup',
@@ -17,6 +18,7 @@ export class SetupPage {
     public platform: Platform,
     public navController: NavController,
     public dataService: DataService,
+    public handshakeDaemon: HandshakeDaemon,
   ) { }
 
   async submit (): Promise<void> {
@@ -26,6 +28,8 @@ export class SetupPage {
       ...identifiers,
       friendlyName: this.friendlyName,
     })
+
+    await this.handshakeDaemon.reset()
 
     this.navController.navigateRoot(['/dashboard'])
   }

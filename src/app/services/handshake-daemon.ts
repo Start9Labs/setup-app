@@ -35,6 +35,9 @@ export class HandshakeDaemon {
           case 'resolved':
             const lanServer = enableLAN(server, service.ipv4Addresses[0])
             lanServer.connected = await this.lanService.handshake(lanServer)
+            if (lanServer.connected && !lanServer.torAddress) {
+              lanServer.torAddress = await this.lanService.getTorAddress(lanServer)
+            }
             await this.dataService.saveServer(lanServer)
             break
           case 'removed':
