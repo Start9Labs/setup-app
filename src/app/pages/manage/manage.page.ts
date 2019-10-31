@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { Start9Server } from 'src/types/misc'
 import { ActivatedRoute } from '@angular/router'
 import { DataService } from 'src/app/services/data-service'
-import { NavController } from '@ionic/angular'
+import { NavController, AlertController } from '@ionic/angular'
 import { getServerName } from 'src/types/misc'
 
 @Component({
@@ -18,7 +18,8 @@ export class ManagePage {
   constructor (
     public route: ActivatedRoute,
     public dataService: DataService,
-    public navController: NavController,
+    public navCtrl: NavController,
+    public alertCtrl: AlertController,
   ) { }
 
   ngOnInit () {
@@ -33,10 +34,27 @@ export class ManagePage {
     }
   }
 
-  async forget () {
-    this.edited = false
-    await this.dataService.forgetServer(this.server.ssid)
-    await this.navController.navigateRoot(['/dashboard'])
-  }
+  async presentAlertRemove () {
+    const alert = await this.alertCtrl.create({
+      header: 'Confirm!',
+      message: 'Are you sure you want to remove this server?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: 'Remove',
+          cssClass: 'alert-danger',
+          handler: async () => {
+            this.edited = false
+            await this.dataService.forgetServer(this.server.ssid)
+            await this.navCtrl.navigateRoot(['/dashboard'])
+          },
+        },
+      ],
+    })
 
+    await alert.present()
+  }
 }

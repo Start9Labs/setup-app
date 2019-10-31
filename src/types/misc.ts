@@ -1,9 +1,9 @@
 import * as CryptoJS from 'crypto-js'
 
 export interface Start9Server {
-  secret: string // ap mode secret
+  secret: string
   ssid: string // ap mode ssid
-  zeroconfHostname: string //ssid.local
+  zeroconfHostname: string // ssid.local
   friendlyName?: string
   torAddress?: string
   ipAddress?: string

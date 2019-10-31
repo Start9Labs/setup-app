@@ -17,8 +17,8 @@
       <ion-input (input)="server.friendlyName = $event.target.value" [ngModel]="getServerName(server)" (ionChange)="edited = true"></ion-input>
     </ion-item>
     <ion-item>
-      <ion-label position="stacked" color="medium">Zeroconf Hostname</ion-label>          
-      <ion-input disabled [ngModel]="server.zeroconfHostname"></ion-input>
+      <ion-label position="stacked" color="medium">IP Address</ion-label>          
+      <ion-input disabled [ngModel]="server.ipAddress"></ion-input>
     </ion-item>
     <ion-item>
       <ion-label position="stacked" color="medium">Tor Address</ion-label>          
@@ -28,8 +28,8 @@
   <ion-button expand="block" fill="outline" [routerLink]="['/manage/' + server.ssid + '/wifi']">
     Setup Wifi
   </ion-button>
-  <ion-button style="margin-top: 20px;" expand="block" fill="outline" color="danger" (click)="forget()">
-    Forget
+  <ion-button style="margin-top: 20px;" expand="block" fill="outline" color="danger" (click)="presentAlertRemove()">
+    Remove
   </ion-button>
 
 </ion-content>
