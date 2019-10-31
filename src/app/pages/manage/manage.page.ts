@@ -3,6 +3,7 @@ import { Start9Server } from 'src/types/misc'
 import { ActivatedRoute } from '@angular/router'
 import { DataService } from 'src/app/services/data-service'
 import { NavController } from '@ionic/angular'
+import { getServerName } from 'src/types/misc'
 
 @Component({
   selector: 'page-manage',
@@ -10,6 +11,7 @@ import { NavController } from '@ionic/angular'
   styleUrls: ['manage.page.scss'],
 })
 export class ManagePage {
+  getServerName = getServerName
   server: Start9Server
   edited = false
 
@@ -26,6 +28,7 @@ export class ManagePage {
 
   async ionViewWillLeave () {
     if (this.edited) {
+      console.log(this.server)
       await this.dataService.saveServer(this.server)
     }
   }
