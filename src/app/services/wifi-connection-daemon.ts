@@ -8,7 +8,6 @@ import { Subscription } from 'rxjs'
 export class WifiConnectionDaemon {
   private disconnectionMonitor: Subscription
   private connectionMonitor: Subscription
-  private pollingForConnection: NodeJS.Timer
 
   constructor (
     private readonly hsDaemon: HandshakeDaemon,
@@ -47,9 +46,9 @@ export class WifiConnectionDaemon {
   }
 
   private async manageHandshakeDaemon () {
-    this.pollingForConnection = setInterval(() => {
+    let pollingForConnection = setInterval(() => {
       if (this.network.type && this.network.type !== 'none') {
-        clearInterval(this.pollingForConnection)
+        clearInterval(pollingForConnection)
         if (this.network.type === 'wifi') {
           console.log('wifi connection obtained')
           this.hsDaemon.reset()

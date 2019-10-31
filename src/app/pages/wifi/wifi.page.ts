@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
-import { Platform, NavController, LoadingController } from '@ionic/angular';
-import { DataService } from 'src/app/services/data-service';
+import { Component } from '@angular/core'
+import { Platform, NavController, LoadingController } from '@ionic/angular'
+import { DataService } from 'src/app/services/data-service'
 import { APService } from 'src/app/services/ap-service'
-import { WifiWizard } from 'src/app/services/wifi-wizard';
-import { ActivatedRoute } from '@angular/router';
-import { Start9Server } from 'src/types/misc';
+import { WifiWizard } from 'src/app/services/wifi-wizard'
+import { ActivatedRoute } from '@angular/router'
+import { Start9Server } from 'src/types/misc'
 
 @Component({
   selector: 'app-wifi',
@@ -19,17 +19,17 @@ export class WifiPage {
   serverPasscodeInput = ''
   server: Start9Server
 
-  constructor(
+  constructor (
     public platform: Platform,
     public navController: NavController,
     public dataService: DataService,
     public APService: APService,
     public wifiWizard: WifiWizard,
     public loadingCtrl: LoadingController,
-    public route: ActivatedRoute
+    public route: ActivatedRoute,
   ) { }
 
-  async ngOnInit() {
+  async ngOnInit () {
     await this.detectWifi()
     this.loading = false
 
@@ -41,15 +41,15 @@ export class WifiPage {
     this.server = this.dataService.getServer(ssid)
   }
 
-  async ngOnDestroy() {
+  async ngOnDestroy () {
     this.platform.resume.unsubscribe()
   }
 
-  async detectWifi(): Promise<void> {
+  async detectWifi (): Promise<void> {
     this.connectedSSID = await this.wifiWizard.getConnectedSSID()
   }
 
-  async connect(): Promise<void> {
+  async connect (): Promise<void> {
     const loader = await this.loadingCtrl.create({
       message: 'Connecting to server...',
     })
@@ -63,7 +63,7 @@ export class WifiPage {
         })
       // AP - get Tor address
       loader.message = 'Getting Tor address...'
-      const { torAddress } = await this.APService.getTorAddress()
+      const torAddress = await this.APService.getTorAddress()
         .catch((e) => {
           throw new Error(`Error getting Tor address: ${e}`)
         })

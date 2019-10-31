@@ -5,7 +5,7 @@ import { LANStart9Server } from 'src/types/misc'
 
 @Injectable()
 export class LANService {
-  constructor(
+  constructor (
     public httpService: HttpService,
   ) { }
 

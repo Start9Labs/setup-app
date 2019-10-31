@@ -13,26 +13,24 @@ export class ManagePage {
   server: Start9Server
   edited = false
 
-  constructor(
+  constructor (
     public route: ActivatedRoute,
     public dataService: DataService,
     public navController: NavController,
   ) { }
 
-  ngOnInit() {
+  ngOnInit () {
     const ssid = this.route.snapshot.paramMap.get('ssid')
-    console.log('made it!')
-    console.log(ssid)
     this.server = this.dataService.getServer(ssid)
   }
 
-  async ionViewWillLeave() {
+  async ionViewWillLeave () {
     if (this.edited) {
       await this.dataService.saveServer(this.server)
     }
   }
 
-  async forget() {
+  async forget () {
     this.edited = false
     await this.dataService.forgetServer(this.server.ssid)
     await this.navController.navigateRoot(['/dashboard'])

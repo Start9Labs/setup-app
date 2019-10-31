@@ -15,13 +15,13 @@ import { WifiConnectionDaemon } from './services/wifi-connection-daemon'
 })
 export class AppComponent {
 
-  constructor(
+  constructor (
     public platform: Platform,
     public splashScreen: SplashScreen,
     public statusBar: StatusBar,
     public dataService: DataService,
     public hsDaemon: HandshakeDaemon,
-    public wcDaemon: WifiConnectionDaemon
+    public wcDaemon: WifiConnectionDaemon,
   ) {
     document.body.classList.toggle('dark', true)
     platform.ready().then(async () => {
@@ -29,7 +29,7 @@ export class AppComponent {
       await this.dataService.load()
 
       // mocky mock
-      if (!this.dataService.servers.length) {
+      if (!this.dataService.getServerCount()) {
         await this.dataService.saveServer({
           secret: '1234abcd',
           ssid: 'start9-abcd',

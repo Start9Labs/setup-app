@@ -13,18 +13,18 @@ export class SetupPage {
   public friendlyName = ''
   public serverPasscodeInput = ''
 
-  constructor(
+  constructor (
     public platform: Platform,
     public navController: NavController,
     public dataService: DataService,
   ) { }
 
-  async submit(): Promise<void> {
+  async submit (): Promise<void> {
     const identifiers = identifiersFromSecret(this.serverPasscodeInput)
 
     this.dataService.saveServer({
       ...identifiers,
-      friendlyName: this.friendlyName
+      friendlyName: this.friendlyName,
     })
 
     this.navController.navigateRoot(['/dashboard'])

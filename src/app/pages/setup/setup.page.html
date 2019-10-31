@@ -17,10 +17,10 @@
     </ion-item>
     <ion-item>
       <ion-label position="stacked" color="medium">Server Passcode</ion-label>
-      <ion-input type="password" [(ngModel)]="serverPasscodeInput"></ion-input>
+      <ion-input type="password" maxLength="8" [(ngModel)]="serverPasscodeInput"></ion-input>
     </ion-item>
   </ion-item-group>
-  <ion-button [disabled]="serverPasscodeInput.length != 8" expand="block" fill="outline" (click)="submit()">
+  <ion-button [disabled]="serverPasscodeInput.length < 8" expand="block" fill="outline" (click)="submit()">
     Connect
   </ion-button>
   <div *ngIf="error" style="margin-top: 20px;">

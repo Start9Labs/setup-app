@@ -6,11 +6,11 @@ declare var WifiWizard2: any
 @Injectable()
 export class WifiWizard {
 
-  constructor(
-    public platform: Platform
+  constructor (
+    public platform: Platform,
   ) { }
 
-  async getConnectedSSID(): Promise<string> {
+  async getConnectedSSID (): Promise<string> {
     if (this.platform.is('cordova')) {
       return WifiWizard2.getConnectedSSID().catch((_: Error) => undefined)
     } else {
@@ -18,7 +18,7 @@ export class WifiWizard {
     }
   }
 
-  async connect(ssid: string, password: string): Promise<void> {
+  async connect (ssid: string, password: string): Promise<void> {
     if (this.platform.is('ios')) {
       await WifiWizard2.iOSConnectNetwork(ssid, password)
     } else if (this.platform.is('android')) {

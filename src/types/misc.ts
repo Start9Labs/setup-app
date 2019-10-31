@@ -10,15 +10,15 @@ export interface Start9Server {
   connected?: boolean
 }
 
-export function enableLAN<T extends Start9Server>(t: T, ipAddress: string): T & { ipAddress: string } {
+export function enableLAN<T extends Start9Server> (t: T, ipAddress: string): T & { ipAddress: string } {
   return Object.assign(t, { ipAddress })
 }
 
-export function enableTor<T extends Start9Server>(t: T, torAddress: string): T & { torAddress: string } {
+export function enableTor<T extends Start9Server> (t: T, torAddress: string): T & { torAddress: string } {
   return Object.assign(t, { torAddress })
 }
 
-export function identifiersFromSecret(secret: string): Start9Server {
+export function identifiersFromSecret (secret: string): Start9Server {
   const first4 = CryptoJS.SHA256(secret).toString().substr(0, 4)
   const ssid = `start9-${first4}`
   const zeroconfHostname = `${ssid}.local`
@@ -26,7 +26,7 @@ export function identifiersFromSecret(secret: string): Start9Server {
   return { ssid, zeroconfHostname, secret }
 }
 
-export function getServerName(server: Start9Server): string {
+export function getServerName (server: Start9Server): string {
   return server.friendlyName || server.ssid
 }
 

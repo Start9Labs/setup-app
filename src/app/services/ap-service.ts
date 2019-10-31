@@ -7,19 +7,19 @@ import { Ap } from '../../types/api-types'
 export class APService {
   private readonly url = 'http://192.168.12.1/v0'
 
-  constructor(
+  constructor (
     public httpService: HttpService,
   ) { }
 
-  async getTorAddress(): Promise<string> {
+  async getTorAddress (): Promise<string> {
     return this.httpService.request<Ap.GetTorRes>(Method.get, this.url + '/tor').then(r => r.torAddress)
   }
 
-  async submitWifiCredentials(body: Ap.PostSubmitWifiReq): Promise<Ap.PostSubmitWifiRes> {
+  async submitWifiCredentials (body: Ap.PostSubmitWifiReq): Promise<Ap.PostSubmitWifiRes> {
     return this.httpService.request(Method.post, this.url + '/wifi', undefined, body)
   }
 
-  async enableWifi(body: Ap.PostEnableWifiReq): Promise<Ap.PostEnableWifiRes> {
+  async enableWifi (body: Ap.PostEnableWifiReq): Promise<Ap.PostEnableWifiRes> {
     return this.httpService.request(Method.post, this.url + '/wifi/enable', undefined, body)
   }
 }
