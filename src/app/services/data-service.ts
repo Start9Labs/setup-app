@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core'
 import { Platform } from '@ionic/angular'
-import { Start9Server } from 'src/types/misc'
+import { Start9Server, getServerName } from 'src/types/misc'
 import { SecureStorage, SecureStorageObject } from '@ionic-native/secure-storage/ngx'
 import { Storage } from '@ionic/storage'
 
 @Injectable()
-export class DataService  {
+export class DataService {
   secure: SecureStorageObject
-  servers: Start9Server[] = []
+  servers: { [ssid: string]: Start9Server } = { }
 
   constructor (
     public platform: Platform,
@@ -24,25 +24,33 @@ export class DataService  {
     }
   }
 
-  getServer (zeroconfHostname: string) {
-    return this.servers.find(server => server.zeroconfHostname === zeroconfHostname)
+  getServer (ssid: string): Start9Server | undefined {
+    return this.servers[ssid]
+  }
+
+  getServers (): Start9Server[] {
+    return Object.values(this.servers).filter(x => !!x)
+  }
+
+  getServerCount (): number {
+    return this.getServers().length
+  }
+
+  getServerBy (filter: Partial<Start9Server>): Start9Server | undefined {
+    return this.getServers().find(s =>
+      Object.entries(filter).every(e => s[e[0]] === e[1]),
+    )
   }
 
   async saveServer (server: Start9Server): Promise<void> {
     const clone: Start9Server = JSON.parse(JSON.stringify(server))
     delete clone.connected
-    const index = this.servers.findIndex(s => s.zeroconfHostname === server.zeroconfHostname)
-    if (index === -1) {
-      this.servers.push(clone)
-    } else {
-      this.servers[index] = clone
-    }
+    this.servers[server.ssid] = clone
     await this.saveAll()
   }
 
-  async forgetServer (zeroconfHostname: string): Promise<void> {
-    const index = this.servers.findIndex(s => s.zeroconfHostname === zeroconfHostname)
-    this.servers.splice(index)
+  async forgetServer (ssid: string): Promise<void> {
+    delete this.servers[ssid]
     await this.saveAll()
   }
 
@@ -54,3 +62,4 @@ export class DataService  {
     }
   }
 }
+

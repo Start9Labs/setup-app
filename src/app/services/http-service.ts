@@ -14,9 +14,9 @@ export class HttpService {
 
   async request<T> (method: Method, url: string, httpOptions: HttpOptions = { }, body: any = { }): Promise<T> {
 
-    this.setDefaultOptions(httpOptions) // mutates httpOptions
+      this.setDefaultOptions(httpOptions) // mutates httpOptions
 
-    let call: () => Observable<HttpEvent<T>>
+      let call: () => Observable<HttpEvent<T>>
     switch (method) {
       case Method.get:
         call = () => this.http.get<T>(url, httpOptions as any)
@@ -35,7 +35,7 @@ export class HttpService {
     try {
       const response = await call().toPromise()
       if (response.type === HttpEventType.Response) {
-        return response.body
+        return response.body as T
       }
     } catch (e) {
       const error: HttpErrorResponse = e
