@@ -8,15 +8,15 @@ const APP_VERSION = '1.0.0'
 @Injectable()
 export class HttpService {
 
-  constructor(
+  constructor (
     public http: HttpClient,
   ) { }
 
-  async request<T>(method: Method, url: string, httpOptions: HttpOptions = {}, body: any = {}): Promise<T> {
+  async request<T> (method: Method, url: string, httpOptions: HttpOptions = { }, body: any = { }): Promise<T> {
 
-    this.setDefaultOptions(httpOptions) // mutates httpOptions
+      this.setDefaultOptions(httpOptions) // mutates httpOptions
 
-    let call: () => Observable<HttpEvent<T>>
+      let call: () => Observable<HttpEvent<T>>
     switch (method) {
       case Method.get:
         call = () => this.http.get<T>(url, httpOptions as any)
@@ -44,7 +44,7 @@ export class HttpService {
     }
   }
 
-  private setDefaultOptions(httpOptions: HttpOptions) {
+  private setDefaultOptions (httpOptions: HttpOptions) {
     let headers: HttpHeaders = httpOptions.headers || new HttpHeaders()
     headers = headers.set('APP-VERSION', APP_VERSION)
     httpOptions.headers = headers

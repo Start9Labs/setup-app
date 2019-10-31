@@ -9,7 +9,7 @@ export class LANService {
     public httpService: HttpService,
   ) { }
 
-  async handshake(server: LANStart9Server): Promise<boolean> {
+  async handshake (server: LANStart9Server): Promise<boolean> {
     return this.httpService.request(Method.post, server.ipAddress + '/handshake')
       .then(() => true)
       .catch(() => false)

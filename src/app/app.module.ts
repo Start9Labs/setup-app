@@ -17,6 +17,7 @@ import { WifiWizard } from './services/wifi-wizard'
 import { SplashScreen } from '@ionic-native/splash-screen/ngx'
 import { StatusBar } from '@ionic-native/status-bar/ngx'
 import { Zeroconf } from '@ionic-native/zeroconf/ngx'
+import { Network } from '@ionic-native/network/ngx';
 import { SecureStorage } from '@ionic-native/secure-storage/ngx'
 import { HandshakeDaemon } from './services/handshake-daemon';
 import { WifiConnectionDaemon } from './services/wifi-connection-daemon';
@@ -43,6 +44,7 @@ import { WifiConnectionDaemon } from './services/wifi-connection-daemon';
     StatusBar,
     SplashScreen,
     Zeroconf,
+    Network,
     HandshakeDaemon,
     WifiConnectionDaemon,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },

@@ -7,37 +7,41 @@ import { enableLAN } from 'src/types/misc'
 // attempts to handshake with every lan service for which we have a s9server.
 @Injectable()
 export class HandshakeDaemon {
-    constructor(
-        public lanService: LANService,
-        public zeroconf: Zeroconf,
-        public dataService: DataService,
-    ) { }
+  constructor (
+    public lanService: LANService,
+    public zeroconf: Zeroconf,
+    public dataService: DataService,
+  ) { }
 
-    async reset(): Promise<void> {
-        await this.zeroconf.stop()
-        await this.zeroconf.reInit()
-        return this.watch()
-    }
+  async stop (): Promise<void> {
+    this.zeroconf.stop()
+  }
 
-    watch(): void {
-        this.zeroconf.watch('_http._tcp.', 'local.').subscribe(async result => {
-            const { action, service } = result
+  async reset (): Promise<void> {
+    await this.stop()
+    await this.zeroconf.reInit()
+    this.watch()
+  }
 
-            const server = this.dataService.getServerFromLANHost(service.hostname)
+  async watch (): Promise<void> {
+    this.zeroconf.watch('_http._tcp.', 'local.').subscribe(async result => {
+      const { action, service } = result
 
-            if (server) {
-                switch (action) {
-                    case 'added':
-                    case 'resolved':
-                        const lanServer = enableLAN(server, service.ipv4Addresses[0])
-                        lanServer.connected = await this.lanService.handshake(lanServer)
-                        await this.dataService.saveServer(lanServer)
-                        break
-                    case 'removed':
-                        server.connected = false
-                        break
-                }
-            }
-        })
+      const server = this.dataService.getServerBy({ zeroconfHostname: service.hostname })
+
+      if (server) {
+        switch (action) {
+          case 'added':
+          case 'resolved':
+            const lanServer = enableLAN(server, service.ipv4Addresses[0])
+            lanServer.connected = await this.lanService.handshake(lanServer)
+            await this.dataService.saveServer(lanServer)
+            break
+          case 'removed':
+            server.connected = false
+            break
+        }
+      }
+    }),
     }
 }

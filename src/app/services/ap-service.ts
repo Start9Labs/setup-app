@@ -11,8 +11,8 @@ export class APService {
     public httpService: HttpService,
   ) { }
 
-  async getTorAddress(): Promise<Ap.GetTorRes> {
-    return this.httpService.request(Method.get, this.url + '/tor')
+  async getTorAddress(): Promise<string> {
+    return this.httpService.request<Ap.GetTorRes>(Method.get, this.url + '/tor').then(r => r.torAddress)
   }
 
   async submitWifiCredentials(body: Ap.PostSubmitWifiReq): Promise<Ap.PostSubmitWifiRes> {

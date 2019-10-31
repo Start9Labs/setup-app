@@ -1,34 +1,62 @@
 import { Injectable } from '@angular/core'
 import { HandshakeDaemon } from './handshake-daemon'
-import { WifiWizard } from './wifi-wizard'
+import { Network } from '@ionic-native/network/ngx'
+import { Subscription } from 'rxjs'
 
 // detects when phone changes wifi network
 @Injectable()
 export class WifiConnectionDaemon {
-    private currentWifiSSID: string | undefined
-    private lastWifiSSID: string | undefined
+  private disconnectionMonitor: Subscription
+  private connectionMonitor: Subscription
+  private pollingForConnection: NodeJS.Timer
 
-    constructor(
-        private readonly wifiWizard: WifiWizard,
-        private readonly hsDaemon: HandshakeDaemon
-    ) { }
+  constructor (
+    private readonly hsDaemon: HandshakeDaemon,
+    private readonly network: Network,
+  ) { }
 
-    async watch(timeout: number) {
-        setTimeout(() => this.setCurrentWifi(), timeout)
-    }
+  async watch () {
+    this.enableDisconnectionMonitor()
+    this.enableConnectionMonitor()
+    this.enableChangeMonitor()
+  }
 
-    async setCurrentWifi(): Promise<string> {
+  async enableDisconnectionMonitor () {
+    this.disconnectionMonitor = this.network.onDisconnect().subscribe(() => {
+      console.log('network disconnected')
+      this.hsDaemon.stop()
+    })
+  }
 
-        console.log('RUNNING ' + this.currentWifiSSID)
+  async enableChangeMonitor () {
+    this.disconnectionMonitor = this.network.onChange().subscribe(() => {
+      console.log('network changed')
+      this.manageHandshakeDaemon()
+    })
+  }
+  async enableConnectionMonitor () {
+    this.connectionMonitor = this.network.onConnect().subscribe(() => {
+      console.log('network connected')
+      this.manageHandshakeDaemon()
+    })
+  }
 
-        this.lastWifiSSID = this.currentWifiSSID
-        this.currentWifiSSID = await this.wifiWizard.getConnectedSSID()
+  async stop () {
+    this.connectionMonitor.unsubscribe()
+    this.disconnectionMonitor.unsubscribe()
+  }
 
-        //if we have wifi and it's new reset the handshake daemon
-        if (this.lastWifiSSID !== this.currentWifiSSID && this.currentWifiSSID) {
-            this.hsDaemon.reset()
+  private async manageHandshakeDaemon () {
+    this.pollingForConnection = setInterval(() => {
+      if (this.network.type && this.network.type !== 'none') {
+        clearInterval(this.pollingForConnection)
+        if (this.network.type === 'wifi') {
+          console.log('wifi connection obtained')
+          this.hsDaemon.reset()
+        } else {
+          this.hsDaemon.stop()
         }
-
-        return this.currentWifiSSID
-    }
+      }
+    }, 500)
+  }
 }

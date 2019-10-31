@@ -45,7 +45,7 @@ export class AppComponent {
       if (platform.is('cordova')) {
         this.hsDaemon.watch()
         // check wifi connection every 5 seconds
-        this.wcDaemon.watch(5000)
+        this.wcDaemon.watch()
 
         // style status bar for iOS and Android
         if (platform.is('ios')) {
