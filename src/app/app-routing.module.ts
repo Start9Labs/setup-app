@@ -16,11 +16,11 @@ const routes: Routes = [
     loadChildren: () => import('./pages/setup/setup.module').then(m => m.SetupPageModule),
   },
   {
-    path: 'manage/:ssid',
+    path: 'manage/:id',
     loadChildren: () => import('./pages/manage/manage.module').then(m => m.ManagePageModule),
   },
   {
-    path: 'manage/:ssid/wifi',
+    path: 'manage/:id/wifi',
     loadChildren: () => import('./pages/wifi/wifi.module').then(m => m.WifiPageModule),
   },
 ]

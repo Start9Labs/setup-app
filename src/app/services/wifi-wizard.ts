@@ -33,7 +33,7 @@ export class WifiWizard {
 
 // export abstract class AbsWifiWizard {
 //   abstract getConnectedSSID(): Promise<string>
-//   abstract connect(ssid: string, password: string): Promise<void>
+//   abstract connect(id: string, password: string): Promise<void>
 
 //   static new(platform: Platform): AbsWifiWizard {
 //     if (platform.is('ios')) {
@@ -53,8 +53,8 @@ export class WifiWizard {
 //     return WifiWizard2.getConnectedSSID().catch((_: Error) => undefined)
 //   }
 
-//   async connect(ssid: string, password: string): Promise<void> {
-//     await WifiWizard2.iOSConnectNetwork(ssid, password)
+//   async connect(id: string, password: string): Promise<void> {
+//     await WifiWizard2.iOSConnectNetwork(id, password)
 //   }
 // }
 
@@ -65,8 +65,8 @@ export class WifiWizard {
 //     return WifiWizard2.getConnectedSSID().catch((_: Error) => undefined)
 //   }
 
-//   async connect(ssid: string, password: string): Promise<void> {
-//     await WifiWizard2.connect(ssid, true, password, 'WPA', true)
+//   async connect(id: string, password: string): Promise<void> {
+//     await WifiWizard2.connect(id, true, password, 'WPA', true)
 //   }
 // }
 
@@ -74,11 +74,11 @@ export class WifiWizard {
 //   constructor() { super() }
 
 //   async getConnectedSSID(): Promise<string> {
-//     return prompt('Enter current wifi ssid')
+//     return prompt('Enter current wifi id')
 //   }
 
-//   async connect(ssid: string, password: string): Promise<void> {
-//     if (!confirm(`Browser detected. Please connect computer to wif: ${ssid}`)) {
+//   async connect(id: string, password: string): Promise<void> {
+//     if (!confirm(`Browser detected. Please connect computer to wif: ${id}`)) {
 //       throw new Error('User refused to comply with orders.')
 //     }
 //   }

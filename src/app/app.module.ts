@@ -9,7 +9,7 @@ import { AppComponent } from './app.component'
 import { AppRoutingModule } from './app-routing.module'
 // services
 import { APService } from './services/ap-service'
-import { DataService } from './services/data-service'
+import { ServerModel } from './storage/server-model'
 import { HttpService } from './services/http-service'
 import { LANService } from './services/lan-service'
 import { WifiWizard } from './services/wifi-wizard'
@@ -35,7 +35,7 @@ import { WifiConnectionDaemon } from './services/wifi-connection-daemon'
   providers: [
     // services
     APService,
-    DataService,
+    ServerModel,
     HttpService,
     LANService,
     WifiWizard,

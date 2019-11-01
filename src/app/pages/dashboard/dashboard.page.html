@@ -16,7 +16,7 @@
   </div>
 
   <ion-item-group>
-    <ion-item *ngFor="let server of dataService.getServers()" [routerLink]="['/manage/' + server.ssid]">
+    <ion-item *ngFor="let server of dataService.getServers()" [routerLink]="['/manage/' + server.id]">
       <ion-icon slot="start" size="large" name="cube"></ion-icon>
       {{ getServerName(server) }}
       <ion-note slot="end">

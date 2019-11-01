@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core'
 import { Zeroconf } from '@ionic-native/zeroconf/ngx'
-import { DataService } from './data-service'
+import { ServerModel } from '../storage/server-model'
 import { LANService } from './lan-service'
-import { enableLAN } from 'src/types/misc'
+import { enableLAN } from 'src/types/Start9Server';
 
 // attempts to handshake with every lan service for which we have a s9server.
 @Injectable()
@@ -10,7 +10,7 @@ export class HandshakeDaemon {
   constructor (
     public lanService: LANService,
     public zeroconf: Zeroconf,
-    public dataService: DataService,
+    public dataService: ServerModel,
   ) { }
 
   async stop (): Promise<void> {

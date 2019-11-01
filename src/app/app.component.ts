@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { Platform } from '@ionic/angular'
 import { SplashScreen } from '@ionic-native/splash-screen/ngx'
 import { StatusBar } from '@ionic-native/status-bar/ngx'
-import { DataService } from './services/data-service'
+import { ServerModel } from './storage/server-model'
 import { Zeroconf } from '@ionic-native/zeroconf/ngx'
 import { LANService } from './services/lan-service'
 import { HandshakeDaemon } from './services/handshake-daemon'
@@ -19,7 +19,7 @@ export class AppComponent {
     public platform: Platform,
     public splashScreen: SplashScreen,
     public statusBar: StatusBar,
-    public dataService: DataService,
+    public dataService: ServerModel,
     public hsDaemon: HandshakeDaemon,
     public wcDaemon: WifiConnectionDaemon,
   ) {
@@ -33,7 +33,7 @@ export class AppComponent {
         await this.dataService.saveServer({
           secret: '1234abcd',
           ssid: 'start9-abcd',
-          friendlyName: 'My First Server',
+          friendlyName: 'My First S9Server',
           zeroconfHostname: 'start9-abcd.local',
           torAddress: 'hgfjandkhasjdbfkljamxjkasbnc.onion',
           ipAddress: 'lalalalalala',

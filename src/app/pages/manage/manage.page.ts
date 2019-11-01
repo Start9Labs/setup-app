@@ -1,9 +1,9 @@
 import { Component } from '@angular/core'
-import { Start9Server } from 'src/types/misc'
+import { Start9Server } from 'src/types/Start9Server';
 import { ActivatedRoute } from '@angular/router'
-import { DataService } from 'src/app/services/data-service'
+import { ServerModel } from 'src/app/storage/server-model'
 import { NavController, AlertController } from '@ionic/angular'
-import { getServerName } from 'src/types/misc'
+import { getServerName } from 'src/types/Start9Server';
 
 @Component({
   selector: 'page-manage',
@@ -17,13 +17,13 @@ export class ManagePage {
 
   constructor (
     public route: ActivatedRoute,
-    public dataService: DataService,
+    public dataService: ServerModel,
     public navCtrl: NavController,
     public alertCtrl: AlertController,
   ) { }
 
   ngOnInit () {
-    const ssid = this.route.snapshot.paramMap.get('ssid')
+    const ssid = this.route.snapshot.paramMap.get('id')
     this.server = this.dataService.getServer(ssid)
   }
 
@@ -48,7 +48,7 @@ export class ManagePage {
           cssClass: 'alert-danger',
           handler: async () => {
             this.edited = false
-            await this.dataService.forgetServer(this.server.ssid)
+            await this.dataService.forgetServer(this.server.id)
             await this.navCtrl.navigateRoot(['/dashboard'])
           },
         },

@@ -1,10 +1,10 @@
 import { Component } from '@angular/core'
 import { Platform, NavController, LoadingController } from '@ionic/angular'
-import { DataService } from 'src/app/services/data-service'
+import { ServerModel } from 'src/app/storage/server-model'
 import { APService } from 'src/app/services/ap-service'
 import { WifiWizard } from 'src/app/services/wifi-wizard'
 import { ActivatedRoute } from '@angular/router'
-import { Start9Server } from 'src/types/misc'
+import { Start9Server } from 'src/types/Start9Server';
 import { Subscription } from 'rxjs'
 
 @Component({
@@ -24,7 +24,7 @@ export class WifiPage {
   constructor (
     public platform: Platform,
     public navController: NavController,
-    public dataService: DataService,
+    public dataService: ServerModel,
     public APService: APService,
     public wifiWizard: WifiWizard,
     public loadingCtrl: LoadingController,
@@ -39,7 +39,7 @@ export class WifiPage {
       await this.detectWifi()
     })
 
-    const ssid = this.route.snapshot.paramMap.get('ssid')
+    const ssid = this.route.snapshot.paramMap.get('id')
     this.server = this.dataService.getServer(ssid)
   }
 
@@ -59,7 +59,7 @@ export class WifiPage {
 
     try {
       // AP - connect to server
-      await this.wifiWizard.connect(this.server.ssid, this.server.secret)
+      await this.wifiWizard.connect(this.server.id, this.server.secret)
         .catch((e) => {
           throw new Error(`Error connecting to server: ${e} Please make sure your server is in setup mode.`)
         })

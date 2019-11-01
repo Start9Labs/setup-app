@@ -1,13 +1,16 @@
 import { Injectable } from '@angular/core'
 import { Platform } from '@ionic/angular'
-import { Start9Server, getServerName } from 'src/types/misc'
+import { Start9ServerPlus } from 'src/types/misc'
+import { Start9Server } from 'src/types/Start9Server'
 import { SecureStorage, SecureStorageObject } from '@ionic-native/secure-storage/ngx'
 import { Storage } from '@ionic/storage'
+import { S9Server, Start9Server, StorableS9Server } from './types'
+
 
 @Injectable()
-export class DataService {
+export class ServerModel {
   secure: SecureStorageObject
-  servers: { [ssid: string]: Start9Server } = { }
+  servers: S9ServerCache = { }
 
   constructor (
     public platform: Platform,
@@ -15,12 +18,12 @@ export class DataService {
     public storage: Storage,
   ) { }
 
-  async load (): Promise<void> {
+  async load (): Promise<S9ServerCache> {
     if (this.platform.is('cordova')) {
       this.secure = await this.secureStorage.create('start9')
       this.servers = JSON.parse(await this.secure.get('servers').catch((e: Error) => '[]'))
     } else {
-      this.servers = await this.storage.get('servers') || []
+      this.servers = await this.storage.get('servers') || { }
     }
   }
 
@@ -45,7 +48,7 @@ export class DataService {
   async saveServer (server: Start9Server): Promise<void> {
     const clone: Start9Server = JSON.parse(JSON.stringify(server))
     delete clone.connected
-    this.servers[server.ssid] = clone
+    this.servers[server.id] = clone
     await this.saveAll()
   }
 
@@ -63,3 +66,5 @@ export class DataService {
   }
 }
 
+type S9ServerCache =  { [id: string]: S9Server }
+type ServerStore = StorableS9Server[]

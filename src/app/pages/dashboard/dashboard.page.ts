@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
-import { DataService } from 'src/app/services/data-service'
-import { getServerName } from 'src/types/misc'
+import { ServerModel } from 'src/app/storage/server-model'
+import { getServerName } from 'src/types/Start9Server';
 
 @Component({
   selector: 'page-dashboard',
@@ -11,7 +11,7 @@ export class DashboardPage {
   getServerName = getServerName
 
   constructor (
-    public dataService: DataService,
+    public dataService: ServerModel,
   ) { }
 
 }

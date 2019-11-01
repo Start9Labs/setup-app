@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { Platform, NavController } from '@ionic/angular'
-import { DataService } from 'src/app/services/data-service'
-import { identifiersFromSecret } from 'src/types/misc'
+import { ServerModel } from 'src/app/storage/server-model'
+import { identifiersFromSecret } from 'src/types/Start9Server';
 import { HandshakeDaemon } from 'src/app/services/handshake-daemon'
 
 @Component({
@@ -17,7 +17,7 @@ export class SetupPage {
   constructor (
     public platform: Platform,
     public navController: NavController,
-    public dataService: DataService,
+    public dataService: ServerModel,
     public handshakeDaemon: HandshakeDaemon,
   ) { }
 
