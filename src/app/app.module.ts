@@ -19,7 +19,7 @@ import { StatusBar } from '@ionic-native/status-bar/ngx'
 import { Zeroconf } from '@ionic-native/zeroconf/ngx'
 import { Network } from '@ionic-native/network/ngx'
 import { SecureStorage } from '@ionic-native/secure-storage/ngx'
-import { HandshakeDaemon } from './services/handshake-daemon'
+import { HandshakeDaemon } from './services/handshake-service'
 import { WifiConnectionDaemon } from './services/wifi-connection-daemon'
 
 @NgModule({

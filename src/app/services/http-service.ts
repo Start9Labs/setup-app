@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core'
 import { HttpClient, HttpEventType, HttpErrorResponse, HttpHeaders, HttpEvent } from '@angular/common/http'
 import { Method } from '../../types/enums'
 import { Observable } from 'rxjs'
+import { S9Server, ConnectionProtocol } from '../storage/types'
 
 const APP_VERSION = '1.0.0'
 
@@ -14,9 +15,9 @@ export class HttpService {
 
   async request<T> (method: Method, url: string, httpOptions: HttpOptions = { }, body: any = { }): Promise<T> {
 
-      this.setDefaultOptions(httpOptions) // mutates httpOptions
+    this.setDefaultOptions(httpOptions) // mutates httpOptions
 
-      let call: () => Observable<HttpEvent<T>>
+    let call: () => Observable<HttpEvent<T>>
     switch (method) {
       case Method.get:
         call = () => this.http.get<T>(url, httpOptions as any)
@@ -36,6 +37,8 @@ export class HttpService {
       const response = await call().toPromise()
       if (response.type === HttpEventType.Response) {
         return response.body as T
+      } else {
+        throw new Error(`Expected HTTP Event Type, got ${response.type}`)
       }
     } catch (e) {
       const error: HttpErrorResponse = e
@@ -49,6 +52,19 @@ export class HttpService {
     headers = headers.set('APP-VERSION', APP_VERSION)
     httpOptions.headers = headers
     httpOptions.observe = 'response'
+  }
+}
+
+export class S9HttpService {
+  constructor (private readonly httpService: HttpService, private readonly server: S9Server) { }
+
+  request<T> (m: Method, u: string, h: HttpOptions = { }, b: any = { }): Promise<[T, S9Server]> {
+    return this.httpService.request(m, u, h, b).catch(
+      e => {
+        this.server.connected = ConnectionProtocol.NONE
+        throw e
+      },
+    ).then(t => [t, this.server]) as Promise<[T, S9Server]>
   }
 }
 

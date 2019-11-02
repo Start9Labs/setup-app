@@ -5,7 +5,7 @@ import { StatusBar } from '@ionic-native/status-bar/ngx'
 import { ServerModel } from './storage/server-model'
 import { Zeroconf } from '@ionic-native/zeroconf/ngx'
 import { LANService } from './services/lan-service'
-import { HandshakeDaemon } from './services/handshake-daemon'
+import { HandshakeDaemon } from './services/handshake-service'
 import { WifiConnectionDaemon } from './services/wifi-connection-daemon'
 
 @Component({

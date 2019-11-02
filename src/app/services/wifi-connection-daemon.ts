@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { HandshakeDaemon } from './handshake-daemon'
+import { HandshakeDaemon } from './handshake-service'
 import { Network } from '@ionic-native/network/ngx'
 import { Subscription } from 'rxjs'
 

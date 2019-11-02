@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core'
 import { Platform, NavController } from '@ionic/angular'
 import { ServerModel } from 'src/app/storage/server-model'
-import { identifiersFromSecret } from 'src/types/Start9Server';
-import { HandshakeDaemon } from 'src/app/services/handshake-daemon'
+import { identifiersFromSecret } from 'src/types/Start9Server'
+import { HandshakeDaemon } from 'src/app/services/handshake-service'
 
 @Component({
   selector: 'page-setup',
