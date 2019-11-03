@@ -1,94 +1,103 @@
 import * as CryptoJS from 'crypto-js'
+import { HttpService } from '../services/http-service'
+import { Method } from 'src/types/enums'
 
-export interface S9Server {
-  readonly id: string,
-  readonly pubkey: string,
-  readonly zeroconfHostname: string,
-  friendlyName: string,
-  connected: ConnectionProtocol,
-  torAddress?: string,
-  zeroconfService?: ZeroconfService, //ipv4 + ipv6 addresses
-}
+export class S9Server {
+  constructor (
+    public readonly id: string,
+    public readonly pubkey: string,
+    public readonly zeroconfHostname: string,
+    public friendlyName: string,
+    public connected: ConnectionProtocol,
+    public torAddress?: string,
+    public zeroconfService?: ZeroconfService,
+  ) { }
 
-export function updateS9Server (s: S9Server, update: Partial<S9Server>): S9Server {
-  return { ...s, ...update}
-}
-
-export function fromUserInput (id: string, friendlyName: string, pubkey: string): S9Server {
-  const zeroconfHostname = hostnameFromId(id)
-  return {
-    id,
-    pubkey,
-    zeroconfHostname,
-    friendlyName,
-    connected: ConnectionProtocol.NONE,
+  static fromUserInput (id: string, friendlyName: string, pubkey: string): S9Server {
+    const zeroconfHostname = hostnameFromId(id)
+    return new S9Server(
+      id,
+      pubkey,
+      zeroconfHostname,
+      friendlyName,
+      ConnectionProtocol.NONE,
+    )
   }
-}
 
-export function fromStoredServer (ss : StorableS9Server) : S9Server {
-  const { friendlyName, torAddress, zeroconfService, id, pubkey } = ss
-  const zeroconfHostname = hostnameFromId(id)
-  return {
-    id,
-    pubkey,
-    zeroconfHostname,
-    friendlyName,
-    connected: ConnectionProtocol.NONE,
-    torAddress,
-    zeroconfService,
+  static fromStoredServer (ss : StorableS9Server) : S9Server {
+    const { friendlyName, torAddress, zeroconfService, id, pubkey } = ss
+    const zeroconfHostname = hostnameFromId(id)
+    return new S9Server(
+      id,
+      pubkey,
+      zeroconfHostname,
+      friendlyName,
+      ConnectionProtocol.NONE,
+      torAddress,
+      zeroconfService,
+    )
   }
-}
 
-export function toStorableServer (s9Server: S9Server): StorableS9Server {
-  return {
-    id: s9Server.id,
-    pubkey: s9Server.pubkey,
-    friendlyName: s9Server.friendlyName,
-    torAddress: s9Server.torAddress,
-    zeroconfService: s9Server.zeroconfService,
+  toStorableServer (): StorableS9Server {
+    return {
+      id: this.id,
+      pubkey: this.pubkey,
+      friendlyName: this.friendlyName,
+      torAddress: this.torAddress,
+      zeroconfService: this.zeroconfService,
+    }
   }
-}
 
-export type LanEnabled<T> = T & { zeroconfService: ZeroconfService}
-export function enableLan<T extends S9Server> (t: T, s: ZeroconfService): LanEnabled<T> {
-  return { ...t, zeroconfService: s}
-}
-
-export function getLanIP<T extends { zeroconfService: ZeroconfService}> ( t: T ): string {
-  const { ipv4Addresses, ipv6Addresses } = t.zeroconfService
-  return ipv4Addresses.concat(ipv6Addresses)[0]
-}
-
-export function isLanEnabled<T extends S9Server> (t: T): boolean {
-  return !!t.zeroconfService
-}
-
-export type TorEnabled<T extends S9Server> = T & { torAddress: string}
-export function enableTor<T extends S9Server> (t: T, torAddress: string): TorEnabled<T> {
-  return { ...t, torAddress }
-}
-
-export function getTorAddress<T extends { torAddress: string}> ( t: T ): string {
-  return t.torAddress
-}
-
-export function getProtocolHost (s: S9Server, cp: ConnectionProtocol): string | undefined {
-  switch (cp) {
-    case ConnectionProtocol.TOR:
-      if (isTorEnabled(s)) {
-        return getTorAddress(s as TorEnabled<S9Server>)
-      } break
-    case ConnectionProtocol.LAN:
-      if (isLanEnabled(s)) {
-        return getLanIP(s as LanEnabled<S9Server>)
-      } break
-    default:
-      return undefined
+  update (update: Partial<S9Server>): void {
+    Object.entries(update).forEach( ([k, v]) => {
+      this[k] = v
+    })
   }
-}
 
-export function isTorEnabled<T extends S9Server> (t: T): boolean {
-  return !!t.torAddress
+  async handshake (p: ConnectionProtocol, httpService: HttpService) : Promise<boolean> {
+    const host = this.protocolHost(p)
+    if (host) {
+      return httpService.request(Method.post, host + '/handshake')
+        .then(() => {
+          this.update({ connected: p})
+          return true
+        })
+        .catch(() => false)
+    } else {
+      return false
+    }
+  }
+
+  async setup (httpService: HttpService): Promise<void> {
+    if (this.connected === ConnectionProtocol.TOR) return
+    if (this.connected === ConnectionProtocol.LAN && !this.protocolHost(ConnectionProtocol.TOR)) {
+      // get tor address over lan
+      // success here will get picked up by handshake daemon
+    }
+    if (!this.protocolHost(ConnectionProtocol.LAN)) {
+      // get lan stuff, recall setup function to promote through tor
+    }
+  }
+
+  private protocolHost (p: ConnectionProtocol): string | undefined {
+    switch (p) {
+      case ConnectionProtocol.TOR: return this.getTorAddress()
+      case ConnectionProtocol.LAN: return this.getLanIP()
+      default: undefined
+    }
+  }
+
+  getTorAddress (): string | undefined {
+    return this.torAddress
+  }
+
+  getLanIP (): string | undefined  {
+    if (this.zeroconfService) {
+      const { ipv4Addresses, ipv6Addresses } = this.zeroconfService
+      return ipv4Addresses.concat(ipv6Addresses)[0]
+    }
+    return undefined
+  }
 }
 
 export type ZeroconfService = {
