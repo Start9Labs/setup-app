@@ -2,9 +2,36 @@ import { Injectable } from '@angular/core'
 import { HttpClient, HttpEventType, HttpErrorResponse, HttpHeaders, HttpEvent } from '@angular/common/http'
 import { Method } from '../../types/enums'
 import { Observable } from 'rxjs'
-import { S9Server, ConnectionProtocol } from '../storage/types'
+import { S9Server, ConnectionProtocol, updateS9Server, getProtocolHost } from '../storage/types'
 
 const APP_VERSION = '1.0.0'
+
+export type State<S, T> = (s : S) => Promise<Res<S, T>>
+export type Res<S, T> = { state: S, val : T }
+
+function bindState<S, T> ( req1: State<S, T>, f: (t: T) => State<S, T>): State<S, T> {
+  return async (s: S) => req1(s).then( ({ state, val }) =>  f(val)(state))
+}
+
+export class S9HttpService {
+  constructor (private readonly httpService, private readonly connectionType: ConnectionProtocol) { }
+
+  request<T> (method: Method, path: string, httpOptions: HttpOptions = { }, body: any = { }): State<S9Server, T> {
+    return (server: S9Server) => {
+      const host = getProtocolHost(server, this.connectionType)
+      if (!host) {
+        throw { state: updateS9Server( server, { connected: ConnectionProtocol.NONE }), err: `server not enabled for communication over ${this.connectionType}` }
+      } else {
+        return this.httpService.request(method, host + '/' + path, httpOptions, body)
+        .then( (t: T) => ({ state: updateS9Server(server, { connected: this.connectionType }), val: t }))
+        .catch( (e: any) => {
+            throw { state: updateS9Server(server, { connected: ConnectionProtocol.NONE }), err: e.message }
+          },
+        )
+      }
+    }
+  }
+}
 
 @Injectable()
 export class HttpService {
@@ -52,19 +79,6 @@ export class HttpService {
     headers = headers.set('APP-VERSION', APP_VERSION)
     httpOptions.headers = headers
     httpOptions.observe = 'response'
-  }
-}
-
-export class S9HttpService {
-  constructor (private readonly httpService: HttpService, private readonly server: S9Server) { }
-
-  request<T> (m: Method, u: string, h: HttpOptions = { }, b: any = { }): Promise<[T, S9Server]> {
-    return this.httpService.request(m, u, h, b).catch(
-      e => {
-        this.server.connected = ConnectionProtocol.NONE
-        throw e
-      },
-    ).then(t => [t, this.server]) as Promise<[T, S9Server]>
   }
 }
 

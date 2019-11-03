@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 import { Zeroconf } from '@ionic-native/zeroconf/ngx'
 import { ServerModel } from '../storage/server-model'
 import { LANService } from './lan-service'
-import { ConnectionProtocol, S9Server, isTorEnabled, isLanEnabled, TorEnabled, LanEnabled } from '../storage/types'
+import { ConnectionProtocol, S9Server, isTorEnabled, isLanEnabled, TorEnabled, LanEnabled, updateS9Server } from '../storage/types'
 
 // attempts to handshake with every lan service for which we have a s9server.
 @Injectable()
@@ -16,21 +16,18 @@ export class HandshakeService {
   async handshake (ss: S9Server): Promise<S9Server> {
     if (isTorEnabled(ss) && await this.torHandshake(ss as TorEnabled<S9Server>)) {
       console.log(`Successful tor handshake for ${ss.id}`)
-      ss.connected = ConnectionProtocol.TOR
-      return ss
+      return updateS9Server(ss, { connected: ConnectionProtocol.TOR })
     }
 
     if (isLanEnabled(ss) && await this.lanHandshake(ss as LanEnabled<S9Server>)) {
       console.log(`Successful lan handshake for ${ss.id}`)
-      ss.torAddress = ss.torAddress || await this.lanService.getTorAddress(ss as LanEnabled<S9Server>)
-      ss.connected = ConnectionProtocol.LAN
-      return ss
+      const torAddress = ss.torAddress || await this.lanService.getTorAddress(ss as LanEnabled<S9Server>)
+      return updateS9Server(ss, { torAddress, connected: ConnectionProtocol.LAN })
     }
 
     if (isLanEnabled(ss)) {
       console.log(`Unsuccessful lan handshake for ${ss.id}, but we have ip addresses.`)
-      ss.connected = ConnectionProtocol.NONE
-      return ss
+      return updateS9Server(ss, { connected: ConnectionProtocol.NONE })
     }
 
 

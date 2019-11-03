@@ -3,7 +3,6 @@ import { SecureStorageObject } from '@ionic-native/secure-storage/ngx'
 import { Storage } from '@ionic/storage'
 import { S9Server, StorableS9Server, toStorableServer, fromStoredServer } from './types'
 
-
 @Injectable()
 export class ServerModel {
   secure: SecureStorageObject

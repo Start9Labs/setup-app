@@ -1,5 +1,4 @@
 import * as CryptoJS from 'crypto-js'
-import { NONE_TYPE } from '@angular/compiler/src/output/output_ast'
 
 export interface S9Server {
   readonly id: string,
@@ -9,6 +8,10 @@ export interface S9Server {
   connected: ConnectionProtocol,
   torAddress?: string,
   zeroconfService?: ZeroconfService, //ipv4 + ipv6 addresses
+}
+
+export function updateS9Server (s: S9Server, update: Partial<S9Server>): S9Server {
+  return { ...s, ...update}
 }
 
 export function fromUserInput (id: string, friendlyName: string, pubkey: string): S9Server {
@@ -67,6 +70,21 @@ export function enableTor<T extends S9Server> (t: T, torAddress: string): TorEna
 
 export function getTorAddress<T extends { torAddress: string}> ( t: T ): string {
   return t.torAddress
+}
+
+export function getProtocolHost (s: S9Server, cp: ConnectionProtocol): string | undefined {
+  switch (cp) {
+    case ConnectionProtocol.TOR:
+      if (isTorEnabled(s)) {
+        return getTorAddress(s as TorEnabled<S9Server>)
+      } break
+    case ConnectionProtocol.LAN:
+      if (isLanEnabled(s)) {
+        return getLanIP(s as LanEnabled<S9Server>)
+      } break
+    default:
+      return undefined
+  }
 }
 
 export function isTorEnabled<T extends S9Server> (t: T): boolean {
