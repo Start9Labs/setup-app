@@ -45,9 +45,16 @@ export class AppComponent {
       if (platform.is('cordova')) {
         // detects new lan services
         this.zcDaemon.watch()
+
+        // detects wifi connection and resets zc daemon if so
         this.wcDaemon.watch()
 
+        // iterates through servers in S9ServerModel and tries to handshake w Tor and Lan every 5 seconds
+        // consider adding an attempts counter per server
         this.ssDaemon.handshakeLoop(5000)
+
+        // iterates through servers in S9ServerModel and detects which are missing Tor and Lan info and retrieves that data if possible
+        // consider adding an attempts counter per server
         this.ssDaemon.setupLoop(5000)
 
         // style status bar for iOS and Android

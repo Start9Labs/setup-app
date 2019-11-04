@@ -13,7 +13,6 @@ import { ServerStatusDaemon } from './services/server-status-daemon'
 import { WifiConnectionDaemon } from './services/wifi-connection-daemon'
 // services
 import { HttpService } from './services/http-service'
-import { WifiWizard } from './services/wifi-wizard'
 import { S9ServerModel } from './storage/server-model'
 // native
 import { SplashScreen } from '@ionic-native/splash-screen/ngx'

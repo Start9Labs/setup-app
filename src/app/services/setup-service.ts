@@ -4,7 +4,6 @@ import { HttpService } from './http-service'
 import { ZeroconfDaemon } from './zeroconf-daemon'
 import { Method } from 'src/types/enums'
 
-// attempts to handshake with every lan service for which we have a s9server.
 @Injectable()
 export class SetupService {
   constructor (
@@ -28,6 +27,20 @@ export class SetupService {
     return updateS9(ss, updates)
   }
 
+  async handshake (ss: S9Server): Promise<S9Server> {
+    const torConnexion = await this.handshakeWith(Connexion.TOR, ss)
+    if (torConnexion === Connexion.TOR) {
+      return updateS9(ss, { handshakeWith: torConnexion })
+    }
+
+    const lanConnexion = await this.handshakeWith(Connexion.LAN, ss)
+    if (lanConnexion === Connexion.LAN) {
+      return updateS9(ss, { handshakeWith: lanConnexion })
+    }
+
+    return updateS9(ss, { handshakeWith: Connexion.NONE})
+  }
+
   async handshakeWith (p: Connexion, ss: S9Server) : Promise<Connexion> {
     const lastHandshake = ss.handshakeWith
     const host = protocolHost(ss, p)
@@ -43,19 +56,5 @@ export class SetupService {
       }
     }
     return ss.handshakeWith
-  }
-
-  async handshake (ss: S9Server): Promise<S9Server> {
-    const torConnexion = await this.handshakeWith(Connexion.TOR, ss)
-    if (torConnexion === Connexion.TOR) {
-      return updateS9(ss, { handshakeWith: torConnexion })
-    }
-
-    const lanConnexion = await this.handshakeWith(Connexion.LAN, ss)
-    if (lanConnexion === Connexion.LAN) {
-      return updateS9(ss, { handshakeWith: lanConnexion })
-    }
-
-    return updateS9(ss, { handshakeWith: Connexion.NONE})
   }
 }

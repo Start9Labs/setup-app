@@ -21,18 +21,13 @@ export class ManagePage {
   ) { }
 
   ngOnInit () {
-    // TODO: all hell will break loose if this id dne
     const id = this.route.snapshot.paramMap.get('id')
-    if (!id) {
-      throw new Error (`Need id in params for manage page but got none.`)
-    }
+    if (!id) throw new Error (`Need id in params for manage page but got none.`)
 
-    const server = this.dataService.getServer(id as string) as S9Server
-    if (!server) {
-      throw new Error (`Need server in server model for manage page but got none for id ${id}.`)
-    }
+    const server = this.dataService.getServer(id as string)
+    if (!server) throw new Error (`Need server in server model for manage page but got none for id ${id}.`)
 
-    this.server = server
+    this.server = server as S9Server
   }
 
   async ionViewWillLeave () {
