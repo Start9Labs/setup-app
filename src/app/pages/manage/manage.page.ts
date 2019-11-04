@@ -1,9 +1,8 @@
 import { Component } from '@angular/core'
-import { Start9Server } from 'src/types/Start9Server';
 import { ActivatedRoute } from '@angular/router'
-import { ServerModel } from 'src/app/storage/server-model'
+import { S9ServerModel } from 'src/app/storage/server-model'
 import { NavController, AlertController } from '@ionic/angular'
-import { getServerName } from 'src/types/Start9Server';
+import { S9Server } from 'src/app/storage/s9-server'
 
 @Component({
   selector: 'page-manage',
@@ -11,20 +10,27 @@ import { getServerName } from 'src/types/Start9Server';
   styleUrls: ['manage.page.scss'],
 })
 export class ManagePage {
-  getServerName = getServerName
-  server: Start9Server
+  server: S9Server
   edited = false
 
   constructor (
     public route: ActivatedRoute,
-    public dataService: ServerModel,
+    public dataService: S9ServerModel,
     public navCtrl: NavController,
     public alertCtrl: AlertController,
   ) { }
 
   ngOnInit () {
-    const ssid = this.route.snapshot.paramMap.get('id')
-    this.server = this.dataService.getServer(ssid)
+    // TODO: all hell will break loose if this id dne
+    const id = this.route.snapshot.paramMap.get('id')
+    if (!id) {
+      throw new Error (`Need id in params for manage page but got none.`)
+    }
+    const server = this.dataService.getServer(id as string) as S9Server
+    if (!server) {
+      throw new Error (`Need server in server model for manage page but got none for id ${id}.`)
+    }
+    this.server = server
   }
 
   async ionViewWillLeave () {

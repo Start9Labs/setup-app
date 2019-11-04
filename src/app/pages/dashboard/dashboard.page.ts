@@ -1,6 +1,5 @@
 import { Component } from '@angular/core'
-import { ServerModel } from 'src/app/storage/server-model'
-import { getServerName } from 'src/types/Start9Server';
+import { S9ServerModel } from 'src/app/storage/server-model'
 
 @Component({
   selector: 'page-dashboard',
@@ -8,10 +7,7 @@ import { getServerName } from 'src/types/Start9Server';
   styleUrls: ['./dashboard.page.scss'],
 })
 export class DashboardPage {
-  getServerName = getServerName
-
   constructor (
-    public dataService: ServerModel,
+    public dataService: S9ServerModel,
   ) { }
-
 }

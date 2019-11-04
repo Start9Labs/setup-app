@@ -1,6 +1,7 @@
 import * as CryptoJS from 'crypto-js'
 import { HttpService } from '../services/http-service'
 import { Method } from 'src/types/enums'
+import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 
 export class S9Server {
   constructor (
@@ -8,7 +9,7 @@ export class S9Server {
     public readonly pubkey: string,
     public readonly zeroconfHostname: string,
     public friendlyName: string,
-    public connected: ConnectionProtocol,
+    public handshakeWith: Connexion,
     public torAddress?: string,
     public zeroconfService?: ZeroconfService,
   ) { }
@@ -20,7 +21,7 @@ export class S9Server {
       pubkey,
       zeroconfHostname,
       friendlyName,
-      ConnectionProtocol.NONE,
+      Connexion.NONE,
     )
   }
 
@@ -32,7 +33,7 @@ export class S9Server {
       pubkey,
       zeroconfHostname,
       friendlyName,
-      ConnectionProtocol.NONE,
+      Connexion.NONE,
       torAddress,
       zeroconfService,
     )
@@ -54,35 +55,14 @@ export class S9Server {
     })
   }
 
-  async handshake (p: ConnectionProtocol, httpService: HttpService) : Promise<boolean> {
-    const host = this.protocolHost(p)
-    if (host) {
-      return httpService.request(Method.post, host + '/handshake')
-        .then(() => {
-          this.update({ connected: p})
-          return true
-        })
-        .catch(() => false)
-    } else {
-      return false
-    }
+  get handshakeSuccess (): boolean {
+    return this.handshakeWith !== Connexion.NONE
   }
 
-  async setup (httpService: HttpService): Promise<void> {
-    if (this.connected === ConnectionProtocol.TOR) return
-    if (this.connected === ConnectionProtocol.LAN && !this.protocolHost(ConnectionProtocol.TOR)) {
-      // get tor address over lan
-      // success here will get picked up by handshake daemon
-    }
-    if (!this.protocolHost(ConnectionProtocol.LAN)) {
-      // get lan stuff, recall setup function to promote through tor
-    }
-  }
-
-  private protocolHost (p: ConnectionProtocol): string | undefined {
+  protocolHost (p: Connexion): string | undefined {
     switch (p) {
-      case ConnectionProtocol.TOR: return this.getTorAddress()
-      case ConnectionProtocol.LAN: return this.getLanIP()
+      case Connexion.TOR: return this.getTorAddress()
+      case Connexion.LAN: return this.getLanIP()
       default: undefined
     }
   }
@@ -98,17 +78,16 @@ export class S9Server {
     }
     return undefined
   }
+
+  complete (): boolean {
+    return !!(this.getTorAddress() && this.getLanIP())
+  }
 }
 
-export type ZeroconfService = {
-  domain: string
-  type: string
-  name: string
-  port: number
-  hostname: string
-  ipv4Addresses: string[]
-  ipv6Addresses: string[]
-  txtRecord: { [key: string]: string}
+export class SetupS9Server extends S9Server {
+  constructor (private readonly http: HttpService, s9: S9Server) {
+    super(s9.id, s9.pubkey, s9.zeroconfHostname, s9.friendlyName, s9.handshakeWith, s9.torAddress, s9.zeroconfService)
+  }
 }
 
 export interface StorableS9Server {
@@ -120,17 +99,15 @@ export interface StorableS9Server {
   zeroconfService?: ZeroconfService
 }
 
-export function identifiersFromSerial (serialNo: string): { id: string, zeroconfHostname: string } {
-  const id = CryptoJS.SHA256(serialNo).toString().substr(0, 4)
-  const zeroconfHostname = hostnameFromId(id)
-  return { id, zeroconfHostname }
+export function idFromSerial (serialNo: string): string {
+  return CryptoJS.SHA256(serialNo).toString().substr(0, 6)
 }
 
 export function hostnameFromId (id: string) {
   return `start9-${id}.local`
 }
 
-export enum ConnectionProtocol {
+export enum Connexion {
   TOR,
   LAN,
   NONE,

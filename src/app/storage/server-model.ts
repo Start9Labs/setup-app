@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core'
 import { SecureStorageObject } from '@ionic-native/secure-storage/ngx'
 import { Storage } from '@ionic/storage'
-import { S9Server, StorableS9Server, toStorableServer, fromStoredServer } from './types'
+import { S9Server, StorableS9Server } from './s9-server'
 
 @Injectable()
-export class ServerModel {
+export class S9ServerModel {
   secure: SecureStorageObject
   servers: S9ServerCache = { }
 
@@ -16,8 +16,8 @@ export class ServerModel {
     this.servers = toServerCache(await this.storage.get('servers') || [])
   }
 
-  getServer (ssid: string): S9Server | undefined {
-    return this.servers[ssid]
+  getServer (id: string): S9Server | undefined {
+    return this.servers[id]
   }
 
   getServers (): S9Server[] {
@@ -36,7 +36,6 @@ export class ServerModel {
 
   async saveServer (server: S9Server): Promise<void> {
     const clone: S9Server = JSON.parse(JSON.stringify(server))
-    delete clone.connected
     this.servers[server.id] = clone
     await this.saveAll()
   }
@@ -53,12 +52,12 @@ export class ServerModel {
 }
 
 function fromServerCache (sc : S9ServerCache): S9ServerStore {
-  return Object.values(sc).map(s => toStorableServer(s))
+  return Object.values(sc).map(s => s.toStorableServer())
 }
 
 function toServerCache (ss : S9ServerStore): S9ServerCache {
   return ss.reduce((acc, next) => {
-    acc[next.id] = fromStoredServer(next)
+    acc[next.id] = S9Server.fromStoredServer(next)
     return acc
   }, { } as S9ServerCache)
 }

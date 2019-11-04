@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core'
-import { Platform, NavController } from '@ionic/angular'
-import { ServerModel } from 'src/app/storage/server-model'
-import { identifiersFromSecret } from 'src/types/Start9Server'
-import { HandshakeDaemon } from 'src/app/services/handshake-service'
+import { Component } from '@angular/core'
+import { NavController } from '@ionic/angular'
+import { S9ServerModel } from 'src/app/storage/server-model'
+import { idFromSerial, S9Server } from 'src/app/storage/s9-server'
+import { SetupService } from 'src/app/services/setup-service'
 
 @Component({
   selector: 'page-setup',
@@ -15,21 +15,18 @@ export class SetupPage {
   public serverPasscodeInput = ''
 
   constructor (
-    public platform: Platform,
-    public navController: NavController,
-    public dataService: ServerModel,
-    public handshakeDaemon: HandshakeDaemon,
+    private readonly navController: NavController,
+    private readonly setupService: SetupService,
+    private readonly s9Model: S9ServerModel,
   ) { }
 
   async submit (): Promise<void> {
-    const identifiers = identifiersFromSecret(this.serverPasscodeInput)
+    const id = idFromSerial(this.serverPasscodeInput)
+    const newServer = S9Server.fromUserInput(id, this.friendlyName || id, 'publickey')
+    await this.s9Model.saveServer(newServer)
 
-    this.dataService.saveServer({
-      ...identifiers,
-      friendlyName: this.friendlyName,
-    })
-
-    await this.handshakeDaemon.reset()
+    // attempt to acquire all connection info for new server + handshake asynchronously
+    this.setupService.setup(newServer).then(ss => this.s9Model.saveServer(ss))
 
     this.navController.navigateRoot(['/dashboard'])
   }

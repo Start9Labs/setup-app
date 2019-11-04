@@ -10,7 +10,7 @@ export class WifiWizard {
     public platform: Platform,
   ) { }
 
-  async getConnectedSSID (): Promise<string> {
+  async getConnectedSSID (): Promise<string | null> {
     if (this.platform.is('cordova')) {
       return WifiWizard2.getConnectedSSID().catch((_: Error) => undefined)
     } else {
@@ -30,56 +30,3 @@ export class WifiWizard {
     }
   }
 }
-
-// export abstract class AbsWifiWizard {
-//   abstract getConnectedSSID(): Promise<string>
-//   abstract connect(id: string, password: string): Promise<void>
-
-//   static new(platform: Platform): AbsWifiWizard {
-//     if (platform.is('ios')) {
-//       return new IosWifiWizard()
-//     } else if (platform.is('android')) {
-//       return new AndroidWifiWizard()
-//     } else {
-//       return new WebWifiWizard()
-//     }
-//   }
-// }
-
-// export class IosWifiWizard extends AbsWifiWizard {
-//   constructor() { super() }
-
-//   async getConnectedSSID(): Promise<string> {
-//     return WifiWizard2.getConnectedSSID().catch((_: Error) => undefined)
-//   }
-
-//   async connect(id: string, password: string): Promise<void> {
-//     await WifiWizard2.iOSConnectNetwork(id, password)
-//   }
-// }
-
-// export class AndroidWifiWizard extends AbsWifiWizard {
-//   constructor() { super() }
-
-//   async getConnectedSSID(): Promise<string> {
-//     return WifiWizard2.getConnectedSSID().catch((_: Error) => undefined)
-//   }
-
-//   async connect(id: string, password: string): Promise<void> {
-//     await WifiWizard2.connect(id, true, password, 'WPA', true)
-//   }
-// }
-
-// export class WebWifiWizard extends AbsWifiWizard {
-//   constructor() { super() }
-
-//   async getConnectedSSID(): Promise<string> {
-//     return prompt('Enter current wifi id')
-//   }
-
-//   async connect(id: string, password: string): Promise<void> {
-//     if (!confirm(`Browser detected. Please connect computer to wif: ${id}`)) {
-//       throw new Error('User refused to comply with orders.')
-//     }
-//   }
-// }
