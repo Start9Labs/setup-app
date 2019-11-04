@@ -18,9 +18,9 @@
   <ion-item-group>
     <ion-item *ngFor="let server of dataService.getServers()" [routerLink]="['/manage/' + server.id]">
       <ion-icon slot="start" size="large" name="cube"></ion-icon>
-      {{ getServerName(server) }}
+      {{ server.friendlyName }}
       <ion-note slot="end">
-        <ion-icon size="large" name="wifi" [color]="server.connected ? 'success' : 'danger'"></ion-icon>
+        <ion-icon size="large" name="wifi" [color]="server.handshakeSuccess ? 'success' : 'danger'"></ion-icon>
       </ion-note>
     </ion-item>
   </ion-item-group>

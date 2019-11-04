@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { NavController } from '@ionic/angular'
 import { S9ServerModel } from 'src/app/storage/server-model'
-import { idFromSerial, S9Server } from 'src/app/storage/s9-server'
+import { idFromSerial, S9Server, fromUserInput } from 'src/app/storage/s9-server'
 import { SetupService } from 'src/app/services/setup-service'
 
 @Component({
@@ -22,7 +22,7 @@ export class SetupPage {
 
   async submit (): Promise<void> {
     const id = idFromSerial(this.serverPasscodeInput)
-    const newServer = S9Server.fromUserInput(id, this.friendlyName || id, 'publickey')
+    const newServer = fromUserInput(id, this.friendlyName || id, 'publickey')
     await this.s9Model.saveServer(newServer)
 
     // attempt to acquire all connection info for new server + handshake asynchronously

@@ -31,13 +31,14 @@ export class AppComponent {
 
       // mocky mock
       if (!this.dataService.getServerCount()) {
-        await this.dataService.saveServer(new S9Server(
-          'abcdef',
-          'publickey',
-          'start9-abcdef.local',
-          'My friendly server',
-          Connexion.NONE,
-        ))
+        await this.dataService.saveServer({
+          id: 'abcdef',
+          pubkey: 'publickey',
+          zeroconfHostname: 'start9-abcdef.local',
+          friendlyName: 'My friendly server',
+          torAddress: 'tor.onion.onion',
+          handshakeWith: Connexion.NONE,
+        })
       }
 
       // do Cordova things if Cordova

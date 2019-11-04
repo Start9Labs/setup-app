@@ -21,6 +21,7 @@ import { StatusBar } from '@ionic-native/status-bar/ngx'
 import { Zeroconf } from '@ionic-native/zeroconf/ngx'
 import { Network } from '@ionic-native/network/ngx'
 import { SecureStorage } from '@ionic-native/secure-storage/ngx'
+import { SetupService } from './services/setup-service'
 
 @NgModule({
   declarations: [AppComponent],
@@ -40,7 +41,7 @@ import { SecureStorage } from '@ionic-native/secure-storage/ngx'
     // services
     S9ServerModel,
     HttpService,
-    WifiWizard,
+    SetupService,
     // native
     SecureStorage,
     StatusBar,

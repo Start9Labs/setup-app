@@ -14,10 +14,10 @@
   <ion-item-group style="margin-bottom: 40px;">
     <ion-item>
       <ion-label position="stacked" color="medium">Friendly Name</ion-label>
-      <ion-input (input)="server.friendlyName = $event.target.value" [ngModel]="getServerName(server)" (ionChange)="edited = true"></ion-input>
+      <ion-input [(ngModel)]="server.friendlyName" (ionChange)="edited = true"></ion-input>
     </ion-item>
     <ion-item>
-      <ion-label position="stacked" color="medium">Tor Address</ion-label>          
+      <ion-label position="stacked" color="medium">Tor Address</ion-label>
       <ion-input disabled [ngModel]="server.torAddress"></ion-input>
     </ion-item>
   </ion-item-group>

@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/storage/server-model'
 import { NavController, AlertController } from '@ionic/angular'
-import { S9Server } from 'src/app/storage/s9-server'
+import { S9Server, updateS9 } from 'src/app/storage/s9-server'
 
 @Component({
   selector: 'page-manage',
@@ -26,16 +26,18 @@ export class ManagePage {
     if (!id) {
       throw new Error (`Need id in params for manage page but got none.`)
     }
+
     const server = this.dataService.getServer(id as string) as S9Server
     if (!server) {
       throw new Error (`Need server in server model for manage page but got none for id ${id}.`)
     }
+
     this.server = server
   }
 
   async ionViewWillLeave () {
     if (this.edited) {
-      console.log(this.server)
+      this.server = updateS9(this.server, { friendlyName: this.server.friendlyName || this.server.id })
       await this.dataService.saveServer(this.server)
     }
   }

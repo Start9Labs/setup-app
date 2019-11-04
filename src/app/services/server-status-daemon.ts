@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core'
 import { S9ServerModel } from '../storage/server-model'
 import { SetupService } from './setup-service'
+import { isFullySetup } from '../storage/s9-server'
 
 @Injectable()
 export class ServerStatusDaemon {
@@ -11,7 +12,7 @@ export class ServerStatusDaemon {
 
   async setupLoop (ms: number): Promise<void> {
     setInterval(async () => {
-      const sss = this.svm.getServers().filter(ss => !ss.complete())
+      const sss = this.svm.getServers().filter(ss => !isFullySetup(ss))
       await Promise.all(
         sss.map(
           ss => this.setupService.setup(ss).then(ss => this.svm.saveServer(ss)),
