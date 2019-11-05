@@ -27,7 +27,7 @@ export class ZeroconfDaemon {
       const { action, service } = result
       console.log(`acquired new service`)
 
-      if (service.hostname.startsWith('start9-')) {
+      if (service.hostname.startsWith('start9-') && service.ipv4Addresses.concat(service.ipv6Addresses).length > 0) {
         console.log(`acquired new start9 server ${service.hostname}`)
 
         switch (action) {

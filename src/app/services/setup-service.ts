@@ -1,62 +1,88 @@
 import { Injectable } from '@angular/core'
-import { Connexion, S9Server, updateS9, getLanIP, protocolHost, updateS9_MUT } from '../storage/s9-server'
-import { HttpService } from './http-service'
+import { S9Server, getLanIP, updateS9_MUT, LanS9Server, isLanEnabled, HandshakeAttempt, isFullySetup } from '../storage/s9-server'
+import { HttpService, HttpOptions } from './http-service'
 import { ZeroconfDaemon } from './zeroconf-daemon'
 import { Method } from 'src/types/enums'
 import { clone } from '../storage/server-model'
+import { pauseFor } from 'src/types/misc'
+import { HttpHeaders } from '@angular/common/http'
 
 @Injectable()
 export class SetupService {
+  private static readonly setupAttempts = 10
+  private static readonly waitForMS = 1000
+  public message = ''
+
   constructor (
     private readonly httpService: HttpService,
     private readonly zeroconfDaemon: ZeroconfDaemon,
   ) { }
 
-  async setup (ss: S9Server): Promise<S9Server> {
-    const ssClone = clone(ss)
-
-    if (!getLanIP(ssClone)) {
-      updateS9_MUT(ssClone, { zeroconfService: this.zeroconfDaemon.getService(ssClone)})
-      updateS9_MUT(ssClone, { handshakeWith: await this.handshakeWith(Connexion.LAN, ssClone)})
+  async setup (ss: S9Server, serial: string): Promise<S9Server> {
+    const pubkey = 'publicknomicon'
+    for (let i = 0; i < SetupService.setupAttempts; i ++) {
+      const completedServer = await this.setupAttempt(ss, pubkey, serial)
+      if (isFullySetup(completedServer)) {
+        return completedServer
+      }
+      await pauseFor(SetupService.waitForMS)
     }
 
-    if (!ssClone.torAddress && getLanIP(ssClone) && ssClone.handshakeWith === Connexion.LAN) {
+    throw new Error(`failed ${this.message}`)
+  }
+
+  private async setupAttempt (ss: S9Server, pubkey: string, serial: string): Promise<S9Server> {
+    const ssClone = clone(ss)
+
+    // enable lan
+    if (!isLanEnabled(ssClone)) {
+      this.message = `getting zeroconf service`
+      updateS9_MUT(ssClone, { zeroconfService: this.zeroconfDaemon.getService(ssClone)})
+    }
+
+    // pubkey registration
+    if (isLanEnabled(ssClone) && !ss.registered) {
+      this.message = `registering pubkey`
+      updateS9_MUT(ssClone, { registered: await this.registerPubkey(ssClone, pubkey, serial) }) // true or false
+    }
+
+    // lan handshake
+    if (isLanEnabled(ssClone) && ss.registered && !ss.lastHandshake.success) {
+      this.message = `executing server handshake`
+      updateS9_MUT(ssClone, { lastHandshake: await this.handshake(ssClone) })
+    }
+
+    // tor acquisition
+    if (isLanEnabled(ssClone) && ss.registered && ss.lastHandshake.success && !ss.torAddress) {
+      this.message = `getting tor address`
       const { torAddress } = await this.httpService.request<{ torAddress: string }>(Method.get, getLanIP(ss) + '/tor')
       updateS9_MUT(ssClone, { torAddress })
-      updateS9_MUT(ssClone, { handshakeWith: await this.handshakeWith(Connexion.TOR, ssClone)})
     }
 
     return ssClone
   }
 
-  async handshake (ss: S9Server): Promise<S9Server> {
-    const torConnexion = await this.handshakeWith(Connexion.TOR, ss)
-    if (torConnexion === Connexion.TOR) {
-      return updateS9(ss, { handshakeWith: torConnexion })
+  async registerPubkey (ss: LanS9Server, pubkey: string, serial: string): Promise<boolean> {
+    try {
+      const headers: HttpHeaders = new HttpHeaders({ 'timeout': '3000' })
+      await this.httpService.request(Method.post, getLanIP(ss) + '/register', { headers }, { pubkey, serial })
+      return true
+    } catch (e) {
+      console.error(`failed pubkey registration for ${ss.id}: ${e.message}`)
+      return false
     }
-
-    const lanConnexion = await this.handshakeWith(Connexion.LAN, ss)
-    if (lanConnexion === Connexion.LAN) {
-      return updateS9(ss, { handshakeWith: lanConnexion })
-    }
-
-    return updateS9(ss, { handshakeWith: Connexion.NONE})
   }
 
-  async handshakeWith (p: Connexion, ss: S9Server) : Promise<Connexion> {
-    const lastHandshake = ss.handshakeWith
-    const host = protocolHost(ss, p)
-    if (host) {
-      try {
-        await this.httpService.request(Method.post, host + '/handshake')
-        return p
-      } catch (e) {
-        console.error(`failed handhsake ${e.message}`)
-        if (lastHandshake === p) {
-          return Connexion.NONE
-        }
-      }
+  async handshake (ss: LanS9Server, timeoutMs?: number) : Promise<HandshakeAttempt> {
+    const now = new Date()
+    try {
+      let options: HttpOptions = { }
+      if (timeoutMs) { options.headers = new HttpHeaders({ 'timeout': timeoutMs.toString() }) }
+      await this.httpService.request(Method.post, getLanIP(ss) + '/handshake', options)
+      return { success: true, timestamp: now }
+    } catch (e) {
+      console.error(`failed handhsake for ${ss.id}: ${e.message}`)
+      return { success: false, timestamp: now }
     }
-    return ss.handshakeWith
   }
 }

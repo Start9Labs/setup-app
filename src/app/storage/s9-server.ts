@@ -4,9 +4,22 @@ import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 export interface S9Server {
   id: string
   friendlyName: string
-  handshakeWith: Connexion
+  lastHandshake: HandshakeAttempt
+  registered: boolean
   torAddress?: string
   zeroconfService?: ZeroconfService
+}
+
+export interface LanS9Server extends S9Server {
+  zeroconfService: ZeroconfService
+}
+
+export function isFullySetup (ss: S9Server): boolean {
+  return !!getLanIP(ss) && ss.registered && ss.lastHandshake.success && !!ss.torAddress
+}
+
+export function isLanEnabled (ss: S9Server | LanS9Server): ss is LanS9Server {
+  return !!getLanIP(ss)
 }
 
 export function updateS9 (ss: S9Server, u: Partial<S9Server>): S9Server {
@@ -18,18 +31,6 @@ export function updateS9_MUT (ss: S9Server, u: Partial<S9Server>): void {
   Object.entries(u).forEach(([k, v]) => {
     ss[k] = v
   })
-}
-
-export function isFullySetup (ss: S9Server) : boolean {
-  return !!(ss.torAddress && getLanIP(ss))
-}
-
-export function protocolHost (ss: S9Server, p: Connexion): string | undefined {
-  switch (p) {
-    case Connexion.TOR: return ss.torAddress
-    case Connexion.LAN: return getLanIP(ss)
-    default: undefined
-  }
 }
 
 export function zeroconfHostname (ss: S9Server): string {
@@ -44,22 +45,24 @@ export function getLanIP (ss: S9Server): string | undefined  {
   return undefined
 }
 
-export function fromUserInput (id: string, friendlyName: string, pubkey: string): S9Server {
+export function fromUserInput (id: string, friendlyName: string): S9Server {
     return {
       id,
       friendlyName,
-      handshakeWith: Connexion.NONE,
+      lastHandshake: initHandshakeStatus(),
+      registered: false,
     }
   }
 
 export function fromStoredServer (ss : StorableS9Server) : S9Server {
-    const { friendlyName, torAddress, zeroconfService, id } = ss
+    const { registered, friendlyName, torAddress, zeroconfService, id } = ss
     return {
       id,
       friendlyName,
-      handshakeWith: Connexion.NONE,
+      lastHandshake: initHandshakeStatus(),
       torAddress,
       zeroconfService,
+      registered,
     }
   }
 
@@ -69,13 +72,20 @@ export function toStorableServer (ss: S9Server): StorableS9Server {
     friendlyName: ss.friendlyName,
     torAddress: ss.torAddress,
     zeroconfService: ss.zeroconfService,
+    registered: ss.registered,
   }
 }
 
+export type HandshakeAttempt = { success: boolean, timestamp: Date }
+
+export function initHandshakeStatus (): HandshakeAttempt {
+  return { success: false, timestamp: new Date() }
+}
 
 export interface StorableS9Server {
   id: string
   friendlyName: string
+  registered: boolean
   torAddress?: string
   // may not be up to date in which case ip communication will fail and we will replace.
   zeroconfService?: ZeroconfService
@@ -88,10 +98,3 @@ export function idFromSerial (serialNo: string): string {
 function hostnameFromId (id: string) {
   return `start9-${id}.local`
 }
-
-export enum Connexion {
-  TOR,
-  LAN,
-  NONE,
-}
-

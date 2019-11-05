@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core'
 import { S9ServerModel } from '../storage/server-model'
 import { SetupService } from './setup-service'
-import { isFullySetup } from '../storage/s9-server'
+import { isFullySetup, isLanEnabled, updateS9 } from '../storage/s9-server'
+import { pauseFor } from 'src/types/misc'
 
 @Injectable()
 export class ServerStatusDaemon {
@@ -10,25 +11,20 @@ export class ServerStatusDaemon {
     private readonly svm: S9ServerModel,
   ) { }
 
-  async setupLoop (ms: number): Promise<void> {
-    setInterval(async () => {
-      const sss = this.svm.getServers().filter(ss => !isFullySetup(ss))
-      await Promise.all(
-        sss.map(
-          ss => this.setupService.setup(ss).then(ss => this.svm.saveServer(ss)),
-        ),
-      )
-    }, ms)
-  }
-
   async handshakeLoop (ms: number): Promise<void> {
-    setInterval(async () => {
+    while (true) {
       const sss = this.svm.getServers()
       await Promise.all(
         sss.map(
-          ss => this.setupService.handshake(ss).then(ss => this.svm.saveServer(ss)),
+          async ss => {
+            if (isLanEnabled(ss)) {
+              const handshakeAttempt = await this.setupService.handshake(ss)
+              this.svm.saveServer(updateS9(ss, { lastHandshake: handshakeAttempt }))
+            }
+          },
         ),
       )
-    }, ms)
+      await pauseFor(ms)
+    }
   }
 }

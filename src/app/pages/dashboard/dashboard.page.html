@@ -20,7 +20,7 @@
       <ion-icon slot="start" size="large" name="cube"></ion-icon>
       {{ server.friendlyName }}
       <ion-note slot="end">
-        <ion-icon size="large" name="wifi" [color]="server.handshakeWith !== Connexion.NONE ? 'success' : 'danger'">
+        <ion-icon size="large" name="wifi" [color]="server.lastHandshake.success ? 'success' : 'danger'">
         </ion-icon>
       </ion-note>
     </ion-item>

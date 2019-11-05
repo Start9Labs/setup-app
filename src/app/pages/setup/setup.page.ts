@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { NavController } from '@ionic/angular'
+import { NavController, LoadingController } from '@ionic/angular'
 import { S9ServerModel } from 'src/app/storage/server-model'
 import { idFromSerial, S9Server, fromUserInput } from 'src/app/storage/s9-server'
 import { SetupService } from 'src/app/services/setup-service'
@@ -12,23 +12,32 @@ import { SetupService } from 'src/app/services/setup-service'
 export class SetupPage {
   public error = ''
   public friendlyName = ''
-  public serverPasscodeInput = ''
+  public serial = ''
 
   constructor (
     private readonly navController: NavController,
     private readonly setupService: SetupService,
     private readonly s9Model: S9ServerModel,
+    private readonly loadingCtrl: LoadingController,
   ) { }
 
   async submit (): Promise<void> {
-    const id = idFromSerial(this.serverPasscodeInput)
-    const newServer = fromUserInput(id, this.friendlyName || id, 'publickey')
-    await this.s9Model.saveServer(newServer)
+    const id = idFromSerial(this.serial)
+    const newServer = fromUserInput(id, this.friendlyName || id)
+
+    const loader = await this.loadingCtrl.create({ message: 'Setting up server...'})
+    await loader.present()
 
     // attempt to acquire all connection info for new server + handshake asynchronously
-    this.setupService.setup(newServer).then(ss => this.s9Model.saveServer(ss))
-
-    this.navController.navigateRoot(['/dashboard'])
+    try {
+      const setupServer = await this.setupService.setup(newServer, this.serial)
+      await this.s9Model.saveServer(setupServer)
+      await this.navController.navigateRoot(['/dashboard'])
+    } catch (e) {
+      this.error = `Error: ${e.message}`
+    } finally {
+      await loader.dismiss()
+    }
   }
 }
 
