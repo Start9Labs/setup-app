@@ -33,8 +33,6 @@ export class AppComponent {
       if (!this.dataService.getServerCount()) {
         await this.dataService.saveServer({
           id: 'abcdef',
-          pubkey: 'publickey',
-          zeroconfHostname: 'start9-abcdef.local',
           friendlyName: 'My friendly server',
           torAddress: 'tor.onion.onion',
           handshakeWith: Connexion.NONE,

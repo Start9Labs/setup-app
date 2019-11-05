@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core'
-import { Connexion, S9Server, updateS9, getLanIP, protocolHost } from '../storage/s9-server'
+import { Connexion, S9Server, updateS9, getLanIP, protocolHost, updateS9_MUT } from '../storage/s9-server'
 import { HttpService } from './http-service'
 import { ZeroconfDaemon } from './zeroconf-daemon'
 import { Method } from 'src/types/enums'
+import { clone } from '../storage/server-model'
 
 @Injectable()
 export class SetupService {
@@ -12,19 +13,20 @@ export class SetupService {
   ) { }
 
   async setup (ss: S9Server): Promise<S9Server> {
-    let updates = { } as Partial<S9Server>
-    if (!getLanIP(ss)) {
-      updates.handshakeWith = await this.handshakeWith(Connexion.LAN, ss),
-      updates.zeroconfService = this.zeroconfDaemon.getService(ss)
+    const ssClone = clone(ss)
+
+    if (!getLanIP(ssClone)) {
+      updateS9_MUT(ssClone, { zeroconfService: this.zeroconfDaemon.getService(ssClone)})
+      updateS9_MUT(ssClone, { handshakeWith: await this.handshakeWith(Connexion.LAN, ssClone)})
     }
 
-    if (!ss.torAddress && getLanIP(ss) && ss.handshakeWith === Connexion.LAN) {
+    if (!ssClone.torAddress && getLanIP(ssClone) && ssClone.handshakeWith === Connexion.LAN) {
       const { torAddress } = await this.httpService.request<{ torAddress: string }>(Method.get, getLanIP(ss) + '/tor')
-      updates.torAddress = torAddress
-      updates.handshakeWith = await this.handshakeWith(Connexion.TOR, ss)
+      updateS9_MUT(ssClone, { torAddress })
+      updateS9_MUT(ssClone, { handshakeWith: await this.handshakeWith(Connexion.TOR, ssClone)})
     }
 
-    return updateS9(ss, updates)
+    return ssClone
   }
 
   async handshake (ss: S9Server): Promise<S9Server> {

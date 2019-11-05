@@ -35,8 +35,7 @@ export class S9ServerModel {
   }
 
   async saveServer (server: S9Server): Promise<void> {
-    const clone: S9Server = JSON.parse(JSON.stringify(server))
-    this.servers[server.id] = clone
+    this.servers[server.id] = clone(server)
     await this.saveAll()
   }
 
@@ -49,6 +48,10 @@ export class S9ServerModel {
     const storableServers = fromServerCache(this.servers)
     await this.storage.set('servers', storableServers)
   }
+}
+
+export function clone<T extends { }> (t: T): T {
+  return JSON.parse(JSON.stringify(t))
 }
 
 function fromServerCache (sc : S9ServerCache): S9ServerStore {

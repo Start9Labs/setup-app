@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Zeroconf, ZeroconfService } from '@ionic-native/zeroconf/ngx'
-import { S9Server } from '../storage/s9-server'
+import { S9Server, zeroconfHostname } from '../storage/s9-server'
 import { Subscription } from 'rxjs'
 
 @Injectable()
@@ -44,6 +44,6 @@ export class ZeroconfDaemon {
   }
 
   getService (s9: S9Server): ZeroconfService | undefined {
-    return this.zeroconfServices[s9.zeroconfHostname]
+    return this.zeroconfServices[zeroconfHostname(s9)]
   }
 }

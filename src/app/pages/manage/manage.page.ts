@@ -24,10 +24,10 @@ export class ManagePage {
     const id = this.route.snapshot.paramMap.get('id')
     if (!id) throw new Error (`Need id in params for manage page but got none.`)
 
-    const server = this.dataService.getServer(id as string)
+    const server = this.dataService.getServer(id)
     if (!server) throw new Error (`Need server in server model for manage page but got none for id ${id}.`)
 
-    this.server = server as S9Server
+    this.server = server
   }
 
   async ionViewWillLeave () {
