@@ -1,9 +1,8 @@
 import { Component } from '@angular/core'
-import { Start9Server } from 'src/types/misc'
 import { ActivatedRoute } from '@angular/router'
-import { DataService } from 'src/app/services/data-service'
+import { S9ServerModel } from 'src/app/storage/server-model'
 import { NavController, AlertController } from '@ionic/angular'
-import { getServerName } from 'src/types/misc'
+import { S9Server, updateS9 } from 'src/app/storage/s9-server'
 
 @Component({
   selector: 'page-manage',
@@ -11,25 +10,29 @@ import { getServerName } from 'src/types/misc'
   styleUrls: ['manage.page.scss'],
 })
 export class ManagePage {
-  getServerName = getServerName
-  server: Start9Server
+  server: S9Server
   edited = false
 
   constructor (
     public route: ActivatedRoute,
-    public dataService: DataService,
+    public dataService: S9ServerModel,
     public navCtrl: NavController,
     public alertCtrl: AlertController,
   ) { }
 
   ngOnInit () {
-    const ssid = this.route.snapshot.paramMap.get('ssid')
-    this.server = this.dataService.getServer(ssid)
+    const id = this.route.snapshot.paramMap.get('id')
+    if (!id) throw new Error (`Need id in params for manage page but got none.`)
+
+    const server = this.dataService.getServer(id)
+    if (!server) throw new Error (`Need server in server model for manage page but got none for id ${id}.`)
+
+    this.server = server
   }
 
   async ionViewWillLeave () {
     if (this.edited) {
-      console.log(this.server)
+      this.server = updateS9(this.server, { friendlyName: this.server.friendlyName || this.server.id })
       await this.dataService.saveServer(this.server)
     }
   }
@@ -48,7 +51,7 @@ export class ManagePage {
           cssClass: 'alert-danger',
           handler: async () => {
             this.edited = false
-            await this.dataService.forgetServer(this.server.ssid)
+            await this.dataService.forgetServer(this.server.id)
             await this.navCtrl.navigateRoot(['/dashboard'])
           },
         },

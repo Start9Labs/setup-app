@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core'
-import { Platform, NavController } from '@ionic/angular'
-import { DataService } from 'src/app/services/data-service'
-import { identifiersFromSecret } from 'src/types/misc'
-import { HandshakeDaemon } from 'src/app/services/handshake-daemon'
+import { Component } from '@angular/core'
+import { NavController, LoadingController } from '@ionic/angular'
+import { S9ServerModel } from 'src/app/storage/server-model'
+import { idFromSerial, S9Server, fromUserInput } from 'src/app/storage/s9-server'
+import { SetupService } from 'src/app/services/setup-service'
 
 @Component({
   selector: 'page-setup',
@@ -12,26 +12,32 @@ import { HandshakeDaemon } from 'src/app/services/handshake-daemon'
 export class SetupPage {
   public error = ''
   public friendlyName = ''
-  public serverPasscodeInput = ''
+  public serial = ''
 
   constructor (
-    public platform: Platform,
-    public navController: NavController,
-    public dataService: DataService,
-    public handshakeDaemon: HandshakeDaemon,
+    private readonly navController: NavController,
+    private readonly setupService: SetupService,
+    private readonly s9Model: S9ServerModel,
+    private readonly loadingCtrl: LoadingController,
   ) { }
 
   async submit (): Promise<void> {
-    const identifiers = identifiersFromSecret(this.serverPasscodeInput)
+    const id = idFromSerial(this.serial)
+    const newServer = fromUserInput(id, this.friendlyName || id)
 
-    this.dataService.saveServer({
-      ...identifiers,
-      friendlyName: this.friendlyName,
-    })
+    const loader = await this.loadingCtrl.create({ message: 'Setting up server...'})
+    await loader.present()
 
-    await this.handshakeDaemon.reset()
-
-    this.navController.navigateRoot(['/dashboard'])
+    // attempt to acquire all connection info for new server + handshake asynchronously
+    try {
+      const setupServer = await this.setupService.setup(newServer, this.serial)
+      await this.s9Model.saveServer(setupServer)
+      await this.navController.navigateRoot(['/dashboard'])
+    } catch (e) {
+      this.error = `Error: ${e.message}`
+    } finally {
+      await loader.dismiss()
+    }
   }
 }
 

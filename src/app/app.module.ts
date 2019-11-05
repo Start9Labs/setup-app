@@ -7,20 +7,20 @@ import { IonicStorageModule } from '@ionic/storage'
 import { HttpClientModule } from '@angular/common/http'
 import { AppComponent } from './app.component'
 import { AppRoutingModule } from './app-routing.module'
+// daemons
+import { ZeroconfDaemon } from './services/zeroconf-daemon'
+import { ServerStatusDaemon } from './services/server-status-daemon'
+import { WifiConnectionDaemon } from './services/wifi-connection-daemon'
 // services
-import { APService } from './services/ap-service'
-import { DataService } from './services/data-service'
 import { HttpService } from './services/http-service'
-import { LANService } from './services/lan-service'
-import { WifiWizard } from './services/wifi-wizard'
+import { S9ServerModel } from './storage/server-model'
 // native
 import { SplashScreen } from '@ionic-native/splash-screen/ngx'
 import { StatusBar } from '@ionic-native/status-bar/ngx'
 import { Zeroconf } from '@ionic-native/zeroconf/ngx'
 import { Network } from '@ionic-native/network/ngx'
 import { SecureStorage } from '@ionic-native/secure-storage/ngx'
-import { HandshakeDaemon } from './services/handshake-daemon'
-import { WifiConnectionDaemon } from './services/wifi-connection-daemon'
+import { SetupService } from './services/setup-service'
 
 @NgModule({
   declarations: [AppComponent],
@@ -33,20 +33,20 @@ import { WifiConnectionDaemon } from './services/wifi-connection-daemon'
     IonicStorageModule.forRoot(),
   ],
   providers: [
+    // daemons
+    ServerStatusDaemon,
+    WifiConnectionDaemon,
+    ZeroconfDaemon,
     // services
-    APService,
-    DataService,
+    S9ServerModel,
     HttpService,
-    LANService,
-    WifiWizard,
+    SetupService,
     // native
     SecureStorage,
     StatusBar,
     SplashScreen,
     Zeroconf,
     Network,
-    HandshakeDaemon,
-    WifiConnectionDaemon,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
   ],
   bootstrap: [AppComponent],
