@@ -2,11 +2,11 @@ import { Component } from '@angular/core'
 import { Platform } from '@ionic/angular'
 import { SplashScreen } from '@ionic-native/splash-screen/ngx'
 import { StatusBar } from '@ionic-native/status-bar/ngx'
-import { S9ServerModel } from './storage/server-model'
-import { ServerStatusDaemon } from './services/server-status-daemon'
-import { WifiConnectionDaemon } from './services/wifi-connection-daemon'
-import { ZeroconfDaemon } from './services/zeroconf-daemon'
-import { initHandshakeStatus } from './storage/s9-server'
+import { S9ServerModel } from './models/server-model'
+import { HealthDaemon } from './daemons/health-daemon'
+import { WifiDaemon } from './daemons/wifi-daemon'
+import { ZeroconfDaemon } from './daemons/zeroconf-daemon'
+import { initHandshakeStatus } from './models/s9-server'
 
 @Component({
   selector: 'app-root',
@@ -20,9 +20,9 @@ export class AppComponent {
     public splashScreen: SplashScreen,
     public statusBar: StatusBar,
     public dataService: S9ServerModel,
-    public zcDaemon: ZeroconfDaemon,
-    public wcDaemon: WifiConnectionDaemon,
-    public ssDaemon: ServerStatusDaemon,
+    public zeroconfDaemon: ZeroconfDaemon,
+    public wifiDaemon: WifiDaemon,
+    public healthDaemon: HealthDaemon,
   ) {
     document.body.classList.toggle('dark', true)
     platform.ready().then(async () => {
@@ -43,15 +43,12 @@ export class AppComponent {
       // do Cordova things if Cordova
       if (platform.is('cordova')) {
         // detects new lan services
-        this.zcDaemon.watch()
-
+        this.zeroconfDaemon.watch()
         // detects wifi connection and resets zc daemon if so
-        this.wcDaemon.watch()
-
+        this.wifiDaemon.watch()
         // iterates through servers in S9ServerModel and tries to handshake w Tor and Lan every 5 seconds
         // consider adding an attempts counter per server
-        this.ssDaemon.handshakeLoop(5000)
-
+        this.healthDaemon.handshakeLoop(5000)
         // style status bar for iOS and Android
         if (platform.is('ios')) {
           statusBar.styleDefault()

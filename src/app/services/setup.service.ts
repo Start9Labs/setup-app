@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core'
-import { S9Server, getLanIP, updateS9_MUT, LanS9Server, isLanEnabled, HandshakeAttempt, isFullySetup } from '../storage/s9-server'
-import { HttpService, HttpOptions } from './http-service'
-import { ZeroconfDaemon } from './zeroconf-daemon'
-import { Method } from 'src/types/enums'
-import { clone } from '../storage/server-model'
-import { pauseFor } from 'src/types/misc'
+import { S9Server, getLanIP, updateS9_MUT, LanS9Server, isLanEnabled, HandshakeAttempt, isFullySetup } from '../models/s9-server'
+import { HttpService, HttpOptions } from './http.service'
+import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
+import { Method } from 'src/app/types/enums'
+import { clone } from '../models/server-model'
+import { pauseFor } from 'src/app/util/misc'
 import { HttpHeaders } from '@angular/common/http'
 
 @Injectable()

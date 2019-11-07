@@ -1,8 +1,8 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { S9ServerModel } from 'src/app/storage/server-model'
+import { S9ServerModel } from 'src/app/models/server-model'
 import { NavController, AlertController } from '@ionic/angular'
-import { S9Server, updateS9 } from 'src/app/storage/s9-server'
+import { S9Server, updateS9 } from 'src/app/models/s9-server'
 
 @Component({
   selector: 'page-manage',

@@ -5,7 +5,7 @@ import { ZeroconfDaemon } from './zeroconf-daemon'
 
 // detects when phone changes wifi network
 @Injectable()
-export class WifiConnectionDaemon {
+export class WifiDaemon {
   private disconnectionMonitor: Subscription
   private connectionMonitor: Subscription
 

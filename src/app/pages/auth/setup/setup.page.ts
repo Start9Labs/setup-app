@@ -1,8 +1,8 @@
 import { Component } from '@angular/core'
 import { NavController, LoadingController } from '@ionic/angular'
-import { S9ServerModel } from 'src/app/storage/server-model'
-import { idFromSerial, fromUserInput } from 'src/app/storage/s9-server'
-import { SetupService } from 'src/app/services/setup-service'
+import { S9ServerModel } from 'src/app/models/server-model'
+import { idFromSerial, fromUserInput } from 'src/app/models/s9-server'
+import { SetupService } from 'src/app/services/setup.service'
 
 @Component({
   selector: 'page-setup',

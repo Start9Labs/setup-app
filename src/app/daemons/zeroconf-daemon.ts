@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Zeroconf, ZeroconfService } from '@ionic-native/zeroconf/ngx'
-import { S9Server, zeroconfHostname } from '../storage/s9-server'
+import { S9Server, zeroconfHostname } from '../models/s9-server'
 import { Subscription } from 'rxjs'
 
 @Injectable()

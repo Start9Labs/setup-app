@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core'
-import { S9ServerModel } from '../storage/server-model'
-import { SetupService } from './setup-service'
-import { isLanEnabled, updateS9 } from '../storage/s9-server'
-import { pauseFor } from 'src/types/misc'
+import { S9ServerModel } from '../models/server-model'
+import { SetupService } from '../services/setup.service'
+import { isLanEnabled, updateS9 } from '../models/s9-server'
+import { pauseFor } from 'src/app/util/misc'
 
 @Injectable()
-export class ServerStatusDaemon {
+export class HealthDaemon {
   constructor (
     private readonly setupService: SetupService,
     private readonly svm: S9ServerModel,

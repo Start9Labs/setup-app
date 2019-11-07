@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { S9ServerModel } from 'src/app/storage/server-model'
+import { S9ServerModel } from 'src/app/models/server-model'
 
 @Component({
   selector: 'page-dashboard',

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { HttpClient, HttpEventType, HttpErrorResponse, HttpHeaders, HttpEvent } from '@angular/common/http'
-import { Method } from '../../types/enums'
+import { Method } from '../types/enums'
 import { Observable } from 'rxjs'
 const APP_VERSION = '1.0.0'
 

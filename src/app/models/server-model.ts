@@ -1,15 +1,13 @@
 import { Injectable } from '@angular/core'
-import { SecureStorageObject } from '@ionic-native/secure-storage/ngx'
 import { Storage } from '@ionic/storage'
 import { S9Server, StorableS9Server, toStorableServer, fromStoredServer } from './s9-server'
 
 @Injectable()
 export class S9ServerModel {
-  secure: SecureStorageObject
   servers: S9ServerCache = { }
 
   constructor (
-    public storage: Storage,
+    private readonly storage: Storage,
   ) { }
 
   async load (): Promise<void> {

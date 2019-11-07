@@ -6,21 +6,21 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular'
 import { IonicStorageModule } from '@ionic/storage'
 import { HttpClientModule } from '@angular/common/http'
 import { AppComponent } from './app.component'
-import { AppRoutingModule } from './app-routing.module'
+import { AppRoutingModule } from './routes/app-routing.module'
 // daemons
-import { ZeroconfDaemon } from './services/zeroconf-daemon'
-import { ServerStatusDaemon } from './services/server-status-daemon'
-import { WifiConnectionDaemon } from './services/wifi-connection-daemon'
+import { HealthDaemon } from './daemons/health-daemon'
+import { WifiDaemon } from './daemons/wifi-daemon'
+import { ZeroconfDaemon } from './daemons/zeroconf-daemon'
 // services
-import { HttpService } from './services/http-service'
-import { S9ServerModel } from './storage/server-model'
+import { HttpService } from './services/http.service'
+import { S9ServerModel } from './models/server-model'
+import { SetupService } from './services/setup.service'
 // native
 import { SplashScreen } from '@ionic-native/splash-screen/ngx'
 import { StatusBar } from '@ionic-native/status-bar/ngx'
 import { Zeroconf } from '@ionic-native/zeroconf/ngx'
 import { Network } from '@ionic-native/network/ngx'
 import { SecureStorage } from '@ionic-native/secure-storage/ngx'
-import { SetupService } from './services/setup-service'
 
 @NgModule({
   declarations: [AppComponent],
@@ -34,8 +34,8 @@ import { SetupService } from './services/setup-service'
   ],
   providers: [
     // daemons
-    ServerStatusDaemon,
-    WifiConnectionDaemon,
+    HealthDaemon,
+    WifiDaemon,
     ZeroconfDaemon,
     // services
     S9ServerModel,
