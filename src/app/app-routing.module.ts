@@ -1,23 +1,18 @@
 import { NgModule } from '@angular/core'
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router'
+import { AuthGuard } from './pages/auth/auth.guard'
+import { UnauthGuard } from './pages/unauth/unauth.guard'
 
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'dashboard',
-    pathMatch: 'full',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./pages/auth/auth-routing.module').then(m => m.AuthRoutingModule),
   },
   {
-    path: 'dashboard',
-    loadChildren: () => import('./pages/dashboard/dashboard.module').then(m => m.DashboardPageModule),
-  },
-  {
-    path: 'setup',
-    loadChildren: () => import('./pages/setup/setup.module').then(m => m.SetupPageModule),
-  },
-  {
-    path: 'manage/:id',
-    loadChildren: () => import('./pages/manage/manage.module').then(m => m.ManagePageModule),
+    path: 'welcome',
+    canActivate: [UnauthGuard],
+    loadChildren: () => import('./pages/unauth/unauth-routing.module').then(m => m.UnauthRoutingModule),
   },
 ]
 

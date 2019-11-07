@@ -1,0 +1,21 @@
+<ion-content>
+
+  <div class="welcome-banner">
+    <img src="assets/img/logo.png">
+    <ion-text color="danger">
+      <h1>Sovereign Computing</h1>
+    </ion-text>
+  </div>
+
+  <div class="welcome-buttons">
+
+    <ion-button expand="full" fill="outline" size="large" [routerLink]="['create']">
+      Generate Keychain
+    </ion-button>
+    <ion-button expand="full" fill="outline" size="large" color="danger" [routerLink]="['restore']">
+      Restore Keychain
+    </ion-button>
+
+  </div>
+
+</ion-content>
