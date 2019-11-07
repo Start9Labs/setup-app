@@ -1,0 +1,69 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="welcome"></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      Generate Keychain
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-grid coloe="primary">
+    <ion-row class="ion-align-items-center">
+      <ion-col class="ion-align-self-start">
+        1. {{ mnemonic[0] }}
+      </ion-col>
+      <ion-col class="ion-align-self-start">
+        2. {{ mnemonic[1] }}
+      </ion-col>
+      <ion-col class="ion-align-self-start">
+        3. {{ mnemonic[2] }}
+      </ion-col>
+    </ion-row>
+    <ion-row class="ion-align-items-center">
+      <ion-col class="ion-align-self-start">
+        4. {{ mnemonic[3] }}
+      </ion-col>
+      <ion-col class="ion-align-self-start">
+        5. {{ mnemonic[4] }}
+      </ion-col>
+      <ion-col class="ion-align-self-start">
+        6. {{ mnemonic[5] }}
+      </ion-col>
+    </ion-row>
+    <ion-row class="ion-align-items-center">
+      <ion-col class="ion-align-self-start">
+        7. {{ mnemonic[6] }}
+      </ion-col>
+      <ion-col class="ion-align-self-start">
+        8. {{ mnemonic[7] }}
+      </ion-col>
+      <ion-col class="ion-align-self-start">
+        9. {{ mnemonic[8] }}
+      </ion-col>
+    </ion-row>
+    <ion-row class="ion-align-items-center">
+      <ion-col class="ion-align-self-start">
+        10. {{ mnemonic[9] }}
+      </ion-col>
+      <ion-col class="ion-align-self-start">
+        11. {{ mnemonic[10] }}
+      </ion-col>
+      <ion-col class="ion-align-self-start">
+        12. {{ mnemonic[11] }}
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ion-button style="margin: 20px 0;" expand="block" fill="outline" color="danger" (click)="regenerate()">
+    Regenerate
+  </ion-button>
+
+  <ion-button expand="block" fill="outline" (click)="login()">
+    Continue
+  </ion-button>
+
+</ion-content>

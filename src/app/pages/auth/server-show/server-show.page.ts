@@ -5,11 +5,11 @@ import { NavController, AlertController } from '@ionic/angular'
 import { S9Server, updateS9 } from 'src/app/models/s9-server'
 
 @Component({
-  selector: 'page-manage',
-  templateUrl: 'manage.page.html',
-  styleUrls: ['manage.page.scss'],
+  selector: 'page-server-show',
+  templateUrl: 'server-show.page.html',
+  styleUrls: ['server-show.page.scss'],
 })
-export class ManagePage {
+export class ServerShowPage {
   server: S9Server
   edited = false
 
@@ -52,7 +52,7 @@ export class ManagePage {
           handler: async () => {
             this.edited = false
             await this.dataService.forgetServer(this.server.id)
-            await this.navCtrl.navigateRoot(['/dashboard'])
+            await this.navCtrl.navigateRoot(['/servers'])
           },
         },
       ],

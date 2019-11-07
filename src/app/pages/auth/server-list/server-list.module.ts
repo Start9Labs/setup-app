@@ -2,12 +2,12 @@ import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { Routes, RouterModule } from '@angular/router'
 import { IonicModule } from '@ionic/angular'
-import { DashboardPage } from './dashboard.page'
+import { ServerListPage } from './server-list.page'
 
 const routes: Routes = [
   {
     path: '',
-    component: DashboardPage,
+    component: ServerListPage,
   },
 ]
 
@@ -17,6 +17,6 @@ const routes: Routes = [
     IonicModule,
     RouterModule.forChild(routes),
   ],
-  declarations: [DashboardPage],
+  declarations: [ServerListPage],
 })
-export class DashboardPageModule { }
+export class ServerListPageModule { }

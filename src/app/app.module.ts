@@ -6,7 +6,7 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular'
 import { IonicStorageModule } from '@ionic/storage'
 import { HttpClientModule } from '@angular/common/http'
 import { AppComponent } from './app.component'
-import { AppRoutingModule } from './routes/app-routing.module'
+import { AppRoutingModule } from './app-routing.module'
 // daemons
 import { HealthDaemon } from './daemons/health-daemon'
 import { WifiDaemon } from './daemons/wifi-daemon'

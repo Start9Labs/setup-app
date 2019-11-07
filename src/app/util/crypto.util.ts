@@ -12,11 +12,19 @@ export async function run () {
   console.log('first4', first4)
   const index = new DataView(first4).getUint32(0, false) >> 1
   console.log('index', index)
-  const words = bip39.generateMnemonic()
+  const words = getMnemonic().join(' ')
   console.log('words', words)
   const seed = bip39.mnemonicToSeedSync(words)
   console.log('seed', seed)
   const node = bip32.fromSeed(seed)
   const pubkey = node.derivePath(`${basePath}/${index}`).publicKey.toString('hex')
   console.log(pubkey)
+}
+
+export function getMnemonic (): string[] {
+  return bip39.generateMnemonic().split(' ')
+}
+
+export function checkMnemonic (mnemonic: string[]): boolean {
+  return bip39.validateMnemonic(mnemonic.join(' '))
 }

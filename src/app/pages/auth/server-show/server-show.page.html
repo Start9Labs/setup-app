@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="dashboard"></ion-back-button>
+      <ion-back-button defaultHref="servers"></ion-back-button>
     </ion-buttons>
     <ion-title>
       Server
@@ -21,7 +21,7 @@
       <ion-input disabled [ngModel]="server.torAddress"></ion-input>
     </ion-item>
   </ion-item-group>
-  <!-- <ion-button expand="block" fill="outline" [routerLink]="['/manage/' + server.id + '/wifi']">
+  <!-- <ion-button expand="block" fill="outline" [routerLink]="[server.id, 'wifi']">
     Setup Wifi
   </ion-button> -->
   <ion-button style="margin-top: 20px;" expand="block" fill="outline" color="danger" (click)="presentAlertRemove()">

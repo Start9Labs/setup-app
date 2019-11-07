@@ -32,7 +32,7 @@ export class AppComponent {
       // mocky mock
       if (!this.dataService.getServerCount()) {
         await this.dataService.saveServer({
-          id: 'abcdef',
+          id: 'abcdefgh',
           friendlyName: 'My Server',
           torAddress: 'sample-tor-address.onion',
           lastHandshake: initHandshakeStatus(),

@@ -1,20 +1,22 @@
 import { Injectable } from '@angular/core'
-import { BehaviorSubject } from 'rxjs'
 import { SecureStorageObject, SecureStorage } from '@ionic-native/secure-storage/ngx'
 import { Platform } from '@ionic/angular'
 import { Storage } from '@ionic/storage'
+import { Router } from '@angular/router'
+import * as crypto from '../util/crypto.util'
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  secure: SecureStorageObject
-  authenticationState = new BehaviorSubject(false)
+  private secure: SecureStorageObject
+  isAuthenticated = false
 
   constructor (
     private readonly platform: Platform,
     private readonly ss: SecureStorage,
     private readonly storage: Storage,
+    private readonly router: Router,
   ) {
     this.platform.ready()
       .then(async () => {
@@ -31,32 +33,41 @@ export class AuthService {
     if (this.platform.is('cordova')) {
       this.secure.get('mnemonic')
         .then(() => {
-          this.authenticationState.next(true)
+          this.isAuthenticated = true
         })
         .catch(() => {
-          this.authenticationState.next(false)
+          this.isAuthenticated = false
         })
     } else {
       const mnemonic = await this.storage.get('mnemonic')
       if (mnemonic) {
-        this.authenticationState.next(true)
+        this.isAuthenticated = true
       } else {
-        this.authenticationState.next(false)
+        this.isAuthenticated = false
       }
     }
   }
 
   async login (mnemonic: string[]) {
-    await this.secure.set('mnemonic', JSON.stringify(mnemonic))
-    this.authenticationState.next(true)
+    if (!crypto.checkMnemonic(mnemonic)) {
+      throw new Error('invalid mnemonic')
+    }
+    if (this.platform.is('cordova')) {
+      await this.secure.set('mnemonic', JSON.stringify(mnemonic))
+    } else {
+      await this.storage.set('mnemonic', JSON.stringify(mnemonic))
+    }
+    this.isAuthenticated = true
+    await this.router.navigate(['/servers'])
   }
 
   async logout () {
-    await this.secure.remove('mnemonic')
-    this.authenticationState.next(false)
-  }
-
-  isAuthenticated () {
-    return this.authenticationState.value
+    if (this.platform.is('cordova')) {
+      await this.secure.remove('mnemonic')
+    } else {
+      await this.storage.remove('mnemonic')
+    }
+    this.isAuthenticated = false
+    await this.router.navigate(['/welcome'])
   }
 }

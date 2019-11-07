@@ -4,7 +4,7 @@ import { HttpService, HttpOptions } from './http.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { Method } from 'src/app/types/enums'
 import { clone } from '../models/server-model'
-import { pauseFor } from 'src/app/util/misc'
+import { pauseFor } from 'src/app/util/misc.util'
 import { HttpHeaders } from '@angular/common/http'
 
 @Injectable()

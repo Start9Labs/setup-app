@@ -32,7 +32,7 @@ export class SetupPage {
     try {
       const setupServer = await this.setupService.setup(newServer, this.serial)
       await this.s9Model.saveServer(setupServer)
-      await this.navController.navigateRoot(['/dashboard'])
+      await this.navController.navigateRoot(['/servers'])
     } catch (e) {
       this.error = `Error: ${e.message}`
     } finally {

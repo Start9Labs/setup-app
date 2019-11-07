@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 import { IonicModule } from '@ionic/angular'
 
-import { ManagePage } from './manage.page'
+import { ServerShowPage } from './server-show.page'
 
 describe('ListPage', () => {
-  let component: ManagePage
-  let fixture: ComponentFixture<ManagePage>
+  let component: ServerShowPage
+  let fixture: ComponentFixture<ServerShowPage>
   let listPage: HTMLElement
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ManagePage ],
+      declarations: [ ServerShowPage ],
       imports: [IonicModule.forRoot()],
     }).compileComponents()
 
-    fixture = TestBed.createComponent(ManagePage)
+    fixture = TestBed.createComponent(ServerShowPage)
     component = fixture.componentInstance
     fixture.detectChanges()
   }))

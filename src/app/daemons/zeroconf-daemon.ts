@@ -17,7 +17,7 @@ export class ZeroconfDaemon {
 
   async reset (): Promise<void> {
     await this.zeroconf.stop()
-    await this.watching.unsubscribe() // kills the subscription
+    this.watching.unsubscribe() // kills the subscription
     await this.zeroconf.reInit()
     this.watch()
   }
