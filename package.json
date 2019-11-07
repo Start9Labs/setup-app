@@ -1,8 +1,8 @@
 {
   "name": "start-9-companion",
   "version": "0.0.1",
-  "author": "Ionic Framework",
-  "homepage": "https://ionicframework.com/",
+  "author": "Start9 Labs",
+  "homepage": "https://start9labs.com",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -28,13 +28,12 @@
     "@ionic-native/zeroconf": "^5.15.1",
     "@ionic/angular": "^4.7.1",
     "@ionic/storage": "^2.2.0",
-    "@types/crypto-js": "^3.1.43",
     "base32.js": "^0.1.0",
     "bip32": "^2.0.4",
     "bip39": "^3.0.2",
     "bitcoinjs-lib": "^5.1.6",
     "buffer": "^5.4.3",
-    "cordova-android": "^8.1.0",
+    "cordova-android": "8.1.0",
     "cordova-plugin-add-swift-support": "^2.0.1",
     "cordova-plugin-network-information": "^2.0.2",
     "cordova-plugin-secure-storage-echo": "^5.0.0",
@@ -45,7 +44,7 @@
     "es6-promise-plugin": "^4.1.0",
     "rxjs": "~6.5.1",
     "tslib": "^1.9.0",
-    "wifiwizard": "^0.2.11",
+    "wifiwizard2": "^3.1.1",
     "zone.js": "~0.9.1"
   },
   "devDependencies": {
@@ -54,10 +53,10 @@
     "@angular-devkit/core": "~8.1.2",
     "@angular-devkit/schematics": "~8.1.2",
     "@angular/cli": "~8.1.2",
-    "@angular/compiler": "~8.1.2",
     "@angular/compiler-cli": "~8.1.2",
     "@angular/language-service": "~8.1.2",
     "@ionic/angular-toolkit": "~2.0.0",
+    "@types/crypto-js": "^3.1.43",
     "@types/jasmine": "~3.3.8",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~8.9.4",
@@ -88,7 +87,9 @@
       "cordova-plugin-statusbar": {},
       "cordova-plugin-device": {},
       "cordova-plugin-splashscreen": {},
-      "cordova-plugin-ionic-webview": {},
+      "cordova-plugin-ionic-webview": {
+        "ANDROID_SUPPORT_ANNOTATIONS_VERSION": "27.+"
+      },
       "cordova-plugin-ionic-keyboard": {},
       "cordova-plugin-zeroconf": {},
       "cordova-plugin-secure-storage-echo": {},

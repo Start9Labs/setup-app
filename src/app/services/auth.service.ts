@@ -17,35 +17,11 @@ export class AuthService {
     private readonly ss: SecureStorage,
     private readonly storage: Storage,
     private readonly router: Router,
-  ) {
-    this.platform.ready()
-      .then(async () => {
-        await this.initSecure()
-        await this.checkSecure()
-      })
-  }
+  ) { }
 
-  async initSecure () {
-    this.secure = await this.ss.create('start9')
-  }
-
-  async checkSecure () {
-    if (this.platform.is('cordova')) {
-      this.secure.get('mnemonic')
-        .then(() => {
-          this.isAuthenticated = true
-        })
-        .catch(() => {
-          this.isAuthenticated = false
-        })
-    } else {
-      const mnemonic = await this.storage.get('mnemonic')
-      if (mnemonic) {
-        this.isAuthenticated = true
-      } else {
-        this.isAuthenticated = false
-      }
-    }
+  async checkedAuthenticated () {
+    await this.initSecure()
+    await this.checkSecure()
   }
 
   async login (mnemonic: string[]) {
@@ -62,6 +38,7 @@ export class AuthService {
   }
 
   async logout () {
+    await this.storage.remove('servers')
     if (this.platform.is('cordova')) {
       await this.secure.remove('mnemonic')
     } else {
@@ -69,5 +46,28 @@ export class AuthService {
     }
     this.isAuthenticated = false
     await this.router.navigate(['/welcome'])
+  }
+
+  private async initSecure () {
+    this.secure = await this.ss.create('start9')
+  }
+
+  private async checkSecure () {
+    if (this.platform.is('cordova')) {
+      this.secure.get('mnemonic')
+        .then(() => {
+          this.isAuthenticated = true
+        })
+        .catch(() => {
+          this.isAuthenticated = false
+        })
+    } else {
+      const mnemonic = await this.storage.get('mnemonic')
+      if (mnemonic) {
+        this.isAuthenticated = true
+      } else {
+        this.isAuthenticated = false
+      }
+    }
   }
 }

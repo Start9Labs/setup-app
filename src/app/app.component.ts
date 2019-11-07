@@ -7,6 +7,7 @@ import { HealthDaemon } from './daemons/health-daemon'
 import { WifiDaemon } from './daemons/wifi-daemon'
 import { ZeroconfDaemon } from './daemons/zeroconf-daemon'
 import { initHandshakeStatus } from './models/s9-server'
+import { AuthService } from './services/auth.service'
 
 @Component({
   selector: 'app-root',
@@ -23,9 +24,12 @@ export class AppComponent {
     public zeroconfDaemon: ZeroconfDaemon,
     public wifiDaemon: WifiDaemon,
     public healthDaemon: HealthDaemon,
+    public authService: AuthService,
   ) {
     document.body.classList.toggle('dark', true)
     platform.ready().then(async () => {
+      // check if user is authenticated
+      await this.authService.checkedAuthenticated()
       // load data into memory
       await this.dataService.load()
 

@@ -19,6 +19,10 @@ const routes: Routes = [
     path: 'servers/:id',
     loadChildren: () => import('./server-show/server-show.module').then(m => m.ServerShowPageModule),
   },
+  {
+    path: 'settings',
+    loadChildren: () => import('./settings/settings.module').then(m => m.SettingsPageModule),
+  },
 ]
 
 @NgModule({

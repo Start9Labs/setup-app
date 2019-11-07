@@ -39,7 +39,7 @@ export class ServerShowPage {
 
   async presentAlertRemove () {
     const alert = await this.alertCtrl.create({
-      header: 'Confirm!',
+      header: 'Caution!',
       message: 'Are you sure you want to remove this server?',
       buttons: [
         {
@@ -47,7 +47,7 @@ export class ServerShowPage {
           role: 'cancel',
         },
         {
-          text: 'Remove',
+          text: 'Remove Server',
           cssClass: 'alert-danger',
           handler: async () => {
             this.edited = false
