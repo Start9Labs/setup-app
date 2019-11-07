@@ -92,7 +92,7 @@ export interface StorableS9Server {
 }
 
 export function idFromSerial (serialNo: string): string {
-  return CryptoJS.SHA256(serialNo).toString().substr(0, 6)
+  return CryptoJS.SHA256(serialNo).toString().substr(0, 8)
 }
 
 function hostnameFromId (id: string) {

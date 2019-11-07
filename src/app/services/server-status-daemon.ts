@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { S9ServerModel } from '../storage/server-model'
 import { SetupService } from './setup-service'
-import { isFullySetup, isLanEnabled, updateS9 } from '../storage/s9-server'
+import { isLanEnabled, updateS9 } from '../storage/s9-server'
 import { pauseFor } from 'src/types/misc'
 
 @Injectable()

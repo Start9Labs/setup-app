@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { NavController, LoadingController } from '@ionic/angular'
 import { S9ServerModel } from 'src/app/storage/server-model'
-import { idFromSerial, S9Server, fromUserInput } from 'src/app/storage/s9-server'
+import { idFromSerial, fromUserInput } from 'src/app/storage/s9-server'
 import { SetupService } from 'src/app/services/setup-service'
 
 @Component({
