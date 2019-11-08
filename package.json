@@ -42,6 +42,7 @@
     "core-js": "^2.5.4",
     "crypto-js": "^3.1.9-1",
     "es6-promise-plugin": "^4.1.0",
+    "jsontokens": "^2.0.3-beta.0",
     "rxjs": "~6.5.1",
     "tslib": "^1.9.0",
     "wifiwizard2": "^3.1.1",

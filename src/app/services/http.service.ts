@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core'
 import { HttpClient, HttpEventType, HttpErrorResponse, HttpHeaders, HttpEvent } from '@angular/common/http'
 import { Method } from '../types/enums'
 import { Observable } from 'rxjs'
-import { S9ServerLan, getLanIP } from '../models/s9-server'
+import { S9ServerLan, getLanIP, S9ServerFull, hasKeys } from '../models/s9-server'
 const APP_VERSION = '1.0.0'
-
+import { TokenSigner } from 'jsontokens'
 
 @Injectable()
 export class HttpService {
@@ -13,8 +13,8 @@ export class HttpService {
     private readonly http: HttpClient,
   ) { }
 
-  async request<T> (server: S9ServerLan, method: Method, url: string, httpOptions: HttpOptions = { }, body: any = { }): Promise<T> {
-    this.setDefaultOptions(httpOptions) // mutates httpOptions
+  async request<T> (server: S9ServerLan | S9ServerFull, method: Method, url: string, httpOptions: HttpOptions = { }, body: any = { }): Promise<T> {
+    this.setDefaultOptions(server, httpOptions) // mutates httpOptions
     const path = `${getLanIP(server)}/v0/${url}`
 
     let call: () => Observable<HttpEvent<T>>
@@ -49,9 +49,17 @@ export class HttpService {
     }
   }
 
-  private setDefaultOptions (httpOptions: HttpOptions) {
+  private setDefaultOptions (server: S9ServerLan | S9ServerFull, httpOptions: HttpOptions) {
     let headers: HttpHeaders = httpOptions.headers || new HttpHeaders()
+
     headers = headers.set('APP-VERSION', APP_VERSION)
+
+    if (hasKeys(server)) {
+      const tokenPayload = { 'iss': 'start9-companion', 'exp': new Date(new Date().getTime() + 3000) }
+      const token = new TokenSigner('ES256K', server.privkey).sign(tokenPayload)
+      headers = headers.set('Authorization', 'Bearer ' + token)
+    }
+
     httpOptions.headers = headers
     httpOptions.observe = 'response'
   }
