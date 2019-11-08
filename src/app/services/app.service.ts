@@ -21,24 +21,24 @@ export class AppService {
       torAddress: 'sample-bitcoin-tor-address',
       lastStatus: initAppStatus(),
     }
-    // const installed = await this.httpService.request<Lan.PostInstallAppRes>(Method.post, '/apps/install', { }, { id: availableApp.id })
+    // const installed = await this.httpService.request<Lan.PostInstallAppRes>(server, Method.post, '/apps/install', { }, { id: availableApp.id })
     this.s9Model.addApp(server, installed)
     return installed
   }
 
   async uninstall (server: S9Server, app: InstalledApp) {
-    // await this.httpService.request<Lan.PostUninstallAppRes>(Method.post, '/apps/uninstall', { }, { name })
+    // await this.httpService.request<Lan.PostUninstallAppRes>(server, Method.post, '/apps/uninstall', { }, { name })
     this.s9Model.removeApp(server, app)
   }
 
-  async getAvailableApps (): Promise<AvailableApp[]> {
+  async getAvailableApps (server: S9Server): Promise<AvailableApp[]> {
     return [
       {
         id: 'bitcoin',
         displayName: 'Bitcoin',
       },
     ]
-    // return this.httpService.request<Lan.GetAppsAvailableRes>(Method.get, '/apps/available')
+    // return this.httpService.request<Lan.GetAppsAvailableRes>(server, Method.get, '/apps/available')
   }
 
 }

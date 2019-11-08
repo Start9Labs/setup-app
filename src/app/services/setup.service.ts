@@ -46,7 +46,7 @@ export class SetupService {
     // tor acquisition
     if (isLanEnabled(ssClone) && !ss.torAddress) {
       this.message = `getting tor address`
-      const { torAddress } = await this.httpService.request<Lan.GetTorRes>(Method.get, '/tor')
+      const { torAddress } = await this.httpService.request<Lan.GetTorRes>(ssClone, Method.get, '/tor')
       updateS9_MUT(ssClone, { torAddress })
     }
 
@@ -77,7 +77,7 @@ export class SetupService {
     try {
       const headers: HttpHeaders = new HttpHeaders({ 'timeout': '3000' })
       const body: Lan.PostRegisterReq = { pubkey, serial }
-      await this.httpService.request<Lan.PostRegisterRes>(Method.post, '/register', { headers }, body)
+      await this.httpService.request<Lan.PostRegisterRes>(ss, Method.post, '/register', { headers }, body)
       return true
     } catch (e) {
       console.error(`failed pubkey registration for ${id}: ${e.message}`)
@@ -90,7 +90,7 @@ export class SetupService {
     try {
       let options: HttpOptions = { }
       if (timeoutMs) { options.headers = new HttpHeaders({ 'timeout': timeoutMs.toString() }) }
-      await this.httpService.request<Lan.GetStatusShallowRes>(Method.post, '/status/shallow', options)
+      await this.httpService.request<Lan.GetStatusShallowRes>(ss, Method.post, '/status/shallow', options)
       return { success: true, timestamp: now }
     } catch (e) {
       console.error(`failed handhsake for ${ss.id}: ${e.message}`)

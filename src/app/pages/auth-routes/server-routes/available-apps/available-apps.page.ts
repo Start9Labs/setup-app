@@ -28,7 +28,7 @@ export class AvailableAppsPage {
     if (!server) throw new Error (`No server found with ID: ${serverId}`)
     this.server = server
 
-    this.apps = await this.appService.getAvailableApps()
+    this.apps = await this.appService.getAvailableApps(this.server)
   }
 
   async install (app: AvailableApp) {
