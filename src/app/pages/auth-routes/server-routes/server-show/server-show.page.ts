@@ -22,6 +22,14 @@ export class ServerShowPage {
   ) { }
 
   ngOnInit () {
+    this.fetchServer()
+  }
+
+  ionViewWillEnter () {
+    this.fetchServer()
+  }
+
+  fetchServer () {
     const id = this.route.snapshot.paramMap.get('serverId')
     if (!id) throw new Error (`Need id in params for manage page but got none.`)
 

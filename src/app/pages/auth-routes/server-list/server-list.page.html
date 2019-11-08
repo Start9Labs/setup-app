@@ -20,20 +20,25 @@
     <p>Add Server</p>
   </div>
 
-  <ion-item-group>
-    <ion-item *ngFor="let server of serverModel.getServers()" [routerLink]="[server.id]">
-      <ion-icon slot="start" size="large" name="cube"></ion-icon>
-      {{ server.friendlyName }}
-      <ion-note slot="end">
-        <ion-icon size="large" name="wifi" [color]="server.lastHandshake.success ? 'success' : 'danger'">
-        </ion-icon>
-      </ion-note>
-    </ion-item>
-  </ion-item-group>
 
-  <ion-fab *ngIf="serverModel.getServerCount() > 0" vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button [routerLink]="['/setup']" class="fab-button">
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
+  <div *ngIf="serverModel.getServerCount() > 0">
+    <ion-item-group>
+      <ion-item *ngFor="let server of serverModel.getServers()" [routerLink]="[server.id]">
+        <ion-icon slot="start" size="large" name="cube"></ion-icon>
+        {{ server.friendlyName }}
+        <ion-note slot="end">
+          <ion-icon size="large" name="wifi" [color]="server.lastHandshake.success ? 'success' : 'danger'">
+          </ion-icon>
+        </ion-note>
+      </ion-item>
+    </ion-item-group>
+  
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+      <ion-fab-button [routerLink]="['/setup']" class="fab-button">
+        <ion-icon name="add"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+  </div>
+
+
 </ion-content>

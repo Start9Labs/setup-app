@@ -17,12 +17,12 @@ response: any
 
 GET apps/installed
 params: none
-response: string[]
+response: InstalledApp[]
 
 GET apps/available
 params: none
-response: string[]
+response: AvailableApp[]
 
 POST apps/install
 params: { name: string }
-response: string
+response: InstalledApp

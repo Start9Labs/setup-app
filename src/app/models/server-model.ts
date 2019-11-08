@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
 import { S9Server, StorableS9Server, toStorableServer, fromStorableServer } from './s9-server'
+import { InstalledApp } from './installed-app'
 
 @Injectable()
 export class S9ServerModel {
@@ -26,10 +27,29 @@ export class S9ServerModel {
     return this.getServers().length
   }
 
+  getAppCount (server: S9Server): number {
+    return server.apps.length
+  }
+
   getServerBy (filter: Partial<S9Server>): S9Server | undefined {
     return this.getServers().find(s =>
       Object.entries(filter).every(e => s[e[0]] === e[1]),
     )
+  }
+
+  async addApp (server: S9Server, app: InstalledApp) {
+    const serverClone = clone(server)
+    serverClone.apps.push(app)
+    this.servers[server.id] = serverClone
+    await this.saveAll()
+  }
+
+  async removeApp (server: S9Server, app: InstalledApp) {
+    const serverClone = clone(server)
+    const newApps = serverClone.apps.filter(a => a.id !== app.id)
+    serverClone.apps = newApps
+    this.servers[server.id] = serverClone
+    await this.saveAll()
   }
 
   async saveServer (server: S9Server): Promise<void> {

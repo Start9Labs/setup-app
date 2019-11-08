@@ -1,4 +1,4 @@
-import { InstalledApp } from '../models/installed-app'
+import { InstalledApp, AvailableApp } from '../models/installed-app'
 
 export type TwoHundredOK = { never?: never } // hack for the unit type
 
@@ -26,5 +26,3 @@ export module Lan {
   export type PostUninstallAppReq = { name: string }
   export type PostUninstallAppRes = TwoHundredOK
 }
-
-export type AvailableApp = { name: string }

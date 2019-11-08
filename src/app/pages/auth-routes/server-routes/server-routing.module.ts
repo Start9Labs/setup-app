@@ -12,6 +12,10 @@ const routes: Routes = [
     loadChildren: () => import('./server-show/server-show.module').then(m => m.ServerShowPageModule),
   },
   {
+    path: 'agent/apps',
+    loadChildren: () => import('./available-apps/available-apps.module').then(m => m.AvailableAppsPageModule),
+  },
+  {
     path: ':appId',
     loadChildren: () => import('./app-show/app-show.module').then(m => m.AppShowPageModule),
   },

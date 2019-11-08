@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core'
 import { HttpClient, HttpEventType, HttpErrorResponse, HttpHeaders, HttpEvent } from '@angular/common/http'
 import { Method } from '../types/enums'
 import { Observable } from 'rxjs'
+import { S9ServerLan, getLanIP } from '../models/s9-server'
 const APP_VERSION = '1.0.0'
 
 
@@ -9,29 +10,29 @@ const APP_VERSION = '1.0.0'
 export class HttpService {
 
   constructor (
-    public http: HttpClient,
+    private readonly http: HttpClient,
   ) { }
 
-  async request<T> (method: Method, url: string, httpOptions: HttpOptions = { }, body: any = { }): Promise<T> {
-
+  async request<T> (server: S9ServerLan, method: Method, url: string, httpOptions: HttpOptions = { }, body: any = { }): Promise<T> {
     this.setDefaultOptions(httpOptions) // mutates httpOptions
+    const path = `${getLanIP(server)}/v0/${url}`
 
     let call: () => Observable<HttpEvent<T>>
     switch (method) {
       case Method.get:
-        call = () => this.http.get<T>(url, httpOptions as any)
+        call = () => this.http.get<T>(path, httpOptions as any)
         break
       case Method.post:
-        call = () => this.http.post<T>(url, body, httpOptions as any)
+        call = () => this.http.post<T>(path, body, httpOptions as any)
         break
       case Method.patch:
-        call = () => this.http.patch<T>(url, body, httpOptions as any)
+        call = () => this.http.patch<T>(path, body, httpOptions as any)
         break
       case Method.delete:
-        call = () => this.http.delete<T>(url, httpOptions as any)
+        call = () => this.http.delete<T>(path, httpOptions as any)
         break
       default: // makes tsc happy
-          call = () => this.http.get<T>(url, httpOptions as any)
+          call = () => this.http.get<T>(path, httpOptions as any)
     }
 
     try {

@@ -1,6 +1,9 @@
-export interface InstalledApp {
+export interface AvailableApp {
   id: string
   displayName: string
+}
+
+export interface InstalledApp extends AvailableApp {
   torAddress: string
   lastStatus: StatusCheck
 }

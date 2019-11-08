@@ -7,11 +7,11 @@ export interface S9Server {
   friendlyName: string
   lastHandshake: HandshakeAttempt
   registered: boolean
+  apps: InstalledApp[]
   privkey?: string
   pubkey?: string
   torAddress?: string
   zeroconfService?: ZeroconfService
-  apps: InstalledApp[]
 }
 
 export interface S9ServerLan extends S9Server {

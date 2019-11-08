@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { AlertController } from '@ionic/angular'
+import { AlertController, NavController } from '@ionic/angular'
 import { AppService } from 'src/app/services/app.service'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
@@ -20,6 +20,7 @@ export class AppShowPage {
     private readonly appService: AppService,
     private readonly route: ActivatedRoute,
     private readonly serverModel: S9ServerModel,
+    private readonly navCtrl: NavController,
   ) { }
 
   ngOnInit () {
@@ -48,7 +49,8 @@ export class AppShowPage {
           text: 'Uninstall',
           cssClass: 'alert-danger',
           handler: async () => {
-            await this.appService.uninstall(this.app.displayName)
+            await this.appService.uninstall(this.server, this.app)
+            await this.navCtrl.pop()
           },
         },
       ],
