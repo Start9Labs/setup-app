@@ -1,3 +1,5 @@
+import { InstalledApp } from '../models/installed-app'
+
 export type TwoHundredOK = { never?: never } // hack for the unit type
 
 export module Ap {
@@ -16,7 +18,13 @@ export module Lan {
   export type GetStatusShallowReq = { }
   export type GetStatusShallowRes = any
   export type GetAppsInstalledReq = { }
-  export type GetAppsInstalledRes = string[]
+  export type GetAppsInstalledRes = InstalledApp[]
   export type GetAppsAvailableReq = { }
-  export type GetAppsAvailableRes = string[]
+  export type GetAppsAvailableRes = AvailableApp[]
+  export type PostInstallAppReq = { name: string }
+  export type PostInstallAppRes = InstalledApp
+  export type PostUninstallAppReq = { name: string }
+  export type PostUninstallAppRes = TwoHundredOK
 }
+
+export type AvailableApp = { name: string }

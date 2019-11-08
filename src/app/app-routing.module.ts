@@ -1,18 +1,18 @@
 import { NgModule } from '@angular/core'
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router'
-import { AuthGuard } from './pages/auth/auth.guard'
-import { UnauthGuard } from './pages/unauth/unauth.guard'
+import { AuthGuard } from './pages/auth-routes/auth.guard'
+import { UnauthGuard } from './pages/unauth-routes/unauth.guard'
 
 const routes: Routes = [
   {
     path: '',
     canActivate: [AuthGuard],
-    loadChildren: () => import('./pages/auth/auth-routing.module').then(m => m.AuthRoutingModule),
+    loadChildren: () => import('./pages/auth-routes/auth-routing.module').then(m => m.AuthRoutingModule),
   },
   {
     path: 'welcome',
     canActivate: [UnauthGuard],
-    loadChildren: () => import('./pages/unauth/unauth-routing.module').then(m => m.UnauthRoutingModule),
+    loadChildren: () => import('./pages/unauth-routes/unauth-routing.module').then(m => m.UnauthRoutingModule),
   },
 ]
 

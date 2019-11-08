@@ -32,7 +32,6 @@ export class SettingsPage {
         },
       ],
     })
-
     await alert.present()
   }
 }

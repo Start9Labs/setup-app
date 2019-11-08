@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
-import { S9Server, StorableS9Server, toStorableServer, fromStoredServer } from './s9-server'
+import { S9Server, StorableS9Server, toStorableServer, fromStorableServer } from './s9-server'
 
 @Injectable()
 export class S9ServerModel {
@@ -58,7 +58,7 @@ function fromServerCache (sc : S9ServerCache): S9ServerStore {
 
 function toServerCache (ss : S9ServerStore): S9ServerCache {
   return ss.reduce((acc, next) => {
-    acc[next.id] = fromStoredServer(next)
+    acc[next.id] = fromStorableServer(next)
     return acc
   }, { } as S9ServerCache)
 }

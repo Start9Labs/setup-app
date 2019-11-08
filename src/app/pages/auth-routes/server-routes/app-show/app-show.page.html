@@ -1,0 +1,27 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="'servers/' + server.id"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ app.displayName }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-item-group style="margin-bottom: 40px;">
+    <ion-item>
+      <ion-label position="stacked" color="medium">App Name</ion-label>
+      <ion-text color="medium"><p>{{ app.displayName }}</p></ion-text>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked" color="medium">Tor Address</ion-label>
+      <ion-text color="medium"><p>{{ app.torAddress }}</p></ion-text>
+    </ion-item>
+  </ion-item-group>
+
+  <ion-button expand="block" fill="outline" color="danger" (click)="presentAlertUninstall()">
+    Uninstall
+  </ion-button>
+
+</ion-content>

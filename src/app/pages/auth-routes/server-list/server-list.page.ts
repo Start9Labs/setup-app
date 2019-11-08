@@ -8,6 +8,6 @@ import { S9ServerModel } from 'src/app/models/server-model'
 })
 export class ServerListPage {
   constructor (
-    public dataService: S9ServerModel,
+    public serverModel: S9ServerModel,
   ) { }
 }

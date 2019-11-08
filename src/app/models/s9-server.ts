@@ -1,5 +1,6 @@
 import * as CryptoJS from 'crypto-js'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
+import { InstalledApp, fromStorableApp } from './installed-app'
 
 export interface S9Server {
   id: string
@@ -10,6 +11,7 @@ export interface S9Server {
   pubkey?: string
   torAddress?: string
   zeroconfService?: ZeroconfService
+  apps: InstalledApp[]
 }
 
 export interface S9ServerLan extends S9Server {
@@ -63,28 +65,32 @@ export function fromUserInput (id: string, friendlyName: string): S9Server {
       friendlyName,
       lastHandshake: initHandshakeStatus(),
       registered: false,
+      apps: [],
     }
   }
 
-export function fromStoredServer (ss : StorableS9Server) : S9Server {
-    const { registered, friendlyName, torAddress, zeroconfService, id } = ss
-    return {
-      id,
-      friendlyName,
-      lastHandshake: initHandshakeStatus(),
-      torAddress,
-      zeroconfService,
-      registered,
-    }
+export function fromStorableServer (ss : StorableS9Server): S9Server {
+  const { registered, friendlyName, torAddress, zeroconfService, id, apps } = ss
+  return {
+    id,
+    friendlyName,
+    lastHandshake: initHandshakeStatus(),
+    torAddress,
+    zeroconfService,
+    registered,
+    apps: apps.map(app => fromStorableApp(app)),
   }
+}
 
 export function toStorableServer (ss: S9Server): StorableS9Server {
+  const { registered, friendlyName, torAddress, zeroconfService, id, apps } = ss
   return {
-    id: ss.id,
-    friendlyName: ss.friendlyName,
-    torAddress: ss.torAddress,
-    zeroconfService: ss.zeroconfService,
-    registered: ss.registered,
+    id,
+    friendlyName,
+    torAddress,
+    zeroconfService,
+    registered,
+    apps,
   }
 }
 
@@ -101,6 +107,7 @@ export interface StorableS9Server {
   torAddress?: string
   // may not be up to date in which case ip communication will fail and we will replace.
   zeroconfService?: ZeroconfService
+  apps: InstalledApp[]
 }
 
 export function idFromSerial (serialNo: string): string {

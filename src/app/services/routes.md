@@ -19,6 +19,10 @@ GET apps/installed
 params: none
 response: string[]
 
-apps/available
+GET apps/available
 params: none
 response: string[]
+
+POST apps/install
+params: { name: string }
+response: string

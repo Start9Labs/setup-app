@@ -10,28 +10,22 @@ import { S9Server, updateS9 } from 'src/app/models/s9-server'
   styleUrls: ['server-show.page.scss'],
 })
 export class ServerShowPage {
-  view: 'info' | 'apps' = 'info'
+  view: 'agent' | 'apps' = 'agent'
   server: S9Server
   edited = false
-  apps: any =  [
-    {
-      name: 'Bitcoin',
-      running: true,
-    },
-  ]
 
   constructor (
     public route: ActivatedRoute,
-    public dataService: S9ServerModel,
+    public serverModel: S9ServerModel,
     public navCtrl: NavController,
     public alertCtrl: AlertController,
   ) { }
 
   ngOnInit () {
-    const id = this.route.snapshot.paramMap.get('id')
+    const id = this.route.snapshot.paramMap.get('serverId')
     if (!id) throw new Error (`Need id in params for manage page but got none.`)
 
-    const server = this.dataService.getServer(id)
+    const server = this.serverModel.getServer(id)
     if (!server) throw new Error (`Need server in server model for manage page but got none for id ${id}.`)
 
     this.server = server
@@ -40,7 +34,7 @@ export class ServerShowPage {
   async ionViewWillLeave () {
     if (this.edited) {
       this.server = updateS9(this.server, { friendlyName: this.server.friendlyName || this.server.id })
-      await this.dataService.saveServer(this.server)
+      await this.serverModel.saveServer(this.server)
     }
   }
 
@@ -62,7 +56,7 @@ export class ServerShowPage {
           cssClass: 'alert-danger',
           handler: async () => {
             this.edited = false
-            await this.dataService.forgetServer(this.server.id)
+            await this.serverModel.forgetServer(this.server.id)
             await this.navCtrl.navigateRoot(['/servers'])
           },
         },

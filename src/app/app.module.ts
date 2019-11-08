@@ -21,6 +21,7 @@ import { StatusBar } from '@ionic-native/status-bar/ngx'
 import { Zeroconf } from '@ionic-native/zeroconf/ngx'
 import { Network } from '@ionic-native/network/ngx'
 import { SecureStorage } from '@ionic-native/secure-storage/ngx'
+import { AppService } from './services/app.service'
 
 @NgModule({
   declarations: [AppComponent],
@@ -38,6 +39,7 @@ import { SecureStorage } from '@ionic-native/secure-storage/ngx'
     WifiDaemon,
     ZeroconfDaemon,
     // services
+    AppService,
     S9ServerModel,
     HttpService,
     SetupService,

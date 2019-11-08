@@ -46,7 +46,7 @@ export class SetupService {
     // tor acquisition
     if (isLanEnabled(ssClone) && !ss.torAddress) {
       this.message = `getting tor address`
-      const { torAddress } = await this.httpService.request<{ torAddress: string }>(Method.get, getLanIP(ss) + '/tor')
+      const { torAddress } = await this.httpService.request<Lan.GetTorRes>(Method.get, getLanIP(ss) + '/tor')
       updateS9_MUT(ssClone, { torAddress })
     }
 

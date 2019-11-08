@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core'
 import { SecureStorageObject, SecureStorage } from '@ionic-native/secure-storage/ngx'
 import { Platform } from '@ionic/angular'
 import { Storage } from '@ionic/storage'
-import { Router } from '@angular/router'
 import * as crypto from '../util/crypto.util'
+import { BehaviorSubject } from 'rxjs'
 
 @Injectable({
   providedIn: 'root',
@@ -11,17 +11,16 @@ import * as crypto from '../util/crypto.util'
 export class AuthService {
   private secure: SecureStorageObject
   mnemonic: string[] | undefined
+  authState = new BehaviorSubject(false)
 
   constructor (
     private readonly platform: Platform,
     private readonly ss: SecureStorage,
     private readonly storage: Storage,
-    private readonly router: Router,
-  ) { }
-
-  async checkedAuthenticated () {
-    await this.initSecure()
-    await this.checkSecure()
+  ) {
+    this.platform.ready().then(() => {
+      this.init()
+    })
   }
 
   async login (mnemonic: string[]) {
@@ -34,7 +33,7 @@ export class AuthService {
       await this.storage.set('mnemonic', JSON.stringify(mnemonic))
     }
     this.mnemonic = mnemonic
-    await this.router.navigate(['/servers'])
+    this.authState.next(true)
   }
 
   async logout () {
@@ -44,34 +43,30 @@ export class AuthService {
     } else {
       await this.storage.remove('mnemonic')
     }
+    this.authState.next(false)
     this.mnemonic = undefined
-    await this.router.navigate(['/welcome'])
   }
 
-  private async initSecure () {
+  private async init () {
     this.secure = await this.ss.create('start9')
-  }
 
-  private async checkSecure () {
     if (this.platform.is('cordova')) {
       this.secure.get('mnemonic')
         .then((mnemonic) => {
           this.mnemonic = JSON.parse(mnemonic)
+          this.authState.next(true)
         })
-        .catch(() => {
-          this.mnemonic = undefined
-        })
+        .catch()
     } else {
       const mnemonic = await this.storage.get('mnemonic')
       if (mnemonic) {
         this.mnemonic = JSON.parse(mnemonic)
-      } else {
-        this.mnemonic = undefined
+        this.authState.next(true)
       }
     }
   }
 
   isAuthenticated () {
-
+    return !!this.mnemonic && this.authState.value
   }
 }

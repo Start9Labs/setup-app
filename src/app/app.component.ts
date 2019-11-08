@@ -8,6 +8,8 @@ import { WifiDaemon } from './daemons/wifi-daemon'
 import { ZeroconfDaemon } from './daemons/zeroconf-daemon'
 import { initHandshakeStatus } from './models/s9-server'
 import { AuthService } from './services/auth.service'
+import { Router } from '@angular/router'
+import { initAppStatus } from './models/installed-app'
 
 @Component({
   selector: 'app-root',
@@ -25,11 +27,10 @@ export class AppComponent {
     public wifiDaemon: WifiDaemon,
     public healthDaemon: HealthDaemon,
     public authService: AuthService,
+    public router: Router,
   ) {
     document.body.classList.toggle('dark', true)
     platform.ready().then(async () => {
-      // check if user is authenticated
-      await this.authService.checkedAuthenticated()
       // load data into memory
       await this.dataService.load()
 
@@ -38,9 +39,17 @@ export class AppComponent {
         await this.dataService.saveServer({
           id: 'abcdefgh',
           friendlyName: 'My Server',
-          torAddress: 'sample-tor-address.onion',
+          torAddress: 'agent-tor-address.onion',
           lastHandshake: initHandshakeStatus(),
           registered: false,
+          apps: [
+            {
+              id: 'bitcoin',
+              displayName: 'Bitcoin',
+              torAddress: 'bitcoin-tor-address.onion',
+              lastStatus: initAppStatus(),
+            },
+          ],
         })
       }
 
@@ -63,6 +72,13 @@ export class AppComponent {
           this.splashScreen.hide()
         }, 300)
       }
+      this.authService.authState.subscribe(isAuthed => {
+        if (isAuthed) {
+          this.router.navigate([''])
+        } else {
+          this.router.navigate(['welcome'])
+        }
+      })
     })
   }
 }

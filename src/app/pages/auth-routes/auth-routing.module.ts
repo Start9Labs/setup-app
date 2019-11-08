@@ -12,12 +12,12 @@ const routes: Routes = [
     loadChildren: () => import('./server-list/server-list.module').then(m => m.ServerListPageModule),
   },
   {
-    path: 'servers/setup',
-    loadChildren: () => import('./setup/setup.module').then(m => m.SetupPageModule),
+    path: 'servers/:serverId',
+    loadChildren: () => import('./server-routes/server-routing.module').then(m => m.ServerRoutingModule),
   },
   {
-    path: 'servers/:id',
-    loadChildren: () => import('./server-show/server-show.module').then(m => m.ServerShowPageModule),
+    path: 'setup',
+    loadChildren: () => import('./setup/setup.module').then(m => m.SetupPageModule),
   },
   {
     path: 'settings',
