@@ -10,7 +10,7 @@ import * as crypto from '../util/crypto.util'
 })
 export class AuthService {
   private secure: SecureStorageObject
-  isAuthenticated = false
+  mnemonic: string[] | undefined
 
   constructor (
     private readonly platform: Platform,
@@ -33,7 +33,7 @@ export class AuthService {
     } else {
       await this.storage.set('mnemonic', JSON.stringify(mnemonic))
     }
-    this.isAuthenticated = true
+    this.mnemonic = mnemonic
     await this.router.navigate(['/servers'])
   }
 
@@ -44,7 +44,7 @@ export class AuthService {
     } else {
       await this.storage.remove('mnemonic')
     }
-    this.isAuthenticated = false
+    this.mnemonic = undefined
     await this.router.navigate(['/welcome'])
   }
 
@@ -55,19 +55,23 @@ export class AuthService {
   private async checkSecure () {
     if (this.platform.is('cordova')) {
       this.secure.get('mnemonic')
-        .then(() => {
-          this.isAuthenticated = true
+        .then((mnemonic) => {
+          this.mnemonic = JSON.parse(mnemonic)
         })
         .catch(() => {
-          this.isAuthenticated = false
+          this.mnemonic = undefined
         })
     } else {
       const mnemonic = await this.storage.get('mnemonic')
       if (mnemonic) {
-        this.isAuthenticated = true
+        this.mnemonic = JSON.parse(mnemonic)
       } else {
-        this.isAuthenticated = false
+        this.mnemonic = undefined
       }
     }
+  }
+
+  isAuthenticated () {
+
   }
 }

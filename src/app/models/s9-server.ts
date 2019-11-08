@@ -6,19 +6,31 @@ export interface S9Server {
   friendlyName: string
   lastHandshake: HandshakeAttempt
   registered: boolean
+  privkey?: string
+  pubkey?: string
   torAddress?: string
   zeroconfService?: ZeroconfService
 }
 
-export interface LanS9Server extends S9Server {
+export interface S9ServerLan extends S9Server {
   zeroconfService: ZeroconfService
 }
 
-export function isFullySetup (ss: S9Server): boolean {
+export interface S9ServerFull extends S9ServerLan {
+  torAddress: string
+  privkey: string
+  pubkey: string
+}
+
+export function hasKeys (ss: S9Server): ss is S9ServerFull {
+  return !!ss.pubkey && !!ss.pubkey
+}
+
+export function isFullySetup (ss: S9Server): ss is S9ServerFull {
   return !!getLanIP(ss) && ss.registered && ss.lastHandshake.success && !!ss.torAddress
 }
 
-export function isLanEnabled (ss: S9Server | LanS9Server): ss is LanS9Server {
+export function isLanEnabled (ss: S9Server | S9ServerLan): ss is S9ServerLan {
   return !!getLanIP(ss)
 }
 

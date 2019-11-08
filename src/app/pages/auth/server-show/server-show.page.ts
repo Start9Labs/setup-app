@@ -10,8 +10,15 @@ import { S9Server, updateS9 } from 'src/app/models/s9-server'
   styleUrls: ['server-show.page.scss'],
 })
 export class ServerShowPage {
+  view: 'info' | 'apps' = 'info'
   server: S9Server
   edited = false
+  apps: any =  [
+    {
+      name: 'Bitcoin',
+      running: true,
+    },
+  ]
 
   constructor (
     public route: ActivatedRoute,
@@ -35,6 +42,10 @@ export class ServerShowPage {
       this.server = updateS9(this.server, { friendlyName: this.server.friendlyName || this.server.id })
       await this.dataService.saveServer(this.server)
     }
+  }
+
+  segmentChanged (ev: any) {
+    this.view = ev.detail.value
   }
 
   async presentAlertRemove () {

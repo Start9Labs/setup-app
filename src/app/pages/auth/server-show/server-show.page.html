@@ -7,25 +7,60 @@
       Server
     </ion-title>
   </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="view">
+      <ion-segment-button value="info">
+        <ion-label>Info</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="apps">
+        <ion-label>Apps</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
 
-  <ion-item-group style="margin-bottom: 40px;">
-    <ion-item>
-      <ion-label position="stacked" color="medium">Friendly Name</ion-label>
-      <ion-input [(ngModel)]="server.friendlyName" (ionChange)="edited = true"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label position="stacked" color="medium">Tor Address</ion-label>
-      <ion-input disabled [ngModel]="server.torAddress"></ion-input>
-    </ion-item>
-  </ion-item-group>
-  <!-- <ion-button expand="block" fill="outline" [routerLink]="[server.id, 'wifi']">
-    Setup Wifi
-  </ion-button> -->
-  <ion-button style="margin-top: 20px;" expand="block" fill="outline" color="danger" (click)="presentAlertRemove()">
-    Remove
-  </ion-button>
+  <div [ngSwitch]="view">
+
+    <div *ngSwitchCase="'info'">
+      <ion-item-group style="margin-bottom: 40px;">
+        <ion-item>
+          <ion-label position="stacked" color="medium">Friendly Name</ion-label>
+          <ion-input [(ngModel)]="server.friendlyName" (ionChange)="edited = true"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked" color="medium">Tor Address</ion-label>
+          <ion-input disabled [ngModel]="server.torAddress"></ion-input>
+        </ion-item>
+      </ion-item-group>
+      <!-- <ion-button expand="block" fill="outline" [routerLink]="[server.id, 'wifi']">
+        Setup Wifi
+      </ion-button> -->
+      <ion-button expand="block" fill="outline" color="danger" (click)="presentAlertRemove()">
+        Remove
+      </ion-button>
+    </div>
+
+    <div *ngSwitchCase="'apps'">
+      <ion-item-group>
+        <ion-item *ngFor="let app of apps" [routerLink]="[app.id]">
+          <ion-icon slot="start" size="large" name="logo-bitcoin"></ion-icon>
+          {{ app.name }}
+          <ion-note slot="end">
+            <ion-icon size="large" name="flash" [color]="app.running ? 'success' : 'danger'">
+            </ion-icon>
+          </ion-note>
+        </ion-item>
+      </ion-item-group>
+
+      <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+        <ion-fab-button [routerLink]="['availableApps']" class="fab-button">
+          <ion-icon name="add"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+    </div>
+
+  </div>
 
 </ion-content>

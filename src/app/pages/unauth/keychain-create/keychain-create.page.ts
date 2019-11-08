@@ -15,11 +15,7 @@ export class KeychainCreatePage {
   ) { }
 
   ngOnInit () {
-    this.regenerate()
-  }
-
-  regenerate () {
-    this.mnemonic = crypto.getMnemonic()
+    this.mnemonic = crypto.generateMnemonic()
   }
 
   async login () {

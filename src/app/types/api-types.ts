@@ -1,9 +1,6 @@
 export type TwoHundredOK = { never?: never } // hack for the unit type
 
 export module Ap {
-  export type GetTorReq = { }
-  export type GetTorRes = { torAddress: string }
-
   export type PostSubmitWifiReq = { ssid: string, password: string }
   export type PostSubmitWifiRes = TwoHundredOK
 
@@ -12,6 +9,14 @@ export module Ap {
 }
 
 export module Lan {
-  export type PostHandshakeReq = { } // eventually add deviceId: public-key
-  export type PostHandshakeRes = TwoHundredOK
+  export type GetTorReq = { }
+  export type GetTorRes = { torAddress: string }
+  export type PostRegisterReq = { pubkey: string, serial: string }
+  export type PostRegisterRes = TwoHundredOK
+  export type GetStatusShallowReq = { }
+  export type GetStatusShallowRes = any
+  export type GetAppsInstalledReq = { }
+  export type GetAppsInstalledRes = string[]
+  export type GetAppsAvailableReq = { }
+  export type GetAppsAvailableRes = string[]
 }
