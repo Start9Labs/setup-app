@@ -54,7 +54,7 @@ export function zeroconfHostname (ss: S9Server): string {
 export function getLanIP (ss: S9Server): string | undefined  {
   if (ss.zeroconfService) {
     const { ipv4Addresses, ipv6Addresses } = ss.zeroconfService
-    return ipv4Addresses.concat(ipv6Addresses)[0]
+    return ipv4Addresses.concat(ipv6Addresses)[0] + ':5959'
   }
   return undefined
 }
@@ -115,5 +115,5 @@ export function idFromSerial (serialNo: string): string {
 }
 
 function hostnameFromId (id: string) {
-  return `start9-${id}.local`
+  return `start9-${id}`
 }

@@ -56,7 +56,7 @@ export class AuthService {
           this.mnemonic = JSON.parse(mnemonic)
           this.authState.next(true)
         })
-        .catch()
+        .catch(e => console.error(e))
     } else {
       const mnemonic = await this.storage.get('mnemonic')
       if (mnemonic) {
