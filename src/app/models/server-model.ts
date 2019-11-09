@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
 import { S9Server, StorableS9Server, toStorableServer, fromStorableServer } from './s9-server'
-import { InstalledApp } from './installed-app'
+import { InstalledApp } from './s9-app'
 
 @Injectable()
 export class S9ServerModel {

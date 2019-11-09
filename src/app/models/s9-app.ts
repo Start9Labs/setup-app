@@ -1,9 +1,13 @@
-export interface AvailableApp {
+export interface BaseApp {
   id: string
   displayName: string
 }
 
-export interface InstalledApp extends AvailableApp {
+export interface AvailableApp extends BaseApp {
+  installed: boolean
+}
+
+export interface InstalledApp extends BaseApp {
   torAddress: string
   lastStatus: StatusCheck
 }
@@ -12,7 +16,7 @@ export function initAppStatus (): StatusCheck {
   return { healthy: false, timestamp: new Date() }
 }
 
-export function fromStorableApp (app : StorableApp): InstalledApp {
+export function fromStorableApp (app: StorableApp): InstalledApp {
   const { id, displayName, torAddress } = app
   return {
     id,

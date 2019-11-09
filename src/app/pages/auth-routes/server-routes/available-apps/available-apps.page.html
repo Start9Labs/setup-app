@@ -11,9 +11,12 @@
       <ion-icon slot="start" size="large" name="logo-bitcoin"></ion-icon>
       {{ app.displayName }}
       <ion-note slot="end">
-        <ion-button size="small" fill="outline" (click)="install(app)">
+        <ion-button *ngIf="!app.installed" size="small" fill="outline" (click)="install(app)">
           Install
         </ion-button>
+        <ion-text *ngIf="app.installed" color="success">
+          Installed
+        </ion-text>
       </ion-note>
     </ion-item>
   </ion-item-group>

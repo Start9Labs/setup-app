@@ -3,7 +3,7 @@ import { HttpService } from './http.service'
 import { Lan } from '../types/api-types'
 import { Method } from '../types/enums'
 import { S9ServerModel } from '../models/server-model'
-import { InstalledApp, AvailableApp, initAppStatus } from '../models/installed-app'
+import { InstalledApp, AvailableApp, initAppStatus } from '../models/s9-app'
 import { S9Server } from '../models/s9-server'
 
 @Injectable()
@@ -36,6 +36,7 @@ export class AppService {
       {
         id: 'bitcoin',
         displayName: 'Bitcoin',
+        installed: true,
       },
     ]
     // return this.httpService.request<Lan.GetAppsAvailableRes>(server, Method.get, '/apps/available')

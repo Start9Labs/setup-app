@@ -3,7 +3,7 @@ import { AlertController, NavController } from '@ionic/angular'
 import { AppService } from 'src/app/services/app.service'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
-import { InstalledApp } from 'src/app/models/installed-app'
+import { InstalledApp } from 'src/app/models/s9-app'
 import { S9Server } from 'src/app/models/s9-server'
 
 @Component({

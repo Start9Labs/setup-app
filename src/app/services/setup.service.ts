@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core'
-import { S9Server, updateS9_MUT, isLanEnabled, HandshakeAttempt, isFullySetup, hasKeys, S9ServerFull } from '../models/s9-server'
+import { S9Server, updateS9_MUT, isLanEnabled, HandshakeAttempt, isFullySetup, hasKeys, S9ServerFull, S9ServerLan } from '../models/s9-server'
 import { HttpService, HttpOptions } from './http.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { Method } from 'src/app/types/enums'
 import { clone } from '../models/server-model'
 import { pauseFor } from 'src/app/util/misc.util'
-import { HttpHeaders } from '@angular/common/http'
 import * as crypto from '../util/crypto.util'
 import { AuthService } from './auth.service'
 import { Lan } from '../types/api-types'
@@ -46,7 +45,7 @@ export class SetupService {
     // tor acquisition
     if (isLanEnabled(ssClone) && !ss.torAddress) {
       this.message = `getting tor address`
-      const { torAddress } = await this.httpService.request<Lan.GetTorRes>(ssClone, Method.get, '/tor')
+      const torAddress = await this.getTor(ssClone)
       updateS9_MUT(ssClone, { torAddress })
     }
 
@@ -66,18 +65,27 @@ export class SetupService {
     // lan handshake
     if (isLanEnabled(ssClone) && ss.torAddress && hasKeys(ssClone) && ss.registered && !ss.lastHandshake.success) {
       this.message = `executing server handshake`
-      updateS9_MUT(ssClone, { lastHandshake: await this.handshake(ssClone, 3000) })
+      updateS9_MUT(ssClone, { lastHandshake: await this.handshake(ssClone) })
     }
 
     return ssClone
   }
 
+  async getTor (ss: S9ServerLan): Promise<string | undefined> {
+    try {
+      const { torAddress } = await this.httpService.request<Lan.GetTorRes>(ss, Method.get, '/tor')
+      return torAddress
+    } catch (e) {
+      console.error(`failed getting Tor address.`)
+      return undefined
+    }
+  }
+
   async registerPubkey (ss: S9ServerFull, serial: string): Promise<boolean> {
     const { id, pubkey } = ss
     try {
-      const headers: HttpHeaders = new HttpHeaders({ 'timeout': '3000' })
       const body: Lan.PostRegisterReq = { pubkey, serial }
-      await this.httpService.request<Lan.PostRegisterRes>(ss, Method.post, '/register', { headers }, body)
+      await this.httpService.request<Lan.PostRegisterRes>(ss, Method.post, '/register', { }, body)
       return true
     } catch (e) {
       console.error(`failed pubkey registration for ${id}: ${e.message}`)
@@ -85,11 +93,10 @@ export class SetupService {
     }
   }
 
-  async handshake (ss: S9ServerFull, timeoutMs?: number) : Promise<HandshakeAttempt> {
+  async handshake (ss: S9ServerFull) : Promise<HandshakeAttempt> {
     const now = new Date()
     try {
       let options: HttpOptions = { }
-      if (timeoutMs) { options.headers = new HttpHeaders({ 'timeout': timeoutMs.toString() }) }
       await this.httpService.request<Lan.GetStatusShallowRes>(ss, Method.post, '/status/shallow', options)
       return { success: true, timestamp: now }
     } catch (e) {

@@ -1,6 +1,6 @@
 import * as CryptoJS from 'crypto-js'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
-import { InstalledApp, fromStorableApp } from './installed-app'
+import { InstalledApp, fromStorableApp } from './s9-app'
 
 export interface S9Server {
   id: string

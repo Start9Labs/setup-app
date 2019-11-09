@@ -1,4 +1,4 @@
-import { InstalledApp, AvailableApp } from '../models/installed-app'
+import { InstalledApp, AvailableApp } from '../models/s9-app'
 
 export type TwoHundredOK = { never?: never } // hack for the unit type
 

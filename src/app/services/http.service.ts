@@ -2,9 +2,11 @@ import { Injectable } from '@angular/core'
 import { HttpClient, HttpEventType, HttpErrorResponse, HttpHeaders, HttpEvent } from '@angular/common/http'
 import { Method } from '../types/enums'
 import { Observable } from 'rxjs'
+import { timeout, catchError } from 'rxjs/operators'
 import { S9ServerLan, getLanIP, S9ServerFull, hasKeys } from '../models/s9-server'
-const APP_VERSION = '1.0.0'
 import { TokenSigner } from 'jsontokens'
+const APP_VERSION = '1.0.0'
+const TIMEOUT = 3000
 
 @Injectable()
 export class HttpService {
@@ -15,7 +17,7 @@ export class HttpService {
 
   async request<T> (server: S9ServerLan | S9ServerFull, method: Method, url: string, httpOptions: HttpOptions = { }, body: any = { }): Promise<T> {
     this.setDefaultOptions(server, httpOptions) // mutates httpOptions
-    const path = `${getLanIP(server)}/v0/${url}`
+    const path = `http://${getLanIP(server)}/v0${url}`
 
     let call: () => Observable<HttpEvent<T>>
     switch (method) {
@@ -36,7 +38,14 @@ export class HttpService {
     }
 
     try {
-      const response = await call().toPromise()
+      const response = await call()
+        .pipe(
+          timeout(TIMEOUT),
+          catchError(() => {
+            throw new Error(`request timed out after ${TIMEOUT / 1000} seconds`)
+          }),
+        )
+        .toPromise()
       if (response.type === HttpEventType.Response) {
         return response.body as T
       } else {
@@ -44,22 +53,22 @@ export class HttpService {
       }
     } catch (e) {
       const error: HttpErrorResponse = e
-      const message = error.error
+      const message = error.error || error
       throw new Error(message)
     }
   }
 
   private setDefaultOptions (server: S9ServerLan | S9ServerFull, httpOptions: HttpOptions) {
     let headers: HttpHeaders = httpOptions.headers || new HttpHeaders()
-
-    headers = headers.set('APP-VERSION', APP_VERSION)
-
+    // always set app-version
+    headers = headers.set('app-version', APP_VERSION)
+    // set Authorization if hasKeys
     if (hasKeys(server)) {
       const tokenPayload = { 'iss': 'start9-companion', 'exp': new Date(new Date().getTime() + 3000) }
       const token = new TokenSigner('ES256K', server.privkey).sign(tokenPayload)
       headers = headers.set('Authorization', 'Bearer ' + token)
     }
-
+    // finalize options
     httpOptions.headers = headers
     httpOptions.observe = 'response'
   }

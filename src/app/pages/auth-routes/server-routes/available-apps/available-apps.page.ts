@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { AppService } from 'src/app/services/app.service'
-import { AvailableApp } from 'src/app/models/installed-app'
+import { AvailableApp } from 'src/app/models/s9-app'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
 import { S9Server } from 'src/app/models/s9-server'

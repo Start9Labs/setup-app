@@ -22,15 +22,28 @@ export class ZeroconfDaemon {
     this.watch()
   }
 
+  mock () {
+    const zs = {
+      domain: 'local.',
+      type: '_http._tcp',
+      name: 'start9-fb398cc6',
+      hostname: '',
+      ipv4Addresses: ['192.168.20.1'],
+      ipv6Addresses: ['end9823u0ej2fb'],
+      port: 5959,
+      txtRecord: { },
+    }
+
+    this.zeroconfServices[zs.name] = zs
+  }
+
   watch () : void {
     this.watching = this.zeroconf.watch('_http._tcp.', 'local.').subscribe(async result => {
       const { action, service } = result
-      console.log(`acquired new service`)
-      console.log('action', action)
-      console.log('service', service)
+      console.log(`zeroconf service ${action}`, service)
 
       if (service.name.startsWith('start9-') && service.ipv4Addresses.concat(service.ipv6Addresses).length > 0) {
-        console.log(`acquired new start9 server ${service.name}`)
+        console.log(`discovered start9 server ${service.name}`)
 
         switch (action) {
           case 'added':

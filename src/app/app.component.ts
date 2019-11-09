@@ -9,7 +9,7 @@ import { ZeroconfDaemon } from './daemons/zeroconf-daemon'
 import { initHandshakeStatus } from './models/s9-server'
 import { AuthService } from './services/auth.service'
 import { Router } from '@angular/router'
-import { initAppStatus } from './models/installed-app'
+import { initAppStatus } from './models/s9-app'
 
 @Component({
   selector: 'app-root',
@@ -52,6 +52,8 @@ export class AppComponent {
           ],
         })
       }
+
+      this.zeroconfDaemon.mock()
 
       // do Cordova things if Cordova
       if (platform.is('cordova')) {
