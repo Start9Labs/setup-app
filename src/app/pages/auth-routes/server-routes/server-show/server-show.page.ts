@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
 import { NavController, AlertController } from '@ionic/angular'
 import { S9Server, updateS9 } from 'src/app/models/s9-server'
+import { ClipboardService } from 'src/app/services/clipboard.service'
 
 @Component({
   selector: 'page-server-show',
@@ -10,15 +11,16 @@ import { S9Server, updateS9 } from 'src/app/models/s9-server'
   styleUrls: ['server-show.page.scss'],
 })
 export class ServerShowPage {
-  view: 'agent' | 'apps' = 'agent'
+  view: 'apps' | 'about' = 'apps'
   server: S9Server
   edited = false
 
   constructor (
-    public route: ActivatedRoute,
-    public serverModel: S9ServerModel,
-    public navCtrl: NavController,
-    public alertCtrl: AlertController,
+    private readonly route: ActivatedRoute,
+    private readonly serverModel: S9ServerModel,
+    private readonly navCtrl: NavController,
+    private readonly alertCtrl: AlertController,
+    private readonly clipboardService: ClipboardService,
   ) { }
 
   ngOnInit () {
@@ -31,10 +33,10 @@ export class ServerShowPage {
 
   fetchServer () {
     const id = this.route.snapshot.paramMap.get('serverId')
-    if (!id) throw new Error (`Need id in params for manage page but got none.`)
+    if (!id) { throw new Error (`Need id in params for manage page but got none.`) }
 
     const server = this.serverModel.getServer(id)
-    if (!server) throw new Error (`Need server in server model for manage page but got none for id ${id}.`)
+    if (!server) { throw new Error (`Need server in server model for manage page but got none for id ${id}.`) }
 
     this.server = server
   }
@@ -46,13 +48,9 @@ export class ServerShowPage {
     }
   }
 
-  segmentChanged (ev: any) {
-    this.view = ev.detail.value
-  }
-
   async presentAlertRemove () {
     const alert = await this.alertCtrl.create({
-      header: 'Caution!',
+      header: 'Caution',
       message: 'Are you sure you want to remove this server?',
       buttons: [
         {
@@ -63,14 +61,17 @@ export class ServerShowPage {
           text: 'Remove Server',
           cssClass: 'alert-danger',
           handler: async () => {
-            this.edited = false
-            await this.serverModel.forgetServer(this.server.id)
-            await this.navCtrl.navigateRoot(['/servers'])
+            this.remove()
           },
         },
       ],
     })
-
     await alert.present()
+  }
+
+  async remove () {
+    this.edited = false
+    await this.serverModel.removeServer(this.server.id)
+    await this.navCtrl.navigateRoot(['/servers'])
   }
 }

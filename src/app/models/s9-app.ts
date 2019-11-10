@@ -13,7 +13,7 @@ export interface InstalledApp extends BaseApp {
 }
 
 export function initAppStatus (): StatusCheck {
-  return { healthy: false, timestamp: new Date() }
+  return { status: AppStatus.stopped, timestamp: new Date() }
 }
 
 export function fromStorableApp (app: StorableApp): InstalledApp {
@@ -42,6 +42,11 @@ export interface StorableApp {
 }
 
 export type StatusCheck = {
-  healthy: boolean
+  status: AppStatus
   timestamp: Date
+}
+
+export enum AppStatus {
+  running = 'running',
+  stopped = 'stopped',
 }

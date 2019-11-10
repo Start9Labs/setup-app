@@ -9,7 +9,12 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="ion-padding-top">
+
+  <ion-item *ngIf="error" style="margin-bottom: 20px;">
+    <ion-text class="ion-text-wrap" color="danger">{{error}}</ion-text>
+  </ion-item>
+
   <ion-item-group style="margin-bottom: 40px;">
     <ion-item>
       <ion-label position="stacked" color="medium">Server Serial Number</ion-label>
@@ -23,8 +28,5 @@
   <ion-button [disabled]="serial.length < 8" expand="block" fill="outline" (click)="submit()">
     Save
   </ion-button>
-  <div *ngIf="error" style="margin-top: 20px;">
-    <ion-text class="ion-text-wrap" color="danger">{{error}}</ion-text>
-  </div>
 
 </ion-content>

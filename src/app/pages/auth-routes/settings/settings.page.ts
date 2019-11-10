@@ -16,7 +16,7 @@ export class SettingsPage {
 
   async presentAlertLogout () {
     const alert = await this.alertCtrl.create({
-      header: 'Caution!',
+      header: 'Caution',
       message: 'Are you sure you want to wipe the keychain on this device? All servers will be forgotten. You will need your recovery phrase to regain access to your servers.',
       buttons: [
         {

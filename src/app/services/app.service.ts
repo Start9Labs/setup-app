@@ -4,7 +4,7 @@ import { Lan } from '../types/api-types'
 import { Method } from '../types/enums'
 import { S9ServerModel } from '../models/server-model'
 import { InstalledApp, AvailableApp, initAppStatus } from '../models/s9-app'
-import { S9Server } from '../models/s9-server'
+import { S9ServerFull } from '../models/s9-server'
 
 @Injectable()
 export class AppService {
@@ -14,32 +14,42 @@ export class AppService {
     private readonly s9Model: S9ServerModel,
   ) { }
 
-  async install (server: S9Server, availableApp: AvailableApp) {
-    const installed = {
-      id: 'bitcoin',
-      displayName: 'Bitcoin',
-      torAddress: 'sample-bitcoin-tor-address',
-      lastStatus: initAppStatus(),
-    }
-    // const installed = await this.httpService.request<Lan.PostInstallAppRes>(server, Method.post, '/apps/install', { }, { id: availableApp.id })
+  async install (server: S9ServerFull, app: AvailableApp) {
+    // @TODO remove
+    // const installed = {
+    //   id: 'bitcoin',
+    //   displayName: 'Bitcoin',
+    //   torAddress: 'sample-bitcoin-tor-address',
+    //   lastStatus: initAppStatus(),
+    // }
+    const installed = await this.httpService.request<Lan.PostInstallAppRes>(server, Method.post, `/apps/${app.id}/install`)
     this.s9Model.addApp(server, installed)
     return installed
   }
 
-  async uninstall (server: S9Server, app: InstalledApp) {
-    // await this.httpService.request<Lan.PostUninstallAppRes>(server, Method.post, '/apps/uninstall', { }, { name })
+  async uninstall (server: S9ServerFull, app: InstalledApp) {
+    await this.httpService.request<Lan.PostUninstallAppRes>(server, Method.post, `/apps/${app.id}/uninstall`)
     this.s9Model.removeApp(server, app)
   }
 
-  async getAvailableApps (server: S9Server): Promise<AvailableApp[]> {
-    return [
-      {
-        id: 'bitcoin',
-        displayName: 'Bitcoin',
-        installed: true,
-      },
-    ]
-    // return this.httpService.request<Lan.GetAppsAvailableRes>(server, Method.get, '/apps/available')
+  async start (server: S9ServerFull, app: InstalledApp) {
+    return this.httpService.request<Lan.PostStopAppRes>(server, Method.post, `/apps/${app.id}/start`)
+  }
+
+  async stop (server: S9ServerFull, app: InstalledApp) {
+    return this.httpService.request<Lan.PostStartAppRes>(server, Method.post, `/apps/${app.id}/stop`)
+  }
+
+  async getAvailableApps (server: S9ServerFull): Promise<AvailableApp[]> {
+    // @TODO remove
+    // return [
+    //   {
+    //     id: 'bitcoin',
+    //     displayName: 'Bitcoin',
+    //     installed: true,
+    //   },
+    // ]
+    return this.httpService.request<Lan.GetAppsAvailableRes>(server, Method.get, '/apps/available')
   }
 
 }

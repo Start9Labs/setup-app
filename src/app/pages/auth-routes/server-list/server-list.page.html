@@ -3,7 +3,7 @@
     <ion-title>
       Servers
     </ion-title>
-    <ion-buttons class="ion-padding-end" slot="end">
+    <ion-buttons slot="end">
       <ion-button [routerLink]="['/settings']">
         <ion-icon slot="icon-only" name="settings"></ion-icon>
       </ion-button>
@@ -11,7 +11,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="ion-padding-top">
 
   <div *ngIf="serverModel.getServerCount() == 0" class="top-center">
     <ion-button size="large" fill="outline" [routerLink]="['/setup']">

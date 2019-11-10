@@ -7,41 +7,21 @@
   </ion-toolbar>
   <ion-toolbar>
     <ion-segment [(ngModel)]="view">
-      <ion-segment-button value="agent">
-        <ion-label>Agent App</ion-label>
-      </ion-segment-button>
       <ion-segment-button value="apps">
-        <ion-label>More Apps</ion-label>
+        <ion-label>Installed Apps</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="about">
+        <ion-label>About</ion-label>
       </ion-segment-button>
     </ion-segment>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="ion-padding-top">
 
   <div [ngSwitch]="view">
 
-    <div *ngSwitchCase="'agent'">
-      <ion-item-group style="margin-bottom: 40px;">
-        <ion-item>
-          <ion-label position="stacked" color="medium">Friendly Name</ion-label>
-          <ion-input [(ngModel)]="server.friendlyName" (ionChange)="edited = true"></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label position="stacked" color="medium">Tor Address</ion-label>
-          <ion-text color="medium"><p>{{ server.torAddress }}</p></ion-text>
-        </ion-item>
-      </ion-item-group>
-      <!-- <ion-button expand="block" fill="outline" [routerLink]="['wifi']">
-        Setup Wifi
-      </ion-button> -->
-      <ion-button expand="block" fill="outline" color="danger" (click)="presentAlertRemove()">
-        Remove
-      </ion-button>
-    </div>
-
     <div *ngSwitchCase="'apps'">
-
       <div *ngIf="serverModel.getAppCount(server) == 0" class="top-center">
         <ion-button size="large" fill="outline" [routerLink]="['apps']">
           <ion-icon name="add"></ion-icon>
@@ -55,8 +35,8 @@
             <ion-icon slot="start" size="large" name="logo-bitcoin"></ion-icon>
             {{ app.displayName }}
             <ion-note slot="end">
-              <ion-icon size="large" name="flash" [color]="app.healthy ? 'success' : 'danger'">
-              </ion-icon>
+              <ion-text *ngIf="app.lastStatus.status === 'running'" color="success">Running</ion-text>
+              <ion-text *ngIf="app.lastStatus.status === 'stopped'" color="danger">Stopped</ion-text>
             </ion-note>
           </ion-item>
         </ion-item-group>
@@ -67,6 +47,27 @@
           </ion-fab-button>
         </ion-fab>
       </div>
+    </div>
+
+    <div *ngSwitchCase="'about'">
+      <ion-item-group style="margin-bottom: 40px;">
+        <ion-item>
+          <ion-label position="stacked" color="medium">Friendly Name</ion-label>
+          <ion-input [(ngModel)]="server.friendlyName" (ionChange)="edited = true"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked" color="medium">Tor Address</ion-label>
+          <ion-text color="medium"><p>{{ server.torAddress }}</p></ion-text>
+          <ion-note slot="end">
+            <ion-button (click)="clipboardService.copy(server.torAddress)" fill="outline" size="small">
+              Copy
+            </ion-button>
+          </ion-note>
+        </ion-item>
+      </ion-item-group>
+      <ion-button expand="block" fill="outline" color="danger" (click)="presentAlertRemove()">
+        Remove
+      </ion-button>
     </div>
 
   </div>

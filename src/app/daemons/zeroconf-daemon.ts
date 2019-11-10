@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs'
 
 @Injectable()
 export class ZeroconfDaemon {
-  private zeroconfServices: { [hostanme: string]: ZeroconfService } = { }
+  private zeroconfServices: { [hostname: string]: ZeroconfService } = { }
   private watching: Subscription
   constructor (
     public zeroconf: Zeroconf,

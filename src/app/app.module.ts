@@ -12,16 +12,18 @@ import { HealthDaemon } from './daemons/health-daemon'
 import { WifiDaemon } from './daemons/wifi-daemon'
 import { ZeroconfDaemon } from './daemons/zeroconf-daemon'
 // services
+import { AppService } from './services/app.service'
+import { ClipboardService } from './services/clipboard.service'
 import { HttpService } from './services/http.service'
 import { S9ServerModel } from './models/server-model'
 import { SetupService } from './services/setup.service'
 // native
+import { Clipboard } from '@ionic-native/clipboard/ngx'
+import { Network } from '@ionic-native/network/ngx'
+import { SecureStorage } from '@ionic-native/secure-storage/ngx'
 import { SplashScreen } from '@ionic-native/splash-screen/ngx'
 import { StatusBar } from '@ionic-native/status-bar/ngx'
 import { Zeroconf } from '@ionic-native/zeroconf/ngx'
-import { Network } from '@ionic-native/network/ngx'
-import { SecureStorage } from '@ionic-native/secure-storage/ngx'
-import { AppService } from './services/app.service'
 
 @NgModule({
   declarations: [AppComponent],
@@ -40,10 +42,12 @@ import { AppService } from './services/app.service'
     ZeroconfDaemon,
     // services
     AppService,
+    ClipboardService,
     S9ServerModel,
     HttpService,
     SetupService,
     // native
+    Clipboard,
     SecureStorage,
     StatusBar,
     SplashScreen,

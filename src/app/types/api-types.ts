@@ -25,4 +25,8 @@ export module Lan {
   export type PostInstallAppRes = InstalledApp
   export type PostUninstallAppReq = { name: string }
   export type PostUninstallAppRes = TwoHundredOK
+  export type PostStartAppReq = { }
+  export type PostStartAppRes = InstalledApp
+  export type PostStopAppReq = { }
+  export type PostStopAppRes = InstalledApp
 }

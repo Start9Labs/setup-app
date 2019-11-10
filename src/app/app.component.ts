@@ -50,6 +50,16 @@ export class AppComponent {
               lastStatus: initAppStatus(),
             },
           ],
+          zeroconfService: {
+            domain: 'local.',
+            type: '_http._tcp',
+            name: 'start9-fb398cc6',
+            hostname: '',
+            ipv4Addresses: ['192.168.20.1'],
+            ipv6Addresses: ['end9823u0ej2fb'],
+            port: 5959,
+            txtRecord: { },
+          },
         })
       }
 

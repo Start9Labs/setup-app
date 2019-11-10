@@ -57,7 +57,7 @@ export class S9ServerModel {
     await this.saveAll()
   }
 
-  async forgetServer (id: string): Promise<void> {
+  async removeServer (id: string): Promise<void> {
     delete this.servers[id]
     await this.saveAll()
   }

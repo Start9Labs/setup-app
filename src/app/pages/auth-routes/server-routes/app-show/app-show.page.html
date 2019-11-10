@@ -7,16 +7,42 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="ion-padding-top">
+
+  <ion-item *ngIf="error" style="margin-bottom: 20px;">
+    <ion-text class="ion-text-wrap" color="danger">{{error}}</ion-text>
+  </ion-item>
 
   <ion-item-group style="margin-bottom: 40px;">
     <ion-item>
       <ion-label position="stacked" color="medium">App Name</ion-label>
-      <ion-text color="medium"><p>{{ app.displayName }}</p></ion-text>
+      <ion-text color="dark"><p>{{ app.displayName }}</p></ion-text>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked" color="medium">Status</ion-label>
+      <ion-text *ngIf="app.lastStatus.status === 'running'" color="success"><p>Running</p></ion-text>
+      <ion-text *ngIf="app.lastStatus.status === 'stopped'" color="medium"><p>Stopped</p></ion-text>
+      <ion-note slot="end">
+        <ion-button *ngIf="app.lastStatus.status === 'running'" (click)="stop()" fill="outline" size="small" color="danger">
+          Stop
+        </ion-button>
+        <ion-button (click)="start()" fill="outline" size="small" color="success">
+          Restart
+        </ion-button>
+      </ion-note>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked" color="medium">Last Status Check</ion-label>
+      <ion-text color="medium"><p>{{ app.lastStatus.timestamp | date: 'short' }}</p></ion-text>
     </ion-item>
     <ion-item>
       <ion-label position="stacked" color="medium">Tor Address</ion-label>
       <ion-text color="medium"><p>{{ app.torAddress }}</p></ion-text>
+      <ion-note slot="end">
+        <ion-button (click)="clipboardService.copy(app.torAddress)" fill="outline" size="small">
+          Copy
+        </ion-button>
+      </ion-note>
     </ion-item>
   </ion-item-group>
 
