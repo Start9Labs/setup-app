@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 import { HttpClient, HttpEventType, HttpErrorResponse, HttpHeaders, HttpEvent } from '@angular/common/http'
 import { Method } from '../types/enums'
 import { Observable } from 'rxjs'
-import { timeout, catchError } from 'rxjs/operators'
+import { timeout } from 'rxjs/operators'
 import { S9ServerLan, getLanIP, S9ServerFull, hasKeys } from '../models/s9-server'
 import { TokenSigner } from 'jsontokens'
 const APP_VERSION = '1.0.0'
@@ -39,12 +39,7 @@ export class HttpService {
 
     try {
       const response = await call()
-        .pipe(
-          timeout(TIMEOUT),
-          catchError(() => {
-            throw new Error(`request timed out after ${TIMEOUT / 1000} seconds`)
-          }),
-        )
+        .pipe(timeout(TIMEOUT))
         .toPromise()
       if (response.type === HttpEventType.Response) {
         return response.body as T
@@ -52,6 +47,8 @@ export class HttpService {
         throw new Error(`Expected HTTP Event Type, got ${response.type}`)
       }
     } catch (e) {
+      console.log('here')
+      console.error(e)
       const error: HttpErrorResponse = e
       const message = error.error || error
       throw new Error(message)

@@ -3,7 +3,7 @@ import { AppService } from 'src/app/services/app.service'
 import { AvailableApp } from 'src/app/models/s9-app'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
-import { S9Server } from 'src/app/models/s9-server'
+import { S9ServerFull } from 'src/app/models/s9-server'
 import { NavController } from '@ionic/angular'
 
 @Component({
@@ -12,7 +12,7 @@ import { NavController } from '@ionic/angular'
   styleUrls: ['./available-apps.page.scss'],
 })
 export class AvailableAppsPage {
-  server: S9Server
+  server: S9ServerFull
   apps: AvailableApp[] = []
 
   constructor (
@@ -24,7 +24,7 @@ export class AvailableAppsPage {
 
   async ngOnInit () {
     const serverId = this.route.snapshot.paramMap.get('serverId') as string
-    const server = this.serverModel.getServer(serverId)
+    const server = this.serverModel.getServer(serverId) as S9ServerFull
     if (!server) throw new Error (`No server found with ID: ${serverId}`)
     this.server = server
 
