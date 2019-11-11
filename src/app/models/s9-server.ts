@@ -36,7 +36,7 @@ export function isLanEnabled (ss: S9Server | S9ServerLan): ss is S9ServerLan {
   return !!getLanIP(ss)
 }
 
-export function updateS9 (ss: S9Server, u: Partial<S9Server>): S9Server {
+export function updateS9 (ss: S9ServerFull, u: Partial<S9Server>): S9ServerFull {
   return { ...ss, ...u }
 }
 

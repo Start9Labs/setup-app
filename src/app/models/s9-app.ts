@@ -13,7 +13,7 @@ export interface InstalledApp extends BaseApp {
 }
 
 export function initAppStatus (): StatusCheck {
-  return { status: AppStatus.stopped, timestamp: new Date() }
+  return { status: AppStatus.running, timestamp: new Date() }
 }
 
 export function fromStorableApp (app: StorableApp): InstalledApp {

@@ -6,7 +6,6 @@ import { timeout } from 'rxjs/operators'
 import { S9ServerLan, getLanIP, S9ServerFull, hasKeys } from '../models/s9-server'
 import { TokenSigner } from 'jsontokens'
 const APP_VERSION = '1.0.0'
-const TIMEOUT = 3000
 
 @Injectable()
 export class HttpService {
@@ -15,7 +14,7 @@ export class HttpService {
     private readonly http: HttpClient,
   ) { }
 
-  async request<T> (server: S9ServerLan | S9ServerFull, method: Method, url: string, httpOptions: HttpOptions = { }, body: any = { }): Promise<T> {
+  async request<T> (server: S9ServerLan | S9ServerFull, method: Method, url: string, httpOptions: HttpOptions = { }, body: any = { }, TIMEOUT = 30000): Promise<T> {
     this.setDefaultOptions(server, httpOptions) // mutates httpOptions
     const path = `http://${getLanIP(server)}/v0${url}`
 

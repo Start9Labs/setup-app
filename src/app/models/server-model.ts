@@ -27,10 +27,6 @@ export class S9ServerModel {
     return this.getServers().length
   }
 
-  getAppCount (server: S9Server): number {
-    return server.apps.length
-  }
-
   getServerBy (filter: Partial<S9Server>): S9Server | undefined {
     return this.getServers().find(s =>
       Object.entries(filter).every(e => s[e[0]] === e[1]),

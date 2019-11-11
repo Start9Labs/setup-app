@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
 import { NavController, AlertController } from '@ionic/angular'
-import { S9Server, updateS9 } from 'src/app/models/s9-server'
+import { updateS9, S9ServerFull } from 'src/app/models/s9-server'
 import { ClipboardService } from 'src/app/services/clipboard.service'
 
 @Component({
@@ -12,7 +12,7 @@ import { ClipboardService } from 'src/app/services/clipboard.service'
 })
 export class ServerShowPage {
   view: 'apps' | 'about' = 'apps'
-  server: S9Server
+  server: S9ServerFull
   edited = false
 
   constructor (
@@ -35,7 +35,7 @@ export class ServerShowPage {
     const id = this.route.snapshot.paramMap.get('serverId')
     if (!id) { throw new Error (`Need id in params for manage page but got none.`) }
 
-    const server = this.serverModel.getServer(id)
+    const server = this.serverModel.getServer(id) as S9ServerFull
     if (!server) { throw new Error (`Need server in server model for manage page but got none for id ${id}.`) }
 
     this.server = server
@@ -46,6 +46,10 @@ export class ServerShowPage {
       this.server = updateS9(this.server, { friendlyName: this.server.friendlyName || this.server.id })
       await this.serverModel.saveServer(this.server)
     }
+  }
+
+  async copyTor () {
+    await this.clipboardService.copy(this.server.torAddress)
   }
 
   async presentAlertRemove () {

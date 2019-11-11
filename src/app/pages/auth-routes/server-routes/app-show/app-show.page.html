@@ -16,7 +16,7 @@
   <ion-item-group style="margin-bottom: 40px;">
     <ion-item>
       <ion-label position="stacked" color="medium">App Name</ion-label>
-      <ion-text color="dark"><p>{{ app.displayName }}</p></ion-text>
+      <ion-text color="medium"><p>{{ app.displayName }}</p></ion-text>
     </ion-item>
     <ion-item>
       <ion-label position="stacked" color="medium">Status</ion-label>
@@ -26,8 +26,8 @@
         <ion-button *ngIf="app.lastStatus.status === 'running'" (click)="stop()" fill="outline" size="small" color="danger">
           Stop
         </ion-button>
-        <ion-button (click)="start()" fill="outline" size="small" color="success">
-          Restart
+        <ion-button *ngIf="app.lastStatus.status === 'stopped'" (click)="start()" fill="outline" size="small" color="success">
+          Start
         </ion-button>
       </ion-note>
     </ion-item>
@@ -39,7 +39,7 @@
       <ion-label position="stacked" color="medium">Tor Address</ion-label>
       <ion-text color="medium"><p>{{ app.torAddress }}</p></ion-text>
       <ion-note slot="end">
-        <ion-button (click)="clipboardService.copy(app.torAddress)" fill="outline" size="small">
+        <ion-button (click)="copyTor()" fill="outline" size="small">
           Copy
         </ion-button>
       </ion-note>

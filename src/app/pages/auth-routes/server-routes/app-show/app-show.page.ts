@@ -40,6 +40,10 @@ export class AppShowPage {
     this.app = app
   }
 
+  async copyTor () {
+    await this.clipboardService.copy(this.server.torAddress)
+  }
+
   async stop (): Promise<void> {
     const loader = await this.loadingCtrl.create({
       message: `Stopping ${this.app.displayName}`,
@@ -57,7 +61,7 @@ export class AppShowPage {
 
   async start (): Promise<void> {
     const loader = await this.loadingCtrl.create({
-      message: `Restarting ${this.app.displayName}`,
+      message: `Starting ${this.app.displayName}`,
     })
     await loader.present()
 

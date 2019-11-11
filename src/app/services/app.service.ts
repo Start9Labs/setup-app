@@ -16,19 +16,19 @@ export class AppService {
 
   async install (server: S9ServerFull, app: AvailableApp) {
     // @TODO remove
-    // const installed = {
-    //   id: 'bitcoin',
-    //   displayName: 'Bitcoin',
-    //   torAddress: 'sample-bitcoin-tor-address',
-    //   lastStatus: initAppStatus(),
-    // }
-    const installed = await this.httpService.request<Lan.PostInstallAppRes>(server, Method.post, `/apps/${app.id}/install`)
+    const installed = {
+      id: 'bitcoin',
+      displayName: 'Bitcoin',
+      torAddress: 'sample-bitcoin-tor-address',
+      lastStatus: initAppStatus(),
+    }
+    // const installed = await this.httpService.request<Lan.PostInstallAppRes>(server, Method.post, `/apps/${app.id}/install`)
     this.s9Model.addApp(server, installed)
     return installed
   }
 
   async uninstall (server: S9ServerFull, app: InstalledApp) {
-    await this.httpService.request<Lan.PostUninstallAppRes>(server, Method.post, `/apps/${app.id}/uninstall`)
+    // await this.httpService.request<Lan.PostUninstallAppRes>(server, Method.post, `/apps/${app.id}/uninstall`)
     this.s9Model.removeApp(server, app)
   }
 
@@ -42,14 +42,14 @@ export class AppService {
 
   async getAvailableApps (server: S9ServerFull): Promise<AvailableApp[]> {
     // @TODO remove
-    // return [
-    //   {
-    //     id: 'bitcoin',
-    //     displayName: 'Bitcoin',
-    //     installed: true,
-    //   },
-    // ]
-    return this.httpService.request<Lan.GetAppsAvailableRes>(server, Method.get, '/apps/available')
+    return [
+      {
+        id: 'bitcoin',
+        displayName: 'Bitcoin',
+        installed: true,
+      },
+    ]
+    // return this.httpService.request<Lan.GetAppsAvailableRes>(server, Method.get, '/apps/available')
   }
 
 }

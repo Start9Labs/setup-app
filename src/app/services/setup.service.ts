@@ -12,6 +12,7 @@ import { Lan } from '../types/api-types'
 @Injectable()
 export class SetupService {
   private static readonly setupAttempts = 10
+  private static readonly timeout = 2000
   private static readonly waitForMS = 1000
   public message = ''
 
@@ -73,7 +74,7 @@ export class SetupService {
 
   async getTor (ss: S9ServerLan): Promise<string | undefined> {
     try {
-      const { torAddress } = await this.httpService.request<Lan.GetTorRes>(ss, Method.get, '/tor')
+      const { torAddress } = await this.httpService.request<Lan.GetTorRes>(ss, Method.get, '/tor', { }, { }, SetupService.timeout)
       return torAddress
     } catch (e) {
       console.error(`failed getting Tor address.`)
@@ -85,7 +86,7 @@ export class SetupService {
     const { id, pubkey } = ss
     try {
       const body: Lan.PostRegisterReq = { pubkey, serial }
-      await this.httpService.request<Lan.PostRegisterRes>(ss, Method.post, '/register', { }, body)
+      await this.httpService.request<Lan.PostRegisterRes>(ss, Method.post, '/register', { }, body, SetupService.timeout)
       return true
     } catch (e) {
       console.error(`failed pubkey registration for ${id}: ${e.message}`)
@@ -97,7 +98,7 @@ export class SetupService {
     const now = new Date()
     try {
       let options: HttpOptions = { }
-      await this.httpService.request<Lan.GetStatusShallowRes>(ss, Method.post, '/status/shallow', options)
+      await this.httpService.request<Lan.GetStatusShallowRes>(ss, Method.post, '/status/shallow', options, { }, SetupService.timeout)
       return { success: true, timestamp: now }
     } catch (e) {
       console.error(`failed handhsake for ${ss.id}: ${e.message}`)
