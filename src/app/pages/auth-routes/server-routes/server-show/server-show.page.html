@@ -8,7 +8,7 @@
   <ion-toolbar>
     <ion-segment [(ngModel)]="view">
       <ion-segment-button value="apps">
-        <ion-label>Installed Apps</ion-label>
+        <ion-label>Apps</ion-label>
       </ion-segment-button>
       <ion-segment-button value="about">
         <ion-label>About</ion-label>
@@ -23,10 +23,11 @@
 
     <div *ngSwitchCase="'apps'">
       <ion-item-group>
-        <ion-item [routerLink]="['/servers', server.id, 'apps', 'available']">
+        <!-- <ion-item [routerLink]="['/servers', server.id, 'apps', 'available']">
           <ion-icon slot="start" size="large" name="search" color="primary"></ion-icon>
-          <ion-text color="primary">Browse apps</ion-text>
-        </ion-item>
+          <ion-text color="primary">Browse Available Apps</ion-text>
+        </ion-item> -->
+        <ion-item-divider>Installed</ion-item-divider>
         <ion-item *ngFor="let app of server.apps" [routerLink]="['/servers', server.id, 'apps', app.id]">
           <ion-avatar slot="start">
             <img src="../../../../../assets/img/bitcoin_core.png" />
@@ -41,6 +42,11 @@
           </ion-note>
         </ion-item>
       </ion-item-group>
+      <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+        <ion-fab-button class="fab-button" [routerLink]="['/servers', server.id, 'apps', 'available']">
+          <ion-icon size="large" name="search"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
     </div>
 
     <div *ngSwitchCase="'about'">
@@ -59,8 +65,8 @@
           </ion-note>
         </ion-item>
       </ion-item-group>
-      <ion-button expand="block" fill="outline" color="danger" (click)="presentAlertRemove()">
-        Remove
+      <ion-button expand="block" fill="outline" color="danger" (click)="presentAlertForget()">
+        Forget Server
       </ion-button>
     </div>
 

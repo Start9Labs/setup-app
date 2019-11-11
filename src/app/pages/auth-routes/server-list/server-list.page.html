@@ -14,10 +14,6 @@
 <ion-content class="ion-padding-top">
 
   <ion-item-group>
-    <ion-item [routerLink]="['/setup']">
-      <ion-icon slot="start" size="large" name="add" color="primary"></ion-icon>
-      <ion-text color="primary">Add new server</ion-text>
-    </ion-item>
     <ion-item *ngFor="let server of serverModel.getServers()" [routerLink]="[server.id]">
       <ion-icon slot="start" size="large" name="cube"></ion-icon>
       {{ server.friendlyName }}
@@ -27,5 +23,11 @@
       </ion-note>
     </ion-item>
   </ion-item-group>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button [routerLink]="['/setup']" class="fab-button">
+      <ion-icon size="large" name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 
 </ion-content>

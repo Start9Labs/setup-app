@@ -35,5 +35,7 @@
   --border-style: solid;
   --border-color: var(--ion-color-primary);
   --color: var(--ion-color-primary);
+  min-width: 64px;
+  min-height: 64px;
   margin: 16px;
 }

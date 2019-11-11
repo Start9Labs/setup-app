@@ -52,20 +52,20 @@ export class ServerShowPage {
     await this.clipboardService.copy(this.server.torAddress)
   }
 
-  async presentAlertRemove () {
+  async presentAlertForget () {
     const alert = await this.alertCtrl.create({
       header: 'Caution',
-      message: 'Are you sure you want to remove this server?',
+      message: `Are you sure you want to forget ${this.server.friendlyName} on this device?`,
       buttons: [
         {
           text: 'Cancel',
           role: 'cancel',
         },
         {
-          text: 'Remove Server',
+          text: 'Forget Server',
           cssClass: 'alert-danger',
           handler: async () => {
-            this.remove()
+            this.forget()
           },
         },
       ],
@@ -73,9 +73,9 @@ export class ServerShowPage {
     await alert.present()
   }
 
-  async remove () {
+  async forget () {
     this.edited = false
-    await this.serverModel.removeServer(this.server.id)
+    await this.serverModel.forgetServer(this.server.id)
     await this.navCtrl.navigateRoot(['/servers'])
   }
 }
