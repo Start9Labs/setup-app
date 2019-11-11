@@ -30,9 +30,4 @@ export class AvailableAppsPage {
 
     this.apps = await this.appService.getAvailableApps(this.server)
   }
-
-  async install (app: AvailableApp) {
-    await this.appService.install(this.server, app)
-    await this.navCtrl.pop()
-  }
 }

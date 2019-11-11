@@ -1,24 +1,29 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Available Apps</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="'servers/' + server.id"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Apps</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding-top">
 
-  <ion-item-group>
-    <ion-item *ngFor="let app of apps" [routerLink]="['app.id']">
-      <ion-icon slot="start" size="large" name="logo-bitcoin"></ion-icon>
-      {{ app.displayName }}
-      <ion-note slot="end">
-        <ion-button *ngIf="!app.installed" size="small" fill="outline" (click)="install(app)">
-          Install
-        </ion-button>
-        <ion-text *ngIf="app.installed" color="success">
-          Installed
-        </ion-text>
-      </ion-note>
-    </ion-item>
-  </ion-item-group>
+  <ion-grid>
+    <ion-row>
+      <ion-col *ngFor="let app of apps" size="6">
+        <ion-card [routerLink]="[app.id]">
+          <img src="../../../../../assets/img/bitcoin_core.png" />
+          <ion-card-header>
+            <ion-card-subtitle *ngIf="app.installed" color="success">Installed</ion-card-subtitle>
+            <ion-card-title>{{ app.title }}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            {{ app.descriptionShort }}
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 
 </ion-content>

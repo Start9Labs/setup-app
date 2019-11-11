@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
 import { S9Server, StorableS9Server, toStorableServer, fromStorableServer } from './s9-server'
-import { InstalledApp } from './s9-app'
+import { InstalledApp, AvailableApp } from './s9-app'
 
 @Injectable()
 export class S9ServerModel {
@@ -40,7 +40,7 @@ export class S9ServerModel {
     await this.saveAll()
   }
 
-  async removeApp (server: S9Server, app: InstalledApp) {
+  async removeApp (server: S9Server, app: AvailableApp) {
     const serverClone = clone(server)
     const newApps = serverClone.apps.filter(a => a.id !== app.id)
     serverClone.apps = newApps

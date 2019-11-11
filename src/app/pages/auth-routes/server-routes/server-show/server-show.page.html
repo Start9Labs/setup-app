@@ -8,7 +8,7 @@
   <ion-toolbar>
     <ion-segment [(ngModel)]="view">
       <ion-segment-button value="apps">
-        <ion-label>My Apps</ion-label>
+        <ion-label>Installed Apps</ion-label>
       </ion-segment-button>
       <ion-segment-button value="about">
         <ion-label>About</ion-label>
@@ -22,16 +22,19 @@
   <div [ngSwitch]="view">
 
     <div *ngSwitchCase="'apps'">
-      <ion-item [routerLink]="['apps']" class="ion-margin-bottom">
-        <ion-icon slot="start" name="add" color="primary"></ion-icon>
-        <ion-text color="primary">Get Apps</ion-text>
-      </ion-item>
-
-      <ion-item-group *ngIf="server.apps.length">
-        <ion-item-divider>Installed Apps</ion-item-divider>
-        <ion-item *ngFor="let app of server.apps" [routerLink]="['/servers', server.id, app.id]">
-          <ion-icon slot="start" size="large" name="logo-bitcoin" style="color: #ff9900"></ion-icon>
-          {{ app.displayName }}
+      <ion-item-group>
+        <ion-item [routerLink]="['/servers', server.id, 'apps', 'available']">
+          <ion-icon slot="start" size="large" name="search" color="primary"></ion-icon>
+          <ion-text color="primary">Browse apps</ion-text>
+        </ion-item>
+        <ion-item *ngFor="let app of server.apps" [routerLink]="['/servers', server.id, 'apps', app.id]">
+          <ion-avatar slot="start">
+            <img src="../../../../../assets/img/bitcoin_core.png" />
+          </ion-avatar>
+          <ion-label>
+            <h3>{{ app.title }}</h3>
+            <p>version: {{ app.versionInstalled }}</p>
+          </ion-label>
           <ion-note slot="end">
             <ion-text *ngIf="app.lastStatus.status === 'running'" color="success">Running</ion-text>
             <ion-text *ngIf="app.lastStatus.status === 'stopped'" color="danger">Stopped</ion-text>

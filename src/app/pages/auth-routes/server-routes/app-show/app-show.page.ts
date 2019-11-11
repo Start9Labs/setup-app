@@ -46,7 +46,7 @@ export class AppShowPage {
 
   async stop (): Promise<void> {
     const loader = await this.loadingCtrl.create({
-      message: `Stopping ${this.app.displayName}`,
+      message: `Stopping ${this.app.title}`,
     })
     await loader.present()
 
@@ -61,7 +61,7 @@ export class AppShowPage {
 
   async start (): Promise<void> {
     const loader = await this.loadingCtrl.create({
-      message: `Starting ${this.app.displayName}`,
+      message: `Starting ${this.app.title}`,
     })
     await loader.present()
 
@@ -77,7 +77,7 @@ export class AppShowPage {
   async presentAlertUninstall () {
     const alert = await this.alertCtrl.create({
       header: 'Caution',
-      message: `Are you sure you want to uninstall ${this.app.displayName}?`,
+      message: `Are you sure you want to uninstall ${this.app.title}?`,
       buttons: [
         {
           text: 'Cancel',
@@ -97,12 +97,12 @@ export class AppShowPage {
 
   async uninstall (): Promise<void> {
     const loader = await this.loadingCtrl.create({
-      message: `Uninstalling ${this.app.displayName}`,
+      message: `Uninstalling ${this.app.title}`,
     })
     await loader.present()
 
     try {
-      await this.appService.uninstall(this.server, this.app)
+      await this.appService.uninstall(this.server, this.app as any)
       await this.navCtrl.pop()
     } catch (e) {
       this.error = e.message

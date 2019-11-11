@@ -3,20 +3,24 @@
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="'servers/' + server.id"></ion-back-button>
     </ion-buttons>
-    <ion-title>{{ app.displayName }}</ion-title>
+    <ion-title>{{ app.title }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding-top">
 
-  <ion-item *ngIf="error" style="margin-bottom: 20px;">
+  <ion-item *ngIf="error" style="margin-bottom: 16px;">
     <ion-text class="ion-text-wrap" color="danger">{{error}}</ion-text>
   </ion-item>
 
   <ion-item-group style="margin-bottom: 40px;">
     <ion-item>
       <ion-label position="stacked" color="medium">App Name</ion-label>
-      <ion-text color="medium"><p>{{ app.displayName }}</p></ion-text>
+      <ion-text color="medium"><p>{{ app.title }}</p></ion-text>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked" color="medium">Installed Version</ion-label>
+      <ion-text color="medium"><p>{{ app.versionInstalled }}</p></ion-text>
     </ion-item>
     <ion-item>
       <ion-label position="stacked" color="medium">Status</ion-label>

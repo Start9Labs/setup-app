@@ -38,14 +38,15 @@ export class AppComponent {
       if (!this.dataService.getServerCount()) {
         await this.dataService.saveServer({
           id: 'abcdefgh',
-          friendlyName: `Matt's Server`,
+          friendlyName: `Server #1`,
           torAddress: 'agent-tor-address.onion',
           lastHandshake: initHandshakeStatus(),
           registered: false,
           apps: [
             {
               id: 'bitcoin',
-              displayName: 'Bitcoin',
+              versionInstalled: 0.18,
+              title: 'Bitcoin Core',
               torAddress: 'bitcoin-tor-address.onion',
               lastStatus: initAppStatus(),
             },

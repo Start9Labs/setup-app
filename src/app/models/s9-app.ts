@@ -1,10 +1,16 @@
 export interface BaseApp {
   id: string
-  displayName: string
+  title: string
+  versionInstalled: number
 }
 
 export interface AvailableApp extends BaseApp {
+  version: number
+  descriptionShort: string
+  descriptionLong: string
+  releaseNotes: string
   installed: boolean
+  compatible: boolean
 }
 
 export interface InstalledApp extends BaseApp {
@@ -17,27 +23,30 @@ export function initAppStatus (): StatusCheck {
 }
 
 export function fromStorableApp (app: StorableApp): InstalledApp {
-  const { id, displayName, torAddress } = app
+  const { id, versionInstalled, title, torAddress } = app
   return {
     id,
-    displayName,
+    versionInstalled,
+    title,
     lastStatus: initAppStatus(),
     torAddress,
   }
 }
 
 export function toStorableApp (app: InstalledApp): StorableApp {
-  const { id, displayName, torAddress } = app
+  const { id, versionInstalled, title, torAddress } = app
   return {
     id,
-    displayName,
+    versionInstalled,
+    title,
     torAddress,
   }
 }
 
 export interface StorableApp {
   id: string
-  displayName: string
+  versionInstalled: number
+  title: string
   torAddress: string
 }
 

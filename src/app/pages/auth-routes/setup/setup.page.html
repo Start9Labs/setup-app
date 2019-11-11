@@ -11,7 +11,7 @@
 
 <ion-content class="ion-padding-top">
 
-  <ion-item *ngIf="error" style="margin-bottom: 20px;">
+  <ion-item *ngIf="error" style="margin-bottom: 16px;">
     <ion-text class="ion-text-wrap" color="danger">{{error}}</ion-text>
   </ion-item>
 
@@ -26,7 +26,7 @@
     </ion-item>
   </ion-item-group>
   <ion-button [disabled]="serial.length < 8" expand="block" fill="outline" (click)="submit()">
-    Save
+    Connect
   </ion-button>
 
 </ion-content>

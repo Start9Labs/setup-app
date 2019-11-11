@@ -14,11 +14,17 @@ export class AppService {
     private readonly s9Model: S9ServerModel,
   ) { }
 
+  async getApp (server: S9ServerFull, appId: string): Promise<AvailableApp> {
+    return mockApp
+    // return this.httpService.request<Lan.PostInstallAppRes>(server, Method.get, `/apps/${appId}`)
+  }
+
   async install (server: S9ServerFull, app: AvailableApp) {
     // @TODO remove
     const installed = {
       id: 'bitcoin',
-      displayName: 'Bitcoin',
+      versionInstalled: 0.18,
+      title: 'Bitcoin',
       torAddress: 'sample-bitcoin-tor-address',
       lastStatus: initAppStatus(),
     }
@@ -27,7 +33,7 @@ export class AppService {
     return installed
   }
 
-  async uninstall (server: S9ServerFull, app: InstalledApp) {
+  async uninstall (server: S9ServerFull, app: AvailableApp) {
     // await this.httpService.request<Lan.PostUninstallAppRes>(server, Method.post, `/apps/${app.id}/uninstall`)
     this.s9Model.removeApp(server, app)
   }
@@ -42,14 +48,20 @@ export class AppService {
 
   async getAvailableApps (server: S9ServerFull): Promise<AvailableApp[]> {
     // @TODO remove
-    return [
-      {
-        id: 'bitcoin',
-        displayName: 'Bitcoin',
-        installed: true,
-      },
-    ]
+    return [mockApp, mockApp, mockApp]
     // return this.httpService.request<Lan.GetAppsAvailableRes>(server, Method.get, '/apps/available')
   }
+}
 
+const mockApp = {
+  id: 'bitcoin',
+  version: 0.18,
+  title: 'Bitcoin Core',
+  descriptionShort: 'Bitcoin is an innovative payment network and new kind of money.',
+  descriptionLong: 'Bitcoin is an innovative payment network and new kind of money. Bitcoin utilizes a robust p2p network to garner decentralized consensus.',
+  releaseNotes: '* Faster sync time<br />* MAST support',
+  // server specific
+  versionInstalled: 0.18,
+  installed: true,
+  compatible: true,
 }
