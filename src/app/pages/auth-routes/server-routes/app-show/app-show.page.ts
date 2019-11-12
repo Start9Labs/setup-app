@@ -4,7 +4,7 @@ import { AppService } from 'src/app/services/app.service'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
 import { InstalledApp } from 'src/app/models/s9-app'
-import { S9ServerFull } from 'src/app/models/s9-server'
+import { S9Server } from 'src/app/models/s9-server'
 import { ClipboardService } from 'src/app/services/clipboard.service'
 
 @Component({
@@ -14,7 +14,7 @@ import { ClipboardService } from 'src/app/services/clipboard.service'
 })
 export class AppShowPage {
   error: string
-  server: S9ServerFull
+  server: S9Server
   app: InstalledApp
 
   constructor (
@@ -29,7 +29,7 @@ export class AppShowPage {
 
   ngOnInit () {
     const serverId = this.route.snapshot.paramMap.get('serverId') as string
-    const server = this.serverModel.getServer(serverId) as S9ServerFull
+    const server = this.serverModel.getServer(serverId) as S9Server
     if (!server) throw new Error (`No server found with ID: ${serverId}`)
 
     const appId = this.route.snapshot.paramMap.get('appId') as string

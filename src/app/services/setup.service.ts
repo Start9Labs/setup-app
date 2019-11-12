@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
-import { S9Server, updateS9_MUT, isLanEnabled, HandshakeAttempt, isFullySetup, hasKeys, S9ServerFull, S9ServerLan } from '../models/s9-server'
-import { HttpService, HttpOptions } from './http.service'
+import { S9ServerBuilder, updateS9_MUT, isLanEnabled, HandshakeAttempt, isFullySetup, hasKeys, S9Server, S9ServerLan, isTorEnabled } from '../models/s9-server'
+import { HttpOptions, HttpService } from './http.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { Method } from 'src/app/types/enums'
 import { clone } from '../models/server-model'
@@ -22,7 +22,7 @@ export class SetupService {
     private readonly authService: AuthService,
   ) { }
 
-  async setup (ss: S9Server, serial: string): Promise<S9Server> {
+  async setup (ss: S9ServerBuilder, serial: string): Promise<S9ServerBuilder> {
     for (let i = 0; i < SetupService.setupAttempts; i ++) {
       const completedServer = await this.setupAttempt(ss, serial)
       if (isFullySetup(completedServer)) {
@@ -34,7 +34,7 @@ export class SetupService {
     throw new Error(`failed ${this.message}`)
   }
 
-  private async setupAttempt (ss: S9Server, serial: string): Promise<S9Server> {
+  private async setupAttempt (ss: S9ServerBuilder, serial: string): Promise<S9ServerBuilder> {
     const ssClone = clone(ss)
 
     // enable lan
@@ -44,27 +44,27 @@ export class SetupService {
     }
 
     // tor acquisition
-    if (isLanEnabled(ssClone) && !ss.torAddress) {
+    if (isLanEnabled(ssClone) && !isTorEnabled(ssClone)) {
       this.message = `getting tor address`
       const torAddress = await this.getTor(ssClone)
       updateS9_MUT(ssClone, { torAddress })
     }
 
     // derive keys
-    if (isLanEnabled(ssClone) && ss.torAddress && !hasKeys(ssClone)) {
+    if (isLanEnabled(ssClone) && isTorEnabled(ssClone) && !hasKeys(ssClone)) {
       this.message = `deriving keys`
-      const { privkey, pubkey } = crypto.deriveKeys(this.authService.mnemonic!, ss.torAddress)
+      const { privkey, pubkey } = crypto.deriveKeys(this.authService.mnemonic!, ssClone.torAddress)
       updateS9_MUT(ssClone, { privkey, pubkey })
     }
 
     // pubkey registration
-    if (isLanEnabled(ssClone) && ss.torAddress && hasKeys(ssClone) && !ss.registered) {
+    if (isLanEnabled(ssClone) && isTorEnabled(ssClone) && hasKeys(ssClone) && !ss.registered) {
       this.message = `registering pubkey`
       updateS9_MUT(ssClone, { registered: await this.registerPubkey(ssClone, serial) }) // true or false
     }
 
     // lan handshake
-    if (isLanEnabled(ssClone) && ss.torAddress && hasKeys(ssClone) && ss.registered && !ss.lastHandshake.success) {
+    if (isLanEnabled(ssClone) && isTorEnabled(ssClone) && hasKeys(ssClone) && ss.registered && !ss.lastHandshake.success) {
       this.message = `executing server handshake`
       updateS9_MUT(ssClone, { lastHandshake: await this.handshake(ssClone) })
     }
@@ -74,7 +74,7 @@ export class SetupService {
 
   async getTor (ss: S9ServerLan): Promise<string | undefined> {
     try {
-      const { torAddress } = await this.httpService.request<Lan.GetTorRes>(ss, Method.get, '/tor', { }, { }, SetupService.timeout)
+      const { torAddress } = await this.httpService.serverRequest<Lan.GetTorRes>(ss, Method.get, '/tor', { }, { }, SetupService.timeout)
       return torAddress
     } catch (e) {
       console.error(`failed getting Tor address.`)
@@ -82,11 +82,11 @@ export class SetupService {
     }
   }
 
-  async registerPubkey (ss: S9ServerFull, serial: string): Promise<boolean> {
+  async registerPubkey (ss: S9Server, serial: string): Promise<boolean> {
     const { id, pubkey } = ss
     try {
       const body: Lan.PostRegisterReq = { pubkey, serial }
-      await this.httpService.request<Lan.PostRegisterRes>(ss, Method.post, '/register', { }, body, SetupService.timeout)
+      await this.httpService.serverRequest<Lan.PostRegisterRes>(ss, Method.post, '/register', { }, body, SetupService.timeout)
       return true
     } catch (e) {
       console.error(`failed pubkey registration for ${id}: ${e.message}`)
@@ -94,11 +94,11 @@ export class SetupService {
     }
   }
 
-  async handshake (ss: S9ServerFull) : Promise<HandshakeAttempt> {
+  async handshake (ss: S9Server) : Promise<HandshakeAttempt> {
     const now = new Date()
     try {
       let options: HttpOptions = { }
-      await this.httpService.request<Lan.GetStatusShallowRes>(ss, Method.post, '/status/shallow', options, { }, SetupService.timeout)
+      await this.httpService.authServerRequest<Lan.GetStatusShallowRes>(ss, Method.post, '/status/shallow', options, { }, SetupService.timeout)
       return { success: true, timestamp: now }
     } catch (e) {
       console.error(`failed handhsake for ${ss.id}: ${e.message}`)

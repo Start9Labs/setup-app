@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { S9ServerModel } from 'src/app/models/server-model'
-import { S9Server } from 'src/app/models/s9-server'
+import { S9ServerBuilder } from 'src/app/models/s9-server'
 
 @Component({
   selector: 'page-server-list',
@@ -8,7 +8,7 @@ import { S9Server } from 'src/app/models/s9-server'
   styleUrls: ['./server-list.page.scss'],
 })
 export class ServerListPage {
-  servers: S9Server[]
+  servers: S9ServerBuilder[]
 
   constructor (
     private readonly serverModel: S9ServerModel,

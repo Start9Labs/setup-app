@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
 import { NavController, AlertController } from '@ionic/angular'
-import { updateS9, S9ServerFull } from 'src/app/models/s9-server'
+import { updateS9, S9Server } from 'src/app/models/s9-server'
 import { ClipboardService } from 'src/app/services/clipboard.service'
 
 @Component({
@@ -12,7 +12,7 @@ import { ClipboardService } from 'src/app/services/clipboard.service'
 })
 export class ServerShowPage {
   view: 'apps' | 'about' = 'apps'
-  server: S9ServerFull
+  server: S9Server
   edited = false
 
   constructor (
@@ -33,9 +33,9 @@ export class ServerShowPage {
 
   fetchServer () {
     const id = this.route.snapshot.paramMap.get('serverId')
-    if (!id) { throw new Error (`Need id in params for manage page but got none.`) }
+    if (!id) { throw new Error (`Need id in params for server show page but got none.`) }
 
-    const server = this.serverModel.getServer(id) as S9ServerFull
+    const server = this.serverModel.getServer(id) as S9Server
     if (!server) { throw new Error (`Need server in server model for manage page but got none for id ${id}.`) }
 
     this.server = server

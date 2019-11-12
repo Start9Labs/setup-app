@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
-import { S9Server, StorableS9Server, toStorableServer, fromStorableServer } from './s9-server'
+import { S9ServerBuilder, StorableS9Server, toStorableServer, fromStorableServer } from './s9-server'
 import { InstalledApp, AvailableApp } from './s9-app'
 
 @Injectable()
@@ -15,11 +15,11 @@ export class S9ServerModel {
     this.servers = toServerCache(await this.storage.get('servers') || [])
   }
 
-  getServer (id: string): S9Server | undefined {
+  getServer (id: string): S9ServerBuilder | undefined {
     return this.servers[id]
   }
 
-  getServers (): S9Server[] {
+  getServers (): S9ServerBuilder[] {
     return Object.values(this.servers).filter(x => !!x)
   }
 
@@ -27,20 +27,20 @@ export class S9ServerModel {
     return this.getServers().length
   }
 
-  getServerBy (filter: Partial<S9Server>): S9Server | undefined {
+  getServerBy (filter: Partial<S9ServerBuilder>): S9ServerBuilder | undefined {
     return this.getServers().find(s =>
       Object.entries(filter).every(e => s[e[0]] === e[1]),
     )
   }
 
-  async addApp (server: S9Server, app: InstalledApp) {
+  async addApp (server: S9ServerBuilder, app: InstalledApp) {
     const serverClone = clone(server)
     serverClone.apps.push(app)
     this.servers[server.id] = serverClone
     await this.saveAll()
   }
 
-  async removeApp (server: S9Server, app: AvailableApp) {
+  async removeApp (server: S9ServerBuilder, app: AvailableApp) {
     const serverClone = clone(server)
     const newApps = serverClone.apps.filter(a => a.id !== app.id)
     serverClone.apps = newApps
@@ -48,7 +48,7 @@ export class S9ServerModel {
     await this.saveAll()
   }
 
-  async saveServer (server: S9Server): Promise<void> {
+  async saveServer (server: S9ServerBuilder): Promise<void> {
     this.servers[server.id] = clone(server)
     await this.saveAll()
   }
@@ -79,5 +79,5 @@ function toServerCache (ss : S9ServerStore): S9ServerCache {
   }, { } as S9ServerCache)
 }
 
-type S9ServerCache =  { [id: string]: S9Server }
+type S9ServerCache =  { [id: string]: S9ServerBuilder }
 type S9ServerStore = StorableS9Server[]

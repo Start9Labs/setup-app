@@ -1,8 +1,8 @@
 import * as CryptoJS from 'crypto-js'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
-import { InstalledApp, fromStorableApp } from './s9-app'
+import { InstalledApp, companionApp } from './s9-app'
 
-export interface S9Server {
+export interface S9ServerBuilder {
   id: string
   friendlyName: string
   lastHandshake: HandshakeAttempt
@@ -14,44 +14,55 @@ export interface S9Server {
   zeroconfService?: ZeroconfService
 }
 
-export interface S9ServerLan extends S9Server {
+export interface S9ServerLan extends S9ServerBuilder {
   zeroconfService: ZeroconfService
 }
 
-export interface S9ServerFull extends S9ServerLan {
+export interface S9ServerTor extends S9ServerBuilder {
   torAddress: string
+}
+
+export interface S9Server extends S9ServerTor {
   privkey: string
   pubkey: string
 }
 
-export function hasKeys (ss: S9Server): ss is S9ServerFull {
+export function isTorEnabled (ss: S9ServerBuilder): ss is S9ServerTor {
+  return !!ss.torAddress
+}
+
+export function hasAll (ss: S9ServerBuilder): ss is S9Server {
+  return isTorEnabled(ss) && hasKeys(ss) && ss.registered
+}
+
+export function hasKeys (ss: S9ServerBuilder): ss is S9Server {
   return !!ss.pubkey && !!ss.pubkey
 }
 
-export function isFullySetup (ss: S9Server): ss is S9ServerFull {
+export function isFullySetup (ss: S9ServerBuilder): ss is S9Server {
   return !!getLanIP(ss) && ss.registered && ss.lastHandshake.success && !!ss.torAddress
 }
 
-export function isLanEnabled (ss: S9Server | S9ServerLan): ss is S9ServerLan {
+export function isLanEnabled (ss: S9ServerBuilder): ss is S9ServerLan {
   return !!getLanIP(ss)
 }
 
-export function updateS9 (ss: S9ServerFull, u: Partial<S9Server>): S9ServerFull {
+export function updateS9 (ss: S9Server, u: Partial<S9ServerBuilder>): S9Server {
   return { ...ss, ...u }
 }
 
 // careful with this...
-export function updateS9_MUT (ss: S9Server, u: Partial<S9Server>): void {
+export function updateS9_MUT (ss: S9ServerBuilder, u: Partial<S9ServerBuilder>): void {
   Object.entries(u).forEach(([k, v]) => {
     ss[k] = v
   })
 }
 
-export function zeroconfHostname (ss: S9Server): string {
+export function zeroconfHostname (ss: S9ServerBuilder): string {
   return hostnameFromId(ss.id)
 }
 
-export function getLanIP (ss: S9Server): string | undefined  {
+export function getLanIP (ss: S9ServerBuilder): string | undefined  {
   if (ss.zeroconfService) {
     const { ipv4Addresses, ipv6Addresses } = ss.zeroconfService
     return ipv4Addresses.concat(ipv6Addresses)[0] + ':5959'
@@ -59,7 +70,7 @@ export function getLanIP (ss: S9Server): string | undefined  {
   return undefined
 }
 
-export function fromUserInput (id: string, friendlyName: string): S9Server {
+export function fromUserInput (id: string, friendlyName: string): S9ServerBuilder {
     return {
       id,
       friendlyName,
@@ -69,28 +80,34 @@ export function fromUserInput (id: string, friendlyName: string): S9Server {
     }
   }
 
-export function fromStorableServer (ss : StorableS9Server): S9Server {
-  const { registered, friendlyName, torAddress, zeroconfService, id, apps } = ss
-  return {
+export function fromStorableServer (ss : StorableS9Server): S9ServerBuilder {
+  const { registered, friendlyName, torAddress, zeroconfService, id } = ss
+  const toReturn = {
     id,
     friendlyName,
     lastHandshake: initHandshakeStatus(),
     torAddress,
     zeroconfService,
     registered,
-    apps: apps.map(app => fromStorableApp(app)),
+    apps: [],
   }
+
+  if (isTorEnabled(toReturn)) {
+    toReturn.apps.push(companionApp(toReturn))
+  }
+
+  return toReturn
 }
 
-export function toStorableServer (ss: S9Server): StorableS9Server {
-  const { registered, friendlyName, torAddress, zeroconfService, id, apps } = ss
+export function toStorableServer (ss: S9ServerBuilder): StorableS9Server {
+  const { registered, friendlyName, torAddress, zeroconfService, id } = ss
+
   return {
     id,
     friendlyName,
     torAddress,
     zeroconfService,
     registered,
-    apps,
   }
 }
 
@@ -107,7 +124,6 @@ export interface StorableS9Server {
   torAddress?: string
   // may not be up to date in which case ip communication will fail and we will replace.
   zeroconfService?: ZeroconfService
-  apps: InstalledApp[]
 }
 
 export function idFromSerial (serialNo: string): string {

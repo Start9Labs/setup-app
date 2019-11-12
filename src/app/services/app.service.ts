@@ -3,8 +3,8 @@ import { HttpService } from './http.service'
 import { Lan } from '../types/api-types'
 import { Method } from '../types/enums'
 import { S9ServerModel } from '../models/server-model'
-import { InstalledApp, AvailableApp, initAppStatus } from '../models/s9-app'
-import { S9ServerFull } from '../models/s9-server'
+import { InstalledApp, AvailableApp, initAppStatus, companionApp } from '../models/s9-app'
+import { S9Server } from '../models/s9-server'
 
 @Injectable()
 export class AppService {
@@ -14,12 +14,12 @@ export class AppService {
     private readonly s9Model: S9ServerModel,
   ) { }
 
-  async getApp (server: S9ServerFull, appId: string): Promise<AvailableApp> {
+  async getApp (server: S9Server, appId: string): Promise<AvailableApp> {
     return mockApp
-    // return this.httpService.request<Lan.PostInstallAppRes>(server, Method.get, `/apps/${appId}`)
+    // return this.httpService.authServerRequest(server, Method.get, `/apps/${appId}`)
   }
 
-  async install (server: S9ServerFull, app: AvailableApp) {
+  async install (server: S9Server, app: AvailableApp) {
     // @TODO remove
     const installed = {
       id: 'bitcoin',
@@ -28,25 +28,26 @@ export class AppService {
       torAddress: 'sample-bitcoin-tor-address',
       lastStatus: initAppStatus(),
     }
-    // const installed = await this.httpService.request<Lan.PostInstallAppRes>(server, Method.post, `/apps/${app.id}/install`)
+    // const installed = this.httpService.authServerRequest(server, Method.post, `/apps/${app.id}/stop`)
+
     this.s9Model.addApp(server, installed)
     return installed
   }
 
-  async uninstall (server: S9ServerFull, app: AvailableApp) {
-    // await this.httpService.request<Lan.PostUninstallAppRes>(server, Method.post, `/apps/${app.id}/uninstall`)
+  async uninstall (server: S9Server, app: AvailableApp) {
+    // await new S9HttpService(this.httpService, server).authRequest(Method.post, `/apps/${app.id}/uninstall`)
     this.s9Model.removeApp(server, app)
   }
 
-  async start (server: S9ServerFull, app: InstalledApp) {
-    return this.httpService.request<Lan.PostStopAppRes>(server, Method.post, `/apps/${app.id}/start`)
+  async start (server: S9Server, app: InstalledApp): Promise<InstalledApp> {
+    return this.httpService.authServerRequest(server, Method.post, `/apps/${app.id}/start`)
   }
 
-  async stop (server: S9ServerFull, app: InstalledApp) {
-    return this.httpService.request<Lan.PostStartAppRes>(server, Method.post, `/apps/${app.id}/stop`)
+  async stop (server: S9Server, app: InstalledApp): Promise<InstalledApp> {
+    return this.httpService.authServerRequest(server, Method.post, `/apps/${app.id}/stop`)
   }
 
-  async getAvailableApps (server: S9ServerFull): Promise<AvailableApp[]> {
+  async getAvailableApps (server: S9Server): Promise<AvailableApp[]> {
     // @TODO remove
     return [mockApp, mockApp, mockApp]
     // return this.httpService.request<Lan.GetAppsAvailableRes>(server, Method.get, '/apps/available')

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { S9ServerFull } from 'src/app/models/s9-server'
+import { S9Server } from 'src/app/models/s9-server'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
 import { AvailableApp, InstalledApp } from 'src/app/models/s9-app'
@@ -14,7 +14,7 @@ import { NavController, AlertController, LoadingController } from '@ionic/angula
 export class AppPreviewPage {
   loading = true
   error: string
-  server: S9ServerFull
+  server: S9Server
   app: AvailableApp
 
   constructor (
@@ -28,7 +28,7 @@ export class AppPreviewPage {
 
   async ngOnInit () {
     const serverId = this.route.snapshot.paramMap.get('serverId') as string
-    const server = this.serverModel.getServer(serverId) as S9ServerFull
+    const server = this.serverModel.getServer(serverId) as S9Server
     if (!server) throw new Error (`No server found with ID: ${serverId}`)
     this.server = server
 
