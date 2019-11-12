@@ -38,7 +38,7 @@ export class AppComponent {
       if (!this.dataService.getServerCount()) {
         await this.dataService.saveServer({
           id: 'abcdefgh',
-          friendlyName: `Server #1`,
+          friendlyName: `Server 1`,
           torAddress: 'agent-tor-address.onion',
           lastHandshake: initHandshakeStatus(),
           registered: false,

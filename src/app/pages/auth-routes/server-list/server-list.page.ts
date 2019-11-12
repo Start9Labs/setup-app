@@ -17,4 +17,8 @@ export class ServerListPage {
   ngOnInit () {
     this.servers = this.serverModel.getServers()
   }
+
+  ionViewWillEnter () {
+    this.servers = this.serverModel.getServers()
+  }
 }
