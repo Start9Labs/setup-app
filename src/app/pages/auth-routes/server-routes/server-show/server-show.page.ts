@@ -4,6 +4,7 @@ import { S9ServerModel } from 'src/app/models/server-model'
 import { NavController, AlertController } from '@ionic/angular'
 import { updateS9, S9Server } from 'src/app/models/s9-server'
 import { ClipboardService } from 'src/app/services/clipboard.service'
+import { AppService } from 'src/app/services/app.service'
 
 @Component({
   selector: 'page-server-show',
@@ -21,6 +22,7 @@ export class ServerShowPage {
     private readonly navCtrl: NavController,
     private readonly alertCtrl: AlertController,
     private readonly clipboardService: ClipboardService,
+    private readonly appService: AppService,
   ) { }
 
   ngOnInit () {
@@ -38,6 +40,7 @@ export class ServerShowPage {
     const server = this.serverModel.getServer(id) as S9Server
     if (!server) { throw new Error (`Need server in server model for manage page but got none for id ${id}.`) }
 
+    this.appService.getInstalledApps(server).then(apps => this.serverModel.addApps(server, apps))
     this.server = server
   }
 

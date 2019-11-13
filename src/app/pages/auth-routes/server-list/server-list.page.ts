@@ -1,6 +1,7 @@
 import { Component } from '@angular/core'
 import { S9ServerModel } from 'src/app/models/server-model'
-import { S9ServerBuilder } from 'src/app/models/s9-server'
+import { S9ServerBuilder, hasAll } from 'src/app/models/s9-server'
+import { AppService } from 'src/app/services/app.service'
 
 @Component({
   selector: 'page-server-list',
@@ -12,6 +13,7 @@ export class ServerListPage {
 
   constructor (
     private readonly serverModel: S9ServerModel,
+    private readonly appService: AppService,
   ) { }
 
   ngOnInit () {

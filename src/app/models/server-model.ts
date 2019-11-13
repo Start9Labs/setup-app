@@ -33,9 +33,9 @@ export class S9ServerModel {
     )
   }
 
-  async addApp (server: S9ServerBuilder, app: InstalledApp) {
+  async addApps (server: S9ServerBuilder, apps: InstalledApp[]) {
     const serverClone = clone(server)
-    serverClone.apps.push(app)
+    serverClone.apps = serverClone.apps.concat(apps)
     this.servers[server.id] = serverClone
     await this.saveAll()
   }

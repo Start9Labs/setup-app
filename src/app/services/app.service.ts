@@ -19,18 +19,15 @@ export class AppService {
     // return this.httpService.authServerRequest(server, Method.get, `/apps/${appId}`)
   }
 
-  async install (server: S9Server, app: AvailableApp) {
-    // @TODO remove
-    const installed = {
-      id: 'bitcoin',
-      versionInstalled: 0.18,
-      title: 'Bitcoin',
-      torAddress: 'sample-bitcoin-tor-address',
-      lastStatus: initAppStatus(),
-    }
-    // const installed = this.httpService.authServerRequest(server, Method.post, `/apps/${app.id}/stop`)
+  async getInstalledApps (server: S9Server) : Promise<InstalledApp[]> {
+    return [mockInstalledApp(), mockInstalledApp()]
+  }
 
-    this.s9Model.addApp(server, installed)
+  async install (server: S9Server, app: AvailableApp) {
+    // @TODO remove and install the app for real
+
+    const installed = mockInstalledApp()
+    this.s9Model.addApps(server, [installed])
     return installed
   }
 
@@ -66,3 +63,11 @@ const mockApp = {
   installed: true,
   compatible: true,
 }
+
+function mockInstalledApp (): InstalledApp { return {
+  id: 'bitcoin',
+  versionInstalled: 0.18,
+  title: 'Bitcoin',
+  torAddress: 'sample-bitcoin-tor-address',
+  lastStatus: initAppStatus(),
+}}
