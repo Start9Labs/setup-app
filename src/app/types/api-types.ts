@@ -1,4 +1,5 @@
 import { InstalledApp, AvailableApp } from '../models/s9-app'
+import { AppHealthStatus } from '../models/s9-server'
 
 export type TwoHundredOK = { never?: never } // hack for the unit type
 
@@ -16,7 +17,8 @@ export module Lan {
   export type PostRegisterReq = { pubkey: string, serial: string }
   export type PostRegisterRes = TwoHundredOK
   export type GetStatusShallowReq = { }
-  export type GetStatusShallowRes = any
+  export type GetStatusShallowRes = { status: AppHealthStatus, version: number }
+  export type GetAppShallowRes = { status: AppHealthStatus, version: number, id: string }[]
   export type GetAppsInstalledReq = { }
   export type GetAppsInstalledRes = InstalledApp[]
   export type GetAppsAvailableReq = { }

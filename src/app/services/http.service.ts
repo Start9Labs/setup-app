@@ -3,9 +3,10 @@ import { HttpClient, HttpEventType, HttpErrorResponse, HttpHeaders, HttpEvent } 
 import { Method } from '../types/enums'
 import { Observable } from 'rxjs'
 import { timeout } from 'rxjs/operators'
-import { S9ServerLan, getLanIP, S9Server, hasKeys } from '../models/s9-server'
+import { getLanIP, S9Server } from '../models/s9-server'
 import { TokenSigner } from 'jsontokens'
 import { clone } from '../models/server-model'
+import { S9BuilderWith } from './setup.service'
 const APP_VERSION = '1.0.0'
 
 @Injectable()
@@ -16,7 +17,7 @@ export class HttpService {
   ) { }
 
   async authServerRequest<T> (
-    ss: S9Server | S9ServerLan,
+    ss: S9Server | S9BuilderWith<'zeroconfService' | 'privkey'>,
     method: Method,
     path: string,
     httpOptions: HttpOptions = { },
@@ -28,7 +29,7 @@ export class HttpService {
   }
 
   async serverRequest<T> (
-    ss: S9Server | S9ServerLan,
+    ss: S9Server | S9BuilderWith<'zeroconfService'>,
     method: Method,
     path: string,
     httpOptions: HttpOptions = { },
@@ -79,20 +80,20 @@ export class HttpService {
   }
 }
 
-function s9Url (ss: S9Server | S9ServerLan, path: string): string {
-  const host = getLanIP(ss) || ss.torAddress
+function s9Url (ss: S9Server | S9BuilderWith<'zeroconfService'>, path: string): string {
+  const host = getLanIP(ss.zeroconfService) || ss.torAddress
   return `http://${host}/v0${path}`
 }
 
 
-function appendAuthOptions (ss: S9Server | S9ServerLan, httpOptions: HttpOptions): HttpOptions & { headers: HttpHeaders } {
+function appendAuthOptions (ss: S9Server | S9BuilderWith<'privkey'>, httpOptions: HttpOptions): HttpOptions & { headers: HttpHeaders } {
   const optClone = clone(httpOptions)
   let headers: HttpHeaders = httpOptions.headers || new HttpHeaders()
-  if (hasKeys(ss)) {
-    const tokenPayload = { 'iss': 'start9-companion', 'exp': new Date(new Date().getTime() + 3000) }
-    const token = new TokenSigner('ES256K', ss.privkey).sign(tokenPayload)
-    headers = headers.set('Authorization', 'Bearer ' + token)
-  }
+
+  const tokenPayload = { 'iss': 'start9-companion', 'exp': new Date(new Date().getTime() + 3000) }
+  const token = new TokenSigner('ES256K', ss.privkey).sign(tokenPayload)
+  headers = headers.set('Authorization', 'Bearer ' + token)
+
   return { ...optClone, headers }
 }
 

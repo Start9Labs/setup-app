@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
-import { S9ServerBuilder, StorableS9Server, toStorableServer, fromStorableServer } from './s9-server'
+import { S9ServerStorable, toStorableServer, fromStorableServer, S9Server } from './s9-server'
 import { InstalledApp, AvailableApp } from './s9-app'
+import { toObject, update, fromObject, toDedupObject } from '../util/misc.util'
+import { deriveKeys } from '../util/crypto.util'
 
 @Injectable()
 export class S9ServerModel {
@@ -11,15 +13,15 @@ export class S9ServerModel {
     private readonly storage: Storage,
   ) { }
 
-  async load (): Promise<void> {
-    this.servers = toServerCache(await this.storage.get('servers') || [])
+  async load (mnemonic: string[]): Promise<void> {
+    this.servers = toServerCache(await this.storage.get('servers') || [], mnemonic)
   }
 
-  getServer (id: string): S9ServerBuilder | undefined {
+  getServer (id: string): S9Server | undefined {
     return this.servers[id]
   }
 
-  getServers (): S9ServerBuilder[] {
+  getServers (): S9Server[] {
     return Object.values(this.servers).filter(x => !!x)
   }
 
@@ -27,20 +29,27 @@ export class S9ServerModel {
     return this.getServers().length
   }
 
-  getServerBy (filter: Partial<S9ServerBuilder>): S9ServerBuilder | undefined {
+  getServerBy (filter: Partial<S9Server>): S9Server | undefined {
     return this.getServers().find(s =>
       Object.entries(filter).every(e => s[e[0]] === e[1]),
     )
   }
 
-  async addApps (server: S9ServerBuilder, apps: InstalledApp[]) {
+  async addApps (server: S9Server, apps: InstalledApp[]) {
     const serverClone = clone(server)
     serverClone.apps = serverClone.apps.concat(apps)
     this.servers[server.id] = serverClone
     await this.saveAll()
   }
 
-  async removeApp (server: S9ServerBuilder, app: AvailableApp) {
+  async updateApps (server: S9Server, installedApps: InstalledApp[]) {
+    const serverClone = clone(server)
+    const serverApps = toDedupObject(serverClone.apps, installedApps, a => a.id)
+    this.servers[server.id] = { ...serverClone, apps: fromObject(serverApps) }
+    await this.saveAll()
+  }
+
+  async removeApp (server: S9Server, app: AvailableApp) {
     const serverClone = clone(server)
     const newApps = serverClone.apps.filter(a => a.id !== app.id)
     serverClone.apps = newApps
@@ -48,7 +57,7 @@ export class S9ServerModel {
     await this.saveAll()
   }
 
-  async saveServer (server: S9ServerBuilder): Promise<void> {
+  async saveServer (server: S9Server): Promise<void> {
     this.servers[server.id] = clone(server)
     await this.saveAll()
   }
@@ -72,12 +81,13 @@ function fromServerCache (sc : S9ServerCache): S9ServerStore {
   return Object.values(sc).map(toStorableServer)
 }
 
-function toServerCache (ss : S9ServerStore): S9ServerCache {
+function toServerCache (ss : S9ServerStore, mnemonic: string[]): S9ServerCache {
   return ss.reduce((acc, next) => {
-    acc[next.id] = fromStorableServer(next)
+    const { privkey, pubkey } = deriveKeys(mnemonic, next.torAddress)
+    acc[next.id] = fromStorableServer(next, privkey)
     return acc
   }, { } as S9ServerCache)
 }
 
-type S9ServerCache =  { [id: string]: S9ServerBuilder }
-type S9ServerStore = StorableS9Server[]
+type S9ServerCache =  { [id: string]: S9Server }
+type S9ServerStore = S9ServerStorable[]

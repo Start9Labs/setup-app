@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core'
 import { HttpService } from './http.service'
-import { Lan } from '../types/api-types'
 import { Method } from '../types/enums'
 import { S9ServerModel } from '../models/server-model'
-import { InstalledApp, AvailableApp, initAppStatus, companionApp } from '../models/s9-app'
+import { InstalledApp, AvailableApp, initAppStatus, toS9AgentApp } from '../models/s9-app'
 import { S9Server } from '../models/s9-server'
 
 @Injectable()
@@ -69,5 +68,5 @@ function mockInstalledApp (): InstalledApp { return {
   versionInstalled: 0.18,
   title: 'Bitcoin',
   torAddress: 'sample-bitcoin-tor-address',
-  lastStatus: initAppStatus(),
+  lastStatus: initAppStatus().status,
 }}

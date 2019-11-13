@@ -1,9 +1,9 @@
-import { S9Server, HandshakeAttempt, S9ServerBuilder, S9ServerTor } from './s9-server'
+import { S9Server, AppHealthStatus, AppStatusAttempt } from './s9-server'
 
 export interface BaseApp {
   id: string
   title: string
-  versionInstalled: number
+  versionInstalled?: number
 }
 
 export interface AvailableApp extends BaseApp {
@@ -17,33 +17,19 @@ export interface AvailableApp extends BaseApp {
 
 export interface InstalledApp extends BaseApp {
   torAddress: string
-  lastStatus: StatusCheck
+  lastStatus: AppHealthStatus
 }
 
-export function initAppStatus (): StatusCheck {
-  return { status: AppStatus.running, timestamp: new Date() }
+export function initAppStatus (): AppStatusAttempt {
+  return { status: AppHealthStatus.running, timestamp: new Date() }
 }
 
-export function companionApp (ss: S9ServerTor): InstalledApp {
-  const lastStatus = {
-    status: ss.lastHandshake.success ? AppStatus.running : AppStatus.stopped,
-    timestamp: ss.lastHandshake.timestamp,
-  }
+export function toS9AgentApp (ss: S9Server): InstalledApp {
   return {
     id: ss.id,
-    title: 's9 agent',
-    versionInstalled: 0,
+    title: 'S9 agent',
+    versionInstalled: ss.version,
     torAddress: ss.torAddress,
-    lastStatus,
+    lastStatus: ss.lastStatusAttempt.status,
   }
-}
-
-export type StatusCheck = {
-  status: AppStatus
-  timestamp: Date
-}
-
-export enum AppStatus {
-  running = 'running',
-  stopped = 'stopped',
 }

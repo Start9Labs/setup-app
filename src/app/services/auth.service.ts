@@ -11,7 +11,7 @@ import { BehaviorSubject } from 'rxjs'
 export class AuthService {
   private secure: SecureStorageObject
   mnemonic: string[] | undefined
-  authState = new BehaviorSubject(false)
+  readonly authState = new BehaviorSubject(undefined as (string[] | undefined))
 
   constructor (
     private readonly platform: Platform,
@@ -33,7 +33,7 @@ export class AuthService {
       await this.storage.set('mnemonic', JSON.stringify(mnemonic))
     }
     this.mnemonic = mnemonic
-    this.authState.next(true)
+    this.authState.next(mnemonic)
   }
 
   async logout () {
@@ -43,7 +43,7 @@ export class AuthService {
     } else {
       await this.storage.remove('mnemonic')
     }
-    this.authState.next(false)
+    this.authState.next(undefined)
     this.mnemonic = undefined
   }
 
@@ -52,21 +52,21 @@ export class AuthService {
 
     if (this.platform.is('cordova')) {
       this.secure.get('mnemonic')
-        .then((mnemonic) => {
+        .then(mnemonic => {
           this.mnemonic = JSON.parse(mnemonic)
-          this.authState.next(true)
+          this.authState.next(this.mnemonic)
         })
         .catch(e => console.error(e))
     } else {
       const mnemonic = await this.storage.get('mnemonic')
       if (mnemonic) {
         this.mnemonic = JSON.parse(mnemonic)
-        this.authState.next(true)
+        this.authState.next(this.mnemonic)
       }
     }
   }
 
   isAuthenticated () {
-    return !!this.mnemonic && this.authState.value
+    return !!this.mnemonic && !!this.authState.value
   }
 }

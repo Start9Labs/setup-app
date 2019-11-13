@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
 import { NavController, AlertController } from '@ionic/angular'
-import { updateS9, S9Server } from 'src/app/models/s9-server'
+import { S9Server } from 'src/app/models/s9-server'
 import { ClipboardService } from 'src/app/services/clipboard.service'
 import { AppService } from 'src/app/services/app.service'
 
@@ -40,13 +40,13 @@ export class ServerShowPage {
     const server = this.serverModel.getServer(id) as S9Server
     if (!server) { throw new Error (`Need server in server model for manage page but got none for id ${id}.`) }
 
-    this.appService.getInstalledApps(server).then(apps => this.serverModel.addApps(server, apps))
+    this.appService.getInstalledApps(server).then(apps => this.serverModel.updateApps(server, apps))
     this.server = server
   }
 
   async ionViewWillLeave () {
     if (this.edited) {
-      this.server = updateS9(this.server, { friendlyName: this.server.friendlyName || this.server.id })
+      this.server = { ...this.server, friendlyName: this.server.friendlyName || this.server.id }
       await this.serverModel.saveServer(this.server)
     }
   }

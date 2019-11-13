@@ -15,6 +15,7 @@ import { ZeroconfDaemon } from './daemons/zeroconf-daemon'
 import { AppService } from './services/app.service'
 import { ClipboardService } from './services/clipboard.service'
 import { HttpService } from './services/http.service'
+import { StatusCheckService } from './services/status-check.service'
 import { S9ServerModel } from './models/server-model'
 import { SetupService } from './services/setup.service'
 // native
@@ -43,8 +44,9 @@ import { Zeroconf } from '@ionic-native/zeroconf/ngx'
     // services
     AppService,
     ClipboardService,
-    S9ServerModel,
     HttpService,
+    StatusCheckService,
+    S9ServerModel,
     SetupService,
     // native
     Clipboard,
