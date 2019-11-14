@@ -94,7 +94,7 @@ function appendAuthOptions (ss: S9Server | S9BuilderWith<'privkey'>, httpOptions
 
   const optClone = clone(httpOptions)
 
-  const nowish = Math.floor(new Date().getTime() - 1000 / 1000)
+  const nowish = Math.floor((new Date().getTime() - 1000) / 1000)
   const tokenPayload = { 'iss': 'start9-companion', 'iat': nowish, 'exp': nowish + 7 }
   const token = new TokenSigner('ES256K', ss.privkey).sign(tokenPayload)
   headers = headers.set('Authorization', 'Bearer ' + token)
