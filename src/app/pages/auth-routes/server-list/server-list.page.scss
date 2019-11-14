@@ -1,12 +1,15 @@
-ion-card {
-  height: 100%;
-  border-style: solid;
-  border-width: 1px;
-  border-color: var(--ion-color-primary);
-  & img {
-    width: 44%;
-    margin: auto;
-    padding-top: 16px;
+ion-col {
+  padding-bottom: 24px;
+  & ion-card {
+    height: 100%;
+    border-style: solid;
+    border-width: 1px;
+    border-color: var(--ion-color-primary);
+    & img {
+      width: 44%;
+      margin: auto;
+      padding-top: 16px;
+    }
   }
 }
 
