@@ -12,7 +12,7 @@ import { SetupService, fromUserInput, toS9Server } from 'src/app/services/setup.
 export class SetupPage {
   public error = ''
   public friendlyName = ''
-  public serial = ''
+  public productKey = ''
 
   constructor (
     private readonly navController: NavController,
@@ -22,7 +22,7 @@ export class SetupPage {
   ) { }
 
   async submit (): Promise<void> {
-    const id = idFromSerial(this.serial)
+    const id = idFromSerial(this.productKey)
     const newServer = fromUserInput(id, this.friendlyName || id)
 
     const loader = await this.loadingCtrl.create({ message: 'Setting up server...'})
@@ -30,8 +30,8 @@ export class SetupPage {
 
     // attempt to acquire all connection info for new server + check status asynchronously
     try {
-      const setupServer = this.setupService.mock(newServer)
-      // const setupServer = await this.setupService.setup(newServer, this.serial)
+      // const setupServer = this.setupService.mock(newServer)
+      const setupServer = await this.setupService.setup(newServer, this.productKey)
       await this.s9Model.saveServer(toS9Server(setupServer))
       await this.navController.navigateRoot(['/servers'])
     } catch (e) {

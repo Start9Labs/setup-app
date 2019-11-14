@@ -6,7 +6,6 @@ import { S9ServerModel } from './models/server-model'
 import { HealthDaemon } from './daemons/health-daemon'
 import { WifiDaemon } from './daemons/wifi-daemon'
 import { ZeroconfDaemon } from './daemons/zeroconf-daemon'
-import { unknownAppStatusAttempt } from './models/s9-server'
 import { AuthService } from './services/auth.service'
 import { Router } from '@angular/router'
 
@@ -33,9 +32,9 @@ export class AppComponent {
     // wait for platform reday
     platform.ready().then(async () => {
       // subscribe to change in auth events
-      this.authService.authState.subscribe(
-        isAuthed => this.subscribeToAuth(isAuthed),
-      )
+      this.authService.authState.subscribe(isAuthed => {
+        this.subscribeToAuth(isAuthed)
+      })
       // init auth service to obtain initial status
       await this.authService.init()
       // load data if authenticated
@@ -43,7 +42,7 @@ export class AppComponent {
         await this.dataService.load(this.authService.mnemonic)
       }
       // mock zeroconf daemon - watches for zeroconf services on LAN
-      this.zeroconfDaemon.mock()
+      // this.zeroconfDaemon.mock()
 
       // do Cordova things if Cordova
       if (platform.is('cordova')) {

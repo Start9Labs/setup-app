@@ -73,7 +73,8 @@ export interface S9ServerStorable {
 }
 
 export function idFromSerial (serialNo: string): string {
-  return CryptoJS.SHA256(serialNo).toString().substr(0, 8)
+  // sha256 hash is big endian
+  return CryptoJS.SHA256(serialNo).toString(CryptoJS.enc.Hex).substr(0, 8)
 }
 
 export function toS9AgentApp (ss: S9Server): InstalledApp {

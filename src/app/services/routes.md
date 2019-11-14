@@ -4,9 +4,9 @@ params: none
 response: { torAddress: string }
 
 
-# SERIAL AUTH
+# Product Key AUTH
 POST /register
-params: { pubkey: string, serial: string }
+params: { pubkey: string, productKey: string }
 response: no content
 
 

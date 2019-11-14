@@ -30,7 +30,6 @@
     "@ionic/angular": "^4.7.1",
     "@ionic/storage": "^2.2.0",
     "base32.js": "^0.1.0",
-    "bip32": "^2.0.4",
     "bip39": "^3.0.2",
     "bitcoinjs-lib": "^5.1.6",
     "buffer": "^5.4.3",

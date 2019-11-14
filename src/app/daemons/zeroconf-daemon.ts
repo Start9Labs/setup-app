@@ -38,7 +38,7 @@ export class ZeroconfDaemon {
     this.zeroconfServices[zs.name] = zs
   }
 
-  watch () : void {
+  watch (): void {
     this.watching = this.zeroconf.watch('_http._tcp.', 'local.').subscribe(async result => {
       const { action, service } = result
       console.log(`zeroconf service ${action}`, service)

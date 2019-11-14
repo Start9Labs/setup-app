@@ -28,11 +28,12 @@ export class SetupService {
     private readonly statusCheckService: StatusCheckService,
   ) { }
 
-  async setup (ss: S9ServerBuilder, serial: string): Promise<Required<S9ServerBuilder>> {
+  async setup (ss: S9ServerBuilder, productKey: string): Promise<Required<S9ServerBuilder>> {
+    let serverBuilder = ss
     for (let i = 0; i < SetupService.setupAttempts; i ++) {
-      const completedServer = await this.setupAttempt(ss, serial)
-      if (isFullySetup(completedServer)) {
-        return completedServer
+      serverBuilder = await this.setupAttempt(serverBuilder, productKey)
+      if (isFullySetup(serverBuilder)) {
+        return serverBuilder
       }
       await pauseFor(SetupService.waitForMS)
     }
@@ -40,8 +41,9 @@ export class SetupService {
     throw new Error(`failed ${this.message}`)
   }
 
-  private async setupAttempt (ss: S9ServerBuilder, serial: string): Promise<S9ServerBuilder> {
+  private async setupAttempt (ss: S9ServerBuilder, productKey: string): Promise<S9ServerBuilder> {
     const ssClone = clone(ss)
+    console.log(ssClone)
 
     // enable lan
     if (!hasValues(['zeroconfService'], ssClone)) {
@@ -60,6 +62,7 @@ export class SetupService {
       this.message = `deriving keys`
       if (this.authService.mnemonic) {
         const { privkey, pubkey } = crypto.deriveKeys(this.authService.mnemonic, ssClone.torAddress)
+        console.log('pubkey', pubkey)
         ssClone.privkey = privkey
         ssClone.pubkey = pubkey
       } else {
@@ -70,7 +73,7 @@ export class SetupService {
     // pubkey registration
     if (hasValues(['zeroconfService', 'torAddress', 'pubkey', 'privkey'], ssClone) && !ssClone.registered) {
       this.message = `registering pubkey`
-      ssClone.registered = await this.registerPubkey(ssClone, serial) // true or false
+      ssClone.registered = await this.registerPubkey(ssClone, productKey) // true or false
     }
 
     // lan status check
@@ -98,10 +101,10 @@ export class SetupService {
     }
   }
 
-  async registerPubkey (ss: S9BuilderWith<'zeroconfService' | 'pubkey'>, serial: string): Promise<boolean> {
+  async registerPubkey (ss: S9BuilderWith<'zeroconfService' | 'pubkey'>, productKey: string): Promise<boolean> {
     const { id, pubkey } = ss
     try {
-      const body: Lan.PostRegisterReq = { pubkey, serial }
+      const body: Lan.PostRegisterReq = { pubkey, serial: productKey }
       await this.httpService.serverRequest<Lan.PostRegisterRes>(ss, Method.post, '/register', { }, body, SetupService.timeout)
       return true
     } catch (e) {
