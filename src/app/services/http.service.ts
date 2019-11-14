@@ -9,7 +9,9 @@ import { clone } from '../models/server-model'
 import { S9BuilderWith } from './setup.service'
 const APP_VERSION = '1.0.0'
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class HttpService {
 
   constructor (

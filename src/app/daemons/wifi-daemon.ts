@@ -4,7 +4,9 @@ import { Subscription } from 'rxjs'
 import { ZeroconfDaemon } from './zeroconf-daemon'
 
 // detects when phone changes wifi network
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class WifiDaemon {
   private disconnectionMonitor: Subscription
   private connectionMonitor: Subscription

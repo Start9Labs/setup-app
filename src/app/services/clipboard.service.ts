@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core'
 import { Clipboard } from '@ionic-native/clipboard/ngx'
 import { ToastController, Platform } from '@ionic/angular'
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class ClipboardService {
 
   constructor (

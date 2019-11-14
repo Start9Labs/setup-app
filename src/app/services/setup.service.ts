@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { unknownAppStatusAttempt, S9Server, toS9AgentApp } from '../models/s9-server'
-import { HttpOptions, HttpService } from './http.service'
+import { HttpService } from './http.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { Method } from 'src/app/types/enums'
 import { clone } from '../models/server-model'
@@ -12,7 +12,9 @@ import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { InstalledApp, AppHealthStatus, AppStatusAttempt } from '../models/s9-app'
 import { StatusCheckService } from './status-check.service'
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class SetupService {
   private static readonly setupAttempts = 10
   private static readonly timeout = 2000

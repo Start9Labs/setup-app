@@ -43,7 +43,7 @@
           </ion-button>
         </ion-col>
         <ion-col size="6">
-          <ion-button [disabled]="app.versionInstalled >= app.version || !app.compatible" expand="block" fill="outline" (click)="presentAlert('install')">
+          <ion-button [disabled]="!app.versionInstalled || app.versionInstalled >= app.version || !app.compatible" expand="block" fill="outline" (click)="presentAlert('install')">
             Update
           </ion-button>
         </ion-col>

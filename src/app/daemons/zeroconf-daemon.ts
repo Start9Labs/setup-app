@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core'
 import { Zeroconf, ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { Subscription } from 'rxjs'
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class ZeroconfDaemon {
   private zeroconfServices: { [hostname: string]: ZeroconfService } = { }
   private watching: Subscription

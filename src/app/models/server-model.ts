@@ -2,16 +2,28 @@ import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
 import { S9ServerStorable, toStorableServer, fromStorableServer, S9Server } from './s9-server'
 import { InstalledApp, AvailableApp } from './s9-app'
-import { toObject, update, fromObject, toDedupObject } from '../util/misc.util'
+import { fromObject, toDedupObject } from '../util/misc.util'
 import { deriveKeys } from '../util/crypto.util'
+import { AuthService } from '../services/auth.service'
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class S9ServerModel {
   servers: S9ServerCache = { }
 
   constructor (
     private readonly storage: Storage,
-  ) { }
+    private readonly authService: AuthService,
+  ) {
+    this.authService.authState.subscribe(isAuthed => {
+      if (isAuthed) {
+        return
+      } else {
+        this.servers = { }
+      }
+    })
+  }
 
   async load (mnemonic: string[]): Promise<void> {
     this.servers = toServerCache(await this.storage.get('servers') || [], mnemonic)

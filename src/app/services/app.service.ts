@@ -5,7 +5,9 @@ import { S9ServerModel } from '../models/server-model'
 import { InstalledApp, AvailableApp, initAppStatus } from '../models/s9-app'
 import { S9Server } from '../models/s9-server'
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class AppService {
 
   constructor (

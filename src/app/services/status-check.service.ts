@@ -1,16 +1,15 @@
 import { HttpService, HttpOptions } from './http.service'
 import { S9Server } from '../models/s9-server'
-import { S9BuilderWith, SetupService } from './setup.service'
+import { S9BuilderWith } from './setup.service'
 import { Lan } from '../types/api-types'
 import { Method } from '../types/enums'
 import { Injectable } from '@angular/core'
 import { InstalledApp, AppStatusAttempt, AppHealthStatus } from '../models/s9-app'
 import { Valued, toObject } from '../util/misc.util'
-import { HttpParams } from '@angular/common/http'
-import { Timestamp } from 'rxjs/internal/operators/timestamp'
-import { runInContext } from 'vm'
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class StatusCheckService {
   private static readonly timeout = 2000
 

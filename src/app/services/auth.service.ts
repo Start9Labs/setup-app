@@ -10,14 +10,34 @@ import { BehaviorSubject } from 'rxjs'
 })
 export class AuthService {
   private secure: SecureStorageObject
+  readonly authState = new BehaviorSubject(false)
   mnemonic: string[] | undefined
-  readonly authState = new BehaviorSubject(undefined as (string[] | undefined))
 
   constructor (
     private readonly platform: Platform,
     private readonly ss: SecureStorage,
     private readonly storage: Storage,
   ) { }
+
+  async init () {
+    this.secure = await this.ss.create('start9')
+
+    if (this.platform.is('cordova')) {
+      // when fetching from secure storage, if the key does not exist it throws an error
+      await this.secure.get('mnemonic')
+        .then(mnemonic => {
+          this.mnemonic = JSON.parse(mnemonic)
+          this.authState.next(true)
+        })
+        .catch(e => console.error(e))
+    } else {
+      const mnemonic = await this.storage.get('mnemonic')
+      if (mnemonic) {
+        this.mnemonic = JSON.parse(mnemonic)
+        this.authState.next(true)
+      }
+    }
+  }
 
   async login (mnemonic: string[]) {
     if (!crypto.checkMnemonic(mnemonic)) {
@@ -29,7 +49,7 @@ export class AuthService {
       await this.storage.set('mnemonic', JSON.stringify(mnemonic))
     }
     this.mnemonic = mnemonic
-    this.authState.next(mnemonic)
+    this.authState.next(true)
   }
 
   async logout () {
@@ -39,30 +59,11 @@ export class AuthService {
     } else {
       await this.storage.remove('mnemonic')
     }
-    this.authState.next(undefined)
+    this.authState.next(false)
     this.mnemonic = undefined
   }
 
-  async init () {
-    this.secure = await this.ss.create('start9')
-
-    if (this.platform.is('cordova')) {
-      this.secure.get('mnemonic')
-        .then(mnemonic => {
-          this.mnemonic = JSON.parse(mnemonic)
-          this.authState.next(this.mnemonic)
-        })
-        .catch(e => console.error(e))
-    } else {
-      const mnemonic = await this.storage.get('mnemonic')
-      if (mnemonic) {
-        this.mnemonic = JSON.parse(mnemonic)
-        this.authState.next(this.mnemonic)
-      }
-    }
-  }
-
-  isAuthenticated () {
-    return !!this.mnemonic && !!this.authState.value
+  isAuthenticated (): boolean {
+    return !!this.mnemonic && this.authState.value
   }
 }
