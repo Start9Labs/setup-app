@@ -81,7 +81,7 @@ export class SetupService {
     if (
       hasValues(['zeroconfService', 'torAddress', 'pubkey', 'privkey'], ssClone) &&
       ss.registered &&
-      (ss.lastStatusAttempt.status !== AppHealthStatus.running || !hasValues(['version'], ssClone))
+      (ss.lastStatusAttempt.status !== AppHealthStatus.RUNNING || !hasValues(['version'], ssClone))
     ) {
       this.message = `executing server status check`
       const { attempt, version } = await this.statusCheckService.getS9AgentStatus(ssClone)
@@ -120,7 +120,7 @@ export class SetupService {
       friendlyName: ss.friendlyName,
       torAddress: 'agent-tor-address.onion',
       lastStatusAttempt: {
-        status: AppHealthStatus.running,
+        status: AppHealthStatus.RUNNING,
         timestamp: new Date(),
       },
       version: '1.0.0',
@@ -166,7 +166,7 @@ export function hasValues<T extends keyof S9ServerBuilder> (t: T[], s: S9ServerB
 }
 
 export function isFullySetup (ss: S9ServerBuilder): ss is Required<S9ServerBuilder> {
-  return hasValues(builderKeys(), ss) && ss.registered && (ss.lastStatusAttempt.status == AppHealthStatus.running)
+  return hasValues(builderKeys(), ss) && ss.registered && (ss.lastStatusAttempt.status == AppHealthStatus.RUNNING)
 }
 
 export function fromUserInput (id: string, friendlyName: string): S9ServerBuilder {

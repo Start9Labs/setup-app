@@ -24,14 +24,13 @@ export type AppStatusAttempt = {
 }
 
 export enum AppHealthStatus {
-  running = 'running',
-  stopped = 'stopped',
-  notfound = 'notfound',
-  unreachable = 'unreachable',
-  unknown = 'unknown',
-  uninstalled = 'uninstalled', // server should not respond with this
+  RUNNING = 'RUNNING',
+  STOPPED = 'STOPPED',
+  NOT_FOUND = 'NOT_FOUND',
+  UNREACHABLE = 'UNREACHABLE',
+  UNKNOWN = 'UNKNOWN',
 }
 
 export function initAppStatus (): AppStatusAttempt {
-  return { status: AppHealthStatus.running, timestamp: new Date() }
+  return { status: AppHealthStatus.RUNNING, timestamp: new Date() }
 }

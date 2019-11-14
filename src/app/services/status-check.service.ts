@@ -23,7 +23,7 @@ export class StatusCheckService {
       return { attempt: { status, timestamp}, version }
     } catch (e) {
       console.error(`failed to get server status for ${ss.id}: ${e.message}`)
-      return { attempt: { status: AppHealthStatus.unreachable, timestamp}, version: undefined }
+      return { attempt: { status: AppHealthStatus.UNREACHABLE, timestamp}, version: undefined }
     }
   }
 
@@ -48,7 +48,7 @@ export class StatusCheckService {
 
       return toObject(appIdList.map( id => {
         return {
-          id, attempt: { status: AppHealthStatus.unreachable, timestamp }, version: undefined,
+          id, attempt: { status: AppHealthStatus.UNREACHABLE, timestamp }, version: undefined,
         }
       }), r => r.id)
     }

@@ -61,7 +61,7 @@ export function toStorableServer (ss: S9Server): S9ServerStorable {
 }
 
 export function unknownAppStatusAttempt (ts: Date = new Date()): AppStatusAttempt {
-  return { status: AppHealthStatus.unknown, timestamp: ts }
+  return { status: AppHealthStatus.UNKNOWN, timestamp: ts }
 }
 
 export interface S9ServerStorable {
