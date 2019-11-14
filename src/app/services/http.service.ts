@@ -71,7 +71,6 @@ export class HttpService {
         throw new Error(`Expected HTTP Event Type, got ${response.type}`)
       }
     } catch (e) {
-      console.log('here')
       console.error(e)
       const error: HttpErrorResponse = e
       const message = error.error || error

@@ -55,17 +55,6 @@
           <ion-label position="stacked" color="medium">Friendly Name</ion-label>
           <ion-input [(ngModel)]="server.friendlyName" (ionChange)="edited = true"></ion-input>
         </ion-item>
-        <ion-item>
-          <ion-label position="stacked" color="medium">Tor Address</ion-label>
-          <ion-text color="medium">
-            <p>{{ server.torAddress }}</p>
-          </ion-text>
-          <ion-note slot="end">
-            <ion-button (click)="copyTor()" fill="outline" size="small">
-              Copy
-            </ion-button>
-          </ion-note>
-        </ion-item>
       </ion-item-group>
       <ion-button expand="block" fill="outline" color="danger" (click)="presentAlertForget()">
         Forget Server

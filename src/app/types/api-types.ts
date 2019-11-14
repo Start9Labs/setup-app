@@ -1,5 +1,4 @@
-import { InstalledApp, AvailableApp } from '../models/s9-app'
-import { AppHealthStatus } from '../models/s9-server'
+import { InstalledApp, AvailableApp, AppHealthStatus } from '../models/s9-app'
 
 export type TwoHundredOK = { never?: never } // hack for the unit type
 

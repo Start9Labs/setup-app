@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { AppStatusAttempt, unknownAppStatusAttempt, S9Server, AppHealthStatus } from '../models/s9-server'
+import { unknownAppStatusAttempt, S9Server, toS9AgentApp } from '../models/s9-server'
 import { HttpOptions, HttpService } from './http.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { Method } from 'src/app/types/enums'
@@ -9,7 +9,7 @@ import * as crypto from '../util/crypto.util'
 import { AuthService } from './auth.service'
 import { Lan } from '../types/api-types'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
-import { toS9AgentApp, InstalledApp } from '../models/s9-app'
+import { InstalledApp, AppHealthStatus, AppStatusAttempt } from '../models/s9-app'
 import { StatusCheckService } from './status-check.service'
 
 @Injectable()

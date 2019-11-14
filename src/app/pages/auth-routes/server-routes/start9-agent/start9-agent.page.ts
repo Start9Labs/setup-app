@@ -31,7 +31,6 @@ export class Start9AgentPage {
 
     this.server = server
     this.app = app
-    console.log(this.app)
   }
 
   async copyTor () {

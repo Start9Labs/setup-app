@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 import { HttpService } from './http.service'
 import { Method } from '../types/enums'
 import { S9ServerModel } from '../models/server-model'
-import { InstalledApp, AvailableApp, initAppStatus, toS9AgentApp } from '../models/s9-app'
+import { InstalledApp, AvailableApp, initAppStatus } from '../models/s9-app'
 import { S9Server } from '../models/s9-server'
 
 @Injectable()

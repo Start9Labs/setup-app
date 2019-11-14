@@ -1,5 +1,3 @@
-import { S9Server, AppHealthStatus, AppStatusAttempt } from './s9-server'
-
 export interface BaseApp {
   id: string
   title: string
@@ -21,17 +19,19 @@ export interface InstalledApp extends BaseApp {
   lastStatus: AppStatusAttempt
 }
 
-export function initAppStatus (): AppStatusAttempt {
-  return { status: AppHealthStatus.running, timestamp: new Date() }
+export type AppStatusAttempt = {
+  status: AppHealthStatus, timestamp: Date
 }
 
-export function toS9AgentApp (ss: S9Server): InstalledApp {
-  return {
-    id: 'start9Agent',
-    title: 'S9 agent',
-    versionInstalled: ss.version,
-    torAddress: ss.torAddress,
-    lastStatus: ss.lastStatusAttempt,
-    iconPath: 'assets/img/agent.png',
-  }
+export enum AppHealthStatus {
+  running = 'running',
+  stopped = 'stopped',
+  notfound = 'notfound',
+  unreachable = 'unreachable',
+  unknown = 'unknown',
+  uninstalled = 'uninstalled', // server should not respond with this
+}
+
+export function initAppStatus (): AppStatusAttempt {
+  return { status: AppHealthStatus.running, timestamp: new Date() }
 }
