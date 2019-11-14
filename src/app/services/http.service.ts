@@ -85,26 +85,28 @@ function s9Url (ss: S9Server | S9BuilderWith<'zeroconfService'>, path: string): 
 }
 
 
-function appendAuthOptions (ss: S9Server | S9BuilderWith<'privkey'>, httpOptions: HttpOptions): HttpOptions & { headers: HttpHeaders } {
-  const optClone = clone(httpOptions)
+function appendAuthOptions (ss: S9Server | S9BuilderWith<'privkey'>, httpOptions: HttpOptions): HttpOptions  {
   let headers: HttpHeaders = httpOptions.headers || new HttpHeaders()
+
+  const optClone = clone(httpOptions)
 
   const tokenPayload = { 'iss': 'start9-companion', 'exp': new Date(new Date().getTime() + 3000) }
   const token = new TokenSigner('ES256K', ss.privkey).sign(tokenPayload)
+  console.log(`append auth ${JSON.stringify(headers)}`)
   headers = headers.set('Authorization', 'Bearer ' + token)
-
-  return { ...optClone, headers }
+  optClone.headers = headers
+  return optClone
 }
 
-function appendDefaultOptions (httpOptions: HttpOptions): HttpOptions & { headers: HttpHeaders } {
-  const optClone = clone(httpOptions)
-  let headers: HttpHeaders = optClone.headers || new HttpHeaders()
-  // always set app-version
-  headers = headers.set('app-version', APP_VERSION)
-  // finalize options
-  optClone.observe = 'response'
+function appendDefaultOptions (httpOptions: HttpOptions): HttpOptions {
+  let headers: HttpHeaders = httpOptions.headers || new HttpHeaders()
 
-  return { ...optClone, headers }
+  const optClone = clone(httpOptions)
+  console.log(`append default ${JSON.stringify(headers)}`)
+  headers = headers.set('app-version', APP_VERSION)
+  optClone.headers = headers
+  optClone.observe = 'response'
+  return optClone
 }
 
 export interface HttpOptions {

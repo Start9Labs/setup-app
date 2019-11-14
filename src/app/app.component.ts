@@ -36,39 +36,9 @@ export class AppComponent {
 
       this.zeroconfDaemon.mock()
 
-      this.authService.authState.subscribe(async mnemonic => {
-        if (mnemonic) {
-          await this.dataService.load(mnemonic)
-
-          // mocky mock
-          if (!this.dataService.getServerCount()) {
-            await this.dataService.saveServer({
-              id: 'abcdefgh',
-              friendlyName: `Server 1`,
-              torAddress: 'agent-tor-address.onion',
-              lastStatusAttempt: unknownAppStatusAttempt(),
-              version: '0.0.0',
-              privkey: '',
-              apps: [],
-              zeroconfService: {
-                domain: 'local.',
-                type: '_http._tcp',
-                name: 'start9-fb398cc6',
-                hostname: '',
-                ipv4Addresses: ['192.168.20.1'],
-                ipv6Addresses: ['end9823u0ej2fb'],
-                port: 5959,
-                txtRecord: { },
-              },
-            })
-          }
-
-          await this.dataService.load(mnemonic)
-          this.router.navigate([''])
-        } else {
-          this.router.navigate(['welcome'])
-        }
-      })
+      this.authService.authState.subscribe(
+        mnemonic => this.subscribeToAuth(mnemonic),
+      )
 
       await this.authService.init()
 
@@ -92,5 +62,39 @@ export class AppComponent {
         }, 300)
       }
     })
+  }
+
+  private async subscribeToAuth (mnemonic: string[] | undefined) {
+    if (mnemonic) {
+      await this.dataService.load(mnemonic)
+
+      // mocky mock
+      if (!this.dataService.getServerCount()) {
+        await this.dataService.saveServer({
+          id: 'abcdefgh',
+          friendlyName: `Server 1`,
+          torAddress: 'agent-tor-address.onion',
+          lastStatusAttempt: unknownAppStatusAttempt(),
+          version: '0.0.0',
+          privkey: '',
+          apps: [],
+          zeroconfService: {
+            domain: 'local.',
+            type: '_http._tcp',
+            name: 'start9-fb398cc6',
+            hostname: '',
+            ipv4Addresses: ['192.168.20.1'],
+            ipv6Addresses: ['end9823u0ej2fb'],
+            port: 5959,
+            txtRecord: { },
+          },
+        })
+      }
+
+      await this.dataService.load(mnemonic)
+      this.router.navigate([''])
+    } else {
+      this.router.navigate(['welcome'])
+    }
   }
 }
