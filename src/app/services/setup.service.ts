@@ -120,7 +120,7 @@ export interface S9ServerBuilder {
   friendlyName: string
 
   lastStatusAttempt: AppStatusAttempt
-  version?: number
+  version?: string
 
   privkey?: string
   pubkey?: string
@@ -159,6 +159,7 @@ export function toS9Server (sb: Required<S9ServerBuilder>): S9Server {
     torAddress,
     zeroconfService,
   }
+
   toReturn.apps.push(toS9AgentApp(toReturn))
 
   return toReturn

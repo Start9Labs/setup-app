@@ -34,8 +34,43 @@ export class AppComponent {
     platform.ready().then(async () => {
       // load data into memory
 
-
       this.zeroconfDaemon.mock()
+
+      this.authService.authState.subscribe(async mnemonic => {
+        if (mnemonic) {
+          await this.dataService.load(mnemonic)
+
+          // mocky mock
+          if (!this.dataService.getServerCount()) {
+            await this.dataService.saveServer({
+              id: 'abcdefgh',
+              friendlyName: `Server 1`,
+              torAddress: 'agent-tor-address.onion',
+              lastStatusAttempt: unknownAppStatusAttempt(),
+              version: '0.0.0',
+              privkey: '',
+              apps: [],
+              zeroconfService: {
+                domain: 'local.',
+                type: '_http._tcp',
+                name: 'start9-fb398cc6',
+                hostname: '',
+                ipv4Addresses: ['192.168.20.1'],
+                ipv6Addresses: ['end9823u0ej2fb'],
+                port: 5959,
+                txtRecord: { },
+              },
+            })
+          }
+
+          await this.dataService.load(mnemonic)
+          this.router.navigate([''])
+        } else {
+          this.router.navigate(['welcome'])
+        }
+      })
+
+      await this.authService.init()
 
       // do Cordova things if Cordova
       if (platform.is('cordova')) {
@@ -56,39 +91,6 @@ export class AppComponent {
           this.splashScreen.hide()
         }, 300)
       }
-      this.authService.authState.subscribe(async mnemonic => {
-        if (mnemonic) {
-          await this.dataService.load(mnemonic)
-
-          // mocky mock
-          if (!this.dataService.getServerCount()) {
-            const mockTor = 'agent-tor-address.onion'
-            const { privkey } = deriveKeys(mnemonic, mockTor)
-            await this.dataService.saveServer({
-              id: 'abcdefgh',
-              friendlyName: `Server 1`,
-              torAddress: mockTor,
-              lastStatusAttempt: unknownAppStatusAttempt(),
-              version: 0,
-              privkey,
-              apps: [],
-              zeroconfService: {
-                domain: 'local.',
-                type: '_http._tcp',
-                name: 'start9-fb398cc6',
-                hostname: '',
-                ipv4Addresses: ['192.168.20.1'],
-                ipv6Addresses: ['end9823u0ej2fb'],
-                port: 5959,
-                txtRecord: { },
-              },
-            })
-          }
-          this.router.navigate([''])
-        } else {
-          this.router.navigate(['welcome'])
-        }
-      })
     })
   }
 }

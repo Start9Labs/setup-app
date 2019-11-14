@@ -1,15 +1,13 @@
 import * as CryptoJS from 'crypto-js'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { InstalledApp, toS9AgentApp } from './s9-app'
-import { timestamp } from 'rxjs/operators'
-import { Timestamp } from 'rxjs/internal/operators/timestamp'
 
 export interface S9Server {
   id: string
   friendlyName: string
 
   lastStatusAttempt: AppStatusAttempt
-  version: number
+  version: string
 
   apps: InstalledApp[]
 
@@ -34,6 +32,7 @@ export function getLanIP (zcs: ZeroconfService): string  {
 
 
 export function fromStorableServer (ss : S9ServerStorable, privkey: string): S9Server {
+  console.log(ss)
   const { friendlyName, torAddress, zeroconfService, id, version } = ss
   const toReturn: S9Server = {
     id,
@@ -85,7 +84,7 @@ export interface S9ServerStorable {
   friendlyName: string
   torAddress: string
   zeroconfService: ZeroconfService
-  version: number
+  version: string
 }
 
 export function idFromSerial (serialNo: string): string {

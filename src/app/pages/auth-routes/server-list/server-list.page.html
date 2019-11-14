@@ -21,11 +21,8 @@
           <ion-card-header>
             <ion-card-title>{{ server.friendlyName }}</ion-card-title>
           </ion-card-header>
-          <ion-card-subtitle *ngIf="server.lastStatusAttempt.status === AppHealthStatus.running" color="success">
-            Connected
-          </ion-card-subtitle>
-          <ion-card-subtitle *ngIf="!server.lastStatusAttempt.status !== AppHealthStatus.running" color="danger">
-            {{server.lastStatusAttempt.status}}
+          <ion-card-subtitle color="success">
+            {{ server.lastStatusAttempt.status | titlecase }}
           </ion-card-subtitle>
         </ion-card>
       </ion-col>

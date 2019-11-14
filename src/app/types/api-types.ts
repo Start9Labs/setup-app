@@ -17,8 +17,8 @@ export module Lan {
   export type PostRegisterReq = { pubkey: string, serial: string }
   export type PostRegisterRes = TwoHundredOK
   export type GetStatusShallowReq = { }
-  export type GetStatusShallowRes = { status: AppHealthStatus, version: number }
-  export type GetAppShallowRes = { status: AppHealthStatus, version: number, id: string }[]
+  export type GetStatusShallowRes = { status: AppHealthStatus, version: string }
+  export type GetAppShallowRes = { status: AppHealthStatus, version: string, id: string }[]
   export type GetAppsInstalledReq = { }
   export type GetAppsInstalledRes = InstalledApp[]
   export type GetAppsAvailableReq = { }

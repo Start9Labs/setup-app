@@ -17,11 +17,7 @@ export class AuthService {
     private readonly platform: Platform,
     private readonly ss: SecureStorage,
     private readonly storage: Storage,
-  ) {
-    this.platform.ready().then(() => {
-      this.init()
-    })
-  }
+  ) { }
 
   async login (mnemonic: string[]) {
     if (!crypto.checkMnemonic(mnemonic)) {
@@ -47,7 +43,7 @@ export class AuthService {
     this.mnemonic = undefined
   }
 
-  private async init () {
+  async init () {
     this.secure = await this.ss.create('start9')
 
     if (this.platform.is('cordova')) {

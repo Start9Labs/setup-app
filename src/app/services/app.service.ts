@@ -52,21 +52,23 @@ export class AppService {
 
 const mockApp = {
   id: 'bitcoin',
-  version: 0.18,
+  version: '0.18',
   title: 'Bitcoin Core',
   descriptionShort: 'Bitcoin is an innovative payment network and new kind of money.',
   descriptionLong: 'Bitcoin is an innovative payment network and new kind of money. Bitcoin utilizes a robust p2p network to garner decentralized consensus.',
   releaseNotes: '* Faster sync time<br />* MAST support',
   // server specific
-  versionInstalled: 0.18,
+  versionInstalled: '0.18',
   installed: true,
   compatible: true,
+  iconPath: 'assets/img/bitcoin_core.png',
 }
 
 function mockInstalledApp (): InstalledApp { return {
   id: 'bitcoin',
-  versionInstalled: 0.18,
+  versionInstalled: '0.18',
   title: 'Bitcoin',
   torAddress: 'sample-bitcoin-tor-address',
-  lastStatus: initAppStatus().status,
+  lastStatus: initAppStatus(),
+  iconPath: 'assets/img/bitcoin_core.png',
 }}

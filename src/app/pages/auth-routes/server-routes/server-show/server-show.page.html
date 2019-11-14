@@ -30,15 +30,15 @@
         <ion-item-divider>Installed</ion-item-divider>
         <ion-item *ngFor="let app of server.apps" [routerLink]="['/servers', server.id, 'apps', app.id]">
           <ion-avatar slot="start">
-            <img src="../../../../../assets/img/bitcoin_core.png" />
+            <img src={{app.iconPath}} />
           </ion-avatar>
           <ion-label>
             <h3>{{ app.title }}</h3>
             <p>version: {{ app.versionInstalled }}</p>
           </ion-label>
           <ion-note slot="end">
-            <ion-text *ngIf="app.lastStatus.status === 'running'" color="success">Running</ion-text>
-            <ion-text *ngIf="app.lastStatus.status === 'stopped'" color="danger">Stopped</ion-text>
+            <ion-text color="success">{{ app.lastStatus.status | titlecase }}
+            </ion-text>
           </ion-note>
         </ion-item>
       </ion-item-group>

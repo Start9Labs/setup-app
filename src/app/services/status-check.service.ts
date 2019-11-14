@@ -16,7 +16,7 @@ export class StatusCheckService {
 
   constructor (private readonly httpService: HttpService) { }
 
-  async getS9AgentStatus (ss: S9Server | S9BuilderWith<'zeroconfService' | 'privkey'>) : Promise<{ attempt: AppStatusAttempt, version: number | undefined}> {
+  async getS9AgentStatus (ss: S9Server | S9BuilderWith<'zeroconfService' | 'privkey'>) : Promise<{ attempt: AppStatusAttempt, version: string | undefined}> {
     const timestamp = new Date()
     try {
       let options: HttpOptions = { }
@@ -28,14 +28,14 @@ export class StatusCheckService {
     }
   }
 
-  async getAppStatus (ss: S9Server, apps: InstalledApp[]) : Promise<Valued<{ attempt: AppStatusAttempt, version: number | undefined}>> {
+  async getAppStatus (ss: S9Server, apps: InstalledApp[]) : Promise<Valued<{ attempt: AppStatusAttempt, version: string | undefined}>> {
     const timestamp = new Date()
     const appIdList = apps.map(a => a.id)
 
     try {
       const options: HttpOptions = { params: { ids: appIdList.join(',')} }
       const res = await this.httpService.authServerRequest<Lan.GetAppShallowRes>(
-        ss, Method.get, '/apps/installed/status/shallow?apps=oisdjfo,boijsdof,boijsdf', options, { }, StatusCheckService.timeout,
+        ss, Method.get, '/apps/installed/status/shallow', options, { }, StatusCheckService.timeout,
       )
       const mappedRes = res.map( r => ({ version: r.version, id: r.id, attempt: {
           status: r.status,

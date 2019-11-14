@@ -3,11 +3,12 @@ import { S9Server, AppHealthStatus, AppStatusAttempt } from './s9-server'
 export interface BaseApp {
   id: string
   title: string
-  versionInstalled?: number
+  versionInstalled?: string
+  iconPath: string
 }
 
 export interface AvailableApp extends BaseApp {
-  version: number
+  version: string
   descriptionShort: string
   descriptionLong: string
   releaseNotes: string
@@ -17,7 +18,7 @@ export interface AvailableApp extends BaseApp {
 
 export interface InstalledApp extends BaseApp {
   torAddress: string
-  lastStatus: AppHealthStatus
+  lastStatus: AppStatusAttempt
 }
 
 export function initAppStatus (): AppStatusAttempt {
@@ -26,10 +27,11 @@ export function initAppStatus (): AppStatusAttempt {
 
 export function toS9AgentApp (ss: S9Server): InstalledApp {
   return {
-    id: ss.id,
+    id: 'start9Agent',
     title: 'S9 agent',
     versionInstalled: ss.version,
     torAddress: ss.torAddress,
-    lastStatus: ss.lastStatusAttempt.status,
+    lastStatus: ss.lastStatusAttempt,
+    iconPath: 'assets/img/agent.png',
   }
 }
