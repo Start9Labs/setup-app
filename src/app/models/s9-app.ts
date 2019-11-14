@@ -1,11 +1,14 @@
+import { S9Server, AppHealthStatus, AppStatusAttempt } from './s9-server'
+
 export interface BaseApp {
   id: string
   title: string
-  versionInstalled: number
+  versionInstalled?: string
+  iconPath: string
 }
 
 export interface AvailableApp extends BaseApp {
-  version: number
+  version: string
   descriptionShort: string
   descriptionLong: string
   releaseNotes: string
@@ -15,47 +18,20 @@ export interface AvailableApp extends BaseApp {
 
 export interface InstalledApp extends BaseApp {
   torAddress: string
-  lastStatus: StatusCheck
+  lastStatus: AppStatusAttempt
 }
 
-export function initAppStatus (): StatusCheck {
-  return { status: AppStatus.running, timestamp: new Date() }
+export function initAppStatus (): AppStatusAttempt {
+  return { status: AppHealthStatus.running, timestamp: new Date() }
 }
 
-export function fromStorableApp (app: StorableApp): InstalledApp {
-  const { id, versionInstalled, title, torAddress } = app
+export function toS9AgentApp (ss: S9Server): InstalledApp {
   return {
-    id,
-    versionInstalled,
-    title,
-    lastStatus: initAppStatus(),
-    torAddress,
+    id: 'start9Agent',
+    title: 'S9 agent',
+    versionInstalled: ss.version,
+    torAddress: ss.torAddress,
+    lastStatus: ss.lastStatusAttempt,
+    iconPath: 'assets/img/agent.png',
   }
-}
-
-export function toStorableApp (app: InstalledApp): StorableApp {
-  const { id, versionInstalled, title, torAddress } = app
-  return {
-    id,
-    versionInstalled,
-    title,
-    torAddress,
-  }
-}
-
-export interface StorableApp {
-  id: string
-  versionInstalled: number
-  title: string
-  torAddress: string
-}
-
-export type StatusCheck = {
-  status: AppStatus
-  timestamp: Date
-}
-
-export enum AppStatus {
-  running = 'running',
-  stopped = 'stopped',
 }

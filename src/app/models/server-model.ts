@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
-import { S9Server, StorableS9Server, toStorableServer, fromStorableServer } from './s9-server'
+import { S9ServerStorable, toStorableServer, fromStorableServer, S9Server } from './s9-server'
 import { InstalledApp, AvailableApp } from './s9-app'
+import { toObject, update, fromObject, toDedupObject } from '../util/misc.util'
+import { deriveKeys } from '../util/crypto.util'
 
 @Injectable()
 export class S9ServerModel {
@@ -11,8 +13,8 @@ export class S9ServerModel {
     private readonly storage: Storage,
   ) { }
 
-  async load (): Promise<void> {
-    this.servers = toServerCache(await this.storage.get('servers') || [])
+  async load (mnemonic: string[]): Promise<void> {
+    this.servers = toServerCache(await this.storage.get('servers') || [], mnemonic)
   }
 
   getServer (id: string): S9Server | undefined {
@@ -33,10 +35,17 @@ export class S9ServerModel {
     )
   }
 
-  async addApp (server: S9Server, app: InstalledApp) {
+  async addApps (server: S9Server, apps: InstalledApp[]) {
     const serverClone = clone(server)
-    serverClone.apps.push(app)
+    serverClone.apps = serverClone.apps.concat(apps)
     this.servers[server.id] = serverClone
+    await this.saveAll()
+  }
+
+  async updateApps (server: S9Server, installedApps: InstalledApp[]) {
+    const serverClone = clone(server)
+    const serverApps = toDedupObject(serverClone.apps, installedApps, a => a.id)
+    this.servers[server.id] = { ...serverClone, apps: fromObject(serverApps) }
     await this.saveAll()
   }
 
@@ -72,12 +81,13 @@ function fromServerCache (sc : S9ServerCache): S9ServerStore {
   return Object.values(sc).map(toStorableServer)
 }
 
-function toServerCache (ss : S9ServerStore): S9ServerCache {
+function toServerCache (ss : S9ServerStore, mnemonic: string[]): S9ServerCache {
   return ss.reduce((acc, next) => {
-    acc[next.id] = fromStorableServer(next)
+    const { privkey, pubkey } = deriveKeys(mnemonic, next.torAddress)
+    acc[next.id] = fromStorableServer(next, privkey)
     return acc
   }, { } as S9ServerCache)
 }
 
 type S9ServerCache =  { [id: string]: S9Server }
-type S9ServerStore = StorableS9Server[]
+type S9ServerStore = S9ServerStorable[]
