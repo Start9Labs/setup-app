@@ -30,7 +30,8 @@ export class SetupPage {
 
     // attempt to acquire all connection info for new server + check status asynchronously
     try {
-      const setupServer = await this.setupService.setup(newServer, this.serial)
+      const setupServer = this.setupService.mock(newServer)
+      // const setupServer = await this.setupService.setup(newServer, this.serial)
       await this.s9Model.saveServer(toS9Server(setupServer))
       await this.navController.navigateRoot(['/servers'])
     } catch (e) {

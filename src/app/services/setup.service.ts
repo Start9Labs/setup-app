@@ -110,6 +110,31 @@ export class SetupService {
     }
   }
 
+  mock (ss: S9ServerBuilder): Required<S9ServerBuilder> {
+    return {
+      id: ss.id,
+      friendlyName: ss.friendlyName,
+      torAddress: 'agent-tor-address.onion',
+      lastStatusAttempt: {
+        status: AppHealthStatus.running,
+        timestamp: new Date(),
+      },
+      version: '1.0.0',
+      privkey: '',
+      pubkey: '',
+      registered: true,
+      zeroconfService: {
+        domain: 'local.',
+        type: '_http._tcp',
+        name: `start9-${ss.id}`,
+        hostname: '',
+        ipv4Addresses: ['192.168.20.1'],
+        ipv6Addresses: ['end9823u0ej2fb'],
+        port: 5959,
+        txtRecord: { },
+      },
+    }
+  }
 
 }
 

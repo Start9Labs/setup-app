@@ -15,6 +15,14 @@
 
   <ion-grid>
     <ion-row>
+      <ion-col size="6">
+        <ion-card [routerLink]="['/setup']" class="ion-text-center add-card">
+          <ion-icon name="add" color="dark"></ion-icon>
+          <ion-card-header>
+            <ion-card-title>Setup New</ion-card-title>
+          </ion-card-header>
+        </ion-card>
+      </ion-col>
       <ion-col *ngFor="let server of servers" size="6">
         <ion-card [routerLink]="[server.id]" class="ion-text-center">
           <img src="assets/img/cube.png" />
@@ -29,10 +37,10 @@
     </ion-row>
   </ion-grid>
 
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+  <!-- <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button [routerLink]="['/setup']" class="fab-button">
       <ion-icon size="large" name="add"></ion-icon>
     </ion-fab-button>
-  </ion-fab>
+  </ion-fab> -->
 
 </ion-content>

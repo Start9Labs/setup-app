@@ -40,10 +40,6 @@ export class AppComponent {
       await this.authService.init()
       // load data if authenticated
       if (this.authService.mnemonic) {
-        // mock server if none
-        if (!this.dataService.getServerCount()) {
-          await this.mockServer()
-        }
         await this.dataService.load(this.authService.mnemonic)
       }
       // mock zeroconf daemon - watches for zeroconf services on LAN
@@ -77,27 +73,5 @@ export class AppComponent {
     } else {
       this.router.navigate(['welcome'])
     }
-  }
-
-  private async mockServer () {
-    await this.dataService.saveServer({
-      id: 'abcdefgh',
-      friendlyName: `Server 1`,
-      torAddress: 'agent-tor-address.onion',
-      lastStatusAttempt: unknownAppStatusAttempt(),
-      version: '0.0.0',
-      privkey: '',
-      apps: [],
-      zeroconfService: {
-        domain: 'local.',
-        type: '_http._tcp',
-        name: 'start9-fb398cc6',
-        hostname: '',
-        ipv4Addresses: ['192.168.20.1'],
-        ipv6Addresses: ['end9823u0ej2fb'],
-        port: 5959,
-        txtRecord: { },
-      },
-    })
   }
 }
