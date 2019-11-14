@@ -19,7 +19,7 @@ export function deriveKeys (mnemonic: string[], serverId: string): { privkey: st
   const seed = bip39.mnemonicToSeedSync(mnemonic.join(' '))
   const parentNode = bip32.fromSeed(seed)
   const childNode = parentNode.derivePath(path)
-  const privkey = childNode.publicKey.toString('hex')
+  const privkey = childNode.privateKey!.toString('hex')
   const pubkey = childNode.publicKey.toString('hex')
   return { privkey, pubkey }
 }

@@ -89,13 +89,13 @@ function s9Url (ss: S9Server | S9BuilderWith<'zeroconfService'>, path: string): 
   return `https://${host}/v0${path}`
 }
 
-
 function appendAuthOptions (ss: S9Server | S9BuilderWith<'privkey'>, httpOptions: HttpOptions): HttpOptions  {
   let headers: HttpHeaders = httpOptions.headers || new HttpHeaders()
 
   const optClone = clone(httpOptions)
 
-  const tokenPayload = { 'iss': 'start9-companion', 'exp': new Date(new Date().getTime() + 3000) }
+  const nowInSeconds = Math.floor(new Date().getTime() / 1000)
+  const tokenPayload = { 'iss': 'start9-companion', 'iat': nowInSeconds, 'exp': nowInSeconds + 4 }
   const token = new TokenSigner('ES256K', ss.privkey).sign(tokenPayload)
   headers = headers.set('Authorization', 'Bearer ' + token)
   optClone.headers = headers

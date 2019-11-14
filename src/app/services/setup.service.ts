@@ -17,7 +17,7 @@ import { StatusCheckService } from './status-check.service'
 })
 export class SetupService {
   private static readonly setupAttempts = 10
-  private static readonly timeout = 2000
+  private static readonly timeout = 3000
   private static readonly waitForMS = 1000
   public message = ''
 
@@ -62,7 +62,8 @@ export class SetupService {
       this.message = `deriving keys`
       if (this.authService.mnemonic) {
         const { privkey, pubkey } = crypto.deriveKeys(this.authService.mnemonic, ssClone.torAddress)
-        console.log('pubkey', pubkey)
+        console.log('privkey ', privkey)
+        console.log('pubkey ', pubkey)
         ssClone.privkey = privkey
         ssClone.pubkey = pubkey
       } else {
