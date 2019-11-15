@@ -25,7 +25,7 @@
       </ion-col>
       <ion-col *ngFor="let server of servers" size="6">
         <ion-card [routerLink]="[server.id]" class="ion-text-center">
-          <img src="assets/img/cube.png" />
+          <ion-img [src]="assets/img/cube.png"></ion-img>
           <ion-card-header>
             <ion-card-title>{{ server.friendlyName }}</ion-card-title>
           </ion-card-header>
