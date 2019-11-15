@@ -5,6 +5,7 @@ import { NavController, AlertController } from '@ionic/angular'
 import { S9Server } from 'src/app/models/s9-server'
 import { ClipboardService } from 'src/app/services/clipboard.service'
 import { AppService } from 'src/app/services/app.service'
+import { ServerService } from 'src/app/services/server.service'
 
 @Component({
   selector: 'page-server-show',
@@ -23,6 +24,7 @@ export class ServerShowPage {
     private readonly alertCtrl: AlertController,
     private readonly clipboardService: ClipboardService,
     private readonly appService: AppService,
+    private readonly serverService: ServerService,
   ) { }
 
   ngOnInit () {
@@ -33,14 +35,23 @@ export class ServerShowPage {
     this.fetchServer()
   }
 
-  fetchServer () {
+  async fetchServer () {
     const id = this.route.snapshot.paramMap.get('serverId')
     if (!id) { throw new Error (`Need id in params for server show page but got none.`) }
 
     const server = this.serverModel.getServer(id) as S9Server
     if (!server) { throw new Error (`Need server in server model for manage page but got none for id ${id}.`) }
 
-    this.appService.getInstalledApps(server).then(apps => this.serverModel.updateApps(server, apps))
+    this.server = server
+
+    const [installedApps, specs] = await Promise.all([
+      this.appService.getInstalledApps(server),
+      this.serverService.getSpecs(server),
+    ])
+
+    await this.serverModel.updateApps(server, installedApps)
+    server.specs = specs
+
     this.server = server
   }
 

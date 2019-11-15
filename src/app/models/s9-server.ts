@@ -2,33 +2,30 @@ import * as CryptoJS from 'crypto-js'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { InstalledApp, AppHealthStatus, AppStatusAttempt } from './s9-app'
 
-export interface S9Server {
+export interface S9ServerStorable {
   id: string
   friendlyName: string
-
-  lastStatusAttempt: AppStatusAttempt
-  version: string
-
-  apps: InstalledApp[]
-
-  privkey: string // derive from mnemonic + torAddress
-
   torAddress: string
   zeroconfService: ZeroconfService
+  version: string
 }
 
-export interface Storable9SServer {
-  id: string
-  friendlyName: string
-  torAddress: string
-  zeroconfService: ZeroconfService
+export interface S9Server extends S9ServerStorable {
+  lastStatusAttempt: AppStatusAttempt
+  specs: ServerSpec[]
+  apps: InstalledApp[]
+  privkey: string // derive from mnemonic + torAddress
+}
+
+export interface ServerSpec {
+  name: string
+  value: string
 }
 
 export function getLanIP (zcs: ZeroconfService): string  {
   const { ipv4Addresses, ipv6Addresses } = zcs
   return ipv4Addresses.concat(ipv6Addresses)[0] + ':5959'
 }
-
 
 export function fromStorableServer (ss : S9ServerStorable, privkey: string): S9Server {
   const { friendlyName, torAddress, zeroconfService, id, version } = ss
@@ -40,6 +37,7 @@ export function fromStorableServer (ss : S9ServerStorable, privkey: string): S9S
     torAddress,
     zeroconfService,
     apps: [],
+    specs: [],
     version,
   }
 
@@ -64,14 +62,6 @@ export function unknownAppStatusAttempt (ts: Date = new Date()): AppStatusAttemp
   return { status: AppHealthStatus.UNKNOWN, timestamp: ts }
 }
 
-export interface S9ServerStorable {
-  id: string
-  friendlyName: string
-  torAddress: string
-  zeroconfService: ZeroconfService
-  version: string
-}
-
 export function idFromSerial (serialNo: string): string {
   // sha256 hash is big endian
   return CryptoJS.SHA256(serialNo).toString(CryptoJS.enc.Hex).substr(0, 8)
@@ -80,7 +70,7 @@ export function idFromSerial (serialNo: string): string {
 export function toS9AgentApp (ss: S9Server): InstalledApp {
   return {
     id: 'start9Agent',
-    title: 'S9 agent',
+    title: 'Start9 Agent',
     versionInstalled: ss.version,
     torAddress: ss.torAddress,
     lastStatus: ss.lastStatusAttempt,

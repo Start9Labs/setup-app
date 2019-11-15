@@ -95,7 +95,7 @@ function fromServerCache (sc : S9ServerCache): S9ServerStore {
 
 function toServerCache (ss : S9ServerStore, mnemonic: string[]): S9ServerCache {
   return ss.reduce((acc, next) => {
-    const { privkey } = deriveKeys(mnemonic, next.torAddress)
+    const { privkey } = deriveKeys(mnemonic, next.id)
     acc[next.id] = fromStorableServer(next, privkey)
     return acc
   }, { } as S9ServerCache)

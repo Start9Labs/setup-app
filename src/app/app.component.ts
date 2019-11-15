@@ -43,7 +43,7 @@ export class AppComponent {
       }
       // @TODO remove
       // mock zeroconf daemon - watches for zeroconf services on LAN
-      // this.zeroconfDaemon.mock()
+      this.zeroconfDaemon.mock()
       // do Cordova things if Cordova
       if (platform.is('cordova')) {
         // detects new LAN services

@@ -18,26 +18,26 @@ export class AppService {
 
   async getAvailableApps (server: S9Server): Promise<AvailableApp[]> {
     // @TODO remove
-    // return [mockAvailableApp, mockAvailableApp, mockAvailableApp]
-    return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(server, Method.get, '/apps/available')
+    return [mockAvailableApp, mockAvailableApp, mockAvailableApp]
+    // return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(server, Method.get, '/apps/available')
   }
 
   async getApp (server: S9Server, appId: string): Promise<AvailableApp> {
     // @TODO remove
-    // return mockAvailableApp
-    return this.httpService.authServerRequest(server, Method.get, `/apps/${appId}`)
+    return mockAvailableApp
+    // return this.httpService.authServerRequest(server, Method.get, `/apps/${appId}`)
   }
 
   async getInstalledApps (server: S9Server): Promise<InstalledApp[]> {
     // @TODO remove
-    // return [mockInstalledApp, mockInstalledApp]
-    return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.get, `/apps/installed`)
+    return [mockInstalledApp, mockInstalledApp]
+    // return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.get, `/apps/installed`)
   }
 
   async install (server: S9Server, app: AvailableApp): Promise<InstalledApp> {
     // @TODO remove
-    // const installed = mockInstalledApp()
-    const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.post, `/apps/${app.id}/install`)
+    const installed = mockInstalledApp
+    // const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.post, `/apps/${app.id}/install`)
     await this.s9Model.addApps(server, [installed])
     return installed
   }
@@ -75,7 +75,7 @@ const mockAvailableApp: AvailableApp = {
 const mockInstalledApp: InstalledApp = {
   id: 'bitcoin',
   versionInstalled: '0.18.1',
-  title: 'Bitcoin',
+  title: 'Bitcoin Core',
   torAddress: 'sample-bitcoin-tor-address',
   lastStatus: initAppStatus(),
   iconURL: 'assets/img/bitcoin_core.png',

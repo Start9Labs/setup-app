@@ -9,7 +9,7 @@ import * as crypto from '../util/crypto.util'
 import { AuthService } from './auth.service'
 import { Lan } from '../types/api-types'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
-import { InstalledApp, AppHealthStatus, AppStatusAttempt } from '../models/s9-app'
+import { AppHealthStatus, AppStatusAttempt } from '../models/s9-app'
 import { StatusCheckService } from './status-check.service'
 
 @Injectable({
@@ -112,7 +112,7 @@ export class SetupService {
   }
 
   // @TODO remove
-  mock (ss: S9ServerBuilder): Required<S9ServerBuilder> {
+  mockServer (ss: S9ServerBuilder): Required<S9ServerBuilder> {
     return {
       id: ss.id,
       friendlyName: ss.friendlyName,
@@ -183,7 +183,8 @@ export function toS9Server (sb: Required<S9ServerBuilder>): S9Server {
     friendlyName,
     lastStatusAttempt,
     version,
-    apps: [] as InstalledApp[],
+    apps: [],
+    specs: [],
     privkey,
     torAddress,
     zeroconfService,

@@ -15,6 +15,8 @@ export module Lan {
   export type GetTorRes = { torAddress: string }
   export type PostRegisterReq = { pubkey: string, serial: string }
   export type PostRegisterRes = TwoHundredOK
+  export type GetSpecsReq = { }
+  export type GetSpecsRes = [{ name: string, value: string }]
   export type GetStatusShallowReq = { }
   export type GetStatusShallowRes = { status: AppHealthStatus, version: string }
   export type GetAppShallowRes = { status: AppHealthStatus, version: string, id: string }[]
