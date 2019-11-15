@@ -23,6 +23,7 @@ export class ZeroconfDaemon {
     this.watch()
   }
 
+  // @TODO remove
   mock () {
     const zs = {
       domain: 'local.',

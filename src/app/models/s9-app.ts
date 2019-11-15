@@ -2,10 +2,13 @@ export interface BaseApp {
   id: string
   title: string
   versionInstalled?: string
-  iconPath: string
+  iconURL: string
 }
 
 export interface AvailableApp extends BaseApp {
+  id: string
+  title: string
+  versionInstalled?: string
   version: string
   descriptionShort: string
   descriptionLong: string

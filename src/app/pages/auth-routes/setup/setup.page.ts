@@ -30,6 +30,7 @@ export class SetupPage {
 
     // attempt to acquire all connection info for new server + check status asynchronously
     try {
+      // @TODO remove
       // const setupServer = this.setupService.mock(newServer)
       const setupServer = await this.setupService.setup(newServer, this.productKey)
       await this.s9Model.saveServer(toS9Server(setupServer))

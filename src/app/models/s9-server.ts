@@ -84,6 +84,6 @@ export function toS9AgentApp (ss: S9Server): InstalledApp {
     versionInstalled: ss.version,
     torAddress: ss.torAddress,
     lastStatus: ss.lastStatusAttempt,
-    iconPath: 'assets/img/agent.png',
+    iconURL: 'assets/img/agent.png',
   }
 }

@@ -18,22 +18,24 @@ export class AppService {
 
   async getAvailableApps (server: S9Server): Promise<AvailableApp[]> {
     // @TODO remove
-    // return [mockApp, mockApp, mockApp]
+    // return [mockAvailableApp, mockAvailableApp, mockAvailableApp]
     return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(server, Method.get, '/apps/available')
   }
 
   async getApp (server: S9Server, appId: string): Promise<AvailableApp> {
-    // return mockApp
+    // @TODO remove
+    // return mockAvailableApp
     return this.httpService.authServerRequest(server, Method.get, `/apps/${appId}`)
   }
 
   async getInstalledApps (server: S9Server): Promise<InstalledApp[]> {
-    // return [mockInstalledApp(), mockInstalledApp()]
+    // @TODO remove
+    // return [mockInstalledApp, mockInstalledApp]
     return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.get, `/apps/installed`)
   }
 
   async install (server: S9Server, app: AvailableApp): Promise<InstalledApp> {
-    // @TODO remove and install the app for real
+    // @TODO remove
     // const installed = mockInstalledApp()
     const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.post, `/apps/${app.id}/install`)
     await this.s9Model.addApps(server, [installed])
@@ -54,25 +56,27 @@ export class AppService {
   }
 }
 
-const mockApp = {
+// @TODO remove
+const mockAvailableApp: AvailableApp = {
   id: 'bitcoin',
-  version: '0.18',
+  version: '0.18.1',
   title: 'Bitcoin Core',
   descriptionShort: 'Bitcoin is an innovative payment network and new kind of money.',
   descriptionLong: 'Bitcoin is an innovative payment network and new kind of money. Bitcoin utilizes a robust p2p network to garner decentralized consensus.',
   releaseNotes: '* Faster sync time<br />* MAST support',
   // server specific
-  versionInstalled: '0.18',
+  versionInstalled: '0.18.1',
   installed: true,
   compatible: true,
-  iconPath: 'assets/img/bitcoin_core.png',
+  iconURL: 'assets/img/bitcoin_core.png',
 }
 
-function mockInstalledApp (): InstalledApp { return {
+// @TODO remove
+const mockInstalledApp: InstalledApp = {
   id: 'bitcoin',
-  versionInstalled: '0.18',
+  versionInstalled: '0.18.1',
   title: 'Bitcoin',
   torAddress: 'sample-bitcoin-tor-address',
   lastStatus: initAppStatus(),
-  iconPath: 'assets/img/bitcoin_core.png',
-}}
+  iconURL: 'assets/img/bitcoin_core.png',
+}

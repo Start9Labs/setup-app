@@ -43,7 +43,6 @@ export class SetupService {
 
   private async setupAttempt (ss: S9ServerBuilder, productKey: string): Promise<S9ServerBuilder> {
     const ssClone = clone(ss)
-    console.log(ssClone)
 
     // enable lan
     if (!hasValues(['zeroconfService'], ssClone)) {
@@ -62,8 +61,6 @@ export class SetupService {
       this.message = `deriving keys`
       if (this.authService.mnemonic) {
         const { privkey, pubkey } = crypto.deriveKeys(this.authService.mnemonic, ssClone.torAddress)
-        console.log('privkey ', privkey)
-        console.log('pubkey ', pubkey)
         ssClone.privkey = privkey
         ssClone.pubkey = pubkey
       } else {
@@ -114,6 +111,7 @@ export class SetupService {
     }
   }
 
+  // @TODO remove
   mock (ss: S9ServerBuilder): Required<S9ServerBuilder> {
     return {
       id: ss.id,

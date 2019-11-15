@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core'
 import { S9ServerModel } from '../models/server-model'
-import { SetupService } from '../services/setup.service'
 import { pauseFor } from 'src/app/util/misc.util'
 import { StatusCheckService } from '../services/status-check.service'
 
@@ -8,13 +7,14 @@ import { StatusCheckService } from '../services/status-check.service'
   providedIn: 'root',
 })
 export class HealthDaemon {
+  private static readonly ms = 60000
+
   constructor (
-    private readonly setupService: SetupService,
     private readonly statusCheckService: StatusCheckService,
     private readonly svm: S9ServerModel,
   ) { }
 
-  async serverStatusCheck (ms: number): Promise<void> {
+  async serverStatusCheck (): Promise<void> {
     while (true) {
       const sss = this.svm.getServers()
       await Promise.all(
@@ -25,7 +25,7 @@ export class HealthDaemon {
           },
         ),
       )
-      await pauseFor(ms)
+      await pauseFor(HealthDaemon.ms)
     }
 
   }

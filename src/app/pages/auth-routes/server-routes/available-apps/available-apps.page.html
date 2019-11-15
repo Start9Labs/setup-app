@@ -13,7 +13,7 @@
     <ion-row>
       <ion-col *ngFor="let app of apps" size="6">
         <ion-card [routerLink]="[app.id]">
-          <img src={{app.iconPath}} />
+          <img src={{app.iconURL}} />
           <ion-card-header>
             <ion-card-subtitle *ngIf="app.installed" color="success">Installed</ion-card-subtitle>
             <ion-card-title>{{ app.title }}</ion-card-title>

@@ -44,9 +44,10 @@ export class HttpService {
 
   async request<T> (method: Method, url: string, httpOptions: HttpOptions = { }, body: any = { }, TIMEOUT = 30000): Promise<T> {
     const newOptions = appendDefaultOptions(httpOptions)
-    console.log('Request URL', url)
-    console.log('Request Body', body)
-    console.log('Request Options', newOptions)
+    console.log('Request Method: ', method)
+    console.log('Request URL: ', url)
+    console.log('Request Body: ', body)
+    console.log('Request Options: ', newOptions)
 
     let call: () => Observable<HttpEvent<T>>
     switch (method) {
