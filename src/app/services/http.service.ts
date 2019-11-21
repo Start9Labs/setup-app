@@ -3,7 +3,7 @@ import { HttpClient, HttpEventType, HttpErrorResponse, HttpHeaders, HttpEvent } 
 import { Method } from '../types/enums'
 import { Observable } from 'rxjs'
 import { timeout } from 'rxjs/operators'
-import { getLanIP, S9Server } from '../models/s9-server'
+import { getLanIP, S9Server, majorVersion } from '../models/s9-server'
 import { TokenSigner } from 'jsontokens'
 import { clone } from '../models/server-model'
 import { S9BuilderWith } from './setup.service'
@@ -87,7 +87,7 @@ export class HttpService {
 
 function s9Url (ss: S9Server | S9BuilderWith<'zeroconfService' | 'version'>, path: string): string {
   const host = getLanIP(ss.zeroconfService) || ss.torAddress
-  return `https://${host}/${ss.version}/${path}`
+  return `https://${host}/v${majorVersion(ss.version)}/${path}`
 }
 
 function appendAuthOptions (ss: S9Server | S9BuilderWith<'privkey'>, httpOptions: HttpOptions): HttpOptions  {

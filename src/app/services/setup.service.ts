@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { S9Server, toS9AgentApp, ServerSpec, getLanIP } from '../models/s9-server'
+import { S9Server, toS9AgentApp, ServerSpec, getLanIP, AgentVersion, fromVersionString } from '../models/s9-server'
 import { HttpService } from './http.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { Method } from 'src/app/types/enums'
@@ -88,7 +88,7 @@ export class SetupService {
     ) {
       this.message = `executing server status check`
       const { version, status, specs } = await this.serverService.getServer(ssClone)
-      ssClone.version = version
+      ssClone.version = fromVersionString(version)
       ssClone.status = status
       ssClone.statusAt = new Date()
       ssClone.specs = specs
@@ -136,7 +136,7 @@ export class SetupService {
       id: ss.id,
       friendlyName: ss.friendlyName,
       torAddress: 'agent-tor-address.onion',
-      version: '1.0.0',
+      version: [1, 0, 0],
       status: AppHealthStatus.RUNNING,
       statusAt: new Date(),
       specs: ss.specs,
@@ -168,7 +168,7 @@ export interface S9ServerBuilder {
 
   status: AppHealthStatus
   statusAt: Date
-  version?: string
+  version?: AgentVersion
   specs: ServerSpec[]
 
   privkey?: string

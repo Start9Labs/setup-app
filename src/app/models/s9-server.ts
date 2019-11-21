@@ -2,12 +2,32 @@ import * as CryptoJS from 'crypto-js'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { InstalledApp, AppHealthStatus } from './s9-app'
 
+export type AgentVersion = [number, number, number]
+
+export function majorVersion (v : AgentVersion): number {
+  return v[0]
+}
+
+export function toVersionString (v: AgentVersion): string {
+  return v.join('.')
+}
+
+export function fromVersionString (vs: string): AgentVersion {
+  const toReturn = vs.split('.').map(Number)
+
+  if (toReturn.length !== 3 || toReturn.some(isNaN)) {
+    throw new Error(`Agent Version inccorec format: ${vs}`)
+  }
+
+  return toReturn as AgentVersion
+}
+
 export interface S9ServerStorable {
   id: string
   friendlyName: string
   torAddress: string
   zeroconfService: ZeroconfService
-  version: string
+  version: AgentVersion
 }
 
 export interface S9Server extends S9ServerStorable {
@@ -71,8 +91,8 @@ export function toS9AgentApp (ss: S9Server): InstalledApp {
   return {
     id: 'start9Agent',
     title: 'Start9 Agent',
-    version: ss.version,
-    versionInstalled: ss.version,
+    version: toVersionString(ss.version),
+    versionInstalled: toVersionString(ss.version),
     torAddress: ss.torAddress,
     status: ss.status,
     statusAt: ss.statusAt,
