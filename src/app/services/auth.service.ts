@@ -11,6 +11,7 @@ import { BehaviorSubject } from 'rxjs'
 export class AuthService {
   private secure: SecureStorageObject
   readonly authState = new BehaviorSubject(false)
+  initialized = false
   mnemonic: string[] | undefined
 
   constructor (
@@ -20,10 +21,9 @@ export class AuthService {
   ) { }
 
   async init () {
-    this.secure = await this.ss.create('start9')
-
     if (this.platform.is('cordova')) {
-      // when fetching from secure storage, if the key does not exist it throws an error
+      this.secure = await this.ss.create('start9')
+      // throws error if key does not exist
       await this.secure.get('mnemonic')
         .then(mnemonic => {
           this.mnemonic = JSON.parse(mnemonic)
@@ -31,12 +31,14 @@ export class AuthService {
         })
         .catch(e => console.error(e))
     } else {
+      // returns undefined if key does not exist
       const mnemonic = await this.storage.get('mnemonic')
       if (mnemonic) {
         this.mnemonic = JSON.parse(mnemonic)
         this.authState.next(true)
       }
     }
+    this.initialized = true
   }
 
   async login (mnemonic: string[]) {
@@ -64,6 +66,6 @@ export class AuthService {
   }
 
   isAuthenticated (): boolean {
-    return !!this.mnemonic && this.authState.value
+    return this.authState.value
   }
 }
