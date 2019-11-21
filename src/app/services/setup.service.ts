@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { S9Server, toS9AgentApp, ServerSpec, getLanIP, AgentVersion, fromVersionString } from '../models/s9-server'
+import { S9Server, toS9AgentApp, ServerSpec, getLanIP, SemVersion, fromVersionString } from '../models/s9-server'
 import { HttpService } from './http.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { Method } from 'src/app/types/enums'
@@ -121,7 +121,7 @@ export class SetupService {
   async registerPubkey (ss: S9BuilderWith<'zeroconfService' | 'version' | 'pubkey'>, productKey: string): Promise<boolean> {
     const { id, pubkey } = ss
     try {
-      const body: Lan.PostRegisterReq = { pubkey, serial: productKey }
+      const body: Lan.PostRegisterReq = { pubKey: pubkey, productKey }
       await this.httpService.serverRequest<Lan.PostRegisterRes>(ss, Method.post, 'register', { }, body, SetupService.timeout)
       return true
     } catch (e) {
@@ -168,7 +168,7 @@ export interface S9ServerBuilder {
 
   status: AppHealthStatus
   statusAt: Date
-  version?: AgentVersion
+  version?: SemVersion
   specs: ServerSpec[]
 
   privkey?: string

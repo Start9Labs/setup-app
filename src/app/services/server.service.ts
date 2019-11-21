@@ -3,7 +3,7 @@ import { HttpService } from './http.service'
 import { Method } from '../types/enums'
 import { S9ServerModel } from '../models/server-model'
 import { InstalledApp, AvailableApp, AppHealthStatus } from '../models/s9-app'
-import { S9Server } from '../models/s9-server'
+import { S9Server, SemVersion } from '../models/s9-server'
 import { Lan } from '../types/api-types'
 import { S9BuilderWith } from './setup.service'
 
@@ -17,10 +17,11 @@ export class ServerService {
     private readonly s9Model: S9ServerModel,
   ) { }
 
-  async getServer (server: S9Server | S9BuilderWith<'zeroconfService' | 'privkey'>): Promise<Lan.GetServerRes> {
+  async getServer<T extends S9BuilderWith<'zeroconfService' | 'privkey' | 'version'>> (server: T): Promise<T> {
     // @TODO remove
-    return mockServerRes
-    // return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.get, '')
+    // return mockServerRes
+    const res = await this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.get, '')
+    return { ...server, ...res}
   }
 
   async getAvailableApps (server: S9Server): Promise<AvailableApp[]> {
@@ -93,8 +94,9 @@ const mockServerRes: Lan.GetServerRes = {
 // @TODO remove
 const mockAvailableApp: AvailableApp = {
   id: 'bitcoin',
-  version: '0.18.1',
-  versionInstalled: '0.18.1',
+  versionLatest: [0, 18, 1],
+  versionInstalled: [0, 18, 1],
+  version: [0, 18, 0],
   title: 'Bitcoin Core',
   descriptionShort: 'Bitcoin is an innovative payment network and new kind of money.',
   descriptionLong: 'Bitcoin is an innovative payment network and new kind of money. Bitcoin utilizes a robust p2p network to garner decentralized consensus.',
@@ -107,8 +109,8 @@ const mockAvailableApp: AvailableApp = {
 // @TODO remove
 const mockInstalledApp: InstalledApp = {
   id: 'bitcoin',
-  version: '0.18.1',
-  versionInstalled: '0.18.1',
+  versionLatest: [0, 18, 1],
+  versionInstalled: [0, 18, 1],
   title: 'Bitcoin Core',
   torAddress: 'sample-bitcoin-tor-address',
   status: AppHealthStatus.RUNNING,

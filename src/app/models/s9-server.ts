@@ -1,25 +1,26 @@
 import * as CryptoJS from 'crypto-js'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { InstalledApp, AppHealthStatus } from './s9-app'
+import { isNullOrUndefined } from 'util'
 
-export type AgentVersion = [number, number, number]
+export type SemVersion = [number, number, number]
 
-export function majorVersion (v : AgentVersion): number {
+export function majorVersion (v : SemVersion): number {
   return v[0]
 }
 
-export function toVersionString (v: AgentVersion): string {
+export function toVersionString (v: SemVersion): string {
   return v.join('.')
 }
 
-export function fromVersionString (vs: string): AgentVersion {
+export function fromVersionString (vs: string): SemVersion {
   const toReturn = vs.split('.').map(Number)
 
-  if (toReturn.length !== 3 || toReturn.some(isNaN)) {
-    throw new Error(`Agent Version inccorec format: ${vs}`)
+  if (toReturn.length !== 3 || toReturn.some(isNaN) || toReturn.some(isNullOrUndefined)) {
+    throw new Error(`Agent Version incorrect format: ${vs}`)
   }
 
-  return toReturn as AgentVersion
+  return toReturn as SemVersion
 }
 
 export interface S9ServerStorable {
@@ -27,7 +28,7 @@ export interface S9ServerStorable {
   friendlyName: string
   torAddress: string
   zeroconfService: ZeroconfService
-  version: AgentVersion
+  version: SemVersion
 }
 
 export interface S9Server extends S9ServerStorable {
@@ -91,8 +92,8 @@ export function toS9AgentApp (ss: S9Server): InstalledApp {
   return {
     id: 'start9Agent',
     title: 'Start9 Agent',
-    version: toVersionString(ss.version),
-    versionInstalled: toVersionString(ss.version),
+    versionLatest: ss.version,
+    versionInstalled: ss.version,
     torAddress: ss.torAddress,
     status: ss.status,
     statusAt: ss.statusAt,

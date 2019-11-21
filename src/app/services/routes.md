@@ -1,28 +1,31 @@
 # NO AUTH
-GET /tor
+GET /version
+params: none
+response: { version: string } -- e.g. "0.1.0"
+
+GET <version>/tor
 params: none
 response: { torAddress: string }
 
-
 # Product Key AUTH
-POST /register
-params: { pubkey: string, productKey: string }
+POST <version>/register
+params: { pubKey: string, productKey: string }
 response: no content
 
 
 # STANDARD AUTH
-GET /
+GET <version>/
 params: none
 response: S9Server
 
-GET apps/installed
+GET <version>/apps/installed
 params: none
 response: InstalledApp[]
 
-GET apps/available
+GET <version>/apps/available
 params: none
 response: AvailableApp[]
 
-POST apps/install
+POST <version>/apps/install
 params: { name: string }
 response: InstalledApp

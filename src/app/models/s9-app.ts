@@ -1,8 +1,10 @@
+import { SemVersion } from './s9-server'
+
 export interface BaseApp {
   id: string
   title: string
-  version: string
-  versionInstalled?: string
+  versionLatest: SemVersion
+  versionInstalled?: SemVersion
   iconURL: string
 }
 
@@ -11,6 +13,7 @@ export interface AvailableApp extends BaseApp {
   descriptionLong: string
   releaseNotes: string
   compatible: boolean
+  version: SemVersion
 }
 
 export interface InstalledApp extends BaseApp {
