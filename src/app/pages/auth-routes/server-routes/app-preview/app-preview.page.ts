@@ -2,8 +2,8 @@ import { Component } from '@angular/core'
 import { S9Server } from 'src/app/models/s9-server'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
-import { AvailableApp, InstalledApp } from 'src/app/models/s9-app'
-import { AppService } from 'src/app/services/app.service'
+import { AvailableApp } from 'src/app/models/s9-app'
+import { ServerService } from 'src/app/services/server.service'
 import { NavController, AlertController, LoadingController } from '@ionic/angular'
 
 @Component({
@@ -21,7 +21,7 @@ export class AppPreviewPage {
     private readonly navCtrl: NavController,
     private readonly route: ActivatedRoute,
     private readonly serverModel: S9ServerModel,
-    private readonly appService: AppService,
+    private readonly serverService: ServerService,
     private readonly alertCtrl: AlertController,
     private readonly loadingCtrl: LoadingController,
   ) { }
@@ -34,7 +34,7 @@ export class AppPreviewPage {
 
     const appId = this.route.snapshot.paramMap.get('appId') as string
 
-    this.app = await this.appService.getApp(this.server, appId)
+    this.app = await this.serverService.getApp(this.server, appId)
     this.loading = false
   }
 
@@ -70,7 +70,7 @@ export class AppPreviewPage {
     await loader.present()
 
     try {
-      await this.appService.install(this.server, this.app)
+      await this.serverService.install(this.server, this.app)
       await this.navCtrl.navigateBack(['/servers', this.server.id])
     } catch (e) {
       this.error = e.message
@@ -86,7 +86,7 @@ export class AppPreviewPage {
     await loader.present()
 
     try {
-      await this.appService.uninstall(this.server, this.app)
+      await this.serverService.uninstall(this.server, this.app)
       await this.navCtrl.navigateBack(['/servers', this.server.id])
     } catch (e) {
       this.error = e.message

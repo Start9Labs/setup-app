@@ -1,6 +1,6 @@
 import * as CryptoJS from 'crypto-js'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
-import { InstalledApp, AppHealthStatus, AppStatusAttempt } from './s9-app'
+import { InstalledApp, AppHealthStatus } from './s9-app'
 
 export interface S9ServerStorable {
   id: string
@@ -11,7 +11,9 @@ export interface S9ServerStorable {
 }
 
 export interface S9Server extends S9ServerStorable {
-  lastStatusAttempt: AppStatusAttempt
+  updating: boolean
+  status: AppHealthStatus
+  statusAt: Date
   specs: ServerSpec[]
   apps: InstalledApp[]
   privkey: string // derive from mnemonic + torAddress
@@ -32,13 +34,15 @@ export function fromStorableServer (ss : S9ServerStorable, privkey: string): S9S
   const toReturn: S9Server = {
     id,
     friendlyName,
-    lastStatusAttempt: unknownAppStatusAttempt(),
-    privkey,
     torAddress,
     zeroconfService,
+    version,
+    updating: false,
+    status: AppHealthStatus.UNKNOWN,
+    statusAt: new Date(),
+    privkey,
     apps: [],
     specs: [],
-    version,
   }
 
   toReturn.apps.push(toS9AgentApp(toReturn))
@@ -58,10 +62,6 @@ export function toStorableServer (ss: S9Server): S9ServerStorable {
   }
 }
 
-export function unknownAppStatusAttempt (ts: Date = new Date()): AppStatusAttempt {
-  return { status: AppHealthStatus.UNKNOWN, timestamp: ts }
-}
-
 export function idFromSerial (serialNo: string): string {
   // sha256 hash is big endian
   return CryptoJS.SHA256(serialNo).toString(CryptoJS.enc.Hex).substr(0, 8)
@@ -71,9 +71,11 @@ export function toS9AgentApp (ss: S9Server): InstalledApp {
   return {
     id: 'start9Agent',
     title: 'Start9 Agent',
+    version: ss.version,
     versionInstalled: ss.version,
     torAddress: ss.torAddress,
-    lastStatus: ss.lastStatusAttempt,
+    status: ss.status,
+    statusAt: ss.statusAt,
     iconURL: 'assets/img/agent.png',
   }
 }

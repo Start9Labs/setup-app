@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { AppService } from 'src/app/services/app.service'
+import { ServerService } from 'src/app/services/server.service'
 import { AvailableApp } from 'src/app/models/s9-app'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
@@ -18,8 +18,7 @@ export class AvailableAppsPage {
   constructor (
     private readonly route: ActivatedRoute,
     private readonly serverModel: S9ServerModel,
-    private readonly appService: AppService,
-    private readonly navCtrl: NavController,
+    private readonly serverService: ServerService,
   ) { }
 
   async ngOnInit () {
@@ -28,6 +27,6 @@ export class AvailableAppsPage {
     if (!server) throw new Error (`No server found with ID: ${serverId}`)
     this.server = server
 
-    this.apps = await this.appService.getAvailableApps(this.server)
+    this.apps = await this.serverService.getAvailableApps(this.server)
   }
 }

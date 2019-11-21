@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { AlertController, NavController, LoadingController } from '@ionic/angular'
-import { AppService } from 'src/app/services/app.service'
+import { ServerService } from 'src/app/services/server.service'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
 import { InstalledApp } from 'src/app/models/s9-app'
@@ -19,7 +19,7 @@ export class AppShowPage {
 
   constructor (
     private readonly alertCtrl: AlertController,
-    private readonly appService: AppService,
+    private readonly serverService: ServerService,
     private readonly route: ActivatedRoute,
     private readonly serverModel: S9ServerModel,
     private readonly navCtrl: NavController,
@@ -51,7 +51,7 @@ export class AppShowPage {
     await loader.present()
 
     try {
-      this.app = await this.appService.stop(this.server, this.app)
+      this.app = await this.serverService.stop(this.server, this.app)
     } catch (e) {
       this.error = e.message
     } finally {
@@ -66,7 +66,7 @@ export class AppShowPage {
     await loader.present()
 
     try {
-      this.app = await this.appService.start(this.server, this.app)
+      this.app = await this.serverService.start(this.server, this.app)
     } catch (e) {
       this.error = e.message
     } finally {
@@ -102,7 +102,7 @@ export class AppShowPage {
     await loader.present()
 
     try {
-      await this.appService.uninstall(this.server, this.app as any)
+      await this.serverService.uninstall(this.server, this.app as any)
       await this.navCtrl.pop()
     } catch (e) {
       this.error = e.message

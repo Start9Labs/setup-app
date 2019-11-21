@@ -1,29 +1,22 @@
 export interface BaseApp {
   id: string
   title: string
+  version: string
   versionInstalled?: string
   iconURL: string
 }
 
 export interface AvailableApp extends BaseApp {
-  id: string
-  title: string
-  versionInstalled?: string
-  version: string
   descriptionShort: string
   descriptionLong: string
   releaseNotes: string
-  installed: boolean
   compatible: boolean
 }
 
 export interface InstalledApp extends BaseApp {
   torAddress: string
-  lastStatus: AppStatusAttempt
-}
-
-export type AppStatusAttempt = {
-  status: AppHealthStatus, timestamp: Date
+  status: AppHealthStatus
+  statusAt: Date
 }
 
 export enum AppHealthStatus {
@@ -32,8 +25,4 @@ export enum AppHealthStatus {
   NOT_FOUND = 'NOT_FOUND',
   UNREACHABLE = 'UNREACHABLE',
   UNKNOWN = 'UNKNOWN',
-}
-
-export function initAppStatus (): AppStatusAttempt {
-  return { status: AppHealthStatus.RUNNING, timestamp: new Date() }
 }

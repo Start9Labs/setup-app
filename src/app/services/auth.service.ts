@@ -12,7 +12,7 @@ export class AuthService {
   private secure: SecureStorageObject
   readonly authState = new BehaviorSubject(false)
   initialized = false
-  mnemonic: string[] | undefined
+  mnemonic: string[] = []
 
   constructor (
     private readonly platform: Platform,
@@ -62,7 +62,7 @@ export class AuthService {
       await this.storage.remove('mnemonic')
     }
     this.authState.next(false)
-    this.mnemonic = undefined
+    this.mnemonic = []
   }
 
   isAuthenticated (): boolean {

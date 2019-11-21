@@ -3,7 +3,7 @@ import { Platform } from '@ionic/angular'
 import { SplashScreen } from '@ionic-native/splash-screen/ngx'
 import { StatusBar } from '@ionic-native/status-bar/ngx'
 import { S9ServerModel } from './models/server-model'
-import { HealthDaemon } from './daemons/health-daemon'
+import { SyncDaemon } from './daemons/sync-daemon'
 import { WifiDaemon } from './daemons/wifi-daemon'
 import { ZeroconfDaemon } from './daemons/zeroconf-daemon'
 import { AuthService } from './services/auth.service'
@@ -23,7 +23,7 @@ export class AppComponent {
     public dataService: S9ServerModel,
     public zeroconfDaemon: ZeroconfDaemon,
     public wifiDaemon: WifiDaemon,
-    public healthDaemon: HealthDaemon,
+    public syncDaemon: SyncDaemon,
     public authService: AuthService,
     public router: Router,
   ) {
@@ -52,7 +52,7 @@ export class AppComponent {
         this.wifiDaemon.watch()
         // iterates through servers in S9ServerModel and tries to status check w Tor and Lan every 5 seconds
         // consider adding an attempts counter per server
-        this.healthDaemon.serverStatusCheck()
+        this.syncDaemon.sync()
         // style status bar for iOS and Android
         if (platform.is('ios')) {
           statusBar.styleDefault()

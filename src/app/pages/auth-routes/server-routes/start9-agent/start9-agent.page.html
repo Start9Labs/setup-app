@@ -29,13 +29,13 @@
     <ion-item>
       <ion-label position="stacked" color="medium">Status</ion-label>
       <ion-text color="success">
-        <p>{{ app.lastStatus.status | titlecase }}</p>
+        <p>{{ app.status | titlecase }}</p>
       </ion-text>
     </ion-item>
     <ion-item>
       <ion-label position="stacked" color="medium">Last Status Check</ion-label>
       <ion-text color="medium">
-        <p>{{ app.lastStatus.timestamp | date: 'short' }}</p>
+        <p>{{ app.statusAt | date: 'short' }}</p>
       </ion-text>
     </ion-item>
     <ion-item>

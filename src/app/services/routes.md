@@ -11,9 +11,9 @@ response: no content
 
 
 # STANDARD AUTH
-GET /status/shallow
+GET /
 params: none
-response: any
+response: S9Server
 
 GET apps/installed
 params: none

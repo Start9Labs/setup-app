@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { unknownAppStatusAttempt, S9Server, toS9AgentApp } from '../models/s9-server'
+import { S9Server, toS9AgentApp, ServerSpec } from '../models/s9-server'
 import { HttpService } from './http.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { Method } from 'src/app/types/enums'
@@ -9,8 +9,8 @@ import * as crypto from '../util/crypto.util'
 import { AuthService } from './auth.service'
 import { Lan } from '../types/api-types'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
-import { AppHealthStatus, AppStatusAttempt } from '../models/s9-app'
-import { StatusCheckService } from './status-check.service'
+import { AppHealthStatus } from '../models/s9-app'
+import { ServerService } from './server.service'
 
 @Injectable({
   providedIn: 'root',
@@ -25,7 +25,7 @@ export class SetupService {
     private readonly httpService: HttpService,
     private readonly zeroconfDaemon: ZeroconfDaemon,
     private readonly authService: AuthService,
-    private readonly statusCheckService: StatusCheckService,
+    private readonly serverService: ServerService,
   ) { }
 
   async setup (ss: S9ServerBuilder, productKey: string): Promise<Required<S9ServerBuilder>> {
@@ -78,12 +78,14 @@ export class SetupService {
     if (
       hasValues(['zeroconfService', 'torAddress', 'pubkey', 'privkey'], ssClone) &&
       ss.registered &&
-      (ss.lastStatusAttempt.status !== AppHealthStatus.RUNNING || !hasValues(['version'], ssClone))
+      (ss.status !== AppHealthStatus.RUNNING || !hasValues(['version'], ssClone))
     ) {
       this.message = `executing server status check`
-      const { attempt, version } = await this.statusCheckService.getS9AgentStatus(ssClone)
+      const { version, status, specs } = await this.serverService.getServer(ssClone)
       ssClone.version = version
-      ssClone.lastStatusAttempt = attempt
+      ssClone.status = status
+      ssClone.statusAt = new Date()
+      ssClone.specs = specs
     }
 
     return ssClone
@@ -117,11 +119,10 @@ export class SetupService {
       id: ss.id,
       friendlyName: ss.friendlyName,
       torAddress: 'agent-tor-address.onion',
-      lastStatusAttempt: {
-        status: AppHealthStatus.RUNNING,
-        timestamp: new Date(),
-      },
       version: '1.0.0',
+      status: AppHealthStatus.RUNNING,
+      statusAt: new Date(),
+      specs: ss.specs,
       privkey: '',
       pubkey: '',
       registered: true,
@@ -148,8 +149,10 @@ export interface S9ServerBuilder {
   id: string
   friendlyName: string
 
-  lastStatusAttempt: AppStatusAttempt
+  status: AppHealthStatus
+  statusAt: Date
   version?: string
+  specs: ServerSpec[]
 
   privkey?: string
   pubkey?: string
@@ -164,30 +167,34 @@ export function hasValues<T extends keyof S9ServerBuilder> (t: T[], s: S9ServerB
 }
 
 export function isFullySetup (ss: S9ServerBuilder): ss is Required<S9ServerBuilder> {
-  return hasValues(builderKeys(), ss) && ss.registered && (ss.lastStatusAttempt.status == AppHealthStatus.RUNNING)
+  return hasValues(builderKeys(), ss) && ss.registered && (ss.status == AppHealthStatus.RUNNING)
 }
 
 export function fromUserInput (id: string, friendlyName: string): S9ServerBuilder {
   return {
     id,
     friendlyName,
-    lastStatusAttempt: unknownAppStatusAttempt(),
+    status: AppHealthStatus.UNKNOWN,
+    statusAt: new Date(),
+    specs: [],
     registered: false,
   }
 }
 
 export function toS9Server (sb: Required<S9ServerBuilder>): S9Server {
-  const { id, friendlyName, lastStatusAttempt, version, privkey, torAddress, zeroconfService } = sb
+  const { id, friendlyName, status, statusAt, version, privkey, torAddress, zeroconfService } = sb
   const toReturn: S9Server = {
     id,
     friendlyName,
-    lastStatusAttempt,
+    status,
+    statusAt,
     version,
     apps: [],
     specs: [],
     privkey,
     torAddress,
     zeroconfService,
+    updating: false,
   }
 
   toReturn.apps.push(toS9AgentApp(toReturn))
@@ -205,8 +212,10 @@ function builderKeys (): (keyof S9ServerBuilder)[] {
 const defaultBuilder: Required<S9ServerBuilder> = {
   id:              undefined as any,
   friendlyName:    undefined as any,
-  lastStatusAttempt:   undefined as any,
+  status:          undefined as any,
+  statusAt:        undefined as any,
   version:         undefined as any,
+  specs:           undefined as any,
   privkey:         undefined as any,
   pubkey:          undefined as any,
   registered:      undefined as any,
