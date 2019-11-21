@@ -1,22 +1,22 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { AvailableAppsPage } from './available-apps.page'
+import { AvailableAppsListPage } from './available-apps-list.page'
 
 describe('AvailableAppsPage', () => {
-  let component: AvailableAppsPage
-  let fixture: ComponentFixture<AvailableAppsPage>
+  let component: AvailableAppsListPage
+  let fixture: ComponentFixture<AvailableAppsListPage>
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AvailableAppsPage ],
+      declarations: [ AvailableAppsListPage ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     })
     .compileComponents()
   }))
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AvailableAppsPage)
+    fixture = TestBed.createComponent(AvailableAppsListPage)
     component = fixture.componentInstance
     fixture.detectChanges()
   })

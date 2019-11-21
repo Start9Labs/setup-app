@@ -8,12 +8,16 @@ export interface BaseApp {
   iconURL: string
 }
 
-export interface AvailableApp extends BaseApp {
+export interface AvailableAppPreview extends BaseApp {
   descriptionShort: string
-  descriptionLong: string
   releaseNotes: string
   compatible: boolean
   version: SemVersion
+}
+
+export interface AvailableAppFull extends AvailableAppPreview {
+  descriptionLong: string
+  versions: AvailableAppPreview[]
 }
 
 export interface InstalledApp extends BaseApp {

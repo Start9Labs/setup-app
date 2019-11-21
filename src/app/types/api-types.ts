@@ -3,7 +3,7 @@ import { ServerSpec } from '../models/s9-server'
 
 export type TwoHundredOK = { never?: never } // hack for the unit type
 
-export interface ApiBaseApp {
+interface ApiAppBase {
   id: string
   title: string
   versionLatest: string
@@ -11,15 +11,19 @@ export interface ApiBaseApp {
   iconURL: string
 }
 
-export interface ApiAvailableApp extends ApiBaseApp {
+export interface ApiAppAvailablePreview extends ApiAppBase {
   descriptionShort: string
-  descriptionLong: string
   releaseNotes: string
   compatible: boolean
   version: string
 }
 
-export interface ApiInstalledApp extends ApiBaseApp {
+export interface ApiAppAvailableFull extends ApiAppAvailablePreview {
+  descriptionLong: string
+  versions: ApiAppAvailablePreview[]
+}
+
+export interface ApiAppInstalled extends ApiAppBase {
   torAddress: string
   status: AppHealthStatus
 }
@@ -39,15 +43,17 @@ export module Lan {
     specs: ServerSpec[]
   }
   export type GetAppsInstalledReq = { }
-  export type GetAppsInstalledRes = ApiInstalledApp[]
+  export type GetAppsInstalledRes = ApiAppInstalled[]
+  export type GetAppAvailableReq = { }
+  export type GetAppAvailableRes = ApiAppAvailableFull
   export type GetAppsAvailableReq = { }
-  export type GetAppsAvailableRes = ApiAvailableApp[]
+  export type GetAppsAvailableRes = ApiAppAvailablePreview[]
   export type PostInstallAppReq = { name: string }
-  export type PostInstallAppRes = ApiInstalledApp
+  export type PostInstallAppRes = ApiAppInstalled
   export type PostUninstallAppReq = { name: string }
   export type PostUninstallAppRes = TwoHundredOK
   export type PostStartAppReq = { }
-  export type PostStartAppRes = ApiInstalledApp
+  export type PostStartAppRes = ApiAppInstalled
   export type PostStopAppReq = { }
-  export type PostStopAppRes = ApiInstalledApp
+  export type PostStopAppRes = ApiAppInstalled
 }

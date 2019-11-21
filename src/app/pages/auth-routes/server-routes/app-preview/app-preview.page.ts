@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { S9Server } from 'src/app/models/s9-server'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
-import { AvailableApp } from 'src/app/models/s9-app'
+import { AvailableAppFull } from 'src/app/models/s9-app'
 import { ServerService } from 'src/app/services/server.service'
 import { NavController, AlertController, LoadingController } from '@ionic/angular'
 
@@ -15,7 +15,7 @@ export class AppPreviewPage {
   loading = true
   error: string
   server: S9Server
-  app: AvailableApp
+  app: AvailableAppFull
 
   constructor (
     private readonly navCtrl: NavController,
@@ -34,7 +34,7 @@ export class AppPreviewPage {
 
     const appId = this.route.snapshot.paramMap.get('appId') as string
 
-    this.app = await this.serverService.getApp(this.server, appId)
+    this.app = await this.serverService.getAvailableApp(this.server, appId)
     this.loading = false
   }
 

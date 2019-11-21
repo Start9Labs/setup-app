@@ -8,11 +8,11 @@ import { S9Server } from 'src/app/models/s9-server'
 import { ClipboardService } from 'src/app/services/clipboard.service'
 
 @Component({
-  selector: 'app-app-show',
-  templateUrl: './app-show.page.html',
-  styleUrls: ['./app-show.page.scss'],
+  selector: 'app-available-app-show',
+  templateUrl: './available-app-show.page.html',
+  styleUrls: ['./available-app-show.page.scss'],
 })
-export class AppShowPage {
+export class AvailableAppShowPage {
   error: string
   server: S9Server
   app: InstalledApp

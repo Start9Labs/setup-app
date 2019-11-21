@@ -8,7 +8,7 @@ const routes: Routes = [
   },
   {
     path: 'apps/available',
-    loadChildren: () => import('./available-apps/available-apps.module').then(m => m.AvailableAppsPageModule),
+    loadChildren: () => import('./available-apps-list/available-apps-list.module').then(m => m.AvailableAppsListPageModule),
   },
   {
     path: 'apps/available/:appId',
@@ -20,7 +20,7 @@ const routes: Routes = [
   },
   {
     path: 'apps/:appId',
-    loadChildren: () => import('./app-show/app-show.module').then(m => m.AppShowPageModule),
+    loadChildren: () => import('./available-app-show/available-app-show.module').then(m => m.AvailableAppShowPageModule),
   },
 ]
 

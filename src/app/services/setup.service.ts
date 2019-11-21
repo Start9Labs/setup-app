@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { S9Server, toS9AgentApp, ServerSpec, getLanIP, SemVersion, fromVersionString } from '../models/s9-server'
+import { S9Server, toS9AgentApp, ServerSpec, getLanIP, SemVersion } from '../models/s9-server'
 import { HttpService } from './http.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { Method } from 'src/app/types/enums'
@@ -87,10 +87,10 @@ export class SetupService {
       ss.status !== AppHealthStatus.RUNNING
     ) {
       this.message = `executing server status check`
-      const { version, status, specs } = await this.serverService.getServer(ssClone)
-      ssClone.version = fromVersionString(version)
+      const { version, status, statusAt, specs } = await this.serverService.getServer(ssClone)
+      ssClone.version = version
       ssClone.status = status
-      ssClone.statusAt = new Date()
+      ssClone.statusAt = statusAt
       ssClone.specs = specs
     }
 

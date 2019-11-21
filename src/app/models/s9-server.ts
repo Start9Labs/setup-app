@@ -9,11 +9,11 @@ export function majorVersion (v : SemVersion): number {
   return v[0]
 }
 
-export function toVersionString (v: SemVersion): string {
+export function semToString (v: SemVersion): string {
   return v.join('.')
 }
 
-export function fromVersionString (vs: string): SemVersion {
+export function stringToSem (vs: string): SemVersion {
   const toReturn = vs.split('.').map(Number)
 
   if (toReturn.length !== 3 || toReturn.some(isNaN) || toReturn.some(isNullOrUndefined)) {

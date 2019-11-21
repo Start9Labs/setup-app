@@ -1,19 +1,18 @@
 import { Component } from '@angular/core'
 import { ServerService } from 'src/app/services/server.service'
-import { AvailableApp } from 'src/app/models/s9-app'
+import { AvailableAppPreview } from 'src/app/models/s9-app'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
 import { S9Server } from 'src/app/models/s9-server'
-import { NavController } from '@ionic/angular'
 
 @Component({
-  selector: 'app-available-apps',
-  templateUrl: './available-apps.page.html',
-  styleUrls: ['./available-apps.page.scss'],
+  selector: 'app-available-apps-list',
+  templateUrl: './available-apps-list.page.html',
+  styleUrls: ['./available-apps-list.page.scss'],
 })
-export class AvailableAppsPage {
+export class AvailableAppsListPage {
   server: S9Server
-  apps: AvailableApp[] = []
+  apps: AvailableAppPreview[] = []
 
   constructor (
     private readonly route: ActivatedRoute,
