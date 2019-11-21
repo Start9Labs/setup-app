@@ -12,6 +12,8 @@ export type TwoHundredOK = { never?: never } // hack for the unit type
 // }
 
 export module Lan {
+  export type GetVersionReq = { }
+  export type GetVersionRes = { version: string }
   export type GetTorReq = { }
   export type GetTorRes = { torAddress: string }
   export type PostRegisterReq = { pubkey: string, serial: string }
@@ -23,7 +25,7 @@ export module Lan {
     specs: ServerSpec[]
   }
   export type GetAppsInstalledReq = { }
-  export type GetAppsInstalledRes = BaseApp & { torAddress: string, status: AppHealthStatus }[]
+  export type GetAppsInstalledRes = (BaseApp & { torAddress: string, status: AppHealthStatus })[]
   export type GetAppsAvailableReq = { }
   export type GetAppsAvailableRes = AvailableApp[]
   export type PostInstallAppReq = { name: string }

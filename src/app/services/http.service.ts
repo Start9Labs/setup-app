@@ -19,7 +19,7 @@ export class HttpService {
   ) { }
 
   async authServerRequest<T> (
-    ss: S9Server | S9BuilderWith<'zeroconfService' | 'privkey'>,
+    ss: S9Server | S9BuilderWith<'zeroconfService' | 'version' | 'privkey'>,
     method: Method,
     path: string,
     httpOptions: HttpOptions = { },
@@ -31,7 +31,7 @@ export class HttpService {
   }
 
   async serverRequest<T> (
-    ss: S9Server | S9BuilderWith<'zeroconfService'>,
+    ss: S9Server | S9BuilderWith<'zeroconfService' | 'version'>,
     method: Method,
     path: string,
     httpOptions: HttpOptions = { },
@@ -85,9 +85,9 @@ export class HttpService {
   }
 }
 
-function s9Url (ss: S9Server | S9BuilderWith<'zeroconfService'>, path: string): string {
+function s9Url (ss: S9Server | S9BuilderWith<'zeroconfService' | 'version'>, path: string): string {
   const host = getLanIP(ss.zeroconfService) || ss.torAddress
-  return `https://${host}/v0${path}`
+  return `https://${host}/${ss.version}/${path}`
 }
 
 function appendAuthOptions (ss: S9Server | S9BuilderWith<'privkey'>, httpOptions: HttpOptions): HttpOptions  {

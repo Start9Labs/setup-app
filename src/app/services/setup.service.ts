@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { S9Server, toS9AgentApp, ServerSpec } from '../models/s9-server'
+import { S9Server, toS9AgentApp, ServerSpec, getLanIP } from '../models/s9-server'
 import { HttpService } from './http.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { Method } from 'src/app/types/enums'
@@ -51,13 +51,19 @@ export class SetupService {
     }
 
     // tor acquisition
-    if (hasValues(['zeroconfService'], ssClone) && !hasValues(['torAddress'], ssClone)) {
+    if (hasValues(['zeroconfService'], ssClone) && !hasValues(['version'], ssClone)) {
+      this.message = `getting server version`
+      ssClone.torAddress = await this.getVersion(ssClone)
+    }
+
+    // tor acquisition
+    if (hasValues(['zeroconfService', 'version'], ssClone) && !hasValues(['torAddress'], ssClone)) {
       this.message = `getting tor address`
       ssClone.torAddress = await this.getTor(ssClone)
     }
 
     // derive keys
-    if (hasValues(['zeroconfService', 'torAddress'], ssClone) && !hasValues(['pubkey', 'privkey'], ssClone)) {
+    if (hasValues(['zeroconfService', 'version', 'torAddress'], ssClone) && !hasValues(['pubkey', 'privkey'], ssClone)) {
       this.message = `deriving keys`
       if (this.authService.mnemonic) {
         const { privkey, pubkey } = crypto.deriveKeys(this.authService.mnemonic, ssClone.torAddress)
@@ -69,16 +75,16 @@ export class SetupService {
     }
 
     // pubkey registration
-    if (hasValues(['zeroconfService', 'torAddress', 'pubkey', 'privkey'], ssClone) && !ssClone.registered) {
+    if (hasValues(['zeroconfService', 'version', 'torAddress', 'pubkey', 'privkey'], ssClone) && !ssClone.registered) {
       this.message = `registering pubkey`
       ssClone.registered = await this.registerPubkey(ssClone, productKey) // true or false
     }
 
     // lan status check
     if (
-      hasValues(['zeroconfService', 'torAddress', 'pubkey', 'privkey'], ssClone) &&
+      hasValues(['zeroconfService', 'version', 'torAddress', 'pubkey', 'privkey'], ssClone) &&
       ss.registered &&
-      (ss.status !== AppHealthStatus.RUNNING || !hasValues(['version'], ssClone))
+      ss.status !== AppHealthStatus.RUNNING
     ) {
       this.message = `executing server status check`
       const { version, status, specs } = await this.serverService.getServer(ssClone)
@@ -91,9 +97,20 @@ export class SetupService {
     return ssClone
   }
 
-  async getTor (ss: S9BuilderWith<'zeroconfService'>): Promise<string | undefined> {
+  async getVersion (ss: S9BuilderWith<'zeroconfService'>): Promise<string | undefined> {
     try {
-      const { torAddress } = await this.httpService.serverRequest<Lan.GetTorRes>(ss, Method.get, '/tor', { }, { }, SetupService.timeout)
+      const host = getLanIP(ss.zeroconfService)
+      const { version } = await this.httpService.request<Lan.GetVersionRes>(Method.get, `https://${host}/version`, { }, { }, SetupService.timeout)
+      return version
+    } catch (e) {
+      console.error(`failed getting server version.`)
+      return undefined
+    }
+  }
+
+  async getTor (ss: S9BuilderWith<'zeroconfService' | 'version'>): Promise<string | undefined> {
+    try {
+      const { torAddress } = await this.httpService.serverRequest<Lan.GetTorRes>(ss, Method.get, 'tor', { }, { }, SetupService.timeout)
       return torAddress
     } catch (e) {
       console.error(`failed getting Tor address.`)
@@ -101,11 +118,11 @@ export class SetupService {
     }
   }
 
-  async registerPubkey (ss: S9BuilderWith<'zeroconfService' | 'pubkey'>, productKey: string): Promise<boolean> {
+  async registerPubkey (ss: S9BuilderWith<'zeroconfService' | 'version' | 'pubkey'>, productKey: string): Promise<boolean> {
     const { id, pubkey } = ss
     try {
       const body: Lan.PostRegisterReq = { pubkey, serial: productKey }
-      await this.httpService.serverRequest<Lan.PostRegisterRes>(ss, Method.post, '/register', { }, body, SetupService.timeout)
+      await this.httpService.serverRequest<Lan.PostRegisterRes>(ss, Method.post, 'register', { }, body, SetupService.timeout)
       return true
     } catch (e) {
       console.error(`failed pubkey registration for ${id}: ${e.message}`)

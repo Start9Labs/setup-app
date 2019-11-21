@@ -20,46 +20,46 @@ export class ServerService {
   async getServer (server: S9Server | S9BuilderWith<'zeroconfService' | 'privkey'>): Promise<Lan.GetServerRes> {
     // @TODO remove
     return mockServerRes
-    // return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.get, '/')
+    // return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.get, '')
   }
 
   async getAvailableApps (server: S9Server): Promise<AvailableApp[]> {
     // @TODO remove
     return [mockAvailableApp, mockAvailableApp, mockAvailableApp]
-    // return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(server, Method.get, '/apps/available')
+    // return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(server, Method.get, 'apps/available')
   }
 
   async getApp (server: S9Server, appId: string): Promise<AvailableApp> {
     // @TODO remove
     return mockAvailableApp
-    // return this.httpService.authServerRequest(server, Method.get, `/apps/${appId}`)
+    // return this.httpService.authServerRequest(server, Method.get, `apps/${appId}`)
   }
 
   async getInstalledApps (server: S9Server): Promise<InstalledApp[]> {
     // @TODO remove
     return [mockInstalledApp, mockInstalledApp]
-    // return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.get, `/apps/installed`)
+    // return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.get, `apps/installed`)
   }
 
   async install (server: S9Server, app: AvailableApp): Promise<InstalledApp> {
     // @TODO remove
     const installed = mockInstalledApp
-    // const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.post, `/apps/${app.id}/install`)
+    // const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.post, `apps/${app.id}/install`)
     await this.s9Model.addApps(server, [installed])
     return installed
   }
 
   async uninstall (server: S9Server, app: AvailableApp): Promise<void> {
-    await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(server, Method.post, `/apps/${app.id}/uninstall`)
+    await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(server, Method.post, `apps/${app.id}/uninstall`)
     await this.s9Model.removeApp(server, app)
   }
 
   async start (server: S9Server, app: InstalledApp): Promise<InstalledApp> {
-    return this.httpService.authServerRequest(server, Method.post, `/apps/${app.id}/start`)
+    return this.httpService.authServerRequest(server, Method.post, `apps/${app.id}/start`)
   }
 
   async stop (server: S9Server, app: InstalledApp): Promise<InstalledApp> {
-    return this.httpService.authServerRequest(server, Method.post, `/apps/${app.id}/stop`)
+    return this.httpService.authServerRequest(server, Method.post, `apps/${app.id}/stop`)
   }
 }
 

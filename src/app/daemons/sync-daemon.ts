@@ -22,11 +22,11 @@ export class SyncDaemon {
       Promise.all(
         servers.map(async server => {
           if (server.updating) return
-
+          server = 3 as any
           server.updating = true
 
           let version = server.version
-          let status = AppHealthStatus.UNKNOWN
+          let status: AppHealthStatus
           let specs = server.specs
 
           try {
@@ -36,18 +36,20 @@ export class SyncDaemon {
             specs = res.specs
           } catch (e) {
             status = AppHealthStatus.UNREACHABLE
-          } finally {
-            server.updating = false
           }
-          this.serverModel.saveServer({
+
+          await this.serverModel.saveServer({
             ...server,
             version,
             status,
             statusAt: new Date(),
             specs,
           })
+          server.updating = false
         }),
       )
+
+      Promise.all
       await pauseFor(SyncDaemon.ms)
     }
 

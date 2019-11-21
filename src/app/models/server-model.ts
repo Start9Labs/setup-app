@@ -65,12 +65,15 @@ export class S9ServerModel {
     const serverClone = clone(server)
     const newApps = serverClone.apps.filter(a => a.id !== app.id)
     serverClone.apps = newApps
-    this.servers[server.id] = serverClone
-    await this.saveAll()
+    await this.saveServer(serverClone)
+  }
+
+  async reCacheServer (server: S9Server): Promise<void> {
+    this.servers[server.id] = clone(server)
   }
 
   async saveServer (server: S9Server): Promise<void> {
-    this.servers[server.id] = clone(server)
+    this.reCacheServer(server)
     await this.saveAll()
   }
 
