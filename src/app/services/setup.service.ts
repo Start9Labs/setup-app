@@ -32,9 +32,8 @@ export class SetupService {
     let serverBuilder = ss
     for (let i = 0; i < SetupService.setupAttempts; i ++) {
       // @TODO delete
-      serverBuilder = this.mockServer(serverBuilder)
-      console.log(serverBuilder)
-      // serverBuilder = await this.setupAttempt(serverBuilder, productKey)
+      // serverBuilder = this.mockServer(serverBuilder)
+      serverBuilder = await this.setupAttempt(serverBuilder, productKey)
       if (isFullySetup(serverBuilder)) {
         return toS9Server(serverBuilder)
       }
