@@ -28,9 +28,7 @@
     </ion-item>
     <ion-item>
       <ion-label position="stacked" color="medium">Status</ion-label>
-      <ion-text color="success">
-        <p>{{ app.status | titlecase }}</p>
-      </ion-text>
+      <s9-status [serverUpdating]="server.updating" [status]="server.status"></s9-status>
     </ion-item>
     <ion-item>
       <ion-label position="stacked" color="medium">Last Status Check</ion-label>

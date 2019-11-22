@@ -6,6 +6,7 @@ import { Routes, RouterModule } from '@angular/router'
 import { IonicModule } from '@ionic/angular'
 
 import { Start9AgentPage } from './start9-agent.page'
+import { StatusComponentModule } from 'src/app/components/status/status.components.module'
 
 const routes: Routes = [
   {
@@ -17,6 +18,7 @@ const routes: Routes = [
 @NgModule({
   imports: [
     CommonModule,
+    StatusComponentModule,
     FormsModule,
     IonicModule,
     RouterModule.forChild(routes),

@@ -37,8 +37,7 @@
             <p>version: {{ app.versionInstalled }}</p>
           </ion-label>
           <ion-note slot="end">
-            <ion-text color="success">{{ app.status | titlecase }}
-            </ion-text>
+            <s9-status [serverUpdating]="server.updating" [status]="app.status"></s9-status>
           </ion-note>
         </ion-item>
       </ion-item-group>
@@ -48,14 +47,13 @@
       <ion-item-group style="margin-bottom: 40px;">
         <ion-item-divider>Server Friendly Name</ion-item-divider>
         <ion-item>
-          <!-- <ion-label position="stacked" color="medium">Friendly Name</ion-label> -->
           <ion-input [(ngModel)]="server.friendlyName" (ionChange)="edited = true"></ion-input>
         </ion-item>
         <ion-item-divider>Server Specs</ion-item-divider>
-        <ion-item *ngFor="let key of specKeys">
-          <ion-label position="stacked" color="medium">{{ key | titlecase }}</ion-label>
+        <ion-item *ngFor="let spec of server.specs | keyvalue">
+          <ion-label position="stacked" color="medium">{{ spec.key }}</ion-label>
           <ion-text color="medium">
-            <p>{{ specKeys[key] }}</p>
+            <p>{{ spec.value }}</p>
           </ion-text>
         </ion-item>
       </ion-item-group>

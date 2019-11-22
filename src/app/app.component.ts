@@ -42,7 +42,7 @@ export class AppComponent {
         await this.dataService.load(this.authService.mnemonic)
       }
       // @TODO remove
-      // this.zeroconfDaemon.mock()
+      this.zeroconfDaemon.mock()
       // iterates through servers in S9ServerModel and tries to status check w Tor and Lan every 5 seconds
       // consider adding an attempts counter per server
       this.syncDaemon.sync()

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms'
 import { IonicModule } from '@ionic/angular'
 import { RouterModule, Routes } from '@angular/router'
 import { ServerShowPage } from './server-show.page'
+import { StatusComponentModule } from 'src/app/components/status/status.components.module'
 
 const routes: Routes = [
   {
@@ -15,6 +16,7 @@ const routes: Routes = [
 @NgModule({
   imports: [
     CommonModule,
+    StatusComponentModule,
     FormsModule,
     IonicModule,
     RouterModule.forChild(routes),

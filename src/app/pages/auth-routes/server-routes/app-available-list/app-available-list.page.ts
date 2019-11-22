@@ -6,11 +6,11 @@ import { S9ServerModel } from 'src/app/models/server-model'
 import { S9Server } from 'src/app/models/s9-server'
 
 @Component({
-  selector: 'app-available-apps-list',
-  templateUrl: './available-apps-list.page.html',
-  styleUrls: ['./available-apps-list.page.scss'],
+  selector: 'app-app-available-list',
+  templateUrl: './app-available-list.page.html',
+  styleUrls: ['./app-available-list.page.scss'],
 })
-export class AvailableAppsListPage {
+export class AppAvailableListPage {
   server: S9Server
   apps: AvailableAppPreview[] = []
 

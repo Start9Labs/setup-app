@@ -8,11 +8,11 @@ const routes: Routes = [
   },
   {
     path: 'apps/available',
-    loadChildren: () => import('./available-apps-list/available-apps-list.module').then(m => m.AvailableAppsListPageModule),
+    loadChildren: () => import('./app-available-list/app-available-list.module').then(m => m.AppAvailableListPageModule),
   },
   {
     path: 'apps/available/:appId',
-    loadChildren: () => import('./app-preview/app-preview.module').then(m => m.AppPreviewPageModule),
+    loadChildren: () => import('./app-available-show/app-available-show.module').then(m => m.AppAvailableShowPageModule),
   },
   {
     path: 'apps/start9Agent',
@@ -20,7 +20,7 @@ const routes: Routes = [
   },
   {
     path: 'apps/:appId',
-    loadChildren: () => import('./available-app-show/available-app-show.module').then(m => m.AvailableAppShowPageModule),
+    loadChildren: () => import('./app-installed-show/app-installed-show.module').then(m => m.AppInstalledShowPageModule),
   },
 ]
 

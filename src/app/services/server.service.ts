@@ -24,8 +24,8 @@ export class ServerService {
     specs: ServerSpecs
   }> {
     // @TODO remove
-    // return mockGetServer()
-    return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.get, '')
+    return mockGetServer()
+    // return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.get, '')
       .then(res => {
         return {
           ...res,
@@ -37,15 +37,15 @@ export class ServerService {
 
   async getAvailableApps (server: S9Server): Promise<AvailableAppPreview[]> {
     // @TODO remove
-    // return mockGetAvailableApps()
-    return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(server, Method.get, '/apps/available')
+    return mockGetAvailableApps()
+    // return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(server, Method.get, '/apps/available')
       .then(res => res.map(mapApiAvailableAppPreview))
   }
 
   async getAvailableApp (server: S9Server, appId: string): Promise<AvailableAppFull> {
     // @TODO remove
-    // return mockGetAvailableApp()
-    return this.httpService.authServerRequest<Lan.GetAppAvailableRes>(server, Method.get, `/apps/${appId}`)
+    return mockGetAvailableApp()
+    // return this.httpService.authServerRequest<Lan.GetAppAvailableRes>(server, Method.get, `/apps/${appId}`)
       .then(res => {
         const { version, versionInstalled, versionLatest, versions } = res
         return {
@@ -60,8 +60,8 @@ export class ServerService {
 
   async getInstalledApps (server: S9Server): Promise<InstalledApp[]> {
     // @TODO remove
-    // return mockGetInstalledApps()
-    return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.get, `/apps/installed`)
+    return mockGetInstalledApps()
+    // return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.get, `/apps/installed`)
       .then(res => res.map(mapApiInstalledApp))
   }
 
@@ -70,7 +70,7 @@ export class ServerService {
     // const installed = await mockPostInstallApp()
     const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.post, `/apps/${app.id}/install`)
       .then(mapApiInstalledApp)
-    await this.s9Model.addApps(server, [installed])
+    await this.s9Model.addApp(server, installed)
     return installed
   }
 

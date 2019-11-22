@@ -1,0 +1,2 @@
+<ion-text *ngIf="!serverUpdating" [color]="color">{{ status | titlecase }}</ion-text>
+<ion-spinner *ngIf="serverUpdating" color="warning" name="dots"></ion-spinner>

@@ -2,6 +2,7 @@ import * as CryptoJS from 'crypto-js'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { InstalledApp, AppHealthStatus } from './s9-app'
 import { isNullOrUndefined } from 'util'
+import { deriveKeys } from '../util/crypto.util'
 
 export type SemVersion = [number, number, number]
 
@@ -47,7 +48,7 @@ export function getLanIP (zcs: ZeroconfService): string  {
   return ipv4Addresses.concat(ipv6Addresses)[0] + ':5959'
 }
 
-export function fromStorableServer (ss : S9ServerStorable, privkey: string): S9Server {
+export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): S9Server {
   const { friendlyName, torAddress, zeroconfService, id, version } = ss
   const toReturn: S9Server = {
     id,
@@ -58,7 +59,7 @@ export function fromStorableServer (ss : S9ServerStorable, privkey: string): S9S
     updating: false,
     status: AppHealthStatus.UNKNOWN,
     statusAt: new Date(),
-    privkey,
+    privkey: deriveKeys(mnemonic, id).privkey,
     apps: [],
     specs: { },
   }

@@ -18,16 +18,17 @@ export class SyncDaemon {
 
   async sync (): Promise<void> {
     while (true) {
-      const servers = this.serverModel.getServers()
+      console.log('syncing servers: ', this.serverModel.servers)
 
-      console.log('syncing servers: ', servers)
-
-      Promise.all(servers.map(async server => {
+      Promise.all(this.serverModel.servers.map(async server => {
         if (server.updating) { return }
 
-        server.updating = true
+        let serverClone = { ...server, updating: true }
 
-        let serverClone = { ...server }
+        this.serverModel.reCacheServer(serverClone)
+
+        await pauseFor(2000)
+
         try {
           const [serverRes, apps] = await Promise.all([
             this.serverService.getServer(server),

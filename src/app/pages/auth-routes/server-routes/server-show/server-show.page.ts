@@ -14,7 +14,6 @@ export class ServerShowPage {
   view: 'apps' | 'about' = 'apps'
   server: S9Server
   edited = false
-  specKeys: string[] = []
 
   constructor (
     private readonly route: ActivatedRoute,
@@ -28,19 +27,12 @@ export class ServerShowPage {
     this.fetchServer()
   }
 
-  ionViewWillEnter () {
-    this.fetchServer()
-  }
-
   async fetchServer () {
     const id = this.route.snapshot.paramMap.get('serverId')
     if (!id) { throw new Error (`Need id in params for server show page but got none.`) }
 
-    const server = this.serverModel.getServer(id) as S9Server
-    if (!server) { throw new Error (`Need server in server model for manage page but got none for id ${id}.`) }
-
-    this.server = server
-    this.specKeys = Object.keys(server.specs)
+    this.server = this.serverModel.getServer(id) as S9Server
+    if (!this.server) { throw new Error (`Need server in server model for manage page but got none for id ${id}.`) }
   }
 
   async ionViewWillLeave () {

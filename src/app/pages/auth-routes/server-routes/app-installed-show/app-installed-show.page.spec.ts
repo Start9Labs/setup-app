@@ -1,22 +1,22 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { AppPreviewPage } from './app-preview.page'
+import { AppInstalledShowPage } from './app-installed-show.page'
 
-describe('AppPreviewPage', () => {
-  let component: AppPreviewPage
-  let fixture: ComponentFixture<AppPreviewPage>
+describe('AppInstalledShowPage', () => {
+  let component: AppInstalledShowPage
+  let fixture: ComponentFixture<AppInstalledShowPage>
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AppPreviewPage ],
+      declarations: [ AppInstalledShowPage ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     })
     .compileComponents()
   }))
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AppPreviewPage)
+    fixture = TestBed.createComponent(AppInstalledShowPage)
     component = fixture.componentInstance
     fixture.detectChanges()
   })

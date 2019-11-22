@@ -27,9 +27,11 @@ export interface InstalledApp extends BaseApp {
 }
 
 export enum AppHealthStatus {
+  UNKNOWN = 'UNKNOWN',
+  UNREACHABLE = 'UNREACHABLE',
   RUNNING = 'RUNNING',
   STOPPED = 'STOPPED',
-  NOT_FOUND = 'NOT_FOUND',
-  UNREACHABLE = 'UNREACHABLE',
-  UNKNOWN = 'UNKNOWN',
+  RESTARTING = 'RESTARTING',
+  REMOVING = 'REMOVING',
+  DEAD = 'DEAD',
 }

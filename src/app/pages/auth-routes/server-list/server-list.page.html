@@ -23,24 +23,18 @@
           </ion-card-header>
         </ion-card>
       </ion-col>
-      <ion-col *ngFor="let server of servers" size="6">
+      <ion-col *ngFor="let server of serverModel.servers" size="6">
         <ion-card [routerLink]="[server.id]" class="ion-text-center">
           <ion-img src="assets/img/cube.png" alt="icon"></ion-img>
           <ion-card-header>
             <ion-card-title>{{ server.friendlyName }}</ion-card-title>
           </ion-card-header>
-          <ion-card-subtitle color="success">
-            {{ server.status | titlecase }}
+          <ion-card-subtitle>
+            <s9-status [serverUpdating]="server.updating" [status]="server.status"></s9-status>
           </ion-card-subtitle>
         </ion-card>
       </ion-col>
     </ion-row>
   </ion-grid>
-
-  <!-- <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button [routerLink]="['/setup']" class="fab-button">
-      <ion-icon size="large" name="add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab> -->
 
 </ion-content>

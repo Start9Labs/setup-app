@@ -7,11 +7,11 @@ import { ServerService } from 'src/app/services/server.service'
 import { NavController, AlertController, LoadingController } from '@ionic/angular'
 
 @Component({
-  selector: 'app-app-preview',
-  templateUrl: './app-preview.page.html',
-  styleUrls: ['./app-preview.page.scss'],
+  selector: 'app-app-available-show',
+  templateUrl: './app-available-show.page.html',
+  styleUrls: ['./app-available-show.page.scss'],
 })
-export class AppPreviewPage {
+export class AppAvailableShowPage {
   loading = true
   error: string
   server: S9Server

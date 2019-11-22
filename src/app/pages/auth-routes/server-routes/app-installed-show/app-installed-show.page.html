@@ -28,9 +28,7 @@
     </ion-item>
     <ion-item>
       <ion-label position="stacked" color="medium">Status</ion-label>
-      <ion-text color="success">
-        <p>{{ app.status | titlecase }}</p>
-      </ion-text>
+      <s9-status [serverUpdating]="server.updating" [status]="app.status"></s9-status>
       <ion-note slot="end">
         <ion-button *ngIf="app.status === 'RUNNING'" (click)="stop()" fill="outline" size="small"
           color="danger">

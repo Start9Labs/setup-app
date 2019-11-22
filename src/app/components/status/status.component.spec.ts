@@ -1,22 +1,22 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { AvailableAppShowPage } from './available-app-show.page'
+import { StatusComponent } from './status.component'
 
-describe('AvailableAppShowPage', () => {
-  let component: AvailableAppShowPage
-  let fixture: ComponentFixture<AvailableAppShowPage>
+describe('StatusComponent', () => {
+  let component: StatusComponent
+  let fixture: ComponentFixture<StatusComponent>
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AvailableAppShowPage ],
+      declarations: [ StatusComponent ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     })
     .compileComponents()
   }))
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AvailableAppShowPage)
+    fixture = TestBed.createComponent(StatusComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
   })
