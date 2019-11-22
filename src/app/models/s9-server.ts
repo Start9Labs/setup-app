@@ -66,8 +66,6 @@ export function fromStorableServer (ss : S9ServerStorable, privkey: string): S9S
     specs: [],
   }
 
-  toReturn.apps.push(toS9AgentApp(toReturn))
-
   return toReturn
 }
 

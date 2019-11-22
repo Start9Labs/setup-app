@@ -28,12 +28,15 @@ export class SetupService {
     private readonly serverService: ServerService,
   ) { }
 
-  async setup (ss: S9ServerBuilder, productKey: string): Promise<Required<S9ServerBuilder>> {
+  async setup (ss: S9ServerBuilder, productKey: string): Promise<S9Server> {
     let serverBuilder = ss
     for (let i = 0; i < SetupService.setupAttempts; i ++) {
-      serverBuilder = await this.setupAttempt(serverBuilder, productKey)
+      // @TODO delete
+      serverBuilder = this.mockServer(serverBuilder)
+      console.log(serverBuilder)
+      // serverBuilder = await this.setupAttempt(serverBuilder, productKey)
       if (isFullySetup(serverBuilder)) {
-        return serverBuilder
+        return toS9Server(serverBuilder)
       }
       await pauseFor(SetupService.waitForMS)
     }
@@ -80,7 +83,7 @@ export class SetupService {
       ssClone.registered = await this.registerPubkey(ssClone, productKey) // true or false
     }
 
-    // lan status check
+    // get server request
     if (
       hasValues(['zeroconfService', 'version', 'torAddress', 'pubkey', 'privkey'], ssClone) &&
       ss.registered &&
@@ -140,8 +143,8 @@ export class SetupService {
       status: AppHealthStatus.RUNNING,
       statusAt: new Date(),
       specs: ss.specs,
-      privkey: '',
-      pubkey: '',
+      privkey: 'testprivkey',
+      pubkey: 'testpubkey',
       registered: true,
       zeroconfService: {
         domain: 'local.',
@@ -184,7 +187,8 @@ export function hasValues<T extends keyof S9ServerBuilder> (t: T[], s: S9ServerB
 }
 
 export function isFullySetup (ss: S9ServerBuilder): ss is Required<S9ServerBuilder> {
-  return hasValues(builderKeys(), ss) && ss.registered && (ss.status == AppHealthStatus.RUNNING)
+  console.log(hasValues(builderKeys(), ss))
+  return hasValues(builderKeys(), ss) && ss.registered && (ss.status === AppHealthStatus.RUNNING)
 }
 
 export function fromUserInput (id: string, friendlyName: string): S9ServerBuilder {
@@ -199,24 +203,24 @@ export function fromUserInput (id: string, friendlyName: string): S9ServerBuilde
 }
 
 export function toS9Server (sb: Required<S9ServerBuilder>): S9Server {
-  const { id, friendlyName, status, statusAt, version, privkey, torAddress, zeroconfService } = sb
-  const toReturn: S9Server = {
+  const { id, friendlyName, status, statusAt, version, privkey, torAddress, zeroconfService, specs } = sb
+  const server: S9Server = {
     id,
     friendlyName,
     status,
     statusAt,
     version,
-    apps: [],
-    specs: [],
+    specs,
     privkey,
     torAddress,
     zeroconfService,
+    apps: [],
     updating: false,
   }
 
-  toReturn.apps.push(toS9AgentApp(toReturn))
+  server.apps.push(toS9AgentApp(server))
 
-  return toReturn
+  return server
 }
 
 

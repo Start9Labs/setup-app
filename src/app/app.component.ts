@@ -42,17 +42,16 @@ export class AppComponent {
         await this.dataService.load(this.authService.mnemonic)
       }
       // @TODO remove
-      // mock zeroconf daemon - watches for zeroconf services on LAN
       this.zeroconfDaemon.mock()
+      // iterates through servers in S9ServerModel and tries to status check w Tor and Lan every 5 seconds
+      // consider adding an attempts counter per server
+      this.syncDaemon.sync()
       // do Cordova things if Cordova
       if (platform.is('cordova')) {
         // detects new LAN services
         this.zeroconfDaemon.watch()
         // detects wifi connection and resets zeroconf daemon if so
         this.wifiDaemon.watch()
-        // iterates through servers in S9ServerModel and tries to status check w Tor and Lan every 5 seconds
-        // consider adding an attempts counter per server
-        this.syncDaemon.sync()
         // style status bar for iOS and Android
         if (platform.is('ios')) {
           statusBar.styleDefault()

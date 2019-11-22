@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core'
 import { S9ServerModel } from '../models/server-model'
 import { pauseFor } from 'src/app/util/misc.util'
 import { ServerService } from '../services/server.service'
-import { AppHealthStatus } from '../models/s9-app'
+import { AppHealthStatus, InstalledApp } from '../models/s9-app'
+import { S9Server, toS9AgentApp } from '../models/s9-server'
 
 @Injectable({
   providedIn: 'root',
@@ -18,40 +19,44 @@ export class SyncDaemon {
   async sync (): Promise<void> {
     while (true) {
       const servers = this.serverModel.getServers()
-      // @TODO should we await this?
-      Promise.all(
-        servers.map(async server => {
-          if (server.updating) return
-          server = 3 as any
-          server.updating = true
 
-          let version = server.version
-          let status: AppHealthStatus
-          let specs = server.specs
+      console.log('syncing servers: ', servers)
 
-          try {
-            const res = await this.serverService.getServer(server)
-            version = res.version
-            status = res.status
-            specs = res.specs
-          } catch (e) {
-            status = AppHealthStatus.UNREACHABLE
+      Promise.all(servers.map(async server => {
+        if (server.updating) { return }
+
+        server.updating = true
+
+        let serverClone: S9Server
+        try {
+          const [serverRes, apps] = await Promise.all([
+            this.serverService.getServer(server),
+            this.serverService.getInstalledApps(server),
+          ])
+
+          serverClone = {
+            ...server,
+            ...serverRes,
+            apps,
           }
 
-          await this.serverModel.saveServer({
-            ...server,
-            version,
-            status,
-            statusAt: new Date(),
-            specs,
-          })
-          server.updating = false
-        }),
-      )
+          serverClone.apps.unshift(toS9AgentApp(serverClone))
 
-      Promise.all
+        } catch (e) {
+          serverClone = {
+            ...server,
+            status: AppHealthStatus.UNREACHABLE,
+            statusAt: new Date(),
+          }
+        }
+
+        await this.serverModel.saveServer(serverClone)
+
+        server.updating = false
+
+      }))
+
       await pauseFor(SyncDaemon.ms)
     }
-
   }
 }
