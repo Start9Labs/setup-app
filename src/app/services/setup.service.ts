@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { S9Server, toS9AgentApp, ServerSpec, getLanIP, SemVersion } from '../models/s9-server'
+import { S9Server, toS9AgentApp, ServerSpecs, getLanIP, SemVersion, stringToSem } from '../models/s9-server'
 import { HttpService } from './http.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { Method } from 'src/app/types/enums'
@@ -55,7 +55,7 @@ export class SetupService {
     // tor acquisition
     if (hasValues(['zeroconfService'], ssClone) && !hasValues(['version'], ssClone)) {
       this.message = `getting server version`
-      ssClone.torAddress = await this.getVersion(ssClone)
+      ssClone.version = await this.getVersion(ssClone)
     }
 
     // tor acquisition
@@ -66,68 +66,68 @@ export class SetupService {
 
     // derive keys
     if (hasValues(['zeroconfService', 'version', 'torAddress'], ssClone) && !hasValues(['pubkey', 'privkey'], ssClone)) {
-      this.message = `deriving keys`
+      this.message = 'getting mnemonic'
       if (this.authService.mnemonic) {
+        this.message = `deriving keys`
         const { privkey, pubkey } = crypto.deriveKeys(this.authService.mnemonic, ssClone.torAddress)
         ssClone.privkey = privkey
         ssClone.pubkey = pubkey
-      } else {
-        this.message = 'extracting auth service mnemonic'
       }
     }
 
-    // pubkey registration
+    // register pubkey
     if (hasValues(['zeroconfService', 'version', 'torAddress', 'pubkey', 'privkey'], ssClone) && !ssClone.registered) {
       this.message = `registering pubkey`
       ssClone.registered = await this.registerPubkey(ssClone, productKey) // true or false
     }
 
-    // get server request
+    // get server
     if (
       hasValues(['zeroconfService', 'version', 'torAddress', 'pubkey', 'privkey'], ssClone) &&
       ss.registered &&
       ss.status !== AppHealthStatus.RUNNING
     ) {
-      this.message = `executing server status check`
-      const { version, status, statusAt, specs } = await this.serverService.getServer(ssClone)
-      ssClone.version = version
-      ssClone.status = status
-      ssClone.statusAt = statusAt
-      ssClone.specs = specs
+      this.message = `getting server`
+      await this.serverService.getServer(ssClone)
+        .then(res => {
+          const { version, status, statusAt, specs } = res
+          ssClone.version = version
+          ssClone.status = status
+          ssClone.statusAt = statusAt
+          ssClone.specs = specs
+        })
+        .catch()
     }
 
     return ssClone
   }
 
-  async getVersion (ss: S9BuilderWith<'zeroconfService'>): Promise<string | undefined> {
+  async getVersion (ss: S9BuilderWith<'zeroconfService'>): Promise<SemVersion | undefined> {
     try {
       const host = getLanIP(ss.zeroconfService)
       const { version } = await this.httpService.request<Lan.GetVersionRes>(Method.get, `https://${host}/version`, { }, { }, SetupService.timeout)
-      return version
+      return stringToSem(version)
     } catch (e) {
-      console.error(`failed getting server version.`)
       return undefined
     }
   }
 
   async getTor (ss: S9BuilderWith<'zeroconfService' | 'version'>): Promise<string | undefined> {
     try {
-      const { torAddress } = await this.httpService.serverRequest<Lan.GetTorRes>(ss, Method.get, 'tor', { }, { }, SetupService.timeout)
+      const { torAddress } = await this.httpService.serverRequest<Lan.GetTorRes>(ss, Method.get, '/tor', { }, { }, SetupService.timeout)
       return torAddress
     } catch (e) {
-      console.error(`failed getting Tor address.`)
       return undefined
     }
   }
 
   async registerPubkey (ss: S9BuilderWith<'zeroconfService' | 'version' | 'pubkey'>, productKey: string): Promise<boolean> {
-    const { id, pubkey } = ss
+    const { pubkey } = ss
     try {
       const body: Lan.PostRegisterReq = { pubKey: pubkey, productKey }
-      await this.httpService.serverRequest<Lan.PostRegisterRes>(ss, Method.post, 'register', { }, body, SetupService.timeout)
+      await this.httpService.serverRequest<Lan.PostRegisterRes>(ss, Method.post, '/register', { }, body, SetupService.timeout)
       return true
     } catch (e) {
-      console.error(`failed pubkey registration for ${id}: ${e.message}`)
       return false
     }
   }
@@ -171,7 +171,7 @@ export interface S9ServerBuilder {
   status: AppHealthStatus
   statusAt: Date
   version?: SemVersion
-  specs: ServerSpec[]
+  specs: ServerSpecs
 
   privkey?: string
   pubkey?: string
@@ -186,7 +186,6 @@ export function hasValues<T extends keyof S9ServerBuilder> (t: T[], s: S9ServerB
 }
 
 export function isFullySetup (ss: S9ServerBuilder): ss is Required<S9ServerBuilder> {
-  console.log(hasValues(builderKeys(), ss))
   return hasValues(builderKeys(), ss) && ss.registered && (ss.status === AppHealthStatus.RUNNING)
 }
 
@@ -196,7 +195,7 @@ export function fromUserInput (id: string, friendlyName: string): S9ServerBuilde
     friendlyName,
     status: AppHealthStatus.UNKNOWN,
     statusAt: new Date(),
-    specs: [],
+    specs: { },
     registered: false,
   }
 }

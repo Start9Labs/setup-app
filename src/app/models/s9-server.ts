@@ -35,15 +35,12 @@ export interface S9Server extends S9ServerStorable {
   updating: boolean
   status: AppHealthStatus
   statusAt: Date
-  specs: ServerSpec[]
+  specs: ServerSpecs
   apps: InstalledApp[]
   privkey: string // derive from mnemonic + torAddress
 }
 
-export interface ServerSpec {
-  name: string
-  value: string
-}
+export type ServerSpecs = { [key: string]: string | number | string[] | number[] }
 
 export function getLanIP (zcs: ZeroconfService): string  {
   const { ipv4Addresses, ipv6Addresses } = zcs
@@ -63,7 +60,7 @@ export function fromStorableServer (ss : S9ServerStorable, privkey: string): S9S
     statusAt: new Date(),
     privkey,
     apps: [],
-    specs: [],
+    specs: { },
   }
 
   return toReturn

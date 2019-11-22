@@ -1,5 +1,5 @@
 import { AppHealthStatus } from '../models/s9-app'
-import { ServerSpec } from '../models/s9-server'
+import { ServerSpecs } from '../models/s9-server'
 
 export type TwoHundredOK = { never?: never } // hack for the unit type
 
@@ -40,7 +40,7 @@ export module Lan {
   export type GetServerRes = {
     status: AppHealthStatus
     version: string
-    specs: ServerSpec[]
+    specs: ServerSpecs
   }
   export type GetAppsInstalledReq = { }
   export type GetAppsInstalledRes = ApiAppInstalled[]

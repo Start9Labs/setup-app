@@ -87,7 +87,7 @@ export class HttpService {
 
 function s9Url (ss: S9Server | S9BuilderWith<'zeroconfService' | 'version'>, path: string): string {
   const host = getLanIP(ss.zeroconfService) || ss.torAddress
-  return `https://${host}/v${majorVersion(ss.version)}/${path}`
+  return `https://${host}/v${majorVersion(ss.version)}${path}`
 }
 
 function appendAuthOptions (ss: S9Server | S9BuilderWith<'privkey'>, httpOptions: HttpOptions): HttpOptions  {

@@ -3,7 +3,7 @@ import { HttpService } from './http.service'
 import { Method } from '../types/enums'
 import { S9ServerModel } from '../models/server-model'
 import { InstalledApp, AvailableAppFull, AppHealthStatus, AvailableAppPreview } from '../models/s9-app'
-import { S9Server, SemVersion, ServerSpec, stringToSem } from '../models/s9-server'
+import { S9Server, SemVersion, ServerSpecs, stringToSem } from '../models/s9-server'
 import { Lan, ApiAppAvailablePreview, ApiAppAvailableFull, ApiAppInstalled } from '../types/api-types'
 import { S9BuilderWith } from './setup.service'
 
@@ -21,7 +21,7 @@ export class ServerService {
     status: AppHealthStatus
     statusAt: Date,
     version: SemVersion
-    specs: ServerSpec[]
+    specs: ServerSpecs
   }> {
     // @TODO remove
     // return mockGetServer()
@@ -38,14 +38,14 @@ export class ServerService {
   async getAvailableApps (server: S9Server): Promise<AvailableAppPreview[]> {
     // @TODO remove
     // return mockGetAvailableApps()
-    return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(server, Method.get, 'apps/available')
+    return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(server, Method.get, '/apps/available')
       .then(res => res.map(mapApiAvailableAppPreview))
   }
 
   async getAvailableApp (server: S9Server, appId: string): Promise<AvailableAppFull> {
     // @TODO remove
     // return mockGetAvailableApp()
-    return this.httpService.authServerRequest<Lan.GetAppAvailableRes>(server, Method.get, `apps/${appId}`)
+    return this.httpService.authServerRequest<Lan.GetAppAvailableRes>(server, Method.get, `/apps/${appId}`)
       .then(res => {
         const { version, versionInstalled, versionLatest, versions } = res
         return {
@@ -61,30 +61,30 @@ export class ServerService {
   async getInstalledApps (server: S9Server): Promise<InstalledApp[]> {
     // @TODO remove
     // return mockGetInstalledApps()
-    return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.get, `apps/installed`)
+    return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.get, `/apps/installed`)
       .then(res => res.map(mapApiInstalledApp))
   }
 
   async install (server: S9Server, app: AvailableAppPreview): Promise<InstalledApp> {
     // @TODO remove
     // const installed = await mockPostInstallApp()
-    const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.post, `apps/${app.id}/install`)
+    const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.post, `/apps/${app.id}/install`)
       .then(mapApiInstalledApp)
     await this.s9Model.addApps(server, [installed])
     return installed
   }
 
   async uninstall (server: S9Server, app: AvailableAppPreview): Promise<void> {
-    await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(server, Method.post, `apps/${app.id}/uninstall`)
+    await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(server, Method.post, `/apps/${app.id}/uninstall`)
     await this.s9Model.removeApp(server, app)
   }
 
   async start (server: S9Server, app: InstalledApp): Promise<InstalledApp> {
-    return this.httpService.authServerRequest(server, Method.post, `apps/${app.id}/start`)
+    return this.httpService.authServerRequest(server, Method.post, `/apps/${app.id}/start`)
   }
 
   async stop (server: S9Server, app: InstalledApp): Promise<InstalledApp> {
-    return this.httpService.authServerRequest(server, Method.post, `apps/${app.id}/stop`)
+    return this.httpService.authServerRequest(server, Method.post, `/apps/${app.id}/stop`)
   }
 }
 
@@ -137,28 +137,13 @@ async function mockPostInstallApp (): Promise<Lan.PostInstallAppRes> {
 const mockApiServer: Lan.GetServerRes = {
   version: '1.0.0',
   status: AppHealthStatus.RUNNING,
-  specs: [
-    {
-      name: 'CPU',
-      value: 'Broadcom BCM2711, Quad core Cortex-A72 (ARM v8) 64-bit SoC @ 1.5GHz',
-    },
-    {
-      name: 'RAM',
-      value: '4GB LPDDR4-2400 SDRAM',
-    },
-    {
-      name: 'WiFI',
-      value: '2.4 GHz and 5.0 GHz IEEE 802.11ac wireless, Bluetooth 5.0, BLE',
-    },
-    {
-      name: 'Ethernet',
-      value: 'Gigabit',
-    },
-    {
-      name: 'Disk',
-      value: '512 GB Flash (280 GB available)',
-    },
-  ],
+  specs: {
+    'CPU': 'Broadcom BCM2711, Quad core Cortex-A72 (ARM v8) 64-bit SoC @ 1.5GHz',
+    'RAM': '4GB LPDDR4-2400 SDRAM',
+    'WiFI': '2.4 GHz and 5.0 GHz IEEE 802.11ac wireless, Bluetooth 5.0, BLE',
+    'Ethernet': 'Gigabit',
+    'Disk': '512 GB Flash (280 GB available)',
+  },
 }
 
 // @TODO remove

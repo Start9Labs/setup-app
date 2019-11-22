@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core'
 import { S9ServerModel } from '../models/server-model'
 import { pauseFor } from 'src/app/util/misc.util'
 import { ServerService } from '../services/server.service'
-import { AppHealthStatus, InstalledApp } from '../models/s9-app'
-import { S9Server, toS9AgentApp } from '../models/s9-server'
+import { AppHealthStatus } from '../models/s9-app'
+import { toS9AgentApp } from '../models/s9-server'
 
 @Injectable({
   providedIn: 'root',
@@ -27,7 +27,7 @@ export class SyncDaemon {
 
         server.updating = true
 
-        let serverClone: S9Server
+        let serverClone = { ...server }
         try {
           const [serverRes, apps] = await Promise.all([
             this.serverService.getServer(server),
@@ -35,7 +35,7 @@ export class SyncDaemon {
           ])
 
           serverClone = {
-            ...server,
+            ...serverClone,
             ...serverRes,
             apps,
           }
@@ -44,16 +44,15 @@ export class SyncDaemon {
 
         } catch (e) {
           serverClone = {
-            ...server,
+            ...serverClone,
             status: AppHealthStatus.UNREACHABLE,
             statusAt: new Date(),
           }
         }
 
+        serverClone.updating = false
+
         await this.serverModel.saveServer(serverClone)
-
-        server.updating = false
-
       }))
 
       await pauseFor(SyncDaemon.ms)

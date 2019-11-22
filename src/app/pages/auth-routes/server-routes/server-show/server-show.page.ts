@@ -14,6 +14,7 @@ export class ServerShowPage {
   view: 'apps' | 'about' = 'apps'
   server: S9Server
   edited = false
+  specKeys: string[] = []
 
   constructor (
     private readonly route: ActivatedRoute,
@@ -39,6 +40,7 @@ export class ServerShowPage {
     if (!server) { throw new Error (`Need server in server model for manage page but got none for id ${id}.`) }
 
     this.server = server
+    this.specKeys = Object.keys(server.specs)
   }
 
   async ionViewWillLeave () {

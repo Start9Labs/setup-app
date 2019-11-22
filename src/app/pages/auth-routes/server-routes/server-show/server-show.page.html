@@ -8,7 +8,7 @@
   <ion-toolbar>
     <ion-segment [(ngModel)]="view">
       <ion-segment-button value="apps">
-        <ion-label>My Apps</ion-label>
+        <ion-label>Apps</ion-label>
       </ion-segment-button>
       <ion-segment-button value="about">
         <ion-label>About</ion-label>
@@ -17,17 +17,17 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding-top">
+<ion-content>
 
   <div [ngSwitch]="view">
 
     <div *ngSwitchCase="'apps'">
       <ion-item-group>
         <ion-item [routerLink]="['/servers', server.id, 'apps', 'available']">
-          <ion-icon slot="start" size="large" name="search" color="primary"></ion-icon>
-          <ion-text color="primary">Browse More Apps</ion-text>
+          <ion-icon slot="start" size="large" name="apps" color="primary"></ion-icon>
+          <ion-text color="primary">Get Apps</ion-text>
         </ion-item>
-        <ion-item-divider>Installed</ion-item-divider>
+        <ion-item-divider>Installed on {{ server.friendlyName }}</ion-item-divider>
         <ion-item *ngFor="let app of server.apps" [routerLink]="['/servers', server.id, 'apps', app.id]">
           <ion-avatar slot="start">
             <ion-img [src]="app.iconURL" alt="icon"></ion-img>
@@ -46,14 +46,16 @@
 
     <div *ngSwitchCase="'about'">
       <ion-item-group style="margin-bottom: 40px;">
+        <ion-item-divider>Server Friendly Name</ion-item-divider>
         <ion-item>
-          <ion-label position="stacked" color="medium">Friendly Name</ion-label>
+          <!-- <ion-label position="stacked" color="medium">Friendly Name</ion-label> -->
           <ion-input [(ngModel)]="server.friendlyName" (ionChange)="edited = true"></ion-input>
         </ion-item>
-        <ion-item *ngFor="let spec of server.specs">
-          <ion-label position="stacked" color="medium">{{ spec.name | titlecase }}</ion-label>
+        <ion-item-divider>Server Specs</ion-item-divider>
+        <ion-item *ngFor="let key of specKeys">
+          <ion-label position="stacked" color="medium">{{ key | titlecase }}</ion-label>
           <ion-text color="medium">
-            <p>{{ spec.value }}</p>
+            <p>{{ specKeys[key] }}</p>
           </ion-text>
         </ion-item>
       </ion-item-group>
