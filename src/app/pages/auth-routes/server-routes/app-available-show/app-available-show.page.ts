@@ -78,7 +78,7 @@ export class AppAvailableShowPage {
 
   async install (version: string) {
     const loader = await this.loadingCtrl.create({
-      message: `Installing`,
+      message: `Installing. This could take a while...`,
     })
     await loader.present()
 

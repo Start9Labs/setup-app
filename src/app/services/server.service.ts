@@ -65,7 +65,7 @@ export class ServerService {
     }
     // @TODO remove
     // const installed = await mockPostInstallApp()
-    const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.post, `/apps/install`, { }, body)
+    const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.post, `/apps/install`, { }, body, 240000)
       .then(mapApiInstalledApp)
     await this.s9Model.addApp(server, installed)
     return installed
