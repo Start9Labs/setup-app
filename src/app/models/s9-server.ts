@@ -21,7 +21,7 @@ export interface S9Server extends S9ServerStorable {
   privkey: string // derive from mnemonic + torAddress
 }
 
-export type ServerSpecs = { [key: string]: string | number | string[] | number[] }
+export type ServerSpecs = { [key: string]: string | number }
 
 export function getLanIP (zcs: ZeroconfService): string  {
   const { ipv4Addresses, ipv6Addresses } = zcs

@@ -82,7 +82,6 @@ export class AppComponent {
   }
 
   private stopDaemons () {
-    console.log('** 8 **')
     this.syncDaemon.stop()
     this.zeroconfDaemon.stop()
     this.wifiDaemon.stop()

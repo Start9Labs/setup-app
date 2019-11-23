@@ -96,7 +96,7 @@ export class SetupService {
           ssClone.statusAt = statusAt
           ssClone.specs = specs
         })
-        .catch()
+        .catch(console.error)
     }
 
     return ssClone

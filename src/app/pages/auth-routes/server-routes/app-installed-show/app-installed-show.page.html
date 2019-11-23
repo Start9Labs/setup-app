@@ -13,7 +13,7 @@
     <ion-text class="ion-text-wrap" color="danger">{{error}}</ion-text>
   </ion-item>
 
-  <ion-item-group class="ion-text-wrap" style="margin-bottom: 40px;">
+  <ion-item-group style="margin-bottom: 40px;">
     <ion-item>
       <ion-label position="stacked" color="medium">App Name</ion-label>
       <ion-text color="medium">
@@ -30,12 +30,10 @@
       <ion-label position="stacked" color="medium">Status</ion-label>
       <s9-status [serverUpdating]="server.updating" [status]="app.status"></s9-status>
       <ion-note slot="end">
-        <ion-button *ngIf="app.status === 'RUNNING'" (click)="stop()" fill="outline" size="small"
-          color="danger">
+        <ion-button *ngIf="app.status === 'RUNNING'" (click)="stop()" fill="outline" size="small" color="danger">
           Stop
         </ion-button>
-        <ion-button *ngIf="app.status !== 'RUNNING'" (click)="start()" fill="outline" size="small"
-          color="success">
+        <ion-button *ngIf="app.status !== 'RUNNING'" (click)="start()" fill="outline" size="small" color="success">
           Start
         </ion-button>
       </ion-note>

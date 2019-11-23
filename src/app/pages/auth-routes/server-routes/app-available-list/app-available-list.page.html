@@ -15,7 +15,7 @@
         <ion-card [routerLink]="[app.id]">
           <img [src]="app.iconURL" alt="icon" />
           <ion-card-header>
-            <ion-card-subtitle *ngIf="app.installed" color="success">Installed</ion-card-subtitle>
+            <ion-card-subtitle *ngIf="app.versionInstalled" color="success">Installed</ion-card-subtitle>
             <ion-card-title>{{ app.title }}</ion-card-title>
           </ion-card-header>
           <ion-card-content>

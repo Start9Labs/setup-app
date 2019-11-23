@@ -39,9 +39,7 @@ export class S9ServerModel {
   async addApp (server: S9Server, app: InstalledApp) {
     const serverClone = clone(server)
     serverClone.apps.push(app)
-    const index = this.servers.findIndex(s => s.id === server.id)
-    this.servers.splice(index, 1, serverClone)
-    await this.saveAll()
+    await this.saveServer(serverClone)
   }
 
   async removeApp (server: S9Server, appId: string) {
@@ -69,7 +67,8 @@ export class S9ServerModel {
   }
 
   async forgetServer (id: string): Promise<void> {
-    this.servers = this.servers.filter(s => s.id !== id)
+    const index = this.servers.findIndex(s => s.id === id)
+    this.servers.splice(index, 1)
     await this.saveAll()
   }
 
