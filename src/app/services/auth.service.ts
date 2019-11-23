@@ -29,7 +29,7 @@ export class AuthService {
           this.mnemonic = JSON.parse(mnemonic)
           this.authState.next(true)
         })
-        .catch(e => console.error(e))
+        .catch(console.error)
     } else {
       // returns undefined if key does not exist
       const mnemonic = await this.storage.get('mnemonic')

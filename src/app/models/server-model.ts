@@ -53,11 +53,15 @@ export class S9ServerModel {
   }
 
   async reCacheServer (server: S9Server): Promise<void> {
-    let ser = this.servers.find(s => s.id === server.id) as S9Server
+    let ser = this.servers.find(s => s.id === server.id)
 
-    Object.keys(server).forEach(key => {
-      ser![key] = server[key]
-    })
+    if (!ser) {
+      this.servers.push(server)
+    } else {
+      Object.keys(server).forEach(key => {
+        ser![key] = server[key]
+      })
+    }
   }
 
   async saveServer (server: S9Server): Promise<void> {
@@ -66,7 +70,7 @@ export class S9ServerModel {
   }
 
   async forgetServer (id: string): Promise<void> {
-    this.servers.filter(s => s.id !== id)
+    this.servers = this.servers.filter(s => s.id !== id)
     await this.saveAll()
   }
 

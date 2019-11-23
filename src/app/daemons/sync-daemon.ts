@@ -9,6 +9,7 @@ import { toS9AgentApp } from '../models/s9-server'
   providedIn: 'root',
 })
 export class SyncDaemon {
+  private going = false
   private static readonly ms = 10000
 
   constructor (
@@ -16,8 +17,10 @@ export class SyncDaemon {
     private readonly serverModel: S9ServerModel,
   ) { }
 
-  async sync (): Promise<void> {
-    while (true) {
+  async start (): Promise<void> {
+    this.going = true
+
+    while (this.going) {
       console.log('syncing servers: ', this.serverModel.servers)
 
       Promise.all(this.serverModel.servers.map(async server => {
@@ -26,8 +29,6 @@ export class SyncDaemon {
         let serverClone = { ...server, updating: true }
 
         this.serverModel.reCacheServer(serverClone)
-
-        await pauseFor(2000)
 
         try {
           const [serverRes, apps] = await Promise.all([
@@ -58,5 +59,9 @@ export class SyncDaemon {
 
       await pauseFor(SyncDaemon.ms)
     }
+  }
+
+  stop () {
+    this.going = false
   }
 }

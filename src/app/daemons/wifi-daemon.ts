@@ -16,10 +16,15 @@ export class WifiDaemon {
     private readonly network: Network,
   ) { }
 
-  async watch () {
+  async start () {
     this.enableDisconnectionMonitor()
     this.enableConnectionMonitor()
     this.enableChangeMonitor()
+  }
+
+  async stop () {
+    if (this.connectionMonitor) { this.connectionMonitor.unsubscribe() }
+    if (this.disconnectionMonitor) { this.disconnectionMonitor.unsubscribe() }
   }
 
   async enableDisconnectionMonitor () {
@@ -40,11 +45,6 @@ export class WifiDaemon {
       console.log('network connected')
       this.manageZeroconfDaemon()
     })
-  }
-
-  async stop () {
-    this.connectionMonitor.unsubscribe()
-    this.disconnectionMonitor.unsubscribe()
   }
 
   private async manageZeroconfDaemon () {

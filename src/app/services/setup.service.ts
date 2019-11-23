@@ -32,8 +32,8 @@ export class SetupService {
     let serverBuilder = ss
     for (let i = 0; i < SetupService.setupAttempts; i ++) {
       // @TODO delete
-      serverBuilder = this.mockServer(serverBuilder)
-      // serverBuilder = await this.setupAttempt(serverBuilder, productKey)
+      // serverBuilder = this.mockServer(serverBuilder)
+      serverBuilder = await this.setupAttempt(serverBuilder, productKey)
       if (isFullySetup(serverBuilder)) {
         return toS9Server(serverBuilder)
       }
@@ -69,7 +69,7 @@ export class SetupService {
       this.message = 'getting mnemonic'
       if (this.authService.mnemonic) {
         this.message = `deriving keys`
-        const { privkey, pubkey } = crypto.deriveKeys(this.authService.mnemonic, ssClone.torAddress)
+        const { privkey, pubkey } = crypto.deriveKeys(this.authService.mnemonic, ssClone.id)
         ssClone.privkey = privkey
         ssClone.pubkey = pubkey
       }

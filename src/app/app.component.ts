@@ -33,7 +33,7 @@ export class AppComponent {
     platform.ready().then(async () => {
       // subscribe to change in auth events
       this.authService.authState.subscribe(isAuthed => {
-        this.subscribeToAuth(isAuthed)
+        this.respondToAuthChange(isAuthed)
       })
       // init auth service to obtain initial status
       await this.authService.init()
@@ -41,17 +41,8 @@ export class AppComponent {
       if (this.authService.mnemonic) {
         await this.dataService.load(this.authService.mnemonic)
       }
-      // @TODO remove
-      this.zeroconfDaemon.mock()
-      // iterates through servers in S9ServerModel and tries to status check w Tor and Lan every 5 seconds
-      // consider adding an attempts counter per server
-      this.syncDaemon.sync()
       // do Cordova things if Cordova
       if (platform.is('cordova')) {
-        // detects new LAN services
-        this.zeroconfDaemon.watch()
-        // detects wifi connection and resets zeroconf daemon if so
-        this.wifiDaemon.watch()
         // style status bar for iOS and Android
         if (platform.is('ios')) {
           statusBar.styleDefault()
@@ -65,10 +56,22 @@ export class AppComponent {
     })
   }
 
-  private async subscribeToAuth (isAuthed: boolean) {
+  private async respondToAuthChange (isAuthed: boolean) {
     if (isAuthed) {
+      // syncs servers in S9ServerModel
+      this.syncDaemon.start()
+      // detects new LAN services
+      // @TODO remove
+      // this.zeroconfDaemon.mock()
+      this.zeroconfDaemon.start()
+      // monitors wifi connectivity
+      this.wifiDaemon.start()
       this.router.navigate([''])
     } else {
+      // stop daemons
+      this.syncDaemon.stop()
+      this.zeroconfDaemon.stop()
+      this.wifiDaemon.stop()
       this.router.navigate(['welcome'])
     }
   }

@@ -4,3 +4,9 @@ export enum Method {
   patch = 'PATCH',
   delete = 'DELETE',
 }
+
+export enum AuthStatus {
+  unknown,
+  authed,
+  unauthed,
+}
