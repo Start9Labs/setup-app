@@ -30,7 +30,7 @@
         <ion-item-divider>Installed on {{ server.friendlyName }}</ion-item-divider>
         <ion-item *ngFor="let app of server.apps" [routerLink]="['/servers', server.id, 'apps', app.id]">
           <ion-avatar slot="start">
-            <ion-img [src]="app.iconURL" alt="icon"></ion-img>
+            <img [src]="app.iconURL" alt="icon" />
           </ion-avatar>
           <ion-label>
             <h3>{{ app.title }}</h3>

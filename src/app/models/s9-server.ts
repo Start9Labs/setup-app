@@ -1,35 +1,14 @@
 import * as CryptoJS from 'crypto-js'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { InstalledApp, AppHealthStatus } from './s9-app'
-import { isNullOrUndefined } from 'util'
 import { deriveKeys } from '../util/crypto.util'
-
-export type SemVersion = [number, number, number]
-
-export function majorVersion (v : SemVersion): number {
-  return v[0]
-}
-
-export function semToString (v: SemVersion): string {
-  return v.join('.')
-}
-
-export function stringToSem (vs: string): SemVersion {
-  const toReturn = vs.split('.').map(Number)
-
-  if (toReturn.length !== 3 || toReturn.some(isNaN) || toReturn.some(isNullOrUndefined)) {
-    throw new Error(`Agent Version incorrect format: ${vs}`)
-  }
-
-  return toReturn as SemVersion
-}
 
 export interface S9ServerStorable {
   id: string
   friendlyName: string
   torAddress: string
   zeroconfService: ZeroconfService
-  version: SemVersion
+  versionInstalled: string
 }
 
 export interface S9Server extends S9ServerStorable {
@@ -38,6 +17,7 @@ export interface S9Server extends S9ServerStorable {
   statusAt: Date
   specs: ServerSpecs
   apps: InstalledApp[]
+  versionLatest: string
   privkey: string // derive from mnemonic + torAddress
 }
 
@@ -49,13 +29,14 @@ export function getLanIP (zcs: ZeroconfService): string  {
 }
 
 export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): S9Server {
-  const { friendlyName, torAddress, zeroconfService, id, version } = ss
+  const { friendlyName, torAddress, zeroconfService, id, versionInstalled } = ss
   const toReturn: S9Server = {
     id,
     friendlyName,
     torAddress,
     zeroconfService,
-    version,
+    versionInstalled,
+    versionLatest: '0.0.0',
     updating: false,
     status: AppHealthStatus.UNKNOWN,
     statusAt: new Date(),
@@ -68,14 +49,14 @@ export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): 
 }
 
 export function toStorableServer (ss: S9Server): S9ServerStorable {
-  const { friendlyName, torAddress, zeroconfService, id, version } = ss
+  const { friendlyName, torAddress, zeroconfService, id, versionInstalled } = ss
 
   return {
     id,
     friendlyName,
     torAddress,
     zeroconfService,
-    version,
+    versionInstalled,
   }
 }
 
@@ -88,8 +69,8 @@ export function toS9AgentApp (ss: S9Server): InstalledApp {
   return {
     id: 'start9Agent',
     title: 'Start9 Agent',
-    versionLatest: ss.version,
-    versionInstalled: ss.version,
+    versionLatest: ss.versionLatest,
+    versionInstalled: ss.versionInstalled,
     torAddress: ss.torAddress,
     status: ss.status,
     statusAt: ss.statusAt,

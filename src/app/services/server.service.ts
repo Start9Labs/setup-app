@@ -3,7 +3,7 @@ import { HttpService } from './http.service'
 import { Method } from '../types/enums'
 import { S9ServerModel } from '../models/server-model'
 import { InstalledApp, AvailableAppFull, AppHealthStatus, AvailableAppPreview } from '../models/s9-app'
-import { S9Server, SemVersion, ServerSpecs, stringToSem } from '../models/s9-server'
+import { S9Server, toS9AgentApp } from '../models/s9-server'
 import { Lan, ApiAppAvailablePreview, ApiAppAvailableFull, ApiAppInstalled } from '../types/api-types'
 import { S9BuilderWith } from './setup.service'
 
@@ -17,12 +17,7 @@ export class ServerService {
     private readonly s9Model: S9ServerModel,
   ) { }
 
-  async getServer (server: S9Server | S9BuilderWith<'zeroconfService' | 'privkey' | 'version'>): Promise<{
-    status: AppHealthStatus
-    statusAt: Date,
-    version: SemVersion
-    specs: ServerSpecs
-  }> {
+  async getServer (server: S9Server | S9BuilderWith<'zeroconfService' | 'privkey' | 'versionInstalled'>): Promise<Lan.GetServerRes & { statusAt: Date }> {
     // @TODO remove
     // return mockGetServer()
     return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.get, '')
@@ -30,7 +25,6 @@ export class ServerService {
         return {
           ...res,
           statusAt: new Date(),
-          version: stringToSem(res.version),
         }
       })
   }
@@ -39,21 +33,16 @@ export class ServerService {
     // @TODO remove
     // return mockGetAvailableApps()
     return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(server, Method.get, '/apps/available')
-      .then(res => res.map(mapApiAvailableAppPreview))
   }
 
   async getAvailableApp (server: S9Server, appId: string): Promise<AvailableAppFull> {
     // @TODO remove
     // return mockGetAvailableApp()
-    return this.httpService.authServerRequest<Lan.GetAppAvailableRes>(server, Method.get, `/apps/${appId}`)
+    return this.httpService.authServerRequest<Lan.GetAppAvailableRes>(server, Method.get, `/apps/available/${appId}`)
       .then(res => {
-        const { version, versionInstalled, versionLatest, versions } = res
         return {
           ...res,
-          version: stringToSem(version),
-          versionLatest: stringToSem(versionLatest),
-          versionInstalled: versionInstalled ? stringToSem(versionInstalled) : undefined,
-          versions: versions.map(mapApiAvailableAppPreview),
+          releaseNotes: res.versions.find(v => v.version === res.versionLatest)!.releaseNotes,
         }
       })
   }
@@ -62,21 +51,32 @@ export class ServerService {
     // @TODO remove
     // return mockGetInstalledApps()
     return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.get, `/apps/installed`)
-      .then(res => res.map(mapApiInstalledApp))
+      .then(res => {
+        const apps = res.map(mapApiInstalledApp)
+        apps.unshift(toS9AgentApp(server))
+        return apps
+      })
   }
 
-  async install (server: S9Server, app: AvailableAppPreview): Promise<InstalledApp> {
+  async install (server: S9Server, appId: string, version: string): Promise<InstalledApp> {
+    const body: Lan.PostInstallAppReq = {
+      id: appId,
+      version,
+    }
     // @TODO remove
     // const installed = await mockPostInstallApp()
-    const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.post, `/apps/${app.id}/install`)
+    const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.post, `/apps/install`, { }, body)
       .then(mapApiInstalledApp)
     await this.s9Model.addApp(server, installed)
     return installed
   }
 
-  async uninstall (server: S9Server, app: AvailableAppPreview): Promise<void> {
-    await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(server, Method.post, `/apps/${app.id}/uninstall`)
-    await this.s9Model.removeApp(server, app)
+  async uninstall (server: S9Server, appId: string): Promise<void> {
+    const body: Lan.PostUninstallAppReq = {
+      id: appId,
+    }
+    await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(server, Method.post, `/apps/uninstall`, { }, body)
+    await this.s9Model.removeApp(server, appId)
   }
 
   async start (server: S9Server, app: InstalledApp): Promise<InstalledApp> {
@@ -88,23 +88,10 @@ export class ServerService {
   }
 }
 
-function mapApiAvailableAppPreview (app: ApiAppAvailablePreview): AvailableAppPreview {
-  const { version, versionInstalled, versionLatest } = app
-  return {
-    ...app,
-    version: stringToSem(version),
-    versionLatest: stringToSem(versionLatest),
-    versionInstalled: versionInstalled ? stringToSem(versionInstalled) : undefined,
-  }
-}
-
 function mapApiInstalledApp (app: ApiAppInstalled): InstalledApp {
-  const { versionLatest, versionInstalled } = app
   return {
     ...app,
     statusAt: new Date(),
-    versionLatest: stringToSem(versionLatest),
-    versionInstalled: versionInstalled ? stringToSem(versionInstalled) : undefined,
   }
 }
 
@@ -135,7 +122,8 @@ async function mockPostInstallApp (): Promise<Lan.PostInstallAppRes> {
 
 // @TODO remove
 const mockApiServer: Lan.GetServerRes = {
-  version: '1.0.0',
+  versionInstalled: '0.1.0',
+  versionLatest: '0.1.0',
   status: AppHealthStatus.RUNNING,
   specs: {
     'CPU': 'Broadcom BCM2711, Quad core Cortex-A72 (ARM v8) 64-bit SoC @ 1.5GHz',
@@ -151,12 +139,9 @@ const mockApiAppAvailablePreview: ApiAppAvailablePreview = {
   id: 'bitcoin',
   versionLatest: '0.18.1',
   versionInstalled: '0.18.1',
-  version: '0.18.1',
   title: 'Bitcoin Core',
   descriptionShort: 'Bitcoin is an innovative payment network and new kind of money.',
-  releaseNotes: '* Faster sync time<br />* MAST support',
   // server specific
-  compatible: true,
   iconURL: 'assets/img/bitcoin_core.png',
 }
 
@@ -166,12 +151,12 @@ const mockApiAppAvailableFull: ApiAppAvailableFull = {
   descriptionLong: 'Bitcoin is an innovative payment network and new kind of money. Bitcoin utilizes a robust p2p network to garner decentralized consensus.',
   versions: [
     {
-      ...mockApiAppAvailablePreview,
       version: '0.17.0',
+      releaseNotes: '* Faster sync time<br />* MAST support',
     },
     {
-      ...mockApiAppAvailablePreview,
       version: '0.16.0',
+      releaseNotes: '* New Bitcoiny stuff!!',
     },
   ],
 }

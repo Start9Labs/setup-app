@@ -24,9 +24,9 @@ export class WifiDaemon {
   }
 
   stop () {
-    this.connectionMonitor.unsubscribe()
-    this.disconnectionMonitor.unsubscribe()
-    this.changeMonitor.unsubscribe()
+    if (this.connectionMonitor) { this.connectionMonitor.unsubscribe() }
+    if (this.connectionMonitor) { this.disconnectionMonitor.unsubscribe() }
+    if (this.connectionMonitor) { this.changeMonitor.unsubscribe() }
   }
 
   enableConnectionMonitor () {

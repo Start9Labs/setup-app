@@ -35,7 +35,7 @@ export class ZeroconfDaemon {
   }
 
   stop () {
-    this.zeroconfMonitor.unsubscribe() // kills the subscription
+    if (this.zeroconfMonitor) { this.zeroconfMonitor.unsubscribe() } // kills the subscription
   }
 
   reset () {

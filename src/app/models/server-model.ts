@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
 import { S9ServerStorable, toStorableServer, fromStorableServer, S9Server } from './s9-server'
-import { InstalledApp, AvailableAppPreview } from './s9-app'
-import { fromObject, toDedupObject } from '../util/misc.util'
+import { InstalledApp } from './s9-app'
 import { AuthService } from '../services/auth.service'
 
 @Injectable({
@@ -45,9 +44,9 @@ export class S9ServerModel {
     await this.saveAll()
   }
 
-  async removeApp (server: S9Server, app: AvailableAppPreview) {
+  async removeApp (server: S9Server, appId: string) {
     const serverClone = clone(server)
-    const index = serverClone.apps.findIndex(a => a.id === app.id)
+    const index = serverClone.apps.findIndex(a => a.id === appId)
     serverClone.apps.splice(index, 1)
     await this.saveServer(serverClone)
   }

@@ -3,7 +3,7 @@ import { HttpClient, HttpEventType, HttpErrorResponse, HttpHeaders, HttpEvent } 
 import { Method } from '../types/enums'
 import { Observable } from 'rxjs'
 import { timeout } from 'rxjs/operators'
-import { getLanIP, S9Server, majorVersion } from '../models/s9-server'
+import { getLanIP, S9Server } from '../models/s9-server'
 import { TokenSigner } from 'jsontokens'
 import { clone } from '../models/server-model'
 import { S9BuilderWith } from './setup.service'
@@ -19,7 +19,7 @@ export class HttpService {
   ) { }
 
   async authServerRequest<T> (
-    ss: S9Server | S9BuilderWith<'zeroconfService' | 'version' | 'privkey'>,
+    ss: S9Server | S9BuilderWith<'zeroconfService' | 'versionInstalled' | 'privkey'>,
     method: Method,
     path: string,
     httpOptions: HttpOptions = { },
@@ -31,7 +31,7 @@ export class HttpService {
   }
 
   async serverRequest<T> (
-    ss: S9Server | S9BuilderWith<'zeroconfService' | 'version'>,
+    ss: S9Server | S9BuilderWith<'zeroconfService' | 'versionInstalled'>,
     method: Method,
     path: string,
     httpOptions: HttpOptions = { },
@@ -44,10 +44,10 @@ export class HttpService {
 
   async request<T> (method: Method, url: string, httpOptions: HttpOptions = { }, body: any = { }, TIMEOUT = 30000): Promise<T> {
     const newOptions = appendDefaultOptions(httpOptions)
-    console.log('Request Method: ', method)
-    console.log('Request URL: ', url)
-    console.log('Request Body: ', body)
-    console.log('Request Options: ', newOptions)
+    // console.log('Request Method: ', method)
+    // console.log('Request URL: ', url)
+    // console.log('Request Body: ', body)
+    // console.log('Request Options: ', newOptions)
 
     let call: () => Observable<HttpEvent<T>>
     switch (method) {
@@ -85,9 +85,9 @@ export class HttpService {
   }
 }
 
-function s9Url (ss: S9Server | S9BuilderWith<'zeroconfService' | 'version'>, path: string): string {
+function s9Url (ss: S9Server | S9BuilderWith<'zeroconfService' | 'versionInstalled'>, path: string): string {
   const host = getLanIP(ss.zeroconfService) || ss.torAddress
-  return `https://${host}/v${majorVersion(ss.version)}${path}`
+  return `https://${host}/v${ss.versionInstalled.charAt(0)}${path}`
 }
 
 function appendAuthOptions (ss: S9Server | S9BuilderWith<'privkey'>, httpOptions: HttpOptions): HttpOptions  {

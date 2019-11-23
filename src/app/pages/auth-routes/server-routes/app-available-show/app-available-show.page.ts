@@ -38,39 +38,52 @@ export class AppAvailableShowPage {
     this.loading = false
   }
 
-  async presentAlert (action: 'install' | 'uninstall') {
+  async presentAlertInstall (version: string) {
     const alert = await this.alertCtrl.create({
       header: 'Caution',
-      message: `Are you sure you want to ${action} ${this.app.title}, version ${this.app.versionInstalled}?`,
+      message: `Are you sure you want to install ${this.app.title}, version ${version}?`,
       buttons: [
         {
           text: 'Cancel',
           role: 'cancel',
         },
         {
-          text: action.charAt(0).toUpperCase() + action.slice(1),
-          cssClass: action === 'uninstall' ? 'alert-danger' : 'alert-success',
-          handler: () => {
-            if (action === 'install') {
-              this.install()
-            } else {
-              this.uninstall()
-            }
-          },
+          text: 'Install',
+          cssClass: 'alert-success',
+          handler: () => { this.install(version) },
         },
       ],
     })
     await alert.present()
   }
 
-  async install () {
+  async presentAlertUninstall () {
+    const alert = await this.alertCtrl.create({
+      header: 'Caution',
+      message: `Are you sure you want to uninstall ${this.app.title}, version ${this.app.versionInstalled}?`,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: 'Uninstall',
+          cssClass: 'alert-danger',
+          handler: () => { this.uninstall() },
+        },
+      ],
+    })
+    await alert.present()
+  }
+
+  async install (version: string) {
     const loader = await this.loadingCtrl.create({
       message: `Installing`,
     })
     await loader.present()
 
     try {
-      await this.serverService.install(this.server, this.app)
+      await this.serverService.install(this.server, this.app.id, version)
       await this.navCtrl.navigateBack(['/servers', this.server.id])
     } catch (e) {
       this.error = e.message
@@ -86,7 +99,7 @@ export class AppAvailableShowPage {
     await loader.present()
 
     try {
-      await this.serverService.uninstall(this.server, this.app)
+      await this.serverService.uninstall(this.server, this.app.id)
       await this.navCtrl.navigateBack(['/servers', this.server.id])
     } catch (e) {
       this.error = e.message

@@ -1,4 +1,4 @@
-import { AppHealthStatus } from '../models/s9-app'
+import { AppHealthStatus, AppVersion } from '../models/s9-app'
 import { ServerSpecs } from '../models/s9-server'
 
 export type TwoHundredOK = { never?: never } // hack for the unit type
@@ -13,14 +13,11 @@ interface ApiAppBase {
 
 export interface ApiAppAvailablePreview extends ApiAppBase {
   descriptionShort: string
-  releaseNotes: string
-  compatible: boolean
-  version: string
 }
 
 export interface ApiAppAvailableFull extends ApiAppAvailablePreview {
   descriptionLong: string
-  versions: ApiAppAvailablePreview[]
+  versions: AppVersion[]
 }
 
 export interface ApiAppInstalled extends ApiAppBase {
@@ -39,7 +36,8 @@ export module Lan {
   export type GetServerReq = { }
   export type GetServerRes = {
     status: AppHealthStatus
-    version: string
+    versionInstalled: string
+    versionLatest: string
     specs: ServerSpecs
   }
   export type GetAppsInstalledReq = { }
@@ -48,9 +46,9 @@ export module Lan {
   export type GetAppAvailableRes = ApiAppAvailableFull
   export type GetAppsAvailableReq = { }
   export type GetAppsAvailableRes = ApiAppAvailablePreview[]
-  export type PostInstallAppReq = { name: string }
+  export type PostInstallAppReq = { id: string, version: string }
   export type PostInstallAppRes = ApiAppInstalled
-  export type PostUninstallAppReq = { name: string }
+  export type PostUninstallAppReq = { id: string }
   export type PostUninstallAppRes = TwoHundredOK
   export type PostStartAppReq = { }
   export type PostStartAppRes = ApiAppInstalled

@@ -21,7 +21,7 @@ export class AppComponent {
     public platform: Platform,
     public splashScreen: SplashScreen,
     public statusBar: StatusBar,
-    public dataService: S9ServerModel,
+    public s9ServerModel: S9ServerModel,
     public zeroconfDaemon: ZeroconfDaemon,
     public wifiDaemon: WifiDaemon,
     public syncDaemon: SyncDaemon,
@@ -35,14 +35,10 @@ export class AppComponent {
       // init auth service to obtain initial status
       await this.authService.init()
       // load data if authenticated
-      if (this.authService.isAuthenticated() && this.authService.mnemonic) {
-        await this.dataService.load(this.authService.mnemonic)
-        this.startDaemons()
-        this.router.navigate([''])
-      } else {
-        this.router.navigate(['welcome'])
+      if (this.authService.isAuthenticated()) {
+        await this.s9ServerModel.load(this.authService.mnemonic!)
       }
-      // subscribe to changes in auth status
+      // subscribe to auth status
       this.authService.authState.subscribe(authStatus => {
         this.handleAuthChange(authStatus)
       })
@@ -66,6 +62,7 @@ export class AppComponent {
       this.startDaemons()
       this.router.navigate([''])
     } else if (authStatus === AuthStatus.unauthed) {
+      this.s9ServerModel.servers = []
       this.stopDaemons()
       this.router.navigate(['welcome'])
     } else {
@@ -85,6 +82,7 @@ export class AppComponent {
   }
 
   private stopDaemons () {
+    console.log('** 8 **')
     this.syncDaemon.stop()
     this.zeroconfDaemon.stop()
     this.wifiDaemon.stop()

@@ -69,7 +69,7 @@ export class AuthService {
   }
 
   isAuthenticated (): boolean {
-    return this.authState.value === AuthStatus.authed
+    return this.authState.value === AuthStatus.authed && !!this.mnemonic
   }
 
   isUnauthenticated (): boolean {

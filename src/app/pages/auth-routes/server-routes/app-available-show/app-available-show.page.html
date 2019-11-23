@@ -20,39 +20,35 @@
 
     <ion-item>
       <ion-avatar slot="start">
-        <ion-img [src]="app.iconURL" alt="icon"></ion-img>
+        <img [src]="app.iconURL" alt="icon" />
       </ion-avatar>
       <ion-label>
         <h1>{{ app.title }}</h1>
-        <h3>{{ app.version }}</h3>
+        <h3>{{ app.versionLatest }}</h3>
       </ion-label>
     </ion-item>
 
     <ion-grid class="ion-padding-top ion-padding-bottom">
-      <ion-row *ngIf="!app.installed">
+      <ion-row *ngIf="!app.versionInstalled">
         <ion-col>
-          <ion-button expand="block" fill="outline" (click)="presentAlert('install')">
+          <ion-button expand="block" fill="outline" (click)="presentAlertInstall(app.versionLatest)">
             Install
           </ion-button>
         </ion-col>
       </ion-row>
-      <ion-row *ngIf="app.installed">
+      <ion-row *ngIf="app.versionInstalled">
         <ion-col size="6">
-          <ion-button expand="block" fill="outline" color="danger" (click)="presentAlert('uninstall')">
+          <ion-button expand="block" fill="outline" color="danger" (click)="presentAlertUninstall()">
             Uninstall
           </ion-button>
         </ion-col>
         <ion-col size="6">
-          <ion-button [disabled]="!app.versionInstalled || app.versionInstalled >= app.version || !app.compatible" expand="block" fill="outline" (click)="presentAlert('install')">
+          <ion-button [disabled]="app.versionInstalled === app.versionLatest" expand="block" fill="outline" (click)="presentAlertInstall(app.versionLatest)">
             Update
           </ion-button>
         </ion-col>
       </ion-row>
     </ion-grid>
-
-    <ion-item *ngIf="!app.compatible" style="margin-bottom: 16px;">
-      <ion-text class="ion-text-wrap" color="danger">{{ app.title }} {{ app.version }} is not compatible with your server.</ion-text>
-    </ion-item>
 
     <ion-item-group>
       <ion-item>
@@ -65,7 +61,7 @@
       <ion-item-divider></ion-item-divider>
       <ion-item>
         <ion-label class="ion-text-wrap">
-          <h3>New in {{ app.version }}</h3>
+          <h3>New in {{ app.versionLatest }}</h3>
           <p>Last updated 12/16/2019</p>
           <br />
           <p [innerHTML]="app.releaseNotes"></p>

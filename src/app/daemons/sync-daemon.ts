@@ -3,7 +3,6 @@ import { S9ServerModel } from '../models/server-model'
 import { pauseFor } from 'src/app/util/misc.util'
 import { ServerService } from '../services/server.service'
 import { AppHealthStatus } from '../models/s9-app'
-import { toS9AgentApp } from '../models/s9-server'
 
 @Injectable({
   providedIn: 'root',
@@ -42,13 +41,14 @@ export class SyncDaemon {
             apps,
           }
 
-          serverClone.apps.unshift(toS9AgentApp(serverClone))
-
         } catch (e) {
+          // @TODO create function for resetting s9Server to initial state
           serverClone = {
             ...serverClone,
             status: AppHealthStatus.UNREACHABLE,
             statusAt: new Date(),
+            apps: [],
+            specs: { },
           }
         }
 
