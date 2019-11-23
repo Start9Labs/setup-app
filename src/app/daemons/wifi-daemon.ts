@@ -8,46 +8,50 @@ import { ZeroconfDaemon } from './zeroconf-daemon'
   providedIn: 'root',
 })
 export class WifiDaemon {
-  private disconnectionMonitor: Subscription
   private connectionMonitor: Subscription
+  private disconnectionMonitor: Subscription
+  private changeMonitor: Subscription
 
   constructor (
     private readonly zeroconfDaemon: ZeroconfDaemon,
     private readonly network: Network,
   ) { }
 
-  async start () {
+  start () {
     this.enableDisconnectionMonitor()
     this.enableConnectionMonitor()
     this.enableChangeMonitor()
   }
 
-  async stop () {
-    if (this.connectionMonitor) { this.connectionMonitor.unsubscribe() }
-    if (this.disconnectionMonitor) { this.disconnectionMonitor.unsubscribe() }
+  stop () {
+    this.connectionMonitor.unsubscribe()
+    this.disconnectionMonitor.unsubscribe()
+    this.changeMonitor.unsubscribe()
   }
 
-  async enableDisconnectionMonitor () {
-    this.disconnectionMonitor = this.network.onDisconnect().subscribe(() => {
-      console.log('network disconnected')
-      this.zeroconfDaemon.stop()
-    })
-  }
-
-  async enableChangeMonitor () {
-    this.disconnectionMonitor = this.network.onChange().subscribe(() => {
-      console.log('network changed')
-      this.manageZeroconfDaemon()
-    })
-  }
-  async enableConnectionMonitor () {
+  enableConnectionMonitor () {
     this.connectionMonitor = this.network.onConnect().subscribe(() => {
       console.log('network connected')
       this.manageZeroconfDaemon()
     })
   }
 
-  private async manageZeroconfDaemon () {
+  enableDisconnectionMonitor () {
+    this.disconnectionMonitor = this.network.onDisconnect().subscribe(() => {
+      console.log('network disconnected')
+      this.zeroconfDaemon.stop()
+    })
+  }
+
+  // @TODO test whether onChange method actually works. There are known issues. Andoird and iOS
+  enableChangeMonitor () {
+    this.changeMonitor = this.network.onChange().subscribe(() => {
+      console.log('network changed')
+      this.manageZeroconfDaemon()
+    })
+  }
+
+  private manageZeroconfDaemon () {
     let pollingForConnection = setInterval(() => {
       if (this.network.type && this.network.type !== 'none') {
         clearInterval(pollingForConnection)

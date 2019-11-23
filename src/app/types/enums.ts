@@ -6,7 +6,7 @@ export enum Method {
 }
 
 export enum AuthStatus {
-  unknown,
+  uninitialized,
   authed,
   unauthed,
 }

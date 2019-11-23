@@ -8,6 +8,7 @@ import { WifiDaemon } from './daemons/wifi-daemon'
 import { ZeroconfDaemon } from './daemons/zeroconf-daemon'
 import { AuthService } from './services/auth.service'
 import { Router } from '@angular/router'
+import { AuthStatus } from './types/enums'
 
 @Component({
   selector: 'app-root',
@@ -31,16 +32,20 @@ export class AppComponent {
     document.body.classList.toggle('dark', true)
     // wait for platform reday
     platform.ready().then(async () => {
-      // subscribe to change in auth events
-      this.authService.authState.subscribe(isAuthed => {
-        this.respondToAuthChange(isAuthed)
-      })
       // init auth service to obtain initial status
       await this.authService.init()
       // load data if authenticated
-      if (this.authService.mnemonic) {
+      if (this.authService.isAuthenticated() && this.authService.mnemonic) {
         await this.dataService.load(this.authService.mnemonic)
+        this.startDaemons()
+        this.router.navigate([''])
+      } else {
+        this.router.navigate(['welcome'])
       }
+      // subscribe to changes in auth status
+      this.authService.authState.subscribe(authStatus => {
+        this.handleAuthChange(authStatus)
+      })
       // do Cordova things if Cordova
       if (platform.is('cordova')) {
         // style status bar for iOS and Android
@@ -56,23 +61,32 @@ export class AppComponent {
     })
   }
 
-  private async respondToAuthChange (isAuthed: boolean) {
-    if (isAuthed) {
-      // syncs servers in S9ServerModel
-      this.syncDaemon.start()
-      // detects new LAN services
-      // @TODO remove
-      // this.zeroconfDaemon.mock()
-      this.zeroconfDaemon.start()
-      // monitors wifi connectivity
-      this.wifiDaemon.start()
+  private async handleAuthChange (authStatus: AuthStatus) {
+    if (authStatus === AuthStatus.authed) {
+      this.startDaemons()
       this.router.navigate([''])
-    } else {
-      // stop daemons
-      this.syncDaemon.stop()
-      this.zeroconfDaemon.stop()
-      this.wifiDaemon.stop()
+    } else if (authStatus === AuthStatus.unauthed) {
+      this.stopDaemons()
       this.router.navigate(['welcome'])
+    } else {
+      return
     }
+  }
+
+  private startDaemons () {
+    // syncs servers in S9ServerModel
+    this.syncDaemon.start()
+    // detects new LAN services
+    // @TODO remove
+    // this.zeroconfDaemon.mock()
+    this.zeroconfDaemon.start()
+    // monitors wifi connectivity
+    this.wifiDaemon.start()
+  }
+
+  private stopDaemons () {
+    this.syncDaemon.stop()
+    this.zeroconfDaemon.stop()
+    this.wifiDaemon.stop()
   }
 }

@@ -7,14 +7,14 @@ import { Subscription } from 'rxjs'
 })
 export class ZeroconfDaemon {
   private zeroconfServices: { [hostname: string]: ZeroconfService } = { }
-  private watching: Subscription
+  private zeroconfMonitor: Subscription
 
   constructor (
     public zeroconf: Zeroconf,
   ) { }
 
-  start (): void {
-    this.watching = this.zeroconf.watch('_http._tcp.', 'local.').subscribe(async result => {
+  start () {
+    this.zeroconfMonitor = this.zeroconf.watch('_http._tcp.', 'local.').subscribe(async result => {
       const { action, service } = result
       console.log(`zeroconf service ${action}`, service)
 
@@ -34,12 +34,12 @@ export class ZeroconfDaemon {
       })
   }
 
-  async stop (): Promise<void> {
-    if (this.watching) { this.watching.unsubscribe() } // kills the subscription
+  stop () {
+    this.zeroconfMonitor.unsubscribe() // kills the subscription
   }
 
-  async reset (): Promise<void> {
-    await this.zeroconf.reInit()
+  reset () {
+    this.zeroconf.reInit()
   }
 
   getService (s9id: string): ZeroconfService | undefined {

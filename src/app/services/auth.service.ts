@@ -4,15 +4,15 @@ import { Platform } from '@ionic/angular'
 import { Storage } from '@ionic/storage'
 import * as crypto from '../util/crypto.util'
 import { BehaviorSubject } from 'rxjs'
+import { AuthStatus } from '../types/enums'
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private secure: SecureStorageObject
-  readonly authState = new BehaviorSubject(false)
-  initialized = false
-  mnemonic: string[] = []
+  readonly authState = new BehaviorSubject(AuthStatus.uninitialized)
+  mnemonic: string[] | undefined
 
   constructor (
     private readonly platform: Platform,
@@ -27,18 +27,21 @@ export class AuthService {
       await this.secure.get('mnemonic')
         .then(mnemonic => {
           this.mnemonic = JSON.parse(mnemonic)
-          this.authState.next(true)
+          this.authState.next(AuthStatus.authed)
         })
-        .catch(console.error)
+        .catch(() => {
+          this.authState.next(AuthStatus.unauthed)
+        })
     } else {
       // returns undefined if key does not exist
       const mnemonic = await this.storage.get('mnemonic')
       if (mnemonic) {
         this.mnemonic = JSON.parse(mnemonic)
-        this.authState.next(true)
+        this.authState.next(AuthStatus.authed)
+      } else {
+        this.authState.next(AuthStatus.unauthed)
       }
     }
-    this.initialized = true
   }
 
   async login (mnemonic: string[]) {
@@ -51,7 +54,7 @@ export class AuthService {
       await this.storage.set('mnemonic', JSON.stringify(mnemonic))
     }
     this.mnemonic = mnemonic
-    this.authState.next(true)
+    this.authState.next(AuthStatus.authed)
   }
 
   async logout () {
@@ -61,11 +64,15 @@ export class AuthService {
     } else {
       await this.storage.remove('mnemonic')
     }
-    this.authState.next(false)
-    this.mnemonic = []
+    this.authState.next(AuthStatus.unauthed)
+    this.mnemonic = undefined
   }
 
   isAuthenticated (): boolean {
-    return this.authState.value
+    return this.authState.value === AuthStatus.authed
+  }
+
+  isUnauthenticated (): boolean {
+    return this.authState.value === AuthStatus.unauthed
   }
 }
