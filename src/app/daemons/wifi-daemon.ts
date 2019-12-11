@@ -43,7 +43,7 @@ export class WifiDaemon {
     })
   }
 
-  // @TODO test whether onChange method actually works. There are known issues. Andoird and iOS
+  // @TODO test whether onChange method actually works. There are known issues. Android and iOS
   enableChangeMonitor () {
     this.changeMonitor = this.network.onChange().subscribe(() => {
       console.log('network changed')

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { S9ServerModel } from '../models/server-model'
+import { S9ServerModel, clone } from '../models/server-model'
 import { pauseFor } from 'src/app/util/misc.util'
 import { ServerService } from '../services/server.service'
 import { AppHealthStatus } from '../models/s9-app'
@@ -25,8 +25,9 @@ export class SyncDaemon {
       Promise.all(this.serverModel.servers.map(async server => {
         if (server.updating) { return }
 
-        let serverClone = { ...server, updating: true }
+        let serverClone = clone({ ...server, updating: true })
 
+        // save "updating: true" on the cached version of the server
         this.serverModel.reCacheServer(serverClone)
 
         try {

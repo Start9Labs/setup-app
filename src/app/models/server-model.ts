@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
 import { S9ServerStorable, toStorableServer, fromStorableServer, S9Server } from './s9-server'
-import { InstalledApp } from './s9-app'
+import { AppInstalled } from './s9-app'
 import { AuthService } from '../services/auth.service'
 
 @Injectable({
@@ -36,7 +36,7 @@ export class S9ServerModel {
     return this.servers.length
   }
 
-  async addApp (server: S9Server, app: InstalledApp) {
+  async addApp (server: S9Server, app: AppInstalled) {
     const serverClone = clone(server)
     serverClone.apps.push(app)
     await this.saveServer(serverClone)
@@ -50,13 +50,13 @@ export class S9ServerModel {
   }
 
   async reCacheServer (server: S9Server): Promise<void> {
-    let ser = this.servers.find(s => s.id === server.id)
+    const ser = this.servers.find(s => s.id === server.id)
 
     if (!ser) {
       this.servers.push(server)
     } else {
       Object.keys(server).forEach(key => {
-        ser![key] = server[key]
+        ser[key] = server[key]
       })
     }
   }

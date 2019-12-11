@@ -15,12 +15,16 @@ const routes: Routes = [
     loadChildren: () => import('./app-available-show/app-available-show.module').then(m => m.AppAvailableShowPageModule),
   },
   {
-    path: 'apps/start9Agent',
+    path: 'apps/installed/start9Agent',
     loadChildren: () => import('./start9-agent/start9-agent.module').then(m => m.Start9AgentPageModule),
   },
   {
-    path: 'apps/:appId',
+    path: 'apps/installed/:appId',
     loadChildren: () => import('./app-installed-show/app-installed-show.module').then(m => m.AppInstalledShowPageModule),
+  },
+  {
+    path: 'apps/installed/:appId/config',
+    loadChildren: () => import('./app-config/app-config.module').then(m => m.AppConfigPageModule),
   },
 ]
 

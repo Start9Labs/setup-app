@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="'servers/' + server.id + 'apps/installed' + app.id"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ app.title }} (config)</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-item-group>
+    <ion-item-divider>Options</ion-item-divider>
+    <ion-item *ngFor="let spec of config | keyvalue">
+      <ion-label position="stacked" color="medium">{{ spec.key }}</ion-label>
+      <ion-input [(ngModel)]="spec.value" (ionChange)="edited = true"></ion-input>
+    </ion-item>
+  </ion-item-group>
+
+</ion-content>

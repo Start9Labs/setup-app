@@ -9,21 +9,33 @@
 
 <ion-content class="ion-padding-top">
 
-  <ion-grid>
-    <ion-row>
-      <ion-col *ngFor="let app of apps" size="6">
-        <ion-card [routerLink]="[app.id]">
-          <img [src]="app.iconURL" alt="icon" />
-          <ion-card-header>
-            <ion-card-subtitle *ngIf="app.versionInstalled" color="success">Installed</ion-card-subtitle>
-            <ion-card-title>{{ app.title }}</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            {{ app.descriptionShort }}
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+  <div *ngIf="loading">
+    Loading
+  </div>
+
+  <div *ngIf="!loading">
+
+    <ion-item *ngIf="error" style="margin-bottom: 16px;">
+      <ion-text class="ion-text-wrap" color="danger">{{error}}</ion-text>
+    </ion-item>
+
+    <ion-grid>
+      <ion-row>
+        <ion-col *ngFor="let app of apps" size="6">
+          <ion-card [routerLink]="[app.id]">
+            <img [src]="app.iconURL" alt="icon" />
+            <ion-card-header>
+              <ion-card-subtitle *ngIf="app.versionInstalled" color="success">Installed</ion-card-subtitle>
+              <ion-card-title>{{ app.title }}</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              {{ app.descriptionShort }}
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+    
+  </div>
 
 </ion-content>

@@ -18,11 +18,11 @@ export class ClipboardService {
     if (this.platform.is('cordova')) {
       await this.clipboard.copy(text)
         .then(() => { message = 'copied to clipboard!' })
-        .catch(() => { message = 'failed to copy!' })
+        .catch(() => { message = 'failed to copy' })
     } else {
       await navigator.clipboard.writeText(text)
         .then(() => { message = 'copied to clipboard!' })
-        .catch(() => { message = 'failed to copy!' })
+        .catch(() => { message = 'failed to copy' })
     }
 
     const toast = await this.toastCtrl.create({

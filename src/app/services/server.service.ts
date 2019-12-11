@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core'
 import { HttpService } from './http.service'
 import { Method } from '../types/enums'
 import { S9ServerModel } from '../models/server-model'
-import { InstalledApp, AvailableAppFull, AppHealthStatus, AvailableAppPreview } from '../models/s9-app'
+import { AppInstalled, AppAvailablePreview, AppAvailableFull, AppHealthStatus, AppConfigSpec } from '../models/s9-app'
 import { S9Server, toS9AgentApp } from '../models/s9-server'
-import { Lan, ApiAppAvailablePreview, ApiAppAvailableFull, ApiAppInstalled } from '../types/api-types'
+import { Lan, ApiAppAvailablePreview, ApiAppAvailableFull, ApiAppInstalled, ApiAppConfig } from '../types/api-types'
 import { S9BuilderWith } from './setup.service'
 
 @Injectable({
@@ -29,27 +29,28 @@ export class ServerService {
       })
   }
 
-  async getAvailableApps (server: S9Server): Promise<AvailableAppPreview[]> {
+  async getAvailableApps (server: S9Server): Promise<AppAvailablePreview[]> {
     // @TODO remove
     // return mockGetAvailableApps()
     return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(server, Method.get, '/apps/available')
   }
 
-  async getAvailableApp (server: S9Server, appId: string): Promise<AvailableAppFull> {
+  async getAvailableApp (server: S9Server, appId: string): Promise<AppAvailableFull> {
     // @TODO remove
     // return mockGetAvailableApp()
     return this.httpService.authServerRequest<Lan.GetAppAvailableRes>(server, Method.get, `/apps/available/${appId}`)
       .then(res => {
         return {
           ...res,
+          // versionLatest expected to have a corresponding version, hence bang
           releaseNotes: res.versions.find(v => v.version === res.versionLatest)!.releaseNotes,
         }
       })
   }
 
-  async getInstalledApps (server: S9Server): Promise<InstalledApp[]> {
+  async getInstalledApps (server: S9Server): Promise<AppInstalled[]> {
     // @TODO remove
-    // return mockGetInstalledApps()
+    // return mockGetInstalledAppsPreview()
     return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.get, `/apps/installed`)
       .then(res => {
         const apps = res.map(mapApiInstalledApp)
@@ -58,7 +59,13 @@ export class ServerService {
       })
   }
 
-  async install (server: S9Server, appId: string, version: string): Promise<InstalledApp> {
+  async getAppConfig (server: S9Server, appId: string): Promise<AppConfigSpec> {
+    // @TODO remove
+    return mockGetAppConfig()
+    // return this.httpService.authServerRequest<Lan.GetAppConfigRes>(server, Method.get, `/apps/installed/${appId}/config`)
+  }
+
+  async install (server: S9Server, appId: string, version: string): Promise<AppInstalled> {
     const body: Lan.PostInstallAppReq = {
       id: appId,
       version,
@@ -79,16 +86,16 @@ export class ServerService {
     await this.s9Model.removeApp(server, appId)
   }
 
-  async start (server: S9Server, app: InstalledApp): Promise<InstalledApp> {
+  async start (server: S9Server, app: AppInstalled): Promise<AppInstalled> {
     return this.httpService.authServerRequest(server, Method.post, `/apps/${app.id}/start`)
   }
 
-  async stop (server: S9Server, app: InstalledApp): Promise<InstalledApp> {
+  async stop (server: S9Server, app: AppInstalled): Promise<AppInstalled> {
     return this.httpService.authServerRequest(server, Method.post, `/apps/${app.id}/stop`)
   }
 }
 
-function mapApiInstalledApp (app: ApiAppInstalled): InstalledApp {
+function mapApiInstalledApp (app: ApiAppInstalled): AppInstalled {
   return {
     ...app,
     statusAt: new Date(),
@@ -111,13 +118,18 @@ async function mockGetAvailableApps (): Promise<Lan.GetAppsAvailableRes> {
 }
 
 // @TODO remove
-async function mockGetInstalledApps (): Promise<Lan.GetAppsInstalledRes> {
-  return [mockInstalledApiApp]
+async function mockGetInstalledAppFull (): Promise<Lan.GetAppInstalledRes> {
+  return mockApiAppInstalled
+}
+
+// @TODO remove
+async function mockGetAppConfig (): Promise<Lan.GetAppConfigRes> {
+  return mockApiAppConfig
 }
 
 // @TODO remove
 async function mockPostInstallApp (): Promise<Lan.PostInstallAppRes> {
-  return mockInstalledApiApp
+  return mockApiAppInstalled
 }
 
 // @TODO remove
@@ -162,7 +174,7 @@ const mockApiAppAvailableFull: ApiAppAvailableFull = {
 }
 
 // @TODO remove
-const mockInstalledApiApp: ApiAppInstalled = {
+const mockApiAppInstalled: ApiAppInstalled = {
   id: 'bitcoin',
   versionLatest: '0.18.1',
   versionInstalled: '0.18.1',
@@ -171,3 +183,5 @@ const mockInstalledApiApp: ApiAppInstalled = {
   status: AppHealthStatus.RUNNING,
   iconURL: 'assets/img/bitcoin_core.png',
 }
+
+const mockApiAppConfig: ApiAppConfig = { }

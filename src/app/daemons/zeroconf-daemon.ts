@@ -26,8 +26,8 @@ export class ZeroconfDaemon {
           case 'resolved':
             this.zeroconfServices[service.name] = service
           case 'removed':
-            // delete this.zeroconfServices[service.name]
             // no need to delete these... worst case we end up with some extras in the listing of services
+            // delete this.zeroconfServices[service.name]
             break
           }
         }

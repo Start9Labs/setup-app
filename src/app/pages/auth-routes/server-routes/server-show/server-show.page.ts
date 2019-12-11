@@ -11,6 +11,7 @@ import { ClipboardService } from 'src/app/services/clipboard.service'
   styleUrls: ['server-show.page.scss'],
 })
 export class ServerShowPage {
+  error: string
   view: 'apps' | 'about' = 'apps'
   server: S9Server
   edited = false
@@ -24,15 +25,14 @@ export class ServerShowPage {
   ) { }
 
   ngOnInit () {
-    this.fetchServer()
-  }
-
-  async fetchServer () {
-    const id = this.route.snapshot.paramMap.get('serverId')
-    if (!id) { throw new Error (`Need id in params for server show page but got none.`) }
-
-    this.server = this.serverModel.getServer(id) as S9Server
-    if (!this.server) { throw new Error (`Need server in server model for manage page but got none for id ${id}.`) }
+    try {
+      const id = this.route.snapshot.paramMap.get('serverId') as string
+      const server = this.serverModel.getServer(id)
+      if (!server) throw new Error (`No server found with ID: ${id}`)
+      this.server = server
+    } catch (e) {
+      this.error = e.message
+    }
   }
 
   async ionViewWillLeave () {

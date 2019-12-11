@@ -1,6 +1,6 @@
 import * as CryptoJS from 'crypto-js'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
-import { InstalledApp, AppHealthStatus } from './s9-app'
+import { AppInstalled, AppHealthStatus } from './s9-app'
 import { deriveKeys } from '../util/crypto.util'
 
 export interface S9ServerStorable {
@@ -16,7 +16,7 @@ export interface S9Server extends S9ServerStorable {
   status: AppHealthStatus
   statusAt: Date
   specs: ServerSpecs
-  apps: InstalledApp[]
+  apps: AppInstalled[]
   versionLatest: string
   privkey: string // derive from mnemonic + torAddress
 }
@@ -65,7 +65,7 @@ export function idFromSerial (serialNo: string): string {
   return CryptoJS.SHA256(serialNo).toString(CryptoJS.enc.Hex).substr(0, 8)
 }
 
-export function toS9AgentApp (ss: S9Server): InstalledApp {
+export function toS9AgentApp (ss: S9Server): AppInstalled {
   return {
     id: 'start9Agent',
     title: 'Start9 Agent',

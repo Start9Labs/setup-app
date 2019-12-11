@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { S9Server } from 'src/app/models/s9-server'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
-import { AvailableAppFull } from 'src/app/models/s9-app'
+import { AppAvailableFull } from 'src/app/models/s9-app'
 import { ServerService } from 'src/app/services/server.service'
 import { NavController, AlertController, LoadingController } from '@ionic/angular'
 
@@ -15,7 +15,7 @@ export class AppAvailableShowPage {
   loading = true
   error: string
   server: S9Server
-  app: AvailableAppFull
+  app: AppAvailableFull
 
   constructor (
     private readonly navCtrl: NavController,
@@ -27,15 +27,19 @@ export class AppAvailableShowPage {
   ) { }
 
   async ngOnInit () {
-    const serverId = this.route.snapshot.paramMap.get('serverId') as string
-    const server = this.serverModel.getServer(serverId) as S9Server
-    if (!server) throw new Error (`No server found with ID: ${serverId}`)
-    this.server = server
+    try {
+      const serverId = this.route.snapshot.paramMap.get('serverId') as string
+      const server = this.serverModel.getServer(serverId)
+      if (!server) throw new Error (`No server found with ID: ${serverId}`)
+      this.server = server
 
-    const appId = this.route.snapshot.paramMap.get('appId') as string
-
-    this.app = await this.serverService.getAvailableApp(this.server, appId)
-    this.loading = false
+      const appId = this.route.snapshot.paramMap.get('appId') as string
+      this.app = await this.serverService.getAvailableApp(this.server, appId)
+    } catch (e) {
+      this.error = e.message
+    } finally {
+      this.loading = false
+    }
   }
 
   async presentAlertInstall (version: string) {

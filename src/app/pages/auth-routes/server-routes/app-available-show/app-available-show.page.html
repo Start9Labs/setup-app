@@ -3,6 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="'servers/' + server.id"></ion-back-button>
     </ion-buttons>
+    <ion-title>{{ app.title | async  }}</ion-title>
   </ion-toolbar>
 </ion-header>
 

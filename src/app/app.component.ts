@@ -28,7 +28,8 @@ export class AppComponent {
     public authService: AuthService,
     public router: Router,
   ) {
-    // set dark theme
+    // set dark theme.
+    // @TODO there should be a way to make this the default.
     document.body.classList.toggle('dark', true)
     // wait for platform reday
     platform.ready().then(async () => {
@@ -36,6 +37,7 @@ export class AppComponent {
       await this.authService.init()
       // load data if authenticated
       if (this.authService.isAuthenticated()) {
+        // isAuthenticated() => true means mnemonic is present, hence the bang.
         await this.s9ServerModel.load(this.authService.mnemonic!)
       }
       // subscribe to auth status

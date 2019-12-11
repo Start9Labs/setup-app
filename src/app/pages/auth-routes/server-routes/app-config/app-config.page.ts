@@ -1,22 +1,26 @@
 import { Component } from '@angular/core'
-import { ServerService } from 'src/app/services/server.service'
-import { AppAvailablePreview } from 'src/app/models/s9-app'
+import { NavController } from '@ionic/angular'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
 import { S9Server } from 'src/app/models/s9-server'
+import { AppInstalled, AppConfigSpec } from 'src/app/models/s9-app'
+import { ServerService } from 'src/app/services/server.service'
 
 @Component({
-  selector: 'app-app-available-list',
-  templateUrl: './app-available-list.page.html',
-  styleUrls: ['./app-available-list.page.scss'],
+  selector: 'app-app-config',
+  templateUrl: './app-config.page.html',
+  styleUrls: ['./app-config.page.scss'],
 })
-export class AppAvailableListPage {
+export class AppConfigPage {
   loading = true
   error: string
   server: S9Server
-  apps: AppAvailablePreview[] = []
+  app: AppInstalled
+  config: AppConfigSpec
+  edited = false
 
   constructor (
+    private readonly navCtrl: NavController,
     private readonly route: ActivatedRoute,
     private readonly serverModel: S9ServerModel,
     private readonly serverService: ServerService,
@@ -29,7 +33,12 @@ export class AppAvailableListPage {
       if (!server) throw new Error (`No server found with ID: ${serverId}`)
       this.server = server
 
-      this.apps = await this.serverService.getAvailableApps(this.server)
+      const appId = this.route.snapshot.paramMap.get('appId') as string
+      const app = server.apps.find(app => app.id === appId)
+      if (!app) throw new Error (`No app found on ${serverId} with ID: ${appId}`)
+      this.app = app
+
+      this.config = await this.serverService.getAppConfig(this.server, appId)
     } catch (e) {
       this.error = e.message
     } finally {
