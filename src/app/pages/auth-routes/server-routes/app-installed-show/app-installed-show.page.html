@@ -4,6 +4,11 @@
       <ion-back-button [defaultHref]="'servers/' + server.id"></ion-back-button>
     </ion-buttons>
     <ion-title>{{ app.title }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="presentActionMenu()">
+        <ion-icon name="more"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -56,9 +61,5 @@
       </ion-note>
     </ion-item>
   </ion-item-group>
-
-  <ion-button expand="block" fill="outline" color="danger" (click)="presentAlertUninstall()">
-    Uninstall
-  </ion-button>
 
 </ion-content>

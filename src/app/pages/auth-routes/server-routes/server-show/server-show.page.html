@@ -32,7 +32,7 @@
           <ion-text color="primary">Get Apps</ion-text>
         </ion-item>
         <ion-item-divider>Installed on {{ server.friendlyName }}</ion-item-divider>
-        <ion-item *ngFor="let app of server.apps" [routerLink]="['/servers', server.id, 'apps/installed', app.id]">
+        <ion-item *ngFor="let app of server.apps" [routerLink]="['/servers', server.id, 'apps', 'installed', app.id]">
           <ion-avatar slot="start">
             <img [src]="app.iconURL" alt="icon" />
           </ion-avatar>

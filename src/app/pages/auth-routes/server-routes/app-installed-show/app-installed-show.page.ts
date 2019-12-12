@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { AlertController, NavController, LoadingController } from '@ionic/angular'
+import { AlertController, NavController, LoadingController, ActionSheetController } from '@ionic/angular'
 import { ServerService } from 'src/app/services/server.service'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
@@ -25,6 +25,7 @@ export class AppInstalledShowPage {
     private readonly navCtrl: NavController,
     private readonly clipboardService: ClipboardService,
     private readonly loadingCtrl: LoadingController,
+    private readonly actionCtrl: ActionSheetController,
   ) { }
 
   ngOnInit () {
@@ -55,7 +56,7 @@ export class AppInstalledShowPage {
     await loader.present()
 
     try {
-      this.app = await this.serverService.stop(this.server, this.app)
+      this.app = await this.serverService.stopApp(this.server, this.app)
     } catch (e) {
       this.error = e.message
     } finally {
@@ -70,12 +71,36 @@ export class AppInstalledShowPage {
     await loader.present()
 
     try {
-      this.app = await this.serverService.start(this.server, this.app)
+      this.app = await this.serverService.startApp(this.server, this.app)
     } catch (e) {
       this.error = e.message
     } finally {
       await loader.dismiss()
     }
+  }
+
+  async presentActionMenu () {
+    const action = await this.actionCtrl.create({
+      header: 'Options',
+      buttons: [
+        {
+          text: 'Config',
+          icon: 'construct',
+          handler: () => {
+            this.navCtrl.navigateForward(`/servers/${this.server.id}/apps/installed/${this.app.id}/config`)
+          },
+        },
+        {
+          text: 'Uninstall',
+          role: 'destructive',
+          icon: 'trash',
+          handler: () => {
+            this.presentAlertUninstall()
+          },
+        },
+      ],
+    })
+    await action.present()
   }
 
   async presentAlertUninstall () {
@@ -106,7 +131,7 @@ export class AppInstalledShowPage {
     await loader.present()
 
     try {
-      await this.serverService.uninstall(this.server, this.app as any)
+      await this.serverService.uninstallApp(this.server, this.app.id)
       await this.navCtrl.pop()
     } catch (e) {
       this.error = e.message

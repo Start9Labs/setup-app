@@ -27,7 +27,6 @@ export interface ApiAppInstalled extends ApiAppBase {
 
 export type ApiAppConfig = AppConfigSpec
 
-
 export module Lan {
   export type GetVersionReq = { }
   export type GetVersionRes = { version: string }

@@ -77,8 +77,8 @@ export class AppComponent {
     this.syncDaemon.start()
     // detects new LAN services
     // @TODO remove
-    // this.zeroconfDaemon.mock()
-    this.zeroconfDaemon.start()
+    this.zeroconfDaemon.mock()
+    // this.zeroconfDaemon.start()
     // monitors wifi connectivity
     this.wifiDaemon.start()
   }

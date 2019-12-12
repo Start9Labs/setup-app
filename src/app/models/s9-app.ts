@@ -29,37 +29,48 @@ export interface AppVersion {
 
 export type AppConfigSpec = { [key: string]: AppValueSpec }
 
-export type AppValueSpec = AppValueSpecString | AppValueSpecEnum | AppValueSpecList | AppValueSpecObject
+export type AppValueSpec = AppValueSpecString |
+                           AppValueSpecEnum |
+                           AppValueSpecListHeterogeneous |
+                           AppValueSpecListHomogeneous |
+                           AppValueSpecObject
 
-export interface AppValueSpecString {
+export interface AppValueSpecBase {
+  type: string
+  value: string
+}
+
+export interface AppValueSpecString extends AppValueSpecBase {
   type: 'string'
   nullable: boolean
   default?: DefaultSpec
   pattern?: string
 }
 
-export interface AppValueSpecEnum {
+export interface AppValueSpecEnum extends AppValueSpecBase {
   type: 'enum'
   nullable: boolean
   values: string[]
   default?: string
 }
 
-export type AppValueSpecList = { type: 'list' } & AppValueSpecListHomogeneous | AppValueSpecListHeterogeneous
-
-export interface AppValueSpecObject {
-  type: 'object'
-  nullable: boolean
-  spec: AppConfigSpec
+export interface AppValueSpecList extends AppValueSpecBase {
+  type: 'list'
 }
 
-export interface AppValueSpecListHomogeneous {
+export interface AppValueSpecListHeterogeneous extends AppValueSpecList {
+  spec: AppValueSpec[]
+}
+
+export interface AppValueSpecListHomogeneous extends AppValueSpecList {
   spec: AppValueSpec
   length: string // '0..1' (inclusive) OR '0..' (right unbounded)
 }
 
-export interface AppValueSpecListHeterogeneous {
-  spec: AppValueSpec[]
+export interface AppValueSpecObject extends AppValueSpecBase {
+  type: 'object'
+  nullable: boolean
+  spec: AppConfigSpec
 }
 
 export type DefaultSpec = string | { charset: string, length: string }

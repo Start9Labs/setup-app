@@ -19,8 +19,8 @@ export class ServerService {
 
   async getServer (server: S9Server | S9BuilderWith<'zeroconfService' | 'privkey' | 'versionInstalled'>): Promise<Lan.GetServerRes & { statusAt: Date }> {
     // @TODO remove
-    // return mockGetServer()
-    return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.get, '')
+    return mockGetServer()
+    // return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.get, '')
       .then(res => {
         return {
           ...res,
@@ -31,14 +31,14 @@ export class ServerService {
 
   async getAvailableApps (server: S9Server): Promise<AppAvailablePreview[]> {
     // @TODO remove
-    // return mockGetAvailableApps()
-    return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(server, Method.get, '/apps/available')
+    return mockGetAvailableApps()
+    // return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(server, Method.get, '/apps/available')
   }
 
   async getAvailableApp (server: S9Server, appId: string): Promise<AppAvailableFull> {
     // @TODO remove
-    // return mockGetAvailableApp()
-    return this.httpService.authServerRequest<Lan.GetAppAvailableRes>(server, Method.get, `/apps/available/${appId}`)
+    return mockGetAvailableApp()
+    // return this.httpService.authServerRequest<Lan.GetAppAvailableRes>(server, Method.get, `/apps/available/${appId}`)
       .then(res => {
         return {
           ...res,
@@ -50,8 +50,8 @@ export class ServerService {
 
   async getInstalledApps (server: S9Server): Promise<AppInstalled[]> {
     // @TODO remove
-    // return mockGetInstalledAppsPreview()
-    return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.get, `/apps/installed`)
+    return mockGetInstalledApps()
+    // return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.get, `/apps/installed`)
       .then(res => {
         const apps = res.map(mapApiInstalledApp)
         apps.unshift(toS9AgentApp(server))
@@ -65,20 +65,20 @@ export class ServerService {
     // return this.httpService.authServerRequest<Lan.GetAppConfigRes>(server, Method.get, `/apps/installed/${appId}/config`)
   }
 
-  async install (server: S9Server, appId: string, version: string): Promise<AppInstalled> {
+  async installApp (server: S9Server, appId: string, version: string): Promise<AppInstalled> {
     const body: Lan.PostInstallAppReq = {
       id: appId,
       version,
     }
     // @TODO remove
-    // const installed = await mockPostInstallApp()
-    const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.post, `/apps/install`, { }, body, 240000)
+    const installed = await mockPostInstallApp()
+    // const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.post, `/apps/install`, { }, body, 240000)
       .then(mapApiInstalledApp)
     await this.s9Model.addApp(server, installed)
     return installed
   }
 
-  async uninstall (server: S9Server, appId: string): Promise<void> {
+  async uninstallApp (server: S9Server, appId: string): Promise<void> {
     const body: Lan.PostUninstallAppReq = {
       id: appId,
     }
@@ -86,12 +86,16 @@ export class ServerService {
     await this.s9Model.removeApp(server, appId)
   }
 
-  async start (server: S9Server, app: AppInstalled): Promise<AppInstalled> {
+  async startApp (server: S9Server, app: AppInstalled): Promise<AppInstalled> {
     return this.httpService.authServerRequest(server, Method.post, `/apps/${app.id}/start`)
   }
 
-  async stop (server: S9Server, app: AppInstalled): Promise<AppInstalled> {
+  async stopApp (server: S9Server, app: AppInstalled): Promise<AppInstalled> {
     return this.httpService.authServerRequest(server, Method.post, `/apps/${app.id}/stop`)
+  }
+
+  async updateApp (server: S9Server, app: AppInstalled, config: AppConfigSpec) {
+    return this.httpService.authServerRequest(server, Method.patch, `/apps/installed/${app.id}/config`, { }, { config })
   }
 }
 
@@ -118,8 +122,8 @@ async function mockGetAvailableApps (): Promise<Lan.GetAppsAvailableRes> {
 }
 
 // @TODO remove
-async function mockGetInstalledAppFull (): Promise<Lan.GetAppInstalledRes> {
-  return mockApiAppInstalled
+async function mockGetInstalledApps (): Promise<Lan.GetAppsInstalledRes> {
+  return [mockApiAppInstalled]
 }
 
 // @TODO remove
@@ -163,11 +167,11 @@ const mockApiAppAvailableFull: ApiAppAvailableFull = {
   descriptionLong: 'Bitcoin is an innovative payment network and new kind of money. Bitcoin utilizes a robust p2p network to garner decentralized consensus.',
   versions: [
     {
-      version: '0.17.0',
+      version: mockApiAppAvailablePreview.versionInstalled!,
       releaseNotes: '* Faster sync time<br />* MAST support',
     },
     {
-      version: '0.16.0',
+      version: '0.17.0',
       releaseNotes: '* New Bitcoiny stuff!!',
     },
   ],
@@ -184,4 +188,18 @@ const mockApiAppInstalled: ApiAppInstalled = {
   iconURL: 'assets/img/bitcoin_core.png',
 }
 
-const mockApiAppConfig: ApiAppConfig = { }
+const mockApiAppConfig: ApiAppConfig = {
+  // rpcallowip: {
+  //   value: '192.168.1.1',
+  //   type: 'list',
+  //   spec: [{
+  //     type: 'string',
+  //     nullable: true,
+  //   }],
+  // },
+  rpcauth: {
+    value: 'test',
+    type: 'string',
+    nullable: true,
+  },
+}

@@ -52,6 +52,8 @@ export class SyncDaemon {
             specs: { },
           }
         }
+        
+        await pauseFor(3000)
 
         serverClone.updating = false
 

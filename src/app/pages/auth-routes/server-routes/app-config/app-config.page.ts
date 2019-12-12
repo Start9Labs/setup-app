@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { NavController } from '@ionic/angular'
+import { NavController, LoadingController } from '@ionic/angular'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
 import { S9Server } from 'src/app/models/s9-server'
@@ -24,6 +24,7 @@ export class AppConfigPage {
     private readonly route: ActivatedRoute,
     private readonly serverModel: S9ServerModel,
     private readonly serverService: ServerService,
+    private readonly loadingCtrl: LoadingController,
   ) { }
 
   async ngOnInit () {
@@ -43,6 +44,22 @@ export class AppConfigPage {
       this.error = e.message
     } finally {
       this.loading = false
+    }
+  }
+
+  async save () {
+    const loader = await this.loadingCtrl.create({
+      message: 'saving config...',
+    })
+    await loader.present()
+
+    try {
+      await this.serverService.updateApp(this.server, this.app, this.config)
+      await this.navCtrl.navigateBack(`/servers/${this.server.id}/apps/installed/${this.app.id}`)
+    } catch (e) {
+      this.error = e.message
+    } finally {
+      await loader.dismiss()
     }
   }
 }

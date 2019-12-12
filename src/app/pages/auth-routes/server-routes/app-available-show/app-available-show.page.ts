@@ -15,7 +15,7 @@ export class AppAvailableShowPage {
   loading = true
   error: string
   server: S9Server
-  app: AppAvailableFull
+  app: AppAvailableFull = { } as AppAvailableFull
 
   constructor (
     private readonly navCtrl: NavController,
@@ -35,6 +35,7 @@ export class AppAvailableShowPage {
 
       const appId = this.route.snapshot.paramMap.get('appId') as string
       this.app = await this.serverService.getAvailableApp(this.server, appId)
+      console.log(this.app)
     } catch (e) {
       this.error = e.message
     } finally {
@@ -87,7 +88,7 @@ export class AppAvailableShowPage {
     await loader.present()
 
     try {
-      await this.serverService.install(this.server, this.app.id, version)
+      await this.serverService.installApp(this.server, this.app.id, version)
       await this.navCtrl.navigateBack(['/servers', this.server.id])
     } catch (e) {
       this.error = e.message
@@ -103,7 +104,7 @@ export class AppAvailableShowPage {
     await loader.present()
 
     try {
-      await this.serverService.uninstall(this.server, this.app.id)
+      await this.serverService.uninstallApp(this.server, this.app.id)
       await this.navCtrl.navigateBack(['/servers', this.server.id])
     } catch (e) {
       this.error = e.message

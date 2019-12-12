@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="'servers/' + server.id"></ion-back-button>
     </ion-buttons>
-    <ion-title>{{ app.title | async  }}</ion-title>
+    <ion-title>App Details</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -19,56 +19,60 @@
       <ion-text class="ion-text-wrap" color="danger">{{error}}</ion-text>
     </ion-item>
 
-    <ion-item>
-      <ion-avatar slot="start">
-        <img [src]="app.iconURL" alt="icon" />
-      </ion-avatar>
-      <ion-label>
-        <h1>{{ app.title }}</h1>
-        <h3>{{ app.versionLatest }}</h3>
-      </ion-label>
-    </ion-item>
+    <div *ngIf="app">
 
-    <ion-grid class="ion-padding-top ion-padding-bottom">
-      <ion-row *ngIf="!app.versionInstalled">
-        <ion-col>
-          <ion-button expand="block" fill="outline" (click)="presentAlertInstall(app.versionLatest)">
-            Install
-          </ion-button>
-        </ion-col>
-      </ion-row>
-      <ion-row *ngIf="app.versionInstalled">
-        <ion-col size="6">
-          <ion-button expand="block" fill="outline" color="danger" (click)="presentAlertUninstall()">
-            Uninstall
-          </ion-button>
-        </ion-col>
-        <ion-col size="6">
-          <ion-button [disabled]="app.versionInstalled === app.versionLatest" expand="block" fill="outline" (click)="presentAlertInstall(app.versionLatest)">
-            Update
-          </ion-button>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-
-    <ion-item-group>
       <ion-item>
-        <ion-label class="ion-text-wrap">
-          <h3>Description</h3>
-          <br />
-          <p>{{ app.descriptionLong }}</p>
+        <ion-avatar slot="start">
+          <img [src]="app.iconURL" alt="icon" />
+        </ion-avatar>
+        <ion-label>
+          <h1>{{ app.title }}</h1>
+          <h3>{{ app.versionLatest }}</h3>
         </ion-label>
       </ion-item>
-      <ion-item-divider></ion-item-divider>
-      <ion-item>
-        <ion-label class="ion-text-wrap">
-          <h3>New in {{ app.versionLatest }}</h3>
-          <p>Last updated 12/16/2019</p>
-          <br />
-          <p [innerHTML]="app.releaseNotes"></p>
-        </ion-label>
-      </ion-item>
-    </ion-item-group>
+
+      <ion-grid class="ion-padding-top ion-padding-bottom">
+        <ion-row *ngIf="!app.versionInstalled">
+          <ion-col>
+            <ion-button expand="block" fill="outline" (click)="presentAlertInstall(app.versionLatest)">
+              Install
+            </ion-button>
+          </ion-col>
+        </ion-row>
+        <ion-row *ngIf="app.versionInstalled">
+          <ion-col size="6">
+            <ion-button expand="block" fill="outline" color="danger" (click)="presentAlertUninstall()">
+              Uninstall
+            </ion-button>
+          </ion-col>
+          <ion-col size="6">
+            <ion-button [disabled]="app.versionInstalled === app.versionLatest" expand="block" fill="outline" (click)="presentAlertInstall(app.versionLatest)">
+              Update
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+      <ion-item-group>
+        <ion-item>
+          <ion-label class="ion-text-wrap">
+            <h3>Description</h3>
+            <br />
+            <p>{{ app.descriptionLong }}</p>
+          </ion-label>
+        </ion-item>
+        <ion-item-divider></ion-item-divider>
+        <ion-item>
+          <ion-label class="ion-text-wrap">
+            <h3>New in {{ app.versionLatest }}</h3>
+            <p>Last updated 12/16/2019</p>
+            <br />
+            <p [innerHTML]="app.releaseNotes"></p>
+          </ion-label>
+        </ion-item>
+      </ion-item-group>
+
+    </div>
 
   </div>
 
