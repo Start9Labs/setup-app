@@ -30,31 +30,32 @@ export interface AppVersion {
 export type AppConfigSpec = { [key: string]: AppValueSpec }
 
 export type AppValueSpec = AppValueSpecString |
+                           AppValueSpecBoolean |
                            AppValueSpecEnum |
                            AppValueSpecListHeterogeneous |
                            AppValueSpecListHomogeneous |
                            AppValueSpecObject
 
-export interface AppValueSpecBase {
-  type: string
-  value: string
-}
-
-export interface AppValueSpecString extends AppValueSpecBase {
+export interface AppValueSpecString {
   type: 'string'
   nullable: boolean
   default?: DefaultSpec
   pattern?: string
 }
 
-export interface AppValueSpecEnum extends AppValueSpecBase {
+export interface AppValueSpecBoolean {
+  type: 'boolean'
+  default: boolean
+}
+
+export interface AppValueSpecEnum {
   type: 'enum'
   nullable: boolean
   values: string[]
   default?: string
 }
 
-export interface AppValueSpecList extends AppValueSpecBase {
+export interface AppValueSpecList {
   type: 'list'
 }
 
@@ -67,7 +68,7 @@ export interface AppValueSpecListHomogeneous extends AppValueSpecList {
   length: string // '0..1' (inclusive) OR '0..' (right unbounded)
 }
 
-export interface AppValueSpecObject extends AppValueSpecBase {
+export interface AppValueSpecObject {
   type: 'object'
   nullable: boolean
   spec: AppConfigSpec

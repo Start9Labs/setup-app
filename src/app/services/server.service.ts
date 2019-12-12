@@ -59,7 +59,7 @@ export class ServerService {
       })
   }
 
-  async getAppConfig (server: S9Server, appId: string): Promise<AppConfigSpec> {
+  async getAppConfig (server: S9Server, appId: string): Promise<Lan.GetAppConfigRes> {
     // @TODO remove
     return mockGetAppConfig()
     // return this.httpService.authServerRequest<Lan.GetAppConfigRes>(server, Method.get, `/apps/installed/${appId}/config`)
@@ -94,7 +94,7 @@ export class ServerService {
     return this.httpService.authServerRequest(server, Method.post, `/apps/${app.id}/stop`)
   }
 
-  async updateApp (server: S9Server, app: AppInstalled, config: AppConfigSpec) {
+  async updateApp (server: S9Server, app: AppInstalled, config: object) {
     return this.httpService.authServerRequest(server, Method.patch, `/apps/installed/${app.id}/config`, { }, { config })
   }
 }
@@ -188,18 +188,43 @@ const mockApiAppInstalled: ApiAppInstalled = {
   iconURL: 'assets/img/bitcoin_core.png',
 }
 
-const mockApiAppConfig: ApiAppConfig = {
-  // rpcallowip: {
-  //   value: '192.168.1.1',
-  //   type: 'list',
-  //   spec: [{
-  //     type: 'string',
-  //     nullable: true,
-  //   }],
-  // },
-  rpcauth: {
-    value: 'test',
-    type: 'string',
-    nullable: true,
+const mockApiAppConfig: Lan.GetAppConfigRes = {
+  // config spec
+  spec: {
+    randomEnum: {
+      type: 'enum',
+      nullable: true,
+      values: ['option1', 'option2', 'option3'],
+    },
+    testnet: {
+      type: 'boolean',
+      default: false,
+    },
+    rpcuser: {
+      type: 'string',
+      nullable: false,
+    },
+    rpcallowip: {
+      type: 'list',
+      spec: [{
+        type: 'string',
+        nullable: true,
+      }],
+    },
+    rpcauth: {
+      type: 'list',
+      spec: [{
+        type: 'string',
+        nullable: true,
+      }],
+    },
+  },
+  // actual config
+  config: {
+    randomEnum: null,
+    testnet: true,
+    rpcuser: 'matt',
+    rpcallowip: '192.168.1.1',
+    rpcauth: 'matt: 8273gr8qwoidm1uid91jeh8y23gdio1kskmwejkdnm',
   },
 }

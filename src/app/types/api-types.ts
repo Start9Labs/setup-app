@@ -48,7 +48,7 @@ export module Lan {
   export type GetAppInstalledReq = { }
   export type GetAppInstalledRes = ApiAppInstalled
   export type GetAppConfigReq = { }
-  export type GetAppConfigRes = ApiAppConfig
+  export type GetAppConfigRes = { spec: ApiAppConfig, config: object }
   export type GetAppsInstalledReq = { }
   export type GetAppsInstalledRes = ApiAppInstalled[]
   export type PostInstallAppReq = { id: string, version: string }

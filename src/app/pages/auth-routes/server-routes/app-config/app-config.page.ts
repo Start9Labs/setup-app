@@ -16,7 +16,8 @@ export class AppConfigPage {
   error: string
   server: S9Server
   app: AppInstalled
-  config: AppConfigSpec
+  spec: AppConfigSpec
+  config: object
   edited = false
 
   constructor (
@@ -39,7 +40,9 @@ export class AppConfigPage {
       if (!app) throw new Error (`No app found on ${serverId} with ID: ${appId}`)
       this.app = app
 
-      this.config = await this.serverService.getAppConfig(this.server, appId)
+      const { spec, config } = await this.serverService.getAppConfig(this.server, appId)
+      this.spec = spec
+      this.config = config
     } catch (e) {
       this.error = e.message
     } finally {
