@@ -310,7 +310,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
       rpcuser: 'matt',
       rpcpass: 'hjsbdioqwdubwedo',
     },
-    port: 8333,
+    port: '8333',
     maxconnections: null,
     rpcallowip: ['192.168.1.1', '192.168.1.0'],
     rpcauth: ['matt: 8273gr8qwoidm1uid91jeh8y23gdio1kskmwejkdnm'],

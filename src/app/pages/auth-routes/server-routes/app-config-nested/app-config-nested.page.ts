@@ -11,27 +11,24 @@ import { clone } from 'src/app/models/server-model'
 export class AppConfigNestedPage {
   @Input() spec: AppConfigSpec
   @Input() value: any
+  edited = false
   error: string
 
   constructor (
     private readonly modalCtrl: ModalController,
   ) { }
 
-  ngOnInit () {
-    console.log(this.spec)
-    console.log(this.value)
-  }
-
   async presentModalConfig (spec: { key: string, value: string }) {
     const modal = await this.modalCtrl.create({
       component: AppConfigNestedPage,
       componentProps: {
         spec,
-        value: clone(this.value[spec.key]),
+        value: this.value[spec.key],
       },
     })
 
     modal.onWillDismiss().then(res => {
+      this.edited = this.edited || res.data.edited
       this.value[spec.key] = res.data.value
     })
 
@@ -40,8 +37,13 @@ export class AppConfigNestedPage {
 
   async dismiss () {
     this.modalCtrl.dismiss({
+      edited: this.edited,
       value: this.value,
     })
+  }
+
+  markEdited () {
+    this.edited = true
   }
 
   asIsOrder (a: any, b: any) {

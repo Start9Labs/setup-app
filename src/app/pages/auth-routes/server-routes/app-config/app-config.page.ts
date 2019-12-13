@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { NavController, LoadingController, ModalController, AlertController } from '@ionic/angular'
 import { ActivatedRoute } from '@angular/router'
-import { S9ServerModel, clone } from 'src/app/models/server-model'
+import { S9ServerModel } from 'src/app/models/server-model'
 import { S9Server } from 'src/app/models/s9-server'
 import { AppInstalled, AppConfigSpec, AppValueSpec } from 'src/app/models/s9-app'
 import { ServerService } from 'src/app/services/server.service'
@@ -18,6 +18,7 @@ export class AppConfigPage {
   server: S9Server
   app: AppInstalled
   spec: AppConfigSpec
+  initialConfigStringified: string
   config: object
   edited = false
 
@@ -46,6 +47,7 @@ export class AppConfigPage {
       const { spec, config } = await this.serverService.getAppConfig(this.server, appId)
       this.spec = spec
       this.config = config
+      this.initialConfigStringified = JSON.stringify(this.config)
     } catch (e) {
       this.error = e.message
     } finally {
@@ -53,7 +55,8 @@ export class AppConfigPage {
     }
   }
 
-  async presentDescription (spec: { key: string, value: AppValueSpec }) {
+  async presentDescription (spec: { key: string, value: AppValueSpec }, e: Event) {
+    e.stopPropagation()
     const alert = await this.alertCtrl.create({
       header: spec.key,
       message: spec.value.description,
@@ -66,15 +69,24 @@ export class AppConfigPage {
       component: AppConfigNestedPage,
       componentProps: {
         spec,
-        value: clone(this.config[spec.key]),
+        value: this.config[spec.key],
       },
     })
 
     modal.onWillDismiss().then(res => {
+      this.edited = this.edited || res.data.edited
       this.config[spec.key] = res.data.value
     })
 
     await modal.present()
+  }
+
+  async cancel () {
+    if (JSON.stringify(this.config) !== this.initialConfigStringified) {
+      await this.presentAlertUnsaved()
+    } else {
+      await this.navigateBack()
+    }
   }
 
   async save () {
@@ -85,12 +97,40 @@ export class AppConfigPage {
 
     try {
       await this.serverService.updateAppConfig(this.server, this.app, this.config)
-      await this.navCtrl.navigateBack(`/servers/${this.server.id}/apps/installed/${this.app.id}`)
+      await this.navigateBack()
     } catch (e) {
       this.error = e.message
     } finally {
       await loader.dismiss()
     }
+  }
+
+  async presentAlertUnsaved () {
+    const alert = await this.alertCtrl.create({
+      header: 'Unsaved Changes',
+      message: 'You have unsaved changes. Are you sure you want to leave?',
+      buttons: [
+        {
+          text: 'Stay Here',
+          role: 'cancel',
+        },
+        {
+          text: 'Leave',
+          handler: () => {
+            this.navigateBack()
+          },
+        },
+      ],
+    })
+    await alert.present()
+  }
+
+  markEdited () {
+    this.edited = true
+  }
+
+  async navigateBack () {
+    return this.navCtrl.navigateBack(`/servers/${this.server.id}/apps/installed/${this.app.id}`)
   }
 
   asIsOrder (a: any, b: any) {

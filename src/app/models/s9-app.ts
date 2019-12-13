@@ -44,7 +44,10 @@ export interface AppValueSpecString extends AppValueSpecBase {
   type: 'string'
   nullable: boolean
   default?: DefaultSpec
-  pattern?: string
+  pattern?: {
+    regex: RegExp
+    description: string
+  }
 }
 
 export interface AppValueSpecBoolean extends AppValueSpecBase {

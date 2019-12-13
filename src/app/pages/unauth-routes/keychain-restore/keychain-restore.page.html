@@ -16,7 +16,7 @@
   </div>
 
   <div class="ion-padding-start ion-padding-end">
-    <ion-textarea class="recovery-input" [(ngModel)]="mnemonic" (ionChange)="checkLength($event)"></ion-textarea>
+    <ion-textarea class="recovery-input" [(ngModel)]="mnemonic" (ngModelChange)="checkLength($event)"></ion-textarea>
   </div>
 
   <ion-item *ngIf="error" style="margin-top: 16px;">
