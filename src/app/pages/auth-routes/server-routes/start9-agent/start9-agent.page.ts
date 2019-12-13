@@ -13,7 +13,6 @@ import { ClipboardService } from 'src/app/services/clipboard.service'
 export class Start9AgentPage {
   error: string
   server: S9Server
-  app: AppInstalled
 
   constructor (
     private readonly route: ActivatedRoute,
@@ -27,11 +26,7 @@ export class Start9AgentPage {
       const server = this.serverModel.getServer(serverId) as S9Server
       if (!server) throw new Error (`No server found with ID: ${serverId}`)
 
-      const app = server.apps.find(app => app.id === 'start9Agent')
-      if (!app) throw new Error (`Start9 Agent app not found`)
-
       this.server = server
-      this.app = app
     } catch (e) {
       this.error = e.message
     }

@@ -32,6 +32,20 @@
           <ion-text color="primary">Get Apps</ion-text>
         </ion-item>
         <ion-item-divider>Installed on {{ server.friendlyName }}</ion-item-divider>
+        <!-- agent app -->
+        <ion-item [routerLink]="['/servers', server.id, 'apps', 'installed', server.agentApp.id]">
+          <ion-avatar slot="start">
+            <img [src]="server.agentApp.iconURL" alt="icon" />
+          </ion-avatar>
+          <ion-label>
+            <h3>{{ server.agentApp.title }}</h3>
+            <p>version: {{ server.agentApp.versionInstalled }}</p>
+          </ion-label>
+          <ion-note slot="end">
+            <s9-status [serverUpdating]="server.updating" [status]="server.agentApp.status"></s9-status>
+          </ion-note>
+        </ion-item>
+        <!-- installed apps -->
         <ion-item *ngFor="let app of server.apps" [routerLink]="['/servers', server.id, 'apps', 'installed', app.id]">
           <ion-avatar slot="start">
             <img [src]="app.iconURL" alt="icon" />

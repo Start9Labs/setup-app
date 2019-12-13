@@ -1,4 +1,6 @@
 
+export type Omit<ObjectType, KeysType extends keyof ObjectType> = Pick<ObjectType, Exclude<keyof ObjectType, KeysType>>
+
 export function pauseFor (ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }

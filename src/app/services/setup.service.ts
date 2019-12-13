@@ -4,12 +4,12 @@ import { HttpService } from './http.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { Method } from 'src/app/types/enums'
 import { clone } from '../models/server-model'
-import { pauseFor } from 'src/app/util/misc.util'
+import { pauseFor, Omit } from 'src/app/util/misc.util'
 import * as crypto from '../util/crypto.util'
 import { AuthService } from './auth.service'
 import { Lan } from '../types/api-types'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
-import { AppHealthStatus } from '../models/s9-app'
+import { AppHealthStatus, AppInstalled } from '../models/s9-app'
 import { ServerService } from './server.service'
 
 @Injectable({
@@ -90,11 +90,11 @@ export class SetupService {
       this.message = `getting server`
       await this.serverService.getServer(ssClone)
         .then(res => {
-          const { versionLatest, status, statusAt, specs } = res
-          ssClone.versionLatest = versionLatest
-          ssClone.status = status
-          ssClone.statusAt = statusAt
-          ssClone.specs = specs
+          ssClone.versionInstalled = res.versionInstalled
+          ssClone.versionLatest = res.versionLatest
+          ssClone.status = res.status
+          ssClone.statusAt = res.statusAt
+          ssClone.agentApp = res.agentApp
         })
         .catch(console.error)
     }
@@ -134,7 +134,7 @@ export class SetupService {
 
   // @TODO remove
   mockServer (ss: S9ServerBuilder): Required<S9ServerBuilder> {
-    return {
+    const toReturn: Omit<Required<S9ServerBuilder>, 'agentApp'> = {
       id: ss.id,
       friendlyName: ss.friendlyName,
       torAddress: 'agent-tor-address.onion',
@@ -156,6 +156,10 @@ export class SetupService {
         port: 5959,
         txtRecord: { },
       },
+    }
+    return {
+      ...toReturn,
+      agentApp: toS9AgentApp(toReturn),
     }
   }
 
@@ -181,6 +185,8 @@ export interface S9ServerBuilder {
 
   torAddress?: string
   zeroconfService?: ZeroconfService
+
+  agentApp?: AppInstalled
 }
 
 export function hasValues<T extends keyof S9ServerBuilder> (t: T[], s: S9ServerBuilder): s is S9BuilderWith<T> {
@@ -203,14 +209,15 @@ export function fromUserInput (id: string, friendlyName: string): S9ServerBuilde
 }
 
 export function toS9Server (sb: Required<S9ServerBuilder>): S9Server {
-  const { id, friendlyName, status, statusAt, versionInstalled, versionLatest, privkey, torAddress, zeroconfService, specs } = sb
-  const server: S9Server = {
+  const { id, friendlyName, status, statusAt, versionInstalled, versionLatest, privkey, torAddress, zeroconfService, specs, agentApp } = sb
+  return {
     id,
     friendlyName,
     status,
     statusAt,
     versionInstalled,
     versionLatest,
+    agentApp,
     specs,
     privkey,
     torAddress,
@@ -218,10 +225,6 @@ export function toS9Server (sb: Required<S9ServerBuilder>): S9Server {
     apps: [],
     updating: false,
   }
-
-  server.apps.push(toS9AgentApp(server))
-
-  return server
 }
 
 
@@ -244,4 +247,5 @@ const defaultBuilder: Required<S9ServerBuilder> = {
   registered:       undefined as any,
   torAddress:       undefined as any,
   zeroconfService:  undefined as any,
+  agentApp:         undefined as any,
 }

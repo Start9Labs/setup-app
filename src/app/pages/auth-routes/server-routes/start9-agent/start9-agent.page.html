@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="'servers/' + server.id"></ion-back-button>
     </ion-buttons>
-    <ion-title>{{ app.title }}</ion-title>
+    <ion-title>{{ server.agentApp.title }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -17,13 +17,13 @@
     <ion-item>
       <ion-label position="stacked" color="medium">App Name</ion-label>
       <ion-text color="medium">
-        <p>{{ app.title }}</p>
+        <p>{{ server.agentApp.title }}</p>
       </ion-text>
     </ion-item>
     <ion-item>
       <ion-label position="stacked" color="medium">Installed Version</ion-label>
       <ion-text color="medium">
-        <p>{{ app.versionInstalled }}</p>
+        <p>{{ server.agentApp.versionInstalled }}</p>
       </ion-text>
     </ion-item>
     <ion-item>
@@ -33,13 +33,13 @@
     <ion-item>
       <ion-label position="stacked" color="medium">Last Status Check</ion-label>
       <ion-text color="medium">
-        <p>{{ app.statusAt | date: 'short' }}</p>
+        <p>{{ server.agentApp.statusAt | date: 'short' }}</p>
       </ion-text>
     </ion-item>
     <ion-item>
       <ion-label position="stacked" color="medium">Tor Address</ion-label>
       <ion-text color="medium">
-        <p>{{ app.torAddress }}</p>
+        <p>{{ server.agentApp.torAddress }}</p>
       </ion-text>
       <ion-note slot="end">
         <ion-button (click)="copyTor()" fill="outline" size="small">

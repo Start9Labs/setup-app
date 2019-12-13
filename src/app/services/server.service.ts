@@ -18,14 +18,21 @@ export class ServerService {
     private readonly s9Model: S9ServerModel,
   ) { }
 
-  async getServer (server: S9Server | S9BuilderWith<'zeroconfService' | 'privkey' | 'versionInstalled'>): Promise<Lan.GetServerRes & { statusAt: Date }> {
+  async getServer (server: S9Server | S9BuilderWith<'zeroconfService' | 'privkey' | 'versionInstalled' | 'torAddress'>): Promise<S9Server> {
     // @TODO remove
     return mockGetServer()
     // return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.get, '')
       .then(res => {
-        return {
+        const toReturn = {
+          updating: false,
+          apps: [],
+          ...server,
           ...res,
           statusAt: new Date(),
+        }
+        return {
+          ...toReturn,
+          agentApp: toS9AgentApp(toReturn),
         }
       })
   }
@@ -53,11 +60,7 @@ export class ServerService {
     // @TODO remove
     return mockGetInstalledApps()
     // return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.get, `/apps/installed`)
-      .then(res => {
-        const apps = res.map(mapApiInstalledApp)
-        apps.unshift(toS9AgentApp(server))
-        return apps
-      })
+      .then(res => res.map(mapApiInstalledApp))
   }
 
   async getAppConfig (server: S9Server, appId: string): Promise<Lan.GetAppConfigRes> {
