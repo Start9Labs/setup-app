@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core'
 import { HttpService } from './http.service'
 import { Method } from '../types/enums'
-import { S9ServerModel } from '../models/server-model'
-import { AppInstalled, AppAvailablePreview, AppAvailableFull, AppHealthStatus, AppConfigSpec } from '../models/s9-app'
+import { S9ServerModel, clone } from '../models/server-model'
+import { AppInstalled, AppAvailablePreview, AppAvailableFull, AppHealthStatus, AppValueSpecList } from '../models/s9-app'
 import { S9Server, toS9AgentApp } from '../models/s9-server'
 import { Lan, ApiAppAvailablePreview, ApiAppAvailableFull, ApiAppInstalled, ApiAppConfig } from '../types/api-types'
 import { S9BuilderWith } from './setup.service'
@@ -11,6 +11,7 @@ import { S9BuilderWith } from './setup.service'
   providedIn: 'root',
 })
 export class ServerService {
+  mock = true
 
   constructor (
     private readonly httpService: HttpService,
@@ -71,7 +72,7 @@ export class ServerService {
       version,
     }
     // @TODO remove
-    const installed = await mockPostInstallApp()
+    const installed = await mockInstallApp()
     // const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.post, `/apps/install`, { }, body, 240000)
       .then(mapApiInstalledApp)
     await this.s9Model.addApp(server, installed)
@@ -82,20 +83,31 @@ export class ServerService {
     const body: Lan.PostUninstallAppReq = {
       id: appId,
     }
-    await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(server, Method.post, `/apps/uninstall`, { }, body)
+    // @TODO remove
+    await mockUninstallApp()
+    // await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(server, Method.post, `/apps/uninstall`, { }, body)
     await this.s9Model.removeApp(server, appId)
   }
 
   async startApp (server: S9Server, app: AppInstalled): Promise<AppInstalled> {
-    return this.httpService.authServerRequest(server, Method.post, `/apps/${app.id}/start`)
+    // @TODO remove
+    return mockStartApp()
+    // return this.httpService.authServerRequest<Lan.PostStartAppRes>(server, Method.post, `/apps/${app.id}/start`)
+      .then(mapApiInstalledApp)
   }
 
   async stopApp (server: S9Server, app: AppInstalled): Promise<AppInstalled> {
-    return this.httpService.authServerRequest(server, Method.post, `/apps/${app.id}/stop`)
+    // @TODO remove
+    return mockStopApp()
+    // return this.httpService.authServerRequest<Lan.PostStopAppRes>(server, Method.post, `/apps/${app.id}/stop`)
+      .then(mapApiInstalledApp)
   }
 
-  async updateApp (server: S9Server, app: AppInstalled, config: object) {
-    return this.httpService.authServerRequest(server, Method.patch, `/apps/installed/${app.id}/config`, { }, { config })
+  async updateAppConfig (server: S9Server, app: AppInstalled, config: object): Promise<AppInstalled> {
+    // @TODO remove
+    return mockUpdateAppConfig()
+    // return this.httpService.authServerRequest<Lan.PostUpdateAppConfigRes>(server, Method.patch, `/apps/installed/${app.id}/config`, { }, { config })
+      .then(mapApiInstalledApp)
   }
 }
 
@@ -132,8 +144,28 @@ async function mockGetAppConfig (): Promise<Lan.GetAppConfigRes> {
 }
 
 // @TODO remove
-async function mockPostInstallApp (): Promise<Lan.PostInstallAppRes> {
+async function mockInstallApp (): Promise<Lan.PostInstallAppRes> {
   return mockApiAppInstalled
+}
+
+// @TODO remove
+async function mockUninstallApp (): Promise<void> {
+  return
+}
+
+// @TODO remove
+async function mockStartApp (): Promise<Lan.PostStartAppRes> {
+  return mockApiAppInstalled
+}
+
+// @TODO remove
+async function mockStopApp (): Promise<Lan.PostStopAppRes> {
+  return mockApiAppInstalled
+}
+
+// @TODO remove
+async function mockUpdateAppConfig (): Promise<Lan.PostUpdateAppConfigRes> {
+  return clone(mockApiAppInstalled)
 }
 
 // @TODO remove
@@ -193,38 +225,91 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
   spec: {
     randomEnum: {
       type: 'enum',
+      description: 'This is not even real.',
       nullable: true,
       values: ['option1', 'option2', 'option3'],
     },
     testnet: {
       type: 'boolean',
+      description: 'enable to run testnet instead of mainnet',
       default: false,
     },
-    rpcuser: {
+    rpcuserpass: {
+      type: 'object',
+      description: 'rpc username and password',
+      nullable: true,
+      spec: {
+        rules: {
+          type: 'object',
+          description: 'the rules of the game',
+          nullable: true,
+          spec: {
+            rule1: {
+              type: 'string',
+              description: 'the first rule',
+              nullable: true,
+            },
+            rule2: {
+              type: 'string',
+              description: 'the second rule',
+              nullable: true,
+            },
+          },
+        },
+        rpcuser: {
+          type: 'string',
+          description: 'rpc username',
+          nullable: true,
+        },
+        rpcpass: {
+          type: 'string',
+          description: 'rpc password',
+          nullable: true,
+        },
+      },
+    },
+    port: {
       type: 'string',
-      nullable: false,
+      description: 'the default port for your Bitcoin node. default: 8333, testnet: 18333, regtest: 18444',
+      nullable: true,
+      default: '8333',
+    },
+    maxconnections: {
+      type: 'string',
+      description: 'the maximum number of commections allowed to your Bitcoin node',
+      nullable: true,
     },
     rpcallowip: {
       type: 'list',
-      spec: [{
+      description: 'external ip addresses that are authorized to access your Bitcoin node',
+      spec: {
         type: 'string',
         nullable: true,
-      }],
-    },
+      },
+      length: '0..',
+    } as AppValueSpecList,
     rpcauth: {
       type: 'list',
-      spec: [{
+      description: 'api keys that are authorized to access your Bitcoin node.',
+      spec: {
         type: 'string',
         nullable: true,
-      }],
-    },
+      },
+      length: '0..',
+    } as AppValueSpecList,
   },
   // actual config
   config: {
-    randomEnum: null,
+    randomEnum: 'option1',
     testnet: true,
-    rpcuser: 'matt',
-    rpcallowip: '192.168.1.1',
-    rpcauth: 'matt: 8273gr8qwoidm1uid91jeh8y23gdio1kskmwejkdnm',
+    rpcuserpass: {
+      rules: { rule1: 'you know', rule2: 'you better know' },
+      rpcuser: 'matt',
+      rpcpass: 'hjsbdioqwdubwedo',
+    },
+    port: 8333,
+    maxconnections: null,
+    rpcallowip: ['192.168.1.1', '192.168.1.0'],
+    rpcauth: ['matt: 8273gr8qwoidm1uid91jeh8y23gdio1kskmwejkdnm'],
   },
 }
