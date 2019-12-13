@@ -3,7 +3,7 @@ import { NavController, LoadingController, ModalController, AlertController } fr
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
 import { S9Server } from 'src/app/models/s9-server'
-import { AppInstalled, AppConfigSpec, AppValueSpec } from 'src/app/models/s9-app'
+import { AppInstalled, AppConfigSpec, AppValueSpec, AppHealthStatus } from 'src/app/models/s9-app'
 import { ServerService } from 'src/app/services/server.service'
 import { AppConfigNestedPage } from '../app-config-nested/app-config-nested.page'
 
@@ -91,12 +91,17 @@ export class AppConfigPage {
 
   async save () {
     const loader = await this.loadingCtrl.create({
-      message: 'saving config...',
+      message: 'Saving config...',
     })
     await loader.present()
 
     try {
       await this.serverService.updateAppConfig(this.server, this.app, this.config)
+      if (this.app.status === AppHealthStatus.RUNNING) {
+        loader.message = `Restarting ${this.app.title}`
+        await this.serverService.stopApp(this.server, this.app)
+        await this.serverService.startApp(this.server, this.app)
+      }
       await this.navigateBack()
     } catch (e) {
       this.error = e.message

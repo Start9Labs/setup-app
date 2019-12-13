@@ -60,5 +60,5 @@ export module Lan {
   export type PostStopAppReq = { }
   export type PostStopAppRes = ApiAppInstalled
   export type PostUpdateAppConfigReq = { }
-  export type PostUpdateAppConfigRes = ApiAppInstalled
+  export type PostUpdateAppConfigRes = TwoHundredOK
 }

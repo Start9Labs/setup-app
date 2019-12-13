@@ -106,11 +106,10 @@ export class ServerService {
       .then(mapApiInstalledApp)
   }
 
-  async updateAppConfig (server: S9Server, app: AppInstalled, config: object): Promise<AppInstalled> {
+  async updateAppConfig (server: S9Server, app: AppInstalled, config: object): Promise<void> {
     // @TODO remove
-    return mockUpdateAppConfig()
-    // return this.httpService.authServerRequest<Lan.PostUpdateAppConfigRes>(server, Method.patch, `/apps/installed/${app.id}/config`, { }, { config })
-      .then(mapApiInstalledApp)
+    await mockUpdateAppConfig()
+    // await this.httpService.authServerRequest<Lan.PostUpdateAppConfigRes>(server, Method.patch, `/apps/installed/${app.id}/config`, { }, { config })
   }
 }
 
@@ -152,8 +151,8 @@ async function mockInstallApp (): Promise<Lan.PostInstallAppRes> {
 }
 
 // @TODO remove
-async function mockUninstallApp (): Promise<void> {
-  return
+async function mockUninstallApp (): Promise<Lan.PostUninstallAppRes> {
+  return { }
 }
 
 // @TODO remove
@@ -168,7 +167,7 @@ async function mockStopApp (): Promise<Lan.PostStopAppRes> {
 
 // @TODO remove
 async function mockUpdateAppConfig (): Promise<Lan.PostUpdateAppConfigRes> {
-  return clone(mockApiAppInstalled)
+  return { }
 }
 
 // @TODO remove

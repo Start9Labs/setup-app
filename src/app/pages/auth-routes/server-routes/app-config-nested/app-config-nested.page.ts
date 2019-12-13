@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core'
-import { AppConfigSpec } from 'src/app/models/s9-app'
-import { ModalController } from '@ionic/angular'
+import { AppConfigSpec, AppValueSpec } from 'src/app/models/s9-app'
+import { ModalController, AlertController } from '@ionic/angular'
 import { clone } from 'src/app/models/server-model'
 
 @Component({
@@ -16,7 +16,17 @@ export class AppConfigNestedPage {
 
   constructor (
     private readonly modalCtrl: ModalController,
+    private readonly alertCtrl: AlertController,
   ) { }
+
+  async presentDescription (spec: { key: string, value: AppValueSpec }, e: Event) {
+    e.stopPropagation()
+    const alert = await this.alertCtrl.create({
+      header: spec.key,
+      message: spec.value.description,
+    })
+    await alert.present()
+  }
 
   async presentModalConfig (spec: { key: string, value: string }) {
     const modal = await this.modalCtrl.create({
