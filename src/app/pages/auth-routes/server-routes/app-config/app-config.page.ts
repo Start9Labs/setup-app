@@ -1,11 +1,10 @@
 import { Component } from '@angular/core'
-import { NavController, LoadingController, ModalController, AlertController } from '@ionic/angular'
+import { NavController, LoadingController, AlertController } from '@ionic/angular'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
 import { S9Server } from 'src/app/models/s9-server'
-import { AppInstalled, AppConfigSpec, AppValueSpec, AppHealthStatus } from 'src/app/models/s9-app'
+import { AppInstalled, AppConfigSpec, AppHealthStatus } from 'src/app/models/s9-app'
 import { ServerService } from 'src/app/services/server.service'
-import { AppConfigNestedPage } from '../app-config-nested/app-config-nested.page'
 
 @Component({
   selector: 'app-app-config',
@@ -28,7 +27,6 @@ export class AppConfigPage {
     private readonly serverModel: S9ServerModel,
     private readonly serverService: ServerService,
     private readonly loadingCtrl: LoadingController,
-    private readonly modalCtrl: ModalController,
     private readonly alertCtrl: AlertController,
   ) { }
 
@@ -53,32 +51,6 @@ export class AppConfigPage {
     } finally {
       this.loading = false
     }
-  }
-
-  async presentDescription (spec: { key: string, value: AppValueSpec }, e: Event) {
-    e.stopPropagation()
-    const alert = await this.alertCtrl.create({
-      header: spec.key,
-      message: spec.value.description,
-    })
-    await alert.present()
-  }
-
-  async presentModalConfig (spec: { key: string, value: AppValueSpec }) {
-    const modal = await this.modalCtrl.create({
-      component: AppConfigNestedPage,
-      componentProps: {
-        spec,
-        value: this.config[spec.key],
-      },
-    })
-
-    modal.onWillDismiss().then(res => {
-      this.edited = this.edited || res.data.edited
-      this.config[spec.key] = res.data.value
-    })
-
-    await modal.present()
   }
 
   async cancel () {
@@ -130,15 +102,7 @@ export class AppConfigPage {
     await alert.present()
   }
 
-  markEdited () {
-    this.edited = true
-  }
-
   async navigateBack () {
     return this.navCtrl.navigateBack(`/servers/${this.server.id}/apps/installed/${this.app.id}`)
-  }
-
-  asIsOrder (a: any, b: any) {
-    return 1
   }
 }

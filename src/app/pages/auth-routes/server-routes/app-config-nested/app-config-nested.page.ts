@@ -1,7 +1,6 @@
 import { Component, Input } from '@angular/core'
+import { ModalController } from '@ionic/angular'
 import { AppConfigSpec, AppValueSpec } from 'src/app/models/s9-app'
-import { ModalController, AlertController } from '@ionic/angular'
-import { clone } from 'src/app/models/server-model'
 
 @Component({
   selector: 'app-app-config-nested',
@@ -12,23 +11,19 @@ export class AppConfigNestedPage {
   @Input() spec: AppConfigSpec
   @Input() value: any
   edited = false
-  error: string
 
   constructor (
     private readonly modalCtrl: ModalController,
-    private readonly alertCtrl: AlertController,
   ) { }
 
-  async presentDescription (spec: { key: string, value: AppValueSpec }, e: Event) {
-    e.stopPropagation()
-    const alert = await this.alertCtrl.create({
-      header: spec.key,
-      message: spec.value.description,
+  async dismiss () {
+    this.modalCtrl.dismiss({
+      edited: this.edited,
+      value: this.value,
     })
-    await alert.present()
   }
 
-  async presentModalConfig (spec: { key: string, value: string }) {
+  async presentModalConfig (spec: { key: string, value: AppValueSpec }) {
     const modal = await this.modalCtrl.create({
       component: AppConfigNestedPage,
       componentProps: {
@@ -45,18 +40,7 @@ export class AppConfigNestedPage {
     await modal.present()
   }
 
-  async dismiss () {
-    this.modalCtrl.dismiss({
-      edited: this.edited,
-      value: this.value,
-    })
-  }
-
   markEdited () {
     this.edited = true
-  }
-
-  asIsOrder (a: any, b: any) {
-    return 1
   }
 }
