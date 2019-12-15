@@ -45,9 +45,10 @@ export interface AppValueSpecString extends AppValueSpecBase {
   nullable: boolean
   default?: DefaultSpec
   pattern?: {
-    regex: RegExp
+    regex: string
     description: string
   }
+  error?: boolean
 }
 
 export interface AppValueSpecBoolean extends AppValueSpecBase {
@@ -64,8 +65,9 @@ export interface AppValueSpecEnum extends AppValueSpecBase {
 
 export interface AppValueSpecList extends AppValueSpecBase {
   type: 'list'
-  spec: AppValueSpec
+  spec: AppValueSpecString | AppValueSpecObject
   length: string // '0..1' (inclusive) OR '0..' (right unbounded)
+  errors?: number[]
 }
 
 export interface AppValueSpecObject extends AppValueSpecBase {

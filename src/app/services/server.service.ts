@@ -262,6 +262,10 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
           type: 'string',
           description: 'rpc username',
           nullable: true,
+          pattern: {
+            regex: '^[a-zA-Z]+$',
+            description: 'must contain only letter and be less than 50 characters in length.',
+          },
         },
         rpcpass: {
           type: 'string',
@@ -287,6 +291,10 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
       spec: {
         type: 'string',
         nullable: true,
+        pattern: {
+          regex: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$',
+          description: 'may only contain numbers and periods',
+        },
       },
       length: '0..',
     } as AppValueSpecList,

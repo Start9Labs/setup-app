@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core'
-import { AppConfigSpec, AppValueSpec } from 'src/app/models/s9-app'
+import { AppConfigSpec, AppValueSpec, AppValueSpecString } from 'src/app/models/s9-app'
 import { AlertController, ModalController } from '@ionic/angular'
 import { AppConfigNestedPage } from 'src/app/pages/auth-routes/server-routes/app-config-nested/app-config-nested.page'
 
@@ -19,30 +19,42 @@ export class ObjectConfigComponent {
     private readonly alertCtrl: AlertController,
   ) { }
 
-  async presentDescription (spec: { key: string, value: AppValueSpec }, e: Event) {
+  async presentDescription (keyval: { key: string, value: AppValueSpec }, e: Event) {
     e.stopPropagation()
     const alert = await this.alertCtrl.create({
-      header: spec.key,
-      message: spec.value.description,
+      header: keyval.key,
+      message: keyval.value.description,
     })
     await alert.present()
   }
 
-  async presentModalConfig (spec: { key: string, value: AppValueSpec }) {
+  async presentModalConfig (keyval: { key: string, value: AppValueSpec }) {
     const modal = await this.modalCtrl.create({
       component: AppConfigNestedPage,
       componentProps: {
-        spec,
-        value: this.config[spec.key],
+        keyval,
+        value: this.config[keyval.key],
       },
     })
 
     modal.onWillDismiss().then(res => {
       this.editedChange.emit(this.edited || res.data.edited)
-      this.config[spec.key] = res.data.value
+      this.config[keyval.key] = res.data.value
     })
 
     await modal.present()
+  }
+
+  validate (keyval: { key: string, value: AppValueSpecString }) {
+    const pattern = keyval.value.pattern
+    if (pattern) {
+      const value = this.config[keyval.key]
+      if (!RegExp(pattern.regex).test(value)) {
+        keyval.value.error = true
+      } else {
+        keyval.value.error = false
+      }
+    }
   }
 
   markEdited () {

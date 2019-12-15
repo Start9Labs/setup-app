@@ -1,21 +1,32 @@
 <div *ngFor="let keyval of spec | keyvalue : asIsOrder">
+  <!-- string, boolean, enum -->
   <ion-item *ngIf="['string', 'boolean', 'enum'].includes(keyval.value.type)">
     <ion-button *ngIf="keyval.value.description" class="help-button" fill="clear" size="small" slot="start" (click)="presentDescription(keyval, $event)">
       <ion-icon size="small" slot="icon-only" name="help-circle"></ion-icon>
     </ion-button>
     <ion-label [position]="keyval.value.type === 'string' ? 'stacked' : 'fixed'" color="medium">{{ keyval.key }}</ion-label>
-    <ion-input *ngIf="keyval.value.type === 'string'" [(ngModel)]="config[keyval.key]" (ngModelChange)="markEdited()"></ion-input>
+    <!-- string -->
+    <div *ngIf="keyval.value.type === 'string'">
+      <ion-input [(ngModel)]="config[keyval.key]" (ngModelChange)="validate(keyval); markEdited()"></ion-input>
+    </div>
+    <!-- boolean -->
     <ion-toggle *ngIf="keyval.value.type === 'boolean'" slot="end" [(ngModel)]="config[keyval.key]" (ngModelChange)="markEdited()"></ion-toggle>
+    <!-- enum -->
     <ion-select *ngIf="keyval.value.type === 'enum'" slot="end" placeholder="Select One" [(ngModel)]="config[keyval.key]" (ngModelChange)="markEdited()">
       <ion-select-option *ngFor="let option of keyval.value.values" [value]="option">{{ option }}</ion-select-option>
     </ion-select>
   </ion-item>
+  <!-- error -->
+  <ion-item *ngIf="keyval.value.error">
+    <p><ion-text color="danger">{{ keyval.key }} {{ keyval.value.pattern.description }}</ion-text></p>
+  </ion-item>
+  <!-- list, object -->
   <ion-item button detail="false" *ngIf="['list', 'object'].includes(keyval.value.type)" (click)="presentModalConfig(keyval)">
     <ion-button *ngIf="keyval.value.description" class="help-button" fill="clear" size="small" slot="start" (click)="presentDescription(keyval, $event)">
       <ion-icon size="small" slot="icon-only" name="help-circle"></ion-icon>
     </ion-button>
     <ion-label color="medium">{{ keyval.key }}</ion-label>
-    <ion-note slot="end">( {{ keyval.value.type === 'list' ? 'multiple' : 'complex' }} )</ion-note>
+    <ion-note slot="end">( {{ keyval.value.type === 'list' ? 'list' : 'complex' }} )</ion-note>
     <ion-icon slot="end" name="arrow-forward"></ion-icon>
   </ion-item>
 </div>

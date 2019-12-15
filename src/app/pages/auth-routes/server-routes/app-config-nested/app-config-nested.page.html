@@ -5,28 +5,32 @@
         <ion-icon name="arrow-back"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>{{ spec.key }}</ion-title>
+    <ion-title>{{ keyval.key }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
 
-  <ion-item-group *ngIf="spec.value.type === 'list'">
+  <ion-item-group *ngIf="keyval.value.type === 'list'">
     <ion-item-divider>{{ value.length }} Entries</ion-item-divider>
     <div *ngFor="let entry of value; let i = index">
-      <ion-item *ngIf="spec.value.spec.type === 'string'">
-        <ion-input [(ngModel)]="entry" (ngModelChange)="markEdited()"></ion-input>
+      <ion-item *ngIf="keyval.value.spec.type === 'string'">
+        <ion-input [(ngModel)]="value[i]" (ngModelChange)="validate(keyval.value, i); markEdited()"></ion-input>
       </ion-item>
-      <ion-item button detail="false" *ngIf="['list', 'object'].includes(spec.value.spec.type)" (click)="presentModalConfig(spec.value.spec, entry)">
+      <!-- error -->
+      <ion-item *ngIf="keyval.value.errors && keyval.value.errors.includes(i)">
+        <p><ion-text color="danger">{{ keyval.key }} {{ keyval.value.spec.pattern.description }}</ion-text></p>
+      </ion-item>
+      <ion-item button detail="false" *ngIf="['list', 'object'].includes(keyval.value.spec.type)" (click)="presentModalConfig(keyval.value.spec, entry)">
         <ion-label color="medium">Entry {{ i }}</ion-label>
-        <ion-note slot="end">( {{ spec.value.spec.type === 'list' ? 'multiple' : 'complex' }} )</ion-note>
+        <ion-note slot="end">( {{ keyval.value.spec.type === 'list' ? 'list' : 'complex' }} )</ion-note>
         <ion-icon slot="end" name="arrow-forward"></ion-icon>
       </ion-item>
     </div>
   </ion-item-group>
 
-  <ion-item-group *ngIf="spec.value.type === 'object'">
-    <object-config [spec]="spec.value.spec" [(edited)]="edited" [config]="value"></object-config>
+  <ion-item-group *ngIf="keyval.value.type === 'object'">
+    <object-config [spec]="keyval.value.spec" [(edited)]="edited" [config]="value"></object-config>
   </ion-item-group>
 
 </ion-content>
