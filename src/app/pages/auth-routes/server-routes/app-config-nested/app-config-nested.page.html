@@ -22,12 +22,24 @@
         <span *ngIf="min && max && min === max">&nbsp;( required: {{min}} )</span>
       </ion-item-divider>
       <div *ngFor="let entry of value; let i = index">
-        <ion-item button *ngIf="keyval.value.spec.type === 'string'" (click)="presentAlertConfigValueEdit(i)">
-          {{ entry }}
-        </ion-item>
-        <ion-item button detail="false" *ngIf="['list', 'object'].includes(keyval.value.spec.type)" (click)="presentModalConfig(keyval.value.spec, entry)">
-          <ion-label color="medium">Entry {{ i }}</ion-label>
-        </ion-item>
+        <ion-item-sliding *ngIf="keyval.value.spec.type === 'string'">
+          <ion-item-options side="end">
+            <ion-item-option color="danger" (click)="presentAlertDelete(i)">
+              <ion-icon slot="icon-only" name="trash"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+          <ion-item button detail="false" (click)="presentAlertConfigValueEdit(i)">
+            {{ entry }}
+          </ion-item>
+        </ion-item-sliding>
+        <ion-item-sliding *ngIf="['list', 'object'].includes(keyval.value.spec.type)">
+          <ion-item-options side="end">
+            <ion-item-option color="danger" (click)="share(item)">Delete</ion-item-option>
+          </ion-item-options>
+          <ion-item button detail="false" (click)="presentModalConfig(keyval.value.spec, entry)">
+            Entry {{ i }}
+          </ion-item>
+        </ion-item-sliding>
       </div>
     </ion-item-group>
     <ion-fab vertical="bottom" horizontal="end" slot="fixed">

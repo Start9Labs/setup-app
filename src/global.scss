@@ -27,6 +27,16 @@
 
 .alert-danger {
   color: var(--ion-color-danger) !important;
+  & ion-icon {
+    color: var(--ion-color-danger) !important;
+  }
+}
+
+.alert-primary {
+  color: var(--ion-color-primary) !important;
+  & ion-icon {
+    color: var(--ion-color-primary) !important;
+  }
 }
 
 .fab-button {

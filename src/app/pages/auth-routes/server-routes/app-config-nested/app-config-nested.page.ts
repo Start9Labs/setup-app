@@ -9,7 +9,7 @@ import { AppValueSpec, AppValueSpecList, AppValueSpecString } from 'src/app/mode
 })
 export class AppConfigNestedPage {
   @Input() keyval: { key: string, value: AppValueSpec }
-  @Input() value: string[] | object
+  @Input() value: any[] | object
   min: number
   max: number
   edited = false
@@ -67,8 +67,9 @@ export class AppConfigNestedPage {
           text: 'Cancel',
           role: 'cancel',
           cssClass: 'secondary',
-        }, {
-          text: 'Update',
+        },
+        {
+          text: 'Done',
           handler: (data: { value: string }) => {
             const value = data.value
             // return if no change
@@ -76,7 +77,7 @@ export class AppConfigNestedPage {
             // otherwise add/update value and mark edited
             if (this.validate(value)) {
               this.markEdited();
-              (this.value as string[]).splice(index, 1, value)
+              (this.value as any[]).splice(index, 1, value)
             } else {
               alert.message = ((this.keyval.value as AppValueSpecList).spec as AppValueSpecString).pattern!.description
               return false
@@ -113,7 +114,7 @@ export class AppConfigNestedPage {
             // otherwise add/update value and mark edited
             if (this.validate(value)) {
               this.markEdited();
-              (this.value as string[]).push(value)
+              (this.value as any[]).push(value)
             } else {
               alert.message = ((this.keyval.value as AppValueSpecList).spec as AppValueSpecString).pattern!.description
               return false
@@ -122,6 +123,28 @@ export class AppConfigNestedPage {
         },
       ],
       cssClass: 'alert-config-value',
+    })
+    await alert.present()
+  }
+
+  async presentAlertDelete (index: number) {
+    const alert = await this.alertCtrl.create({
+      header: 'Caution',
+      message: `Are you sure you want to delete this entry?`,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: 'Delete',
+          cssClass: 'alert-danger',
+          handler: async () => {
+            this.markEdited();
+            (this.value as any[]).splice(index, 1)
+          },
+        },
+      ],
     })
     await alert.present()
   }

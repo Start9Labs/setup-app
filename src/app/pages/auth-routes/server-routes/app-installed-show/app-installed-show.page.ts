@@ -84,18 +84,20 @@ export class AppInstalledShowPage {
       header: 'Options',
       buttons: [
         {
-          text: 'Config',
-          icon: 'construct',
-          handler: () => {
-            this.navCtrl.navigateForward(`/servers/${this.server.id}/apps/installed/${this.app.id}/config`)
-          },
-        },
-        {
           text: 'Uninstall',
           role: 'destructive',
           icon: 'trash',
+          cssClass: 'alert-danger',
           handler: () => {
             this.presentAlertUninstall()
+          },
+        },
+        {
+          text: 'Config',
+          icon: 'construct',
+          cssClass: 'alert-primary',
+          handler: () => {
+            this.navCtrl.navigateForward(`/servers/${this.server.id}/apps/installed/${this.app.id}/config`)
           },
         },
       ],
