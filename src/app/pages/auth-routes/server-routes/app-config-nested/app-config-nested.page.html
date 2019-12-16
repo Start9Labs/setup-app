@@ -11,23 +11,31 @@
 
 <ion-content>
 
-  <ion-item-group *ngIf="keyval.value.type === 'list'">
-    <ion-item-divider>{{ value.length }} Entries</ion-item-divider>
-    <div *ngFor="let entry of value; let i = index">
-      <ion-item *ngIf="keyval.value.spec.type === 'string'">
-        <ion-input [(ngModel)]="value[i]" (ngModelChange)="validate(keyval.value, i); markEdited()"></ion-input>
-      </ion-item>
-      <!-- error -->
-      <ion-item *ngIf="keyval.value.errors && keyval.value.errors.includes(i)">
-        <p><ion-text color="danger">{{ keyval.key }} {{ keyval.value.spec.pattern.description }}</ion-text></p>
-      </ion-item>
-      <ion-item button detail="false" *ngIf="['list', 'object'].includes(keyval.value.spec.type)" (click)="presentModalConfig(keyval.value.spec, entry)">
-        <ion-label color="medium">Entry {{ i }}</ion-label>
-        <ion-note slot="end">( {{ keyval.value.spec.type === 'list' ? 'list' : 'complex' }} )</ion-note>
-        <ion-icon slot="end" name="arrow-forward"></ion-icon>
-      </ion-item>
-    </div>
-  </ion-item-group>
+  <div *ngIf="keyval.value.type === 'list'">
+    <ion-item-group>
+      <ion-item-divider>
+        {{ value.length }}&nbsp;
+        <span *ngIf="value.length === 1">Entry</span>
+        <span *ngIf="value.length !== 1">Entries</span>
+        <span *ngIf="min && min !== max">&nbsp;( min: {{min}} )</span>
+        <span *ngIf="max && max !== min">&nbsp;( max: {{max}} )</span>
+        <span *ngIf="min && max && min === max">&nbsp;( required: {{min}} )</span>
+      </ion-item-divider>
+      <div *ngFor="let entry of value; let i = index">
+        <ion-item button *ngIf="keyval.value.spec.type === 'string'" (click)="presentAlertConfigValueEdit(i)">
+          {{ entry }}
+        </ion-item>
+        <ion-item button detail="false" *ngIf="['list', 'object'].includes(keyval.value.spec.type)" (click)="presentModalConfig(keyval.value.spec, entry)">
+          <ion-label color="medium">Entry {{ i }}</ion-label>
+        </ion-item>
+      </div>
+    </ion-item-group>
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+      <ion-fab-button (click)="presentAlertConfigValueNew()" class="fab-button">
+        <ion-icon name="add"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+  </div>
 
   <ion-item-group *ngIf="keyval.value.type === 'object'">
     <object-config [spec]="keyval.value.spec" [(edited)]="edited" [config]="value"></object-config>

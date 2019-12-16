@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core'
-import { ModalController } from '@ionic/angular'
+import { ModalController, AlertController } from '@ionic/angular'
 import { AppValueSpec, AppValueSpecList, AppValueSpecString } from 'src/app/models/s9-app'
 
 @Component({
@@ -9,12 +9,23 @@ import { AppValueSpec, AppValueSpecList, AppValueSpecString } from 'src/app/mode
 })
 export class AppConfigNestedPage {
   @Input() keyval: { key: string, value: AppValueSpec }
-  @Input() value: any
+  @Input() value: string[] | object
+  min: number
+  max: number
   edited = false
 
   constructor (
     private readonly modalCtrl: ModalController,
+    private readonly alertCtrl: AlertController,
   ) { }
+
+  ngOnInit () {
+    if (this.keyval.value.type === 'list') {
+      const arr = this.keyval.value.length.split('.')
+      this.min = Number(arr[0])
+      this.max = Number(arr[arr.length - 1])
+    }
+  }
 
   async dismiss () {
     this.modalCtrl.dismiss({
@@ -40,17 +51,84 @@ export class AppConfigNestedPage {
     await modal.present()
   }
 
-  validate (listSpec: AppValueSpecList, i: number) {
-    const stringSpec = listSpec.spec as AppValueSpecString
-    const pattern = stringSpec.pattern
-    if (pattern) {
-      const value = this.value[i]
-      if (!RegExp(pattern.regex).test(value)) {
-        listSpec.errors = listSpec.errors ? listSpec.errors.concat(i) : [i]
-      } else {
-        listSpec.errors = listSpec.errors ? listSpec.errors.splice(i, 1) : undefined
-      }
-    }
+  async presentAlertConfigValueEdit (index: number) {
+    const alert = await this.alertCtrl.create({
+      header: this.keyval.key,
+      inputs: [
+        {
+          name: 'value',
+          type: 'text',
+          value: this.value[index],
+          placeholder: 'Enter value',
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary',
+        }, {
+          text: 'Update',
+          handler: (data: { value: string }) => {
+            const value = data.value
+            // return if no change
+            if (this.value[index] === value) { return }
+            // otherwise add/update value and mark edited
+            if (this.validate(value)) {
+              this.markEdited();
+              (this.value as string[]).splice(index, 1, value)
+            } else {
+              alert.message = ((this.keyval.value as AppValueSpecList).spec as AppValueSpecString).pattern!.description
+              return false
+            }
+          },
+        },
+      ],
+      cssClass: 'alert-config-value',
+    })
+    await alert.present()
+  }
+
+  async presentAlertConfigValueNew () {
+    const alert = await this.alertCtrl.create({
+      header: this.keyval.key,
+      inputs: [
+        {
+          name: 'value',
+          type: 'text',
+          placeholder: 'Enter value',
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary',
+        }, {
+          text: 'Done',
+          handler: (data: { value: string }) => {
+            const value = data.value
+            // return if no value
+            if (!value) { return }
+            // otherwise add/update value and mark edited
+            if (this.validate(value)) {
+              this.markEdited();
+              (this.value as string[]).push(value)
+            } else {
+              alert.message = ((this.keyval.value as AppValueSpecList).spec as AppValueSpecString).pattern!.description
+              return false
+            }
+          },
+        },
+      ],
+      cssClass: 'alert-config-value',
+    })
+    await alert.present()
+  }
+
+  validate (value: string): boolean {
+    const pattern = ((this.keyval.value as AppValueSpecList).spec as AppValueSpecString).pattern
+    return !pattern || RegExp(pattern.regex).test(value)
   }
 
   markEdited () {

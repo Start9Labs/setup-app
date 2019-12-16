@@ -233,7 +233,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
     },
     testnet: {
       type: 'boolean',
-      description: 'enable to run testnet instead of mainnet',
+      description: 'determines whether your node is running ontestnet or mainnet',
       default: false,
     },
     rpcuserpass: {
@@ -258,6 +258,19 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
             },
           },
         },
+        rulemakerips: {
+          type: 'list',
+          description: 'ip addresses of users who get to make the rules',
+          spec: {
+            type: 'string',
+            nullable: false,
+            pattern: {
+              regex: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$',
+              description: 'may only contain numbers and periods',
+            },
+          },
+          length: '2',
+        }  as AppValueSpecList,
         rpcuser: {
           type: 'string',
           description: 'rpc username',
@@ -290,20 +303,20 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
       description: 'external ip addresses that are authorized to access your Bitcoin node',
       spec: {
         type: 'string',
-        nullable: true,
+        nullable: false,
         pattern: {
           regex: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$',
           description: 'may only contain numbers and periods',
         },
       },
-      length: '0..',
+      length: '0..10',
     } as AppValueSpecList,
     rpcauth: {
       type: 'list',
       description: 'api keys that are authorized to access your Bitcoin node.',
       spec: {
         type: 'string',
-        nullable: true,
+        nullable: false,
       },
       length: '0..',
     } as AppValueSpecList,
@@ -314,12 +327,13 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
     testnet: true,
     rpcuserpass: {
       rules: { rule1: 'you know', rule2: 'you better know' },
+      rulemakerips: ['192.168.1.1', '192.168.1.0'],
       rpcuser: 'matt',
       rpcpass: 'hjsbdioqwdubwedo',
     },
     port: '8333',
     maxconnections: null,
-    rpcallowip: ['192.168.1.1', '192.168.1.0'],
+    rpcallowip: [],
     rpcauth: ['matt: 8273gr8qwoidm1uid91jeh8y23gdio1kskmwejkdnm'],
   },
 }

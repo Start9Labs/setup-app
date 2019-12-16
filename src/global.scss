@@ -35,19 +35,19 @@
   --border-style: solid;
   --border-color: var(--ion-color-primary);
   --color: var(--ion-color-primary);
-  min-width: 64px;
-  min-height: 64px;
   margin: 16px;
 }
 
 .help-button {
-  margin-right: 8px;
-  & .button-native {
-    padding-inline-start: 0;
-    padding-inline-end: 0;
-  }
+  margin: 0 8px 0 0;
 }
 
 .item-interactive {
   --highlight-background: transparent !important;
+}
+
+.alert-config-value {
+  .alert-message.sc-ion-alert-md {
+    color: var(--ion-color-danger) !important;
+  }
 }
