@@ -5,6 +5,7 @@ import { S9ServerModel } from 'src/app/models/server-model'
 import { AppAvailableFull } from 'src/app/models/s9-app'
 import { ServerService } from 'src/app/services/server.service'
 import { NavController, AlertController, LoadingController } from '@ionic/angular'
+import * as compareVersions from 'compare-versions'
 
 @Component({
   selector: 'app-app-available-show',
@@ -16,6 +17,7 @@ export class AppAvailableShowPage {
   error: string
   server: S9Server
   app: AppAvailableFull = { } as AppAvailableFull
+  compareVersions = compareVersions
 
   constructor (
     private readonly navCtrl: NavController,
@@ -65,7 +67,7 @@ export class AppAvailableShowPage {
   async presentAlertUninstall () {
     const alert = await this.alertCtrl.create({
       header: 'Caution',
-      message: `Are you sure you want to uninstall ${this.app.title}, version ${this.app.versionInstalled}?`,
+      message: `Are you sure you want to uninstall ${this.app.title}?`,
       buttons: [
         {
           text: 'Cancel',

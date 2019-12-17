@@ -46,7 +46,7 @@
             </ion-button>
           </ion-col>
           <ion-col size="6">
-            <ion-button [disabled]="app.versionInstalled === app.versionLatest" expand="block" fill="outline" (click)="presentAlertInstall(app.versionLatest)">
+            <ion-button [disabled]="compareVersions(app.versionInstalled, app.versionLatest) !== -1" expand="block" fill="outline" (click)="presentAlertInstall(app.versionLatest)">
               Update
             </ion-button>
           </ion-col>
