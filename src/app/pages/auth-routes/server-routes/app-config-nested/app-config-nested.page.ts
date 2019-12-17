@@ -21,7 +21,8 @@ export class AppConfigNestedPage {
 
   ngOnInit () {
     if (this.keyval.value.type === 'list') {
-      const minMax = this.keyval.value.length.replace('..', '').split('.')
+      const minMax = this.keyval.value.length.split('..')
+      console.log(minMax)
       this.min = Number(minMax[0])
       // need to grab last element instead of 2nd element because there might only be one
       this.max = Number(minMax[minMax.length - 1])
