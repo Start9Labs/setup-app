@@ -91,7 +91,7 @@ export class AppAvailableShowPage {
 
     try {
       await this.serverService.installApp(this.server, this.app.id, version)
-      await this.navCtrl.navigateBack(['/servers', this.server.id])
+      await this.navCtrl.navigateForward(['/servers', this.server.id, 'apps', 'installed', this.app.id, 'config'], { queryParams: { freshInstall: true } })
     } catch (e) {
       this.error = e.message
     } finally {

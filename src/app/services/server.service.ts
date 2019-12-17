@@ -188,7 +188,7 @@ const mockApiServer: Lan.GetServerRes = {
 const mockApiAppAvailablePreview: ApiAppAvailablePreview = {
   id: 'bitcoin',
   versionLatest: '0.18.1',
-  versionInstalled: '0.18.1',
+  versionInstalled: undefined,
   title: 'Bitcoin Core',
   descriptionShort: 'Bitcoin is an innovative payment network and new kind of money.',
   // server specific
@@ -201,7 +201,7 @@ const mockApiAppAvailableFull: ApiAppAvailableFull = {
   descriptionLong: 'Bitcoin is an innovative payment network and new kind of money. Bitcoin utilizes a robust p2p network to garner decentralized consensus.',
   versions: [
     {
-      version: mockApiAppAvailablePreview.versionInstalled!,
+      version: '0.18.1',
       releaseNotes: '* Faster sync time<br />* MAST support',
     },
     {
