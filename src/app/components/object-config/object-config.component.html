@@ -21,7 +21,7 @@
       <ion-icon size="small" slot="icon-only" name="help-circle"></ion-icon>
     </ion-button>
     {{ keyval.key }}
-    <ion-select slot="end" interfaceOptions="setSelectHeader(keyval.key)" placeholder="Select One" [(ngModel)]="config[keyval.key]" (ngModelChange)="markEdited()">
+    <ion-select slot="end" [interfaceOptions]="setSelectHeader(keyval.key)" placeholder="Select One" [(ngModel)]="config[keyval.key]" (ngModelChange)="markEdited()">
       <ion-select-option *ngFor="let option of keyval.value.values" [value]="option">{{ option }}</ion-select-option>
     </ion-select>
   </ion-item>
