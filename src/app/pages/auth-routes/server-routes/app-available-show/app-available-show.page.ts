@@ -48,7 +48,7 @@ export class AppAvailableShowPage {
   async presentAlertInstall (version: string) {
     const alert = await this.alertCtrl.create({
       header: 'Caution',
-      message: `Are you sure you want to install ${this.app.title}, version ${version}?`,
+      message: `Are you sure you want to install ${this.app.title} ${version}?`,
       buttons: [
         {
           text: 'Cancel',
