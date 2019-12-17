@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core'
 import { ModalController, AlertController } from '@ionic/angular'
-import { AppValueSpec, AppValueSpecList, AppValueSpecString } from 'src/app/models/s9-app'
+import { AppValueSpec, AppValueSpecList, AppValueSpecString, AppValueSpecObject } from 'src/app/models/s9-app'
 
 @Component({
   selector: 'app-app-config-nested',
@@ -22,7 +22,6 @@ export class AppConfigNestedPage {
   ngOnInit () {
     if (this.keyval.value.type === 'list') {
       const minMax = this.keyval.value.length.split('..')
-      console.log(minMax)
       this.min = Number(minMax[0])
       // need to grab last element instead of 2nd element because there might only be one
       this.max = Number(minMax[minMax.length - 1])
@@ -36,7 +35,9 @@ export class AppConfigNestedPage {
     })
   }
 
-  async presentModalConfig (keyval: { key: string, value: AppValueSpec }) {
+  async presentModalConfig (keyval: { key: string, value: AppValueSpecObject }) {
+    console.log(keyval)
+    console.log(this.value[keyval.key])
     const modal = await this.modalCtrl.create({
       component: AppConfigNestedPage,
       componentProps: {

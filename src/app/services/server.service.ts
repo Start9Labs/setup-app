@@ -258,15 +258,28 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
             },
           },
         },
-        rulemakerips: {
+        rulemakers: {
           type: 'list',
-          description: 'ip addresses of users who get to make the rules',
+          description: 'the people who make the rules',
           spec: {
-            type: 'string',
-            nullable: false,
-            pattern: {
-              regex: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$',
-              description: 'may only contain numbers and periods',
+            type: 'object',
+            description: '',
+            nullable: true,
+            spec: {
+              rulemakername: {
+                type: 'string',
+                description: 'the name of the rule maker',
+                nullable: false,
+              },
+              rulemakerip: {
+                type: 'string',
+                description: 'the ip of the rule maker',
+                nullable: false,
+                pattern: {
+                  regex: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$',
+                  description: 'may only contain numbers and periods',
+                },
+              },
             },
           },
           length: '2',
@@ -327,7 +340,16 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
     testnet: true,
     rpcuserpass: {
       rules: { rule1: 'you know', rule2: 'you better know' },
-      rulemakerips: ['192.168.1.1', '192.168.1.0'],
+      rulemakers: [
+        {
+          rulemakername: 'joeuser',
+          rulemakerip: '192.168.1.1',
+        },
+        {
+          rulemakername: 'sallyuser',
+          rulemakerip: '192.168.1.0',
+        },
+      ],
       rpcuser: 'matt',
       rpcpass: 'hjsbdioqwdubwedo',
     },
