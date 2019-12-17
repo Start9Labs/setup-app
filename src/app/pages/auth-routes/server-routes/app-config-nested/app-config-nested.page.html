@@ -24,7 +24,7 @@
       <div *ngFor="let entry of value; let i = index">
         <ion-item-sliding *ngIf="keyval.value.spec.type === 'string'">
           <ion-item-options side="end">
-            <ion-item-option color="danger" (click)="presentAlertDelete(i)">
+            <ion-item-option color="danger" (click)="deleteEntry(i)">
               <ion-icon slot="icon-only" name="trash"></ion-icon>
             </ion-item-option>
           </ion-item-options>
@@ -43,7 +43,7 @@
       </div>
     </ion-item-group>
     <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-      <ion-fab-button (click)="presentAlertConfigValueNew()" class="fab-button">
+      <ion-fab-button (click)="addEntry()" class="fab-button">
         <ion-icon name="add"></ion-icon>
       </ion-fab-button>
     </ion-fab>

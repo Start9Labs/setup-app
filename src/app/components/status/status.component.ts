@@ -19,6 +19,9 @@ export class StatusComponent {
         case AppHealthStatus.UNKNOWN:
           this.color = 'dark'
           break
+        case AppHealthStatus.NEEDS_CONFIG:
+          this.color = 'warning'
+          break
         case AppHealthStatus.RUNNING:
           this.color = 'success'
           break

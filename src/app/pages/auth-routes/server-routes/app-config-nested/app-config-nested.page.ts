@@ -21,9 +21,10 @@ export class AppConfigNestedPage {
 
   ngOnInit () {
     if (this.keyval.value.type === 'list') {
-      const arr = this.keyval.value.length.split('.')
-      this.min = Number(arr[0])
-      this.max = Number(arr[arr.length - 1])
+      const minMax = this.keyval.value.length.replace('..', '').split('.')
+      this.min = Number(minMax[0])
+      // need to grab last element instead of 2nd element because there might only be one
+      this.max = Number(minMax[minMax.length - 1])
     }
   }
 
@@ -51,6 +52,22 @@ export class AppConfigNestedPage {
     await modal.present()
   }
 
+  async addEntry () {
+    if ((this.value as any[]).length >= this.max) {
+      await this.presentAlertMaxReached()
+    } else {
+      await this.presentAlertConfigValueNew()
+    }
+  }
+
+  async deleteEntry (index: number) {
+    if ((this.value as any[]).length <= this.min) {
+      await this.presentAlertMinReached()
+    } else {
+      await this.presentAlertDelete(index)
+    }
+  }
+
   async presentAlertConfigValueEdit (index: number) {
     const alert = await this.alertCtrl.create({
       header: this.keyval.key,
@@ -75,11 +92,12 @@ export class AppConfigNestedPage {
             // return if no change
             if (this.value[index] === value) { return }
             // otherwise add/update value and mark edited
-            if (this.validate(value)) {
+            try {
+              this.validate(value)
               this.markEdited();
               (this.value as any[]).splice(index, 1, value)
-            } else {
-              alert.message = ((this.keyval.value as AppValueSpecList).spec as AppValueSpecString).pattern!.description
+            } catch (e) {
+              alert.message = e.message
               return false
             }
           },
@@ -111,18 +129,37 @@ export class AppConfigNestedPage {
             const value = data.value
             // return if no value
             if (!value) { return }
-            // otherwise add/update value and mark edited
-            if (this.validate(value)) {
+            // add value and mark edited
+            try {
+              this.validate(value)
               this.markEdited();
               (this.value as any[]).push(value)
-            } else {
-              alert.message = ((this.keyval.value as AppValueSpecList).spec as AppValueSpecString).pattern!.description
+            } catch (e) {
+              alert.message = e.message
               return false
             }
           },
         },
       ],
       cssClass: 'alert-config-value',
+    })
+    await alert.present()
+  }
+
+  async presentAlertMinReached () {
+    const alert = await this.alertCtrl.create({
+      header: 'Minimum Reached',
+      message: `The minimum number of ${this.keyval.key} is ${this.min}.`,
+      buttons: ['Ok'],
+    })
+    await alert.present()
+  }
+
+  async presentAlertMaxReached () {
+    const alert = await this.alertCtrl.create({
+      header: 'Limit Reached',
+      message: `The maximum number of ${this.keyval.key} is ${this.max}.`,
+      buttons: ['Ok'],
     })
     await alert.present()
   }
@@ -149,9 +186,16 @@ export class AppConfigNestedPage {
     await alert.present()
   }
 
-  validate (value: string): boolean {
+  validate (value: string) {
+    // test blank
+    if (!value) {
+      throw new Error('cannot be blank')
+    }
+    // test pattern
     const pattern = ((this.keyval.value as AppValueSpecList).spec as AppValueSpecString).pattern
-    return !pattern || RegExp(pattern.regex).test(value)
+    if (pattern && !RegExp(pattern.regex).test(value)) {
+      throw new Error(pattern.description)
+    }
   }
 
   markEdited () {

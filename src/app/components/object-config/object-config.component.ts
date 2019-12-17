@@ -51,11 +51,12 @@ export class ObjectConfigComponent {
             // return if no change
             if (this.config[keyval.key] === value) { return }
             // set new value and mark edited
-            if (this.validate(keyval, value)) {
+            try {
+              this.validate(keyval, value)
               this.markEdited()
               this.config[keyval.key] = value
-            } else {
-              alert.message = keyval.value.pattern!.description
+            } catch (e) {
+              alert.message = e.message
               return false
             }
           },
@@ -84,8 +85,15 @@ export class ObjectConfigComponent {
   }
 
   validate (keyval: { key: string, value: AppValueSpecString }, value: string) {
+    // test nullable
+    if (!value && !keyval.value.nullable) {
+      throw new Error('cannot be blank')
+    }
+    // test pattern
     const pattern = keyval.value.pattern
-    return !pattern || RegExp(pattern.regex).test(value)
+    if (pattern && !RegExp(pattern.regex).test(value)) {
+      throw new Error(pattern.description)
+    }
   }
 
   setSelectHeader (key: string) {

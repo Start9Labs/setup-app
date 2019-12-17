@@ -38,8 +38,11 @@
         <ion-button *ngIf="app.status === 'RUNNING'" (click)="stop()" fill="outline" size="small" color="danger">
           Stop
         </ion-button>
-        <ion-button *ngIf="app.status !== 'RUNNING'" (click)="start()" fill="outline" size="small" color="success">
+        <ion-button *ngIf="app.status === 'STOPPED'" (click)="start()" fill="outline" size="small" color="success">
           Start
+        </ion-button>
+        <ion-button *ngIf="app.status === 'NEEDS_CONFIG'" [routerLink]="['config']" fill="outline" size="small" color="warning">
+          Setup
         </ion-button>
       </ion-note>
     </ion-item>

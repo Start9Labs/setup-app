@@ -218,7 +218,7 @@ const mockApiAppInstalled: ApiAppInstalled = {
   versionInstalled: '0.18.1',
   title: 'Bitcoin Core',
   torAddress: 'sample-bitcoin-tor-address',
-  status: AppHealthStatus.RUNNING,
+  status: AppHealthStatus.NEEDS_CONFIG,
   iconURL: 'assets/img/bitcoin_core.png',
 }
 
