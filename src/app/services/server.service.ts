@@ -128,30 +128,45 @@ function mapApiInstalledApp (app: ApiAppInstalled): AppInstalled {
   }
 }
 
-function mapSpecToConfig (spec: AppValueSpec, config: any): any {
+function mapSpecToConfigValue (spec: AppValueSpec, value: any): any {
+  // if value is null and spec is not nullable, mark invalid and return
+  if (value === null) {
+    if (!spec.nullable) {
+      spec.invalid = true
+    }
+    return value
+  }
+
   switch (spec.type) {
     case 'object':
-      return mapSpecToConfigObject(spec, config)
+      return mapSpecToConfigObject(spec, value)
     case 'string':
-      return mapSpecToConfigString(spec, config)
+      return mapSpecToConfigString(spec, value)
     case 'list':
-      return mapSpecToConfigList(spec, config)
+      return mapSpecToConfigList(spec, value)
     case 'enum':
-      return mapSpecToConfigEnum(spec, config)
+      return mapSpecToConfigEnum(spec, value)
     default:
-      return config
+      return value
   }
 }
 
 function mapSpecToConfigObject (spec: AppValueSpecObject, value: object): object {
+  if (typeof value !== 'object' || Array.isArray(value)) {
+    console.log('not an object', spec, value)
+    spec.invalid = true
+    return value
+  }
+
   const objectSpec = spec.spec
+
   Object.entries(objectSpec).map(([key, val]) => {
     const configVal = value[key]
-    if (configVal !== undefined) {
-      value[key] = mapSpecToConfig(val, configVal)
-    } else {
+    if (configVal === undefined) {
       value[key] = getDefaultConfigValue(val)
       val.added = true
+    } else {
+      value[key] = mapSpecToConfigValue(val, configVal)
     }
     if (val.added) {
       spec.added = true
@@ -160,50 +175,68 @@ function mapSpecToConfigObject (spec: AppValueSpecObject, value: object): object
       spec.invalid = true
     }
   })
+
   return value
 }
 
 function mapSpecToConfigString (spec: AppValueSpecString, value: string): string {
+  if (typeof value !== 'string') {
+    console.log('not a string: ', spec, value)
+    spec.invalid = true
+    return value
+  }
+
   const pattern = spec.pattern
+
   if (pattern && !RegExp(pattern.regex).test(value)) {
     spec.invalid = true
   }
-  return value
-}
 
-function mapSpecToConfigList (spec: AppValueSpecList, value: string[] | object[]): string[] | object[] {
-  const listSpec = spec.spec
-  if (listSpec.type === 'object') {
-    for (let i in value) {
-      value[i] = mapSpecToConfigObject(listSpec, value[i] as object)
-    }
-    for (let i = value.length; i < Number(spec.length.split('..')); i++) {
-      (value as object[]).push(getDefaultObject(listSpec.spec))
-    }
-  }
-  if (listSpec.type === 'string') {
-    for (let i in value) {
-      value[i] = mapSpecToConfigString(listSpec, value[i] as string)
-    }
-    for (let i = value.length; i < Number(spec.length.split('..')[0]); i++) {
-      (value as string[]).push(getDefaultString(listSpec))
-    }
-  }
-  if (listSpec.type === 'enum') {
-    for (let i in value) {
-      value[i] = mapSpecToConfigEnum(listSpec, value[i] as string)
-    }
-    for (let i = value.length; i < Number(spec.length.split('..')); i++) {
-      (value as string[]).push(getDefaultEnum(listSpec))
-    }
-  }
   return value
 }
 
 function mapSpecToConfigEnum (spec: AppValueSpecEnum, value: string) {
+  if (typeof value !== 'string') {
+    console.log('not an enum: ', spec, value)
+    spec.invalid = true
+    return value
+  }
+
   if (!spec.values.includes(value)) {
     spec.invalid = true
   }
+
+  return value
+}
+
+function mapSpecToConfigList (spec: AppValueSpecList, value: string[] | object[]): string[] | object[] {
+  if (!Array.isArray(value)) {
+    console.log('not an array', spec, value)
+    spec.invalid = true
+    return value
+  }
+
+  const listSpec = spec.spec
+
+  let fn: (val: object | string) => string | object = () => ({ })
+  switch (listSpec.type) {
+    case 'object':
+      fn = (val: object) => mapSpecToConfigObject(listSpec, val)
+      break
+    case 'string':
+      fn = (val: string) => mapSpecToConfigString(listSpec, val)
+      break
+    case 'enum':
+      fn = (val: string) => mapSpecToConfigEnum(listSpec, val)
+      break
+  }
+  // map nested values
+  value.forEach((val: string | object, i: number) => {
+    value[i] = fn(val)
+  })
+  // * MUT * add list elements until min satisfied
+  getDefaultList(spec, value)
+
   return value
 }
 
@@ -231,6 +264,7 @@ function getDefaultObject (spec: AppConfigSpec): object {
   Object.entries(spec).map(([key, val]) => {
     obj[key] = getDefaultConfigValue(val)
   })
+
   return obj
 }
 
@@ -244,12 +278,22 @@ function getDefaultString (spec: AppValueSpecString): string {
     for (let i = 0; i < length; i++) {
       s = s + crypto.getRandomCharInSet(spec.default!.charset)
     }
+
     return s
   }
 }
 
-function getDefaultList (spec: AppValueSpecList): object[] | string[] {
+function getDefaultEnum (spec: AppValueSpecEnum): string {
+  return spec.default!
+}
+
+function getDefaultBoolean (spec: AppValueSpecBoolean): boolean {
+  return spec.default
+}
+
+function getDefaultList (spec: AppValueSpecList, list: any[] = []): object[] | string[] {
   const listSpec = spec.spec
+
   let fn: () => string | object = () => ({ })
   switch (listSpec.type) {
     case 'object':
@@ -263,20 +307,11 @@ function getDefaultList (spec: AppValueSpecList): object[] | string[] {
       break
   }
 
-  let list: any[] = []
   for (let i = 0; i < Number(spec.length.split('..')[0]); i++) {
     list.push(fn())
   }
 
   return list
-}
-
-function getDefaultEnum (spec: AppValueSpecEnum): string {
-  return spec.default!
-}
-
-function getDefaultBoolean (spec: AppValueSpecBoolean): boolean {
-  return spec.default
 }
 
 // @TODO remove
@@ -398,7 +433,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
     rpcuserpass: {
       type: 'object',
       description: 'rpc username and password',
-      nullable: true,
+      nullable: false,
       spec: {
         rules: {
           type: 'object',
@@ -423,7 +458,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
           spec: {
             type: 'object',
             description: '',
-            nullable: true,
+            nullable: false,
             spec: {
               rulemakername: {
                 type: 'string',
@@ -441,21 +476,27 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
               },
             },
           },
-          length: '2',
+          length: '0..2',
         }  as AppValueSpecList,
         rpcuser: {
           type: 'string',
           description: 'rpc username',
-          nullable: true,
+          nullable: false,
+          // @TODO what if default charset doesn't align with regex. No protection here?
+          default: 'defaultrpcusername',
           pattern: {
             regex: '^[a-zA-Z]+$',
-            description: 'must contain only letter and be less than 50 characters in length.',
+            description: 'must contain only letters and be less than 50 characters in length.',
           },
         },
         rpcpass: {
           type: 'string',
           description: 'rpc password',
-          nullable: true,
+          nullable: false,
+          default: {
+            charset: 'abcdefghijklmnopqrstuvwxyz0123456789',
+            length: '10..50',
+          },
         },
       },
     },
@@ -476,12 +517,13 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
       spec: {
         type: 'string',
         nullable: false,
+        default: '192.168.1.1',
         pattern: {
           regex: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$',
           description: 'may only contain numbers and periods',
         },
       },
-      length: '0..10',
+      length: '1..10',
     } as AppValueSpecList,
     rpcauth: {
       type: 'list',
@@ -497,21 +539,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
   config: {
     randomEnum: 'option1',
     testnet: true,
-    rpcuserpass: {
-      rules: { rule1: 'you know', rule2: 'you better know' },
-      rulemakers: [
-        {
-          rulemakername: 'joeuser',
-          rulemakerip: '192.168.1.1',
-        },
-        {
-          rulemakername: 'sallyuser',
-          rulemakerip: '192.168.1.0',
-        },
-      ],
-      rpcuser: 'matt',
-      rpcpass: 'hjsbdioqwdubwedo',
-    },
+    rpcuserpass: undefined,
     port: '8333',
     maxconnections: null,
     rpcallowip: [],

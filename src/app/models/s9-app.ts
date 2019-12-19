@@ -37,6 +37,7 @@ export type AppValueSpec = AppValueSpecString |
 
 export interface AppValueSpecBase {
   type: string
+  nullable?: boolean
   description?: string
   added?: boolean
   invalid?: boolean

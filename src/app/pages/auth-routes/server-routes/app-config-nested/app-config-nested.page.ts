@@ -21,10 +21,9 @@ export class AppConfigNestedPage {
 
   ngOnInit () {
     if (this.keyval.value.type === 'list') {
-      const minMax = this.keyval.value.length.split('..')
-      this.min = Number(minMax[0])
-      // need to grab last element instead of 2nd element because there might only be one
-      this.max = Number(minMax[minMax.length - 1])
+      const [min, max] = this.keyval.value.length.split('..').map(Number)
+      this.min = min
+      this.max = max
     }
   }
 
@@ -53,7 +52,7 @@ export class AppConfigNestedPage {
   }
 
   async addEntry () {
-    if ((this.value as any[]).length >= this.max) {
+    if (this.max && (this.value as any[]).length >= this.max) {
       await this.presentAlertMaxReached()
     } else {
       await this.presentAlertConfigValueNew()
@@ -61,7 +60,7 @@ export class AppConfigNestedPage {
   }
 
   async deleteEntry (index: number) {
-    if ((this.value as any[]).length <= this.min) {
+    if (this.min && (this.value as any[]).length <= this.min) {
       await this.presentAlertMinReached()
     } else {
       await this.presentAlertDelete(index)

@@ -51,6 +51,7 @@ export class AppConfigPage {
 
       const { spec, config } = await this.serverService.getAppConfig(this.server, appId)
       this.spec = spec
+      console.log(this.spec)
       this.config = config
       this.initialConfigStringified = JSON.stringify(this.config)
       if (this.freshInstall) {

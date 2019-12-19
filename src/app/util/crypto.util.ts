@@ -30,9 +30,5 @@ export function getRandomNumberInRange (min: number, max: number): number {
 }
 
 export function getRandomCharInSet (charset: string): string {
-  let res = ''
-  for ( let i = 0; i < length; i++ ) {
-     res += charset.charAt(Math.floor(Math.random() * charset.length))
-  }
-  return res
+  return charset.charAt(Math.floor(Math.random() * charset.length))
 }
