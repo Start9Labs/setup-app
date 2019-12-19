@@ -56,7 +56,7 @@
     <ion-item-group *ngIf="keyval.value.spec.type === 'enum'">
       <ion-item *ngFor="let option of keyval.value.spec.values">
         {{ option }}
-        <ion-checkbox slot="end" [checked]="value.includes(option)" (ionChange)="handleEnumChange(option, $event)"></ion-checkbox>
+        <ion-checkbox slot="end" [checked]="value.includes(option)" (ionChange)="handleEnumChange(option)"></ion-checkbox>
       </ion-item>
     </ion-item-group>
   </div>

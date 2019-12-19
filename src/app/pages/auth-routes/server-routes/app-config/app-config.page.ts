@@ -107,14 +107,15 @@ export class AppConfigPage {
       message: 'You have unsaved changes. Are you sure you want to leave?',
       buttons: [
         {
-          text: 'Stay Here',
-          role: 'cancel',
-        },
-        {
-          text: 'Leave',
+          text: `Leave`,
+          cssClass: 'alert-danger',
           handler: () => {
             this.navigateBack()
           },
+        },
+        {
+          text: 'Stay Here',
+          role: 'cancel',
         },
       ],
     })

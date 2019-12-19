@@ -30,6 +30,17 @@ export class AppConfigNestedPage {
   }
 
   async dismiss () {
+    const spec = this.keyval.value
+    const listLength = (this.value as string[]).length
+    // if enum list, enforce limits
+    if (spec.type === 'list' && spec.spec.type === 'enum') {
+      if (listLength < this.min) {
+        return this.presentAlertMinReached()
+      } else if (listLength > this.max) {
+        return this.presentAlertMaxReached()
+      }
+    }
+
     this.modalCtrl.dismiss({
       edited: this.edited,
       value: this.value,
@@ -75,37 +86,18 @@ export class AppConfigNestedPage {
     }
   }
 
-  async handleEnumChange (option: string, event: { target: { checked: boolean } }) {
-    // prevent logic from executing again if event.target.checked is set manually below
-    if (event.target.checked === (this.value as string[]).includes(option)) {
-      return
-    }
-
+  async handleEnumChange (option: string) {
     const index = (this.value as string[]).indexOf(option)
     const length = (this.value as string[]).length
 
     // if present, delete
     if (index > -1) {
-      // enforce min
-      if (length <= this.min) {
-        await this.presentAlertMinReached()
-        event.target.checked = true
-      // delete
-      } else {
-        (this.value as string[]).splice(index, 1)
-        this.markEdited()
-      }
+      (this.value as string[]).splice(index, 1)
+      this.markEdited()
     // if not present, add
     } else {
-      // enforce max
-      if (length >= this.max) {
-        await this.presentAlertMaxReached()
-        event.target.checked = false
-      // add
-      } else {
-        (this.value as string[]).push(option)
-        this.markEdited()
-      }
+      (this.value as string[]).push(option)
+      this.markEdited()
     }
   }
 
