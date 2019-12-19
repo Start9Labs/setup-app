@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import * as crypto from '../../../util/crypto.util'
+import * as cryptoUtil from '../../../util/crypto.util'
 import { AuthService } from 'src/app/services/auth.service'
 
 @Component({
@@ -15,7 +15,7 @@ export class KeychainCreatePage {
   ) { }
 
   ngOnInit () {
-    this.mnemonic = crypto.generateMnemonic()
+    this.mnemonic = cryptoUtil.generateMnemonic()
   }
 
   async login () {

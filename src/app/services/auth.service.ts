@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 import { SecureStorageObject, SecureStorage } from '@ionic-native/secure-storage/ngx'
 import { Platform } from '@ionic/angular'
 import { Storage } from '@ionic/storage'
-import * as crypto from '../util/crypto.util'
+import * as cryptoUtil from '../util/crypto.util'
 import { BehaviorSubject } from 'rxjs'
 import { AuthStatus } from '../types/enums'
 
@@ -45,7 +45,7 @@ export class AuthService {
   }
 
   async login (mnemonic: string[]) {
-    if (!crypto.checkMnemonic(mnemonic)) {
+    if (!cryptoUtil.checkMnemonic(mnemonic)) {
       throw new Error('invalid mnemonic')
     }
     if (this.platform.is('cordova')) {

@@ -2,12 +2,11 @@ import { Injectable } from '@angular/core'
 import { HttpService } from './http.service'
 import { Method } from '../types/enums'
 import { S9ServerModel, clone } from '../models/server-model'
-import { AppInstalled, AppAvailablePreview, AppAvailableFull, AppHealthStatus, AppValueSpecList, AppConfigSpec, AppValueSpec, AppValueSpecObject, AppValueSpecString, AppValueSpecEnum, AppValueSpecBoolean } from '../models/s9-app'
+import { AppInstalled, AppAvailablePreview, AppAvailableFull, AppHealthStatus, AppValueSpecList, AppConfigSpec } from '../models/s9-app'
 import { S9Server, toS9AgentApp } from '../models/s9-server'
-import { Lan, ApiAppAvailablePreview, ApiAppAvailableFull, ApiAppInstalled, ApiAppConfig } from '../types/api-types'
+import { Lan, ApiAppAvailablePreview, ApiAppAvailableFull, ApiAppInstalled } from '../types/api-types'
 import { S9BuilderWith } from './setup.service'
-import * as crypto from '../util/crypto.util'
-const MAX_ENTROPY = 100
+import * as configUtil from '../util/config.util'
 
 @Injectable({
   providedIn: 'root',
@@ -72,7 +71,7 @@ export class ServerService {
       .then(({ spec, config }) => {
         return {
           spec,
-          config: mapSpecToConfigObject({ type: 'object', nullable: false, spec }, config || { }),
+          config: configUtil.mapSpecToConfigObject({ type: 'object', nullable: false, spec }, config || { }),
         }
       })
   }
@@ -126,192 +125,6 @@ function mapApiInstalledApp (app: ApiAppInstalled): AppInstalled {
     ...app,
     statusAt: new Date(),
   }
-}
-
-function mapSpecToConfigValue (spec: AppValueSpec, value: any): any {
-  // if value is null and spec is not nullable, mark invalid and return
-  if (value === null) {
-    if (!spec.nullable) {
-      spec.invalid = true
-    }
-    return value
-  }
-
-  switch (spec.type) {
-    case 'object':
-      return mapSpecToConfigObject(spec, value)
-    case 'string':
-      return mapSpecToConfigString(spec, value)
-    case 'list':
-      return mapSpecToConfigList(spec, value)
-    case 'enum':
-      return mapSpecToConfigEnum(spec, value)
-    default:
-      return value
-  }
-}
-
-function mapSpecToConfigObject (spec: AppValueSpecObject, value: object): object {
-  if (typeof value !== 'object' || Array.isArray(value)) {
-    console.log('not an object', spec, value)
-    spec.invalid = true
-    return value
-  }
-
-  const objectSpec = spec.spec
-
-  Object.entries(objectSpec).map(([key, val]) => {
-    const configVal = value[key]
-    if (configVal === undefined) {
-      value[key] = getDefaultConfigValue(val)
-      val.added = true
-    } else {
-      value[key] = mapSpecToConfigValue(val, configVal)
-    }
-    if (val.added) {
-      spec.added = true
-    }
-    if (val.invalid) {
-      spec.invalid = true
-    }
-  })
-
-  return value
-}
-
-function mapSpecToConfigString (spec: AppValueSpecString, value: string): string {
-  if (typeof value !== 'string') {
-    console.log('not a string: ', spec, value)
-    spec.invalid = true
-    return value
-  }
-
-  const pattern = spec.pattern
-
-  if (pattern && !RegExp(pattern.regex).test(value)) {
-    spec.invalid = true
-  }
-
-  return value
-}
-
-function mapSpecToConfigEnum (spec: AppValueSpecEnum, value: string) {
-  if (typeof value !== 'string') {
-    console.log('not an enum: ', spec, value)
-    spec.invalid = true
-    return value
-  }
-
-  if (!spec.values.includes(value)) {
-    spec.invalid = true
-  }
-
-  return value
-}
-
-function mapSpecToConfigList (spec: AppValueSpecList, value: string[] | object[]): string[] | object[] {
-  if (!Array.isArray(value)) {
-    console.log('not an array', spec, value)
-    spec.invalid = true
-    return value
-  }
-
-  const listSpec = spec.spec
-
-  let fn: (val: object | string) => string | object = () => ({ })
-  switch (listSpec.type) {
-    case 'object':
-      fn = (val: object) => mapSpecToConfigObject(listSpec, val)
-      break
-    case 'string':
-      fn = (val: string) => mapSpecToConfigString(listSpec, val)
-      break
-    case 'enum':
-      fn = (val: string) => mapSpecToConfigEnum(listSpec, val)
-      break
-  }
-  // map nested values
-  value.forEach((val: string | object, i: number) => {
-    value[i] = fn(val)
-  })
-  // * MUT * add list elements until min satisfied
-  getDefaultList(spec, value)
-
-  return value
-}
-
-function getDefaultConfigValue (spec: AppValueSpec): object | string | object[] | string[] | boolean | null {
-  if (spec.type !== 'list' && spec.type !== 'boolean' && spec.nullable) {
-    return null
-  }
-
-  switch (spec.type) {
-    case 'object':
-      return getDefaultObject(spec.spec)
-    case 'string':
-      return getDefaultString(spec)
-    case 'list':
-      return getDefaultList(spec)
-    case 'enum':
-      return getDefaultEnum(spec)
-    case 'boolean':
-      return getDefaultBoolean(spec)
-  }
-}
-
-function getDefaultObject (spec: AppConfigSpec): object {
-  const obj = { }
-  Object.entries(spec).map(([key, val]) => {
-    obj[key] = getDefaultConfigValue(val)
-  })
-
-  return obj
-}
-
-function getDefaultString (spec: AppValueSpecString): string {
-  if (typeof spec.default === 'string') {
-    return spec.default
-  } else {
-    const [min, max] = spec.default!.length.split('..').map(Number)
-    const length = crypto.getRandomNumberInRange(min, max || MAX_ENTROPY)
-    let s = ''
-    for (let i = 0; i < length; i++) {
-      s = s + crypto.getRandomCharInSet(spec.default!.charset)
-    }
-
-    return s
-  }
-}
-
-function getDefaultEnum (spec: AppValueSpecEnum): string {
-  return spec.default!
-}
-
-function getDefaultBoolean (spec: AppValueSpecBoolean): boolean {
-  return spec.default
-}
-
-function getDefaultList (spec: AppValueSpecList, list: any[] = []): object[] | string[] {
-  const listSpec = spec.spec
-
-  let fn: () => string | object = () => ({ })
-  switch (listSpec.type) {
-    case 'object':
-      fn = () => getDefaultObject(listSpec.spec)
-      break
-    case 'string':
-      fn = () => getDefaultString(listSpec)
-      break
-    case 'enum':
-      fn = () => getDefaultEnum(listSpec)
-      break
-  }
-
-  for (let i = 0; i < Number(spec.length.split('..')[0]); i++) {
-    list.push(fn())
-  }
-
-  return list
 }
 
 // @TODO remove
@@ -464,11 +277,16 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
                 type: 'string',
                 description: 'the name of the rule maker',
                 nullable: false,
+                default: {
+                  charset: 'abcdefghijklmnopqrstuvwxyz0123456789',
+                  length: '6..12',
+                },
               },
               rulemakerip: {
                 type: 'string',
                 description: 'the ip of the rule maker',
                 nullable: false,
+                default: '192.168.1.0',
                 pattern: {
                   regex: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$',
                   description: 'may only contain numbers and periods',

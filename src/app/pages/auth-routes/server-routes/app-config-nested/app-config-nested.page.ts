@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core'
 import { ModalController, AlertController } from '@ionic/angular'
 import { AppValueSpec, AppValueSpecList, AppValueSpecString, AppValueSpecObject } from 'src/app/models/s9-app'
+import * as configUtil from '../../../../util/config.util'
 
 @Component({
   selector: 'app-app-config-nested',
@@ -55,7 +56,13 @@ export class AppConfigNestedPage {
     if (this.max && (this.value as any[]).length >= this.max) {
       await this.presentAlertMaxReached()
     } else {
-      await this.presentAlertConfigValueNew()
+      // if string list show new string alert
+      if ((this.keyval.value as AppValueSpecList).spec.type === 'string') {
+        await this.presentAlertStringCreate()
+      // if object list show new object alert
+      } else {
+        await this.presentAlertObjectCreate()
+      }
     }
   }
 
@@ -72,7 +79,7 @@ export class AppConfigNestedPage {
       header: this.keyval.key,
       inputs: [
         {
-          name: 'value',
+          name: 'inputValue',
           type: 'text',
           value: this.value[index],
           placeholder: 'Enter value',
@@ -86,15 +93,15 @@ export class AppConfigNestedPage {
         },
         {
           text: 'Done',
-          handler: (data: { value: string }) => {
-            const value = data.value
+          handler: (data: { inputValue: string }) => {
+            const inputValue = data.inputValue
             // return if no change
-            if (this.value[index] === value) { return }
+            if (this.value[index] === inputValue) { return }
             // otherwise add/update value and mark edited
             try {
-              this.validate(value)
+              this.validate(inputValue)
               this.markEdited();
-              (this.value as any[]).splice(index, 1, value)
+              (this.value as any[]).splice(index, 1, inputValue)
             } catch (e) {
               alert.message = e.message
               return false
@@ -107,12 +114,12 @@ export class AppConfigNestedPage {
     await alert.present()
   }
 
-  async presentAlertConfigValueNew () {
+  async presentAlertStringCreate () {
     const alert = await this.alertCtrl.create({
       header: this.keyval.key,
       inputs: [
         {
-          name: 'value',
+          name: 'inputValue',
           type: 'text',
           placeholder: 'Enter value',
         },
@@ -124,15 +131,15 @@ export class AppConfigNestedPage {
           cssClass: 'secondary',
         }, {
           text: 'Done',
-          handler: (data: { value: string }) => {
-            const value = data.value
+          handler: (data: { inputValue: string }) => {
+            const inputValue = data.inputValue
             // return if no value
-            if (!value) { return }
+            if (!inputValue) { return }
             // add value and mark edited
             try {
-              this.validate(value)
+              this.validate(inputValue)
               this.markEdited();
-              (this.value as any[]).push(value)
+              (this.value as any[]).push(inputValue)
             } catch (e) {
               alert.message = e.message
               return false
@@ -141,6 +148,26 @@ export class AppConfigNestedPage {
         },
       ],
       cssClass: 'alert-config-value',
+    })
+    await alert.present()
+  }
+
+  async presentAlertObjectCreate () {
+    const objectSpec = (this.keyval.value as AppValueSpecList).spec as AppValueSpecObject
+    const alert = await this.alertCtrl.create({
+      header: `Create ${this.keyval.key}?`,
+      message: `${this.keyval.key} has multiple fields. You will be able to make edits before saving.`,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        }, {
+          text: 'Create',
+          handler: () => {
+            (this.value as object[]).push(configUtil.mapSpecToConfigObject(objectSpec))
+          },
+        },
+      ],
     })
     await alert.present()
   }

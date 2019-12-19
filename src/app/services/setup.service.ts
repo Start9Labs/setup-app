@@ -5,7 +5,7 @@ import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { Method } from 'src/app/types/enums'
 import { clone } from '../models/server-model'
 import { pauseFor, Omit } from 'src/app/util/misc.util'
-import * as crypto from '../util/crypto.util'
+import * as cryptoUtil from '../util/crypto.util'
 import { AuthService } from './auth.service'
 import { Lan } from '../types/api-types'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
@@ -69,7 +69,7 @@ export class SetupService {
       this.message = 'getting mnemonic'
       if (this.authService.mnemonic) {
         this.message = `deriving keys`
-        const { privkey, pubkey } = crypto.deriveKeys(this.authService.mnemonic, ssClone.id)
+        const { privkey, pubkey } = cryptoUtil.deriveKeys(this.authService.mnemonic, ssClone.id)
         ssClone.privkey = privkey
         ssClone.pubkey = pubkey
       }
