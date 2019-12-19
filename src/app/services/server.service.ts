@@ -7,6 +7,7 @@ import { S9Server, toS9AgentApp } from '../models/s9-server'
 import { Lan, ApiAppAvailablePreview, ApiAppAvailableFull, ApiAppInstalled, ApiAppConfig } from '../types/api-types'
 import { S9BuilderWith } from './setup.service'
 import * as crypto from '../util/crypto.util'
+const MAX_ENTROPY = 100
 
 @Injectable({
   providedIn: 'root',

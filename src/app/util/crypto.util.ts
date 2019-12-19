@@ -25,5 +25,14 @@ export function deriveKeys (mnemonic: string[], serverId: string): { privkey: st
 }
 
 export function getRandomNumberInRange (min: number, max: number): number {
-  return min
+  // ( Math.random() * (max - min + 1) ) << 0
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+export function getRandomCharInSet (charset: string): string {
+  let res = ''
+  for ( let i = 0; i < length; i++ ) {
+     res += charset.charAt(Math.floor(Math.random() * charset.length))
+  }
+  return res
 }
