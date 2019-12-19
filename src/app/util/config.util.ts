@@ -1,11 +1,11 @@
-import { AppValueSpec, AppValueSpecObject, AppValueSpecString, AppValueSpecEnum, AppValueSpecList, AppConfigSpec, AppValueSpecBoolean } from '../models/s9-app'
+import { ValueSpec, ValueSpecList, AppConfigSpec, WithStandalone, ListValueSpecObject, ListValueSpecString, ListValueSpecEnum, ValueSpecString, ValueSpecEnum, ValueSpecBoolean, DefaultString } from '../models/s9-app'
 import * as cryptoUtil from './crypto.util'
 const MAX_ENTROPY = 100
 
-export function mapSpecToConfigValue (spec: AppValueSpec, value: any): any {
+export function mapSpecToConfigValue (spec: ValueSpec, value: any): any {
   // if value is null and spec is not nullable, mark invalid and return
   if (value === null) {
-    if (!spec.nullable) {
+    if (!(spec as WithStandalone).nullable) {
       spec.invalid = true
     }
     return value
@@ -25,7 +25,7 @@ export function mapSpecToConfigValue (spec: AppValueSpec, value: any): any {
   }
 }
 
-export function mapSpecToConfigObject (spec: AppValueSpecObject, value = { }): object {
+export function mapSpecToConfigObject (spec: ListValueSpecObject, value = { }): object {
   if (typeof value !== 'object' || Array.isArray(value)) {
     console.log('not an object', spec, value)
     spec.invalid = true
@@ -53,7 +53,7 @@ export function mapSpecToConfigObject (spec: AppValueSpecObject, value = { }): o
   return value
 }
 
-export function mapSpecToConfigString (spec: AppValueSpecString, value: string): string {
+export function mapSpecToConfigString (spec: ListValueSpecString, value: string): string {
   if (typeof value !== 'string') {
     console.log('not a string: ', spec, value)
     spec.invalid = true
@@ -69,7 +69,7 @@ export function mapSpecToConfigString (spec: AppValueSpecString, value: string):
   return value
 }
 
-export function mapSpecToConfigEnum (spec: AppValueSpecEnum, value: string) {
+export function mapSpecToConfigEnum (spec: ListValueSpecEnum, value: string) {
   if (typeof value !== 'string') {
     console.log('not an enum: ', spec, value)
     spec.invalid = true
@@ -83,7 +83,7 @@ export function mapSpecToConfigEnum (spec: AppValueSpecEnum, value: string) {
   return value
 }
 
-export function mapSpecToConfigList (spec: AppValueSpecList, value: string[] | object[]): string[] | object[] {
+export function mapSpecToConfigList (spec: ValueSpecList, value: string[] | object[]): string[] | object[] {
   if (!Array.isArray(value)) {
     console.log('not an array', spec, value)
     spec.invalid = true
@@ -114,7 +114,7 @@ export function mapSpecToConfigList (spec: AppValueSpecList, value: string[] | o
   return value
 }
 
-export function getDefaultConfigValue (spec: AppValueSpec): object | string | object[] | string[] | boolean | null {
+export function getDefaultConfigValue (spec: ValueSpec): object | string | object[] | string[] | boolean | null {
   if (spec.type !== 'list' && spec.type !== 'boolean' && spec.nullable) {
     return null
   }
@@ -123,13 +123,13 @@ export function getDefaultConfigValue (spec: AppValueSpec): object | string | ob
     case 'object':
       return getDefaultObject(spec.spec)
     case 'string':
-      return getDefaultString(spec)
+      return getDefaultString(spec.default!)
     case 'list':
       return getDefaultList(spec)
     case 'enum':
-      return getDefaultEnum(spec)
+      return getDefaultEnum(spec.default!)
     case 'boolean':
-      return getDefaultBoolean(spec)
+      return getDefaultBoolean(spec.default)
   }
 }
 
@@ -142,48 +142,62 @@ export function getDefaultObject (spec: AppConfigSpec): object {
   return obj
 }
 
-export function getDefaultString (spec: AppValueSpecString): string {
-  console.log(spec)
-  if (typeof spec.default === 'string') {
-    return spec.default
+export function getDefaultListString (defaultVal: string | DefaultString, i: number): string {
+  if (typeof defaultVal === 'string') {
+    return defaultVal
   } else {
-    const [min, max] = spec.default!.length.split('..').map(Number)
+    const [min, max] = defaultVal.length.split('..').map(Number)
     const length = cryptoUtil.getRandomNumberInRange(min, max || MAX_ENTROPY)
     let s = ''
     for (let i = 0; i < length; i++) {
-      s = s + cryptoUtil.getRandomCharInSet(spec.default!.charset)
+      s = s + cryptoUtil.getRandomCharInSet(defaultVal.charset)
     }
 
     return s
   }
 }
 
-export function getDefaultEnum (spec: AppValueSpecEnum): string {
-  return spec.default!
+export function getDefaultString (defaultVal: string | DefaultString): string {
+  if (typeof defaultVal === 'string') {
+    return defaultVal
+  } else {
+    const [min, max] = defaultVal.length.split('..').map(Number)
+    const length = cryptoUtil.getRandomNumberInRange(min, max || MAX_ENTROPY)
+    let s = ''
+    for (let i = 0; i < length; i++) {
+      s = s + cryptoUtil.getRandomCharInSet(defaultVal.charset)
+    }
+
+    return s
+  }
 }
 
-export function getDefaultBoolean (spec: AppValueSpecBoolean): boolean {
-  return spec.default
+export function getDefaultEnum (defaultVal: string): string {
+  return defaultVal
 }
 
-export function getDefaultList (spec: AppValueSpecList, list: any[] = []): object[] | string[] {
+export function getDefaultBoolean (defaultVal: boolean): boolean {
+  return defaultVal
+}
+
+export function getDefaultList (spec: ValueSpecList, list: any[] = []): object[] | string[] {
   const listSpec = spec.spec
 
-  let fn: () => string | object = () => ({ })
+  let fn: (i: number) => string | object = () => ({ })
   switch (listSpec.type) {
     case 'object':
       fn = () => getDefaultObject(listSpec.spec)
       break
     case 'string':
-      fn = () => getDefaultString(listSpec)
+      fn = (i: number) => getDefaultString(spec.default[i] as string | DefaultString)
       break
     case 'enum':
-      fn = () => getDefaultEnum(listSpec)
+      fn = (i: number) => getDefaultEnum(spec.default[i] as string)
       break
   }
 
-  for (let i = 0; i < Number(spec.length.split('..')[0]); i++) {
-    list.push(fn())
+  for (let i = list.length; i < Number(spec.length.split('..')[0]); i++) {
+    list.push(fn(i))
   }
 
   return list

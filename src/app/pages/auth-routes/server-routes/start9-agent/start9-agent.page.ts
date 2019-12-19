@@ -1,7 +1,6 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
-import { AppInstalled } from 'src/app/models/s9-app'
 import { S9Server } from 'src/app/models/s9-server'
 import { ClipboardService } from 'src/app/services/clipboard.service'
 

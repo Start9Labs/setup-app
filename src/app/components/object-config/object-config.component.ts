@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core'
-import { AppConfigSpec, AppValueSpec, AppValueSpecString, AppValueSpecObject } from 'src/app/models/s9-app'
+import { AppConfigSpec, ValueSpec, ValueSpecString, ValueSpecObject } from 'src/app/models/s9-app'
 import { ModalController, AlertController } from '@ionic/angular'
 import { AppConfigNestedPage } from 'src/app/pages/auth-routes/server-routes/app-config-nested/app-config-nested.page'
 import * as configUtil from '../../util/config.util'
@@ -20,7 +20,7 @@ export class ObjectConfigComponent {
     private readonly modalCtrl: ModalController,
   ) { }
 
-  async presentDescription (keyval: { key: string, value: AppValueSpec }, e: Event) {
+  async presentDescription (keyval: { key: string, value: ValueSpec }, e: Event) {
     e.stopPropagation()
     const alert = await this.alertCtrl.create({
       header: keyval.key,
@@ -29,7 +29,7 @@ export class ObjectConfigComponent {
     await alert.present()
   }
 
-  async handleObjectClick (keyval: { key: string, value: AppValueSpecObject }) {
+  async handleObjectClick (keyval: { key: string, value: ValueSpecObject }) {
     // if object is not null, go to it
     if (this.config[keyval.key]) {
       await this.presentModalConfigNested(keyval)
@@ -39,7 +39,7 @@ export class ObjectConfigComponent {
     }
   }
 
-  async presentAlertObjectCreate (keyval: { key: string, value: AppValueSpecObject }) {
+  async presentAlertObjectCreate (keyval: { key: string, value: ValueSpecObject }) {
     const alert = await this.alertCtrl.create({
       header: `Create ${keyval.key}?`,
       message: `${keyval.key} has multiple fields. You will be able to edit them all before saving.`,
@@ -59,7 +59,7 @@ export class ObjectConfigComponent {
     await alert.present()
   }
 
-  async presentAlertConfigValue (keyval: { key: string, value: AppValueSpecString }) {
+  async presentAlertConfigValue (keyval: { key: string, value: ValueSpecString }) {
     const alert = await this.alertCtrl.create({
       header: keyval.key,
       inputs: [
@@ -97,7 +97,7 @@ export class ObjectConfigComponent {
     await alert.present()
   }
 
-  async presentModalConfigNested (keyval: { key: string, value: AppValueSpec }) {
+  async presentModalConfigNested (keyval: { key: string, value: ValueSpec }) {
     const modal = await this.modalCtrl.create({
       component: AppConfigNestedPage,
       componentProps: {
@@ -114,7 +114,7 @@ export class ObjectConfigComponent {
     await modal.present()
   }
 
-  validate (spec: AppValueSpecString, value: string) {
+  validate (spec: ValueSpecString, value: string) {
     // test nullable
     if (!value && !spec.nullable) {
       throw new Error('cannot be blank')

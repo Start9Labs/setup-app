@@ -12,42 +12,53 @@
 <ion-content>
 
   <div *ngIf="keyval.value.type === 'list'">
-    <ion-item-group>
-      <ion-item-divider>
-        {{ value.length }}&nbsp;
-        <span *ngIf="value.length === 1">Entry</span>
-        <span *ngIf="value.length !== 1">Entries</span>
-        <span *ngIf="min">&nbsp;( min: {{min}} )</span>
-        <span *ngIf="max">&nbsp;( max: {{max}} )</span>
-      </ion-item-divider>
-      <div *ngFor="let entry of value; let i = index">
-        <ion-item-sliding *ngIf="keyval.value.spec.type === 'string'">
-          <ion-item-options side="end">
-            <ion-item-option color="danger" (click)="deleteEntry(i)">
-              <ion-icon slot="icon-only" name="trash"></ion-icon>
-            </ion-item-option>
-          </ion-item-options>
-          <ion-item button detail="false" (click)="presentAlertConfigValueEdit(i)">
-            {{ entry }}
-          </ion-item>
-        </ion-item-sliding>
-        <ion-item-sliding *ngIf="keyval.value.spec.type === 'object'">
-          <ion-item-options side="end">
-            <ion-item-option color="danger" (click)="deleteEntry(i)">Delete</ion-item-option>
-          </ion-item-options>
-          <ion-item button detail="false" (click)="presentModalConfig({ key: i, value: keyval.value.spec })">
-            Entry #{{ i + 1 }}
-            <ion-note slot="end">complex</ion-note>
-            <ion-icon slot="end" name="arrow-forward"></ion-icon>
-          </ion-item>
-        </ion-item-sliding>
-      </div>
+
+    <div *ngIf="keyval.value.spec.type !== 'enum'">
+
+      <ion-item-group>
+        <ion-item-divider>
+          {{ value.length }}&nbsp;
+          <span *ngIf="value.length === 1">Entry</span>
+          <span *ngIf="value.length !== 1">Entries</span>
+          <span *ngIf="min">&nbsp;( min: {{min}} )</span>
+          <span *ngIf="max">&nbsp;( max: {{max}} )</span>
+        </ion-item-divider>
+        <div *ngFor="let entry of value; let i = index">
+          <ion-item-sliding *ngIf="keyval.value.spec.type === 'string'">
+            <ion-item-options side="end">
+              <ion-item-option color="danger" (click)="deleteEntry(i)">
+                <ion-icon slot="icon-only" name="trash"></ion-icon>
+              </ion-item-option>
+            </ion-item-options>
+            <ion-item button detail="false" (click)="presentAlertConfigValueEdit(i)">
+              {{ entry }}
+            </ion-item>
+          </ion-item-sliding>
+          <ion-item-sliding *ngIf="keyval.value.spec.type === 'object'">
+            <ion-item-options side="end">
+              <ion-item-option color="danger" (click)="deleteEntry(i)">Delete</ion-item-option>
+            </ion-item-options>
+            <ion-item button detail="false" (click)="presentModalConfig({ key: i, value: keyval.value.spec })">
+              Entry #{{ i + 1 }}
+              <ion-note slot="end">complex</ion-note>
+              <ion-icon slot="end" name="arrow-forward"></ion-icon>
+            </ion-item>
+          </ion-item-sliding>
+        </div>
+      </ion-item-group>
+      <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+        <ion-fab-button (click)="addEntry()" class="fab-button">
+          <ion-icon name="add"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+    </div>
+
+    <ion-item-group *ngIf="keyval.value.spec.type === 'enum'">
+      <ion-item *ngFor="let option of keyval.value.spec.values">
+        {{ option }}
+        <ion-checkbox slot="end" [checked]="value.includes(option)" (ionChange)="handleEnumChange(option, $event)"></ion-checkbox>
+      </ion-item>
     </ion-item-group>
-    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-      <ion-fab-button (click)="addEntry()" class="fab-button">
-        <ion-icon name="add"></ion-icon>
-      </ion-fab-button>
-    </ion-fab>
   </div>
 
   <ion-item-group *ngIf="keyval.value.type === 'object'">

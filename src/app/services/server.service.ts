@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core'
 import { HttpService } from './http.service'
 import { Method } from '../types/enums'
-import { S9ServerModel, clone } from '../models/server-model'
-import { AppInstalled, AppAvailablePreview, AppAvailableFull, AppHealthStatus, AppValueSpecList, AppConfigSpec } from '../models/s9-app'
+import { S9ServerModel } from '../models/server-model'
+import { AppInstalled, AppAvailablePreview, AppAvailableFull, AppHealthStatus, AppConfigSpec } from '../models/s9-app'
 import { S9Server, toS9AgentApp } from '../models/s9-server'
 import { Lan, ApiAppAvailablePreview, ApiAppAvailableFull, ApiAppInstalled } from '../types/api-types'
 import { S9BuilderWith } from './setup.service'
@@ -71,7 +71,7 @@ export class ServerService {
       .then(({ spec, config }) => {
         return {
           spec,
-          config: configUtil.mapSpecToConfigObject({ type: 'object', nullable: false, spec }, config || { }),
+          config: configUtil.mapSpecToConfigObject({ type: 'object', spec }, config || { }),
         }
       })
   }
@@ -268,10 +268,10 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
         rulemakers: {
           type: 'list',
           description: 'the people who make the rules',
+          length: '0..2',
+          default: [],
           spec: {
             type: 'object',
-            description: '',
-            nullable: false,
             spec: {
               rulemakername: {
                 type: 'string',
@@ -294,8 +294,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
               },
             },
           },
-          length: '0..2',
-        }  as AppValueSpecList,
+        },
         rpcuser: {
           type: 'string',
           description: 'rpc username',
@@ -318,6 +317,16 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
         },
       },
     },
+    notifications: {
+      type: 'list',
+      description: 'how you want to be notified',
+      length: '1..3',
+      default: ['email'],
+      spec: {
+        type: 'enum',
+        values: ['email', 'text', 'call', 'push', 'webhook'],
+      },
+    },
     port: {
       type: 'string',
       description: 'the default port for your Bitcoin node. default: 8333, testnet: 18333, regtest: 18444',
@@ -332,32 +341,32 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
     rpcallowip: {
       type: 'list',
       description: 'external ip addresses that are authorized to access your Bitcoin node',
+      length: '1..10',
+      default: ['192.168.1.1'],
       spec: {
         type: 'string',
-        nullable: false,
-        default: '192.168.1.1',
         pattern: {
           regex: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$',
           description: 'may only contain numbers and periods',
         },
       },
-      length: '1..10',
-    } as AppValueSpecList,
+    },
     rpcauth: {
       type: 'list',
       description: 'api keys that are authorized to access your Bitcoin node.',
+      length: '0..',
+      default: [],
       spec: {
         type: 'string',
-        nullable: false,
       },
-      length: '0..',
-    } as AppValueSpecList,
+    },
   },
   // actual config
   config: {
     randomEnum: 'option1',
     testnet: true,
     rpcuserpass: undefined,
+    notifications: ['email', 'text'],
     port: '8333',
     maxconnections: null,
     rpcallowip: [],

@@ -1,7 +1,8 @@
 import { Component, Input } from '@angular/core'
 import { ModalController, AlertController } from '@ionic/angular'
-import { AppValueSpec, AppValueSpecList, AppValueSpecString, AppValueSpecObject } from 'src/app/models/s9-app'
+import { ValueSpec, ValueSpecList, ValueSpecString, ValueSpecObject } from 'src/app/models/s9-app'
 import * as configUtil from '../../../../util/config.util'
+import { CheckboxChangeEventDetail } from '@ionic/core'
 
 @Component({
   selector: 'app-app-config-nested',
@@ -9,7 +10,7 @@ import * as configUtil from '../../../../util/config.util'
   styleUrls: ['./app-config-nested.page.scss'],
 })
 export class AppConfigNestedPage {
-  @Input() keyval: { key: string, value: AppValueSpec }
+  @Input() keyval: { key: string, value: ValueSpec }
   @Input() value: any[] | object
   min: number
   max: number
@@ -35,7 +36,7 @@ export class AppConfigNestedPage {
     })
   }
 
-  async presentModalConfig (keyval: { key: string, value: AppValueSpecObject }) {
+  async presentModalConfig (keyval: { key: string, value: ValueSpecObject }) {
     const modal = await this.modalCtrl.create({
       component: AppConfigNestedPage,
       componentProps: {
@@ -57,7 +58,7 @@ export class AppConfigNestedPage {
       await this.presentAlertMaxReached()
     } else {
       // if string list show new string alert
-      if ((this.keyval.value as AppValueSpecList).spec.type === 'string') {
+      if ((this.keyval.value as ValueSpecList).spec.type === 'string') {
         await this.presentAlertStringCreate()
       // if object list show new object alert
       } else {
@@ -71,6 +72,40 @@ export class AppConfigNestedPage {
       await this.presentAlertMinReached()
     } else {
       await this.presentAlertDelete(index)
+    }
+  }
+
+  async handleEnumChange (option: string, event: { target: { checked: boolean } }) {
+    // prevent logic from executing again if event.target.checked is set manually below
+    if (event.target.checked === (this.value as string[]).includes(option)) {
+      return
+    }
+
+    const index = (this.value as string[]).indexOf(option)
+    const length = (this.value as string[]).length
+
+    // if present, delete
+    if (index > -1) {
+      // enforce min
+      if (length <= this.min) {
+        await this.presentAlertMinReached()
+        event.target.checked = true
+      // delete
+      } else {
+        (this.value as string[]).splice(index, 1)
+        this.markEdited()
+      }
+    // if not present, add
+    } else {
+      // enforce max
+      if (length >= this.max) {
+        await this.presentAlertMaxReached()
+        event.target.checked = false
+      // add
+      } else {
+        (this.value as string[]).push(option)
+        this.markEdited()
+      }
     }
   }
 
@@ -153,7 +188,7 @@ export class AppConfigNestedPage {
   }
 
   async presentAlertObjectCreate () {
-    const objectSpec = (this.keyval.value as AppValueSpecList).spec as AppValueSpecObject
+    const objectSpec = (this.keyval.value as ValueSpecList).spec as ValueSpecObject
     const alert = await this.alertCtrl.create({
       header: `Create ${this.keyval.key}?`,
       message: `${this.keyval.key} has multiple fields. You will be able to make edits before saving.`,
@@ -218,7 +253,7 @@ export class AppConfigNestedPage {
       throw new Error('cannot be blank')
     }
     // test pattern
-    const pattern = ((this.keyval.value as AppValueSpecList).spec as AppValueSpecString).pattern
+    const pattern = ((this.keyval.value as ValueSpecList).spec as ValueSpecString).pattern
     if (pattern && !RegExp(pattern.regex).test(value)) {
       throw new Error(pattern.description)
     }
