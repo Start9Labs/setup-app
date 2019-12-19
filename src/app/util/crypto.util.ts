@@ -23,3 +23,7 @@ export function deriveKeys (mnemonic: string[], serverId: string): { privkey: st
   const pubkey = childNode.publicKey.toString('hex')
   return { privkey, pubkey }
 }
+
+export function getRandomNumberInRange (min: number, max: number): number {
+  return min
+}

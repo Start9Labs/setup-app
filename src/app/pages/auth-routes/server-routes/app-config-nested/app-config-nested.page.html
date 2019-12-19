@@ -17,9 +17,8 @@
         {{ value.length }}&nbsp;
         <span *ngIf="value.length === 1">Entry</span>
         <span *ngIf="value.length !== 1">Entries</span>
-        <span *ngIf="min && min !== max">&nbsp;( min: {{min}} )</span>
-        <span *ngIf="max && max !== min">&nbsp;( max: {{max}} )</span>
-        <span *ngIf="min && max && min === max">&nbsp;( required: {{min}} )</span>
+        <span *ngIf="min">&nbsp;( min: {{min}} )</span>
+        <span *ngIf="max">&nbsp;( max: {{max}} )</span>
       </ion-item-divider>
       <div *ngFor="let entry of value; let i = index">
         <ion-item-sliding *ngIf="keyval.value.spec.type === 'string'">

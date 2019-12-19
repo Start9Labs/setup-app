@@ -36,8 +36,6 @@ export class AppConfigNestedPage {
   }
 
   async presentModalConfig (keyval: { key: string, value: AppValueSpecObject }) {
-    console.log(keyval)
-    console.log(this.value[keyval.key])
     const modal = await this.modalCtrl.create({
       component: AppConfigNestedPage,
       componentProps: {

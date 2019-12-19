@@ -38,9 +38,11 @@ export type AppValueSpec = AppValueSpecString |
 export interface AppValueSpecBase {
   type: string
   description?: string
+  added?: boolean
+  invalid?: boolean
 }
 
-export interface AppValueSpecBaseWithDescription {
+export interface AppValueSpecBaseWithDescription extends AppValueSpecBase {
   description: string
 }
 
@@ -68,8 +70,8 @@ export interface AppValueSpecEnum extends AppValueSpecBaseWithDescription {
 
 export interface AppValueSpecList extends AppValueSpecBaseWithDescription {
   type: 'list'
-  spec: AppValueSpecString | AppValueSpecObject
-  length: string // '0..1' (inclusive) OR '0..' (right unbounded) OR '2' (exact)
+  spec: AppValueSpecString | AppValueSpecEnum | AppValueSpecObject
+  length: string // '0..1' (inclusive) OR '0..' (right unbounded)
 }
 
 export interface AppValueSpecObject extends AppValueSpecBase {
