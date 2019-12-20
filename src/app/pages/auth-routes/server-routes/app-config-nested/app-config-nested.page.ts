@@ -1,8 +1,7 @@
 import { Component, Input } from '@angular/core'
 import { ModalController, AlertController } from '@ionic/angular'
-import { ValueSpec, ValueSpecList, ValueSpecString, ValueSpecObject } from 'src/app/models/s9-app'
+import { ValueSpec, ValueSpecList, ValueSpecString, ValueSpecObject, ListValueSpecObject } from 'src/app/models/s9-app'
 import * as configUtil from '../../../../util/config.util'
-import { CheckboxChangeEventDetail } from '@ionic/core'
 
 @Component({
   selector: 'app-app-config-nested',
@@ -47,7 +46,7 @@ export class AppConfigNestedPage {
     })
   }
 
-  async presentModalConfig (keyval: { key: string, value: ValueSpecObject }) {
+  async presentModalConfig (keyval: { key: string, value: ListValueSpecObject }) {
     const modal = await this.modalCtrl.create({
       component: AppConfigNestedPage,
       componentProps: {
