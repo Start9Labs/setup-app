@@ -1,3 +1,3 @@
 <ion-text [color]="color">
-  <p class="loading">{{ status | titlecase }}</p>
+  <p>{{ display }}<span *ngIf="display === 'Connecting'" class="loading"></span></p>
 </ion-text>

@@ -27,9 +27,10 @@
 
     <div *ngSwitchCase="'apps'">
       <ion-item-group>
+        <ion-item-divider>Get Apps</ion-item-divider>
         <ion-item [routerLink]="['/servers', server.id, 'apps', 'available']">
           <ion-icon slot="start" size="large" name="apps" color="primary"></ion-icon>
-          <ion-text color="primary">Get Apps</ion-text>
+          <ion-text color="primary">Sovereign App Store</ion-text>
         </ion-item>
         <ion-item-divider>Installed on {{ server.friendlyName }}</ion-item-divider>
         <!-- agent app -->

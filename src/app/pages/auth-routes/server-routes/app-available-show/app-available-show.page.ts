@@ -37,7 +37,6 @@ export class AppAvailableShowPage {
 
       const appId = this.route.snapshot.paramMap.get('appId') as string
       this.app = await this.serverService.getAvailableApp(this.server, appId)
-      console.log(this.app)
     } catch (e) {
       this.error = e.message
     } finally {

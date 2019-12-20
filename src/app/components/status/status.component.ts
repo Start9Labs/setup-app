@@ -9,22 +9,34 @@ import { AppHealthStatus } from 'src/app/models/s9-app'
 export class StatusComponent {
   @Input() status: AppHealthStatus
   color: string
+  display: string
 
   constructor () { }
 
   ngOnChanges () {
     switch (this.status) {
       case AppHealthStatus.UNKNOWN:
+      case AppHealthStatus.REMOVING:
+      case AppHealthStatus.RESTARTING:
+        this.display = 'Connecting'
         this.color = 'dark'
         break
       case AppHealthStatus.NEEDS_CONFIG:
+        this.display = 'Needs Config'
         this.color = 'warning'
         break
       case AppHealthStatus.RUNNING:
+        this.display = 'Running'
         this.color = 'success'
         break
       case AppHealthStatus.UNREACHABLE:
+        this.display = 'Unreachable'
+        this.color = 'danger'
       case AppHealthStatus.STOPPED:
+        this.display = 'Stopped'
+        this.color = 'danger'
+      case AppHealthStatus.DEAD:
+        this.display = 'Dead'
         this.color = 'danger'
         break
       default:
