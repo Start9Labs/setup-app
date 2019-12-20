@@ -19,22 +19,21 @@
       <ion-text class="ion-text-wrap" color="danger">{{error}}</ion-text>
     </ion-item>
 
-    <ion-grid>
-      <ion-row>
-        <ion-col *ngFor="let app of apps" size="6">
-          <ion-card [routerLink]="[app.id]">
+    <ion-card *ngFor="let app of apps" [routerLink]="[app.id]">
+        <ion-item>
+          <ion-avatar slot="start">
             <img [src]="app.iconURL" alt="icon" />
-            <ion-card-header>
-              <ion-card-subtitle *ngIf="app.versionInstalled" color="success">Installed</ion-card-subtitle>
-              <ion-card-title>{{ app.title }}</ion-card-title>
-            </ion-card-header>
-            <ion-card-content>
-              {{ app.descriptionShort }}
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
+          </ion-avatar>
+          <ion-label>
+            <h1>{{ app.title }}</h1>
+            <ion-text *ngIf="app.versionInstalled" color="success"><p>Installed</p></ion-text>
+            <ion-text *ngIf="!app.versionInstalled" color="warning"><p>Not installed</p></ion-text>
+          </ion-label>
+        </ion-item>
+      <ion-card-content>
+        {{ app.descriptionShort }}
+      </ion-card-content>
+    </ion-card>
     
   </div>
 

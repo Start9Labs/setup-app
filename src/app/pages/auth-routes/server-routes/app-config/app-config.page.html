@@ -8,7 +8,7 @@
     <ion-title>{{ app.title }}</ion-title>
     <ion-buttons slot="end">
       <ion-button [disabled]="!edited && app.status !== 'NEEDS_CONFIG'" (click)="save()" color="primary">
-        Save{{ app.status === 'RUNNING' ? ' & restart' : app.status === 'NEEDS_CONFIG' ? ' & start' : '' }}
+        Save
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -24,7 +24,8 @@
         <ion-text color="warning">
           <p>
             To use the default configuration for {{ app.title }}, click "SAVE" now.
-            <br /><br />
+            <br />
+            <br />
             Otherwise, configure below and click "SAVE" when finished.
           </p>
         </ion-text>

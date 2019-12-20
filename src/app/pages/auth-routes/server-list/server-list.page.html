@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>
-      My Servers
+      Servers
     </ion-title>
     <ion-buttons slot="end">
       <ion-button [routerLink]="['/settings']">
@@ -11,9 +11,43 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding-top">
+<ion-content class="ion-padding">
 
-  <ion-grid>
+  <ion-item-group *ngIf="!serverModel.servers.length">
+    <ion-item>
+      <ion-label class="ion-text-wrap">
+        <h3>Welcome</h3>
+        <br />
+        <p>
+          To set up your first server, click the <a>plus</a> button below.
+        </p>
+        <br />
+        <p>
+          If you need additional help, please refer to the <a>instructions</a> and <a>FAQ</a>.
+        </p>
+      </ion-label>
+    </ion-item>
+  </ion-item-group>
+
+  <ion-card *ngFor="let server of serverModel.servers" [routerLink]="['/servers', server.id]">
+    <ion-item>
+      <ion-avatar slot="start">
+        <img src="assets/img/cube.png" alt="icon" />
+      </ion-avatar>
+      <ion-label>
+        <h1>{{ server.friendlyName }}</h1>
+        <s9-status [status]="server.status"></s9-status>
+      </ion-label>
+    </ion-item>
+  </ion-card>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button [routerLink]="['/setup']" class="fab-button">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <!-- <ion-grid>
     <ion-row>
       <ion-col size="6">
         <ion-card [routerLink]="['/setup']" class="ion-text-center add-card">
@@ -35,6 +69,6 @@
         </ion-card>
       </ion-col>
     </ion-row>
-  </ion-grid>
+  </ion-grid> -->
 
 </ion-content>

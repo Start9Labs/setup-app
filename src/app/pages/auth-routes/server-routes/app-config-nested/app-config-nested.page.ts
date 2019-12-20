@@ -46,18 +46,19 @@ export class AppConfigNestedPage {
     })
   }
 
-  async presentModalConfig (keyval: { key: string, value: ListValueSpecObject }) {
+  async presentModalConfig (i: number, spec: ListValueSpecObject) {
+    const key = `${this.keyval.key} ${i + 1}`
     const modal = await this.modalCtrl.create({
       component: AppConfigNestedPage,
       componentProps: {
-        keyval,
-        value: this.value[keyval.key],
+        keyval: { key, value: spec },
+        value: this.value[i],
       },
     })
 
     modal.onWillDismiss().then(res => {
       this.edited = this.edited || res.data.edited
-      this.value[keyval.key] = res.data.value
+      this.value[i] = res.data.value
     })
 
     await modal.present()
@@ -87,7 +88,6 @@ export class AppConfigNestedPage {
 
   async handleEnumChange (option: string) {
     const index = (this.value as string[]).indexOf(option)
-    const length = (this.value as string[]).length
 
     // if present, delete
     if (index > -1) {
