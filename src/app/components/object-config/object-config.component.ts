@@ -42,7 +42,7 @@ export class ObjectConfigComponent {
   async presentAlertObjectCreate (keyval: { key: string, value: ValueSpecObject }) {
     const alert = await this.alertCtrl.create({
       header: `Create ${keyval.key}?`,
-      message: `${keyval.key} has multiple fields. You will be able to edit them all before saving.`,
+      message: `${keyval.key} has multiple fields. You will be able to edit them before saving.`,
       buttons: [
         {
           text: 'Cancel',
