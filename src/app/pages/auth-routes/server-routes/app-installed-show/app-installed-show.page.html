@@ -5,8 +5,8 @@
     </ion-buttons>
     <ion-title>{{ app.title }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="presentActionMenu()">
-        <ion-icon name="more"></ion-icon>
+      <ion-button [routerLink]="['config']">
+        <ion-icon color="warning" name="construct"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -18,7 +18,7 @@
     <ion-text class="ion-text-wrap" color="danger">{{error}}</ion-text>
   </ion-item>
 
-  <ion-item-group style="margin-bottom: 40px;">
+  <ion-item-group>
     <ion-item>
       <ion-label position="stacked" color="medium">App Name</ion-label>
       <ion-text color="medium">
@@ -41,9 +41,6 @@
         <ion-button *ngIf="app.status === 'STOPPED'" (click)="start()" fill="outline" size="small" color="success">
           Start
         </ion-button>
-        <ion-button *ngIf="app.status === 'NEEDS_CONFIG'" [routerLink]="['config']" fill="outline" size="small" color="warning">
-          Setup
-        </ion-button>
       </ion-note>
     </ion-item>
     <ion-item>
@@ -62,6 +59,13 @@
           Copy
         </ion-button>
       </ion-note>
+    </ion-item>
+  </ion-item-group>
+
+  <ion-item-group>
+    <ion-item-divider></ion-item-divider>
+    <ion-item button detail="false" (click)="presentAlertUninstall()">
+      <ion-label color="danger">Uninstall {{ app.title }}</ion-label>
     </ion-item>
   </ion-item-group>
 

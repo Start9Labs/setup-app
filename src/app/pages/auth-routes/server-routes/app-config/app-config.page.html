@@ -7,7 +7,9 @@
     </ion-buttons>
     <ion-title>{{ app.title }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button [disabled]="!edited && app.status !== 'NEEDS_CONFIG'" (click)="save()" color="primary">Save</ion-button>
+      <ion-button [disabled]="!edited && app.status !== 'NEEDS_CONFIG'" (click)="save()" color="primary">
+        Save{{ app.status === 'RUNNING' ? ' & restart' : app.status === 'NEEDS_CONFIG' ? ' & start' : '' }}
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -16,7 +18,7 @@
 
   <ion-item-group class="ion-text-wrap">
     <div *ngIf="app.status === 'NEEDS_CONFIG'"></div>
-    <ion-item-divider><ion-text>Initial Setup</ion-text></ion-item-divider>
+    <ion-item-divider><ion-text>Initial Config</ion-text></ion-item-divider>
     <ion-item>
       <!-- <ion-label position="stacked" color="success">* Inital Setup</ion-label> -->
       <ion-text color="warning">

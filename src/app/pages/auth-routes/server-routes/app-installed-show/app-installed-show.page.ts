@@ -79,32 +79,6 @@ export class AppInstalledShowPage {
     }
   }
 
-  async presentActionMenu () {
-    const action = await this.actionCtrl.create({
-      header: 'Options',
-      buttons: [
-        {
-          text: 'Uninstall',
-          role: 'destructive',
-          icon: 'trash',
-          cssClass: 'alert-danger',
-          handler: () => {
-            this.presentAlertUninstall()
-          },
-        },
-        {
-          text: 'Config',
-          icon: 'construct',
-          cssClass: 'alert-primary',
-          handler: () => {
-            this.navCtrl.navigateForward(`/servers/${this.server.id}/apps/installed/${this.app.id}/config`)
-          },
-        },
-      ],
-    })
-    await action.present()
-  }
-
   async presentAlertUninstall () {
     const alert = await this.alertCtrl.create({
       header: 'Caution',

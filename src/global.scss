@@ -39,6 +39,13 @@
   }
 }
 
+.alert-warning {
+  color: var(--ion-color-warning) !important;
+  & ion-icon {
+    color: var(--ion-color-warning) !important;
+  }
+}
+
 .fab-button {
   --background: transparent;
   --border-width: 2px;

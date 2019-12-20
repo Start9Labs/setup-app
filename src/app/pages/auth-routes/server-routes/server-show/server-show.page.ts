@@ -35,15 +35,40 @@ export class ServerShowPage {
     }
   }
 
-  async ionViewWillLeave () {
-    if (this.edited) {
-      this.server = { ...this.server, friendlyName: this.server.friendlyName || this.server.id }
-      await this.serverModel.saveServer(this.server)
-    }
-  }
-
   async copyTor () {
     await this.clipboardService.copy(this.server.torAddress)
+  }
+
+  async presentAlertEditName () {
+    const alert = await this.alertCtrl.create({
+      header: 'Friendly Name',
+      inputs: [
+        {
+          name: 'inputValue',
+          type: 'text',
+          value: this.server.friendlyName,
+          placeholder: this.server.id,
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        }, {
+          text: 'Done',
+          handler: (data: { inputValue: string }) => {
+            const inputValue = data.inputValue
+            // return if no change
+            if (this.server.friendlyName === inputValue) { return }
+            // set new value and mark edited
+            this.server = { ...this.server, friendlyName: inputValue || this.server.id }
+            this.serverModel.saveServer(this.server)
+          },
+        },
+      ],
+      cssClass: 'alert-config-value',
+    })
+    await alert.present()
   }
 
   async presentAlertForget () {

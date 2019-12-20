@@ -64,8 +64,8 @@
     <div *ngSwitchCase="'about'">
       <ion-item-group style="margin-bottom: 40px;">
         <ion-item-divider>Server Friendly Name</ion-item-divider>
-        <ion-item>
-          <ion-input [(ngModel)]="server.friendlyName" (ionChange)="edited = true"></ion-input>
+        <ion-item button detail="false" (click)="presentAlertEditName()">
+          {{ server.friendlyName }}
         </ion-item>
         <ion-item-divider>Server Specs</ion-item-divider>
         <ion-item *ngFor="let spec of server.specs | keyvalue">

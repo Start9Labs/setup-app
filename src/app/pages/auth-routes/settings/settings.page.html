@@ -7,10 +7,44 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding-top">
+<ion-content>
 
-  <ion-button expand="block" fill="outline" color="danger" (click)="presentAlertLogout()">
-    Wipe Keychain
-  </ion-button>
+  <ion-item-group>
+    <ion-item-divider>General</ion-item-divider>
+    <ion-item button (click)="goToInstructionManual()">
+      Instructions
+    </ion-item>
+    <ion-item button (click)="goToFAQ()">
+      FAQ
+    </ion-item>
+  </ion-item-group>
+
+  <ion-item-group>
+    <ion-item-divider>Security</ion-item-divider>
+    <ion-item button (click)="presentAlertWarnRecovery()">
+      View Recovery Phrase
+    </ion-item>
+  </ion-item-group>
+
+  <ion-item-group>
+    <ion-item-divider>More</ion-item-divider>
+    <ion-item button detail="false" (click)="rateApp()">
+      <ion-icon slot="start" color="danger" name="heart"></ion-icon>
+      Rate This App
+      <div slot="end">
+        <ion-icon name="star" color="warning"></ion-icon> <ion-icon name="star" color="warning"></ion-icon> <ion-icon name="star" color="warning"></ion-icon> <ion-icon name="star" color="warning"></ion-icon> <ion-icon name="star" color="warning"></ion-icon>
+      </div>
+    </ion-item>
+    <ion-item button detail="false" (click)="presentActionContact()">
+      Contact support
+    </ion-item>
+  </ion-item-group>
+
+  <ion-item-group>
+    <ion-item-divider></ion-item-divider>
+    <ion-item button detail="false" (click)="presentAlertWipeKeychain()">
+      <ion-label color="danger">Wipe Keychain</ion-label>
+    </ion-item>
+  </ion-item-group>
 
 </ion-content>

@@ -1,18 +1,15 @@
 
 .welcome-banner {
-  position: absolute;
-  top: 16%;
-  padding: 0 18px;
+  font-family: 'Cutive Mono';
+  padding-top: 80px;
   text-align: center;
+  & h1 {
+    font-size: 80px;
+  }
 }
 
 .welcome-buttons {
   position: absolute;
   bottom: 0;
   width: 100%;
-  & .button {
-    border-width: 1px 0 0 0;
-    border-color: #999999;
-    margin: 0;
-  }
 }
