@@ -17,18 +17,19 @@
 <ion-content>
 
   <ion-item-group class="ion-text-wrap">
-    <div *ngIf="app.status === 'NEEDS_CONFIG'"></div>
-    <ion-item-divider><ion-text>Initial Config</ion-text></ion-item-divider>
-    <ion-item>
-      <!-- <ion-label position="stacked" color="success">* Inital Setup</ion-label> -->
-      <ion-text color="warning">
-        <p>
-          To use the default configuration for {{ app.title }}, click "SAVE" now.
-          <br /><br />
-          Otherwise, configure below and click "SAVE" when finished.
-        </p>
-      </ion-text>
-    </ion-item>
+    <div *ngIf="app.status === 'NEEDS_CONFIG'">
+      <ion-item-divider><ion-text>Initial Config</ion-text></ion-item-divider>
+      <ion-item>
+        <!-- <ion-label position="stacked" color="success">* Inital Setup</ion-label> -->
+        <ion-text color="warning">
+          <p>
+            To use the default configuration for {{ app.title }}, click "SAVE" now.
+            <br /><br />
+            Otherwise, configure below and click "SAVE" when finished.
+          </p>
+        </ion-text>
+      </ion-item>
+    </div>
     <ion-item-divider>Config Options</ion-item-divider>
     <object-config [spec]="spec" [(edited)]="edited" [config]="config"></object-config>
   </ion-item-group>

@@ -4,19 +4,29 @@
       <ion-back-button [defaultHref]="'servers/' + server.id"></ion-back-button>
     </ion-buttons>
     <ion-title>{{ app.title }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button [routerLink]="['config']">
-        <ion-icon color="warning" name="construct"></ion-icon>
-      </ion-button>
-    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding-top">
+<ion-content>
 
   <ion-item *ngIf="error" style="margin-bottom: 16px;">
     <ion-text class="ion-text-wrap" color="danger">{{error}}</ion-text>
   </ion-item>
+
+  <ion-grid class="ion-padding-top ion-padding-bottom">
+    <ion-row>
+      <ion-col size="6">
+        <ion-button expand="block" fill="outline" [routerLink]="['/servers', server.id, 'apps', 'available', app.id]">
+          View in Store
+        </ion-button>
+      </ion-col>
+      <ion-col size="6">
+        <ion-button expand="block" fill="outline" color="warning" [routerLink]="['config']">
+          Config
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 
   <ion-item-group>
     <ion-item>
