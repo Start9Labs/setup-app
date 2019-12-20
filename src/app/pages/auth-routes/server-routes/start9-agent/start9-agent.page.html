@@ -13,7 +13,7 @@
     <ion-text class="ion-text-wrap" color="danger">{{error}}</ion-text>
   </ion-item>
 
-  <ion-item-group style="margin-bottom: 40px;">
+  <ion-item-group>
     <ion-item>
       <ion-label position="stacked" color="medium">App Name</ion-label>
       <ion-text color="medium">
@@ -28,7 +28,7 @@
     </ion-item>
     <ion-item>
       <ion-label position="stacked" color="medium">Status</ion-label>
-      <s9-status [serverUpdating]="server.updating" [status]="server.status"></s9-status>
+      <s9-status [status]="server.status"></s9-status>
     </ion-item>
     <ion-item>
       <ion-label position="stacked" color="medium">Last Status Check</ion-label>

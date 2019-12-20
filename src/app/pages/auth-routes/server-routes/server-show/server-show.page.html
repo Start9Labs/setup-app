@@ -42,7 +42,7 @@
             <p>version: {{ server.agentApp.versionInstalled }}</p>
           </ion-label>
           <ion-note slot="end">
-            <s9-status [serverUpdating]="server.updating" [status]="server.agentApp.status"></s9-status>
+            <s9-status [status]="server.agentApp.status"></s9-status>
           </ion-note>
         </ion-item>
         <!-- installed apps -->
@@ -55,14 +55,14 @@
             <p>version: {{ app.versionInstalled }}</p>
           </ion-label>
           <ion-note slot="end">
-            <s9-status [serverUpdating]="server.updating" [status]="app.status"></s9-status>
+            <s9-status [status]="app.status"></s9-status>
           </ion-note>
         </ion-item>
       </ion-item-group>
     </div>
 
     <div *ngSwitchCase="'about'">
-      <ion-item-group style="margin-bottom: 40px;">
+      <ion-item-group>
         <ion-item-divider>Server Friendly Name</ion-item-divider>
         <ion-item button detail="false" (click)="presentAlertEditName()">
           {{ server.friendlyName }}
@@ -75,9 +75,13 @@
           </ion-text>
         </ion-item>
       </ion-item-group>
-      <ion-button expand="block" fill="outline" color="danger" (click)="presentAlertForget()">
-        Forget Server
-      </ion-button>
+
+      <ion-item-group>
+        <ion-item-divider></ion-item-divider>
+        <ion-item button detail="false" (click)="presentAlertForget()">
+          <ion-label color="danger">Forget Server</ion-label>
+        </ion-item>
+      </ion-item-group>
     </div>
 
   </div>

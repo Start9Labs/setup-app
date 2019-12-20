@@ -7,11 +7,13 @@ import { AppConfigNestedPage } from './app-config-nested.page'
 import { ObjectConfigComponentModule } from 'src/app/components/object-config/object-config.components.module'
 
 @NgModule({
+  declarations: [AppConfigNestedPage],
   imports: [
     ObjectConfigComponentModule,
     CommonModule,
     IonicModule,
   ],
-  declarations: [AppConfigNestedPage],
+  entryComponents: [AppConfigNestedPage],
+  exports: [AppConfigNestedPage],
 })
 export class AppConfigNestedPageModule { }

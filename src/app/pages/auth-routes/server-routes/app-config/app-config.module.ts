@@ -6,8 +6,8 @@ import { Routes, RouterModule } from '@angular/router'
 import { IonicModule } from '@ionic/angular'
 
 import { AppConfigPage } from './app-config.page'
-import { AppConfigNestedPage } from '../app-config-nested/app-config-nested.page'
 import { ObjectConfigComponentModule } from 'src/app/components/object-config/object-config.components.module'
+import { AppConfigNestedPageModule } from '../app-config-nested/app-config-nested.module'
 
 const routes: Routes = [
   {
@@ -18,13 +18,13 @@ const routes: Routes = [
 
 @NgModule({
   imports: [
+    AppConfigNestedPageModule,
     ObjectConfigComponentModule,
     CommonModule,
     FormsModule,
     IonicModule,
     RouterModule.forChild(routes),
   ],
-  entryComponents: [AppConfigNestedPage],
-  declarations: [AppConfigPage, AppConfigNestedPage],
+  declarations: [AppConfigPage],
 })
 export class AppConfigPageModule { }

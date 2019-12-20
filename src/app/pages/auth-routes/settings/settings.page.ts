@@ -16,6 +16,14 @@ export class SettingsPage {
     private readonly actionSheetCtrl: ActionSheetController,
   ) { }
 
+  async goToInstructions () {
+    return true
+  }
+
+  async goToFAQ () {
+    return true
+  }
+
   async presentAlertWarnRecovery () {
     const alert = await this.alertCtrl.create({
       header: 'Caution',

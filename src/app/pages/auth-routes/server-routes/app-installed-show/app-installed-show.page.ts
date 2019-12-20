@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { AlertController, NavController, LoadingController, ActionSheetController } from '@ionic/angular'
+import { AlertController, NavController, LoadingController } from '@ionic/angular'
 import { ServerService } from 'src/app/services/server.service'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
@@ -25,7 +25,6 @@ export class AppInstalledShowPage {
     private readonly navCtrl: NavController,
     private readonly clipboardService: ClipboardService,
     private readonly loadingCtrl: LoadingController,
-    private readonly actionCtrl: ActionSheetController,
   ) { }
 
   ngOnInit () {
