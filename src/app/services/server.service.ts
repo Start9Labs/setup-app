@@ -12,8 +12,6 @@ import * as configUtil from '../util/config.util'
   providedIn: 'root',
 })
 export class ServerService {
-  mock = true
-
   constructor (
     private readonly httpService: HttpService,
     private readonly s9Model: S9ServerModel,
@@ -21,8 +19,8 @@ export class ServerService {
 
   async getServer (server: S9Server | S9BuilderWith<'zeroconfService' | 'privkey' | 'versionInstalled' | 'torAddress'>): Promise<S9Server> {
     // @TODO remove
-    return mockGetServer()
-    // return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.get, '')
+    // return mockGetServer()
+    return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.get, '')
       .then(res => {
         const toReturn = {
           updating: false,
@@ -40,14 +38,14 @@ export class ServerService {
 
   async getAvailableApps (server: S9Server): Promise<AppAvailablePreview[]> {
     // @TODO remove
-    return mockGetAvailableApps()
-    // return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(server, Method.get, '/apps/available')
+    // return mockGetAvailableApps()
+    return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(server, Method.get, '/apps/available')
   }
 
   async getAvailableApp (server: S9Server, appId: string): Promise<AppAvailableFull> {
     // @TODO remove
-    return mockGetAvailableApp()
-    // return this.httpService.authServerRequest<Lan.GetAppAvailableRes>(server, Method.get, `/apps/available/${appId}`)
+    // return mockGetAvailableApp()
+    return this.httpService.authServerRequest<Lan.GetAppAvailableRes>(server, Method.get, `/apps/available/${appId}`)
       .then(res => {
         return {
           ...res,
@@ -59,15 +57,15 @@ export class ServerService {
 
   async getInstalledApps (server: S9Server): Promise<AppInstalled[]> {
     // @TODO remove
-    return mockGetInstalledApps()
-    // return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.get, `/apps/installed`)
+    // return mockGetInstalledApps()
+    return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.get, `/apps/installed`)
       .then(res => res.map(mapApiInstalledApp))
   }
 
   async getAppConfig (server: S9Server, appId: string): Promise<{ spec: AppConfigSpec, config: object }> {
     // @TODO remove
-    return mockGetAppConfig()
-    // return this.httpService.authServerRequest<Lan.GetAppConfigRes>(server, Method.get, `/apps/installed/${appId}/config`)
+    // return mockGetAppConfig()
+    return this.httpService.authServerRequest<Lan.GetAppConfigRes>(server, Method.get, `/apps/installed/${appId}/config`)
       .then(({ spec, config }) => {
         return {
           spec,
@@ -82,8 +80,8 @@ export class ServerService {
       version,
     }
     // @TODO remove
-    const installed = await mockInstallApp()
-    // const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.post, `/apps/install`, { }, body, 240000)
+    // const installed = await mockInstallApp()
+    const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.post, `/apps/install`, { }, body, 240000)
       .then(mapApiInstalledApp)
     await this.s9Model.addApp(server, installed)
     return installed
@@ -94,29 +92,29 @@ export class ServerService {
       id: appId,
     }
     // @TODO remove
-    await mockUninstallApp()
-    // await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(server, Method.post, `/apps/uninstall`, { }, body)
+    // await mockUninstallApp()
+    await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(server, Method.post, `/apps/uninstall`, { }, body)
     await this.s9Model.removeApp(server, appId)
   }
 
   async startApp (server: S9Server, app: AppInstalled): Promise<AppInstalled> {
     // @TODO remove
-    return mockStartApp()
-    // return this.httpService.authServerRequest<Lan.PostStartAppRes>(server, Method.post, `/apps/${app.id}/start`)
+    // return mockStartApp()
+    return this.httpService.authServerRequest<Lan.PostStartAppRes>(server, Method.post, `/apps/${app.id}/start`)
       .then(mapApiInstalledApp)
   }
 
   async stopApp (server: S9Server, app: AppInstalled): Promise<AppInstalled> {
     // @TODO remove
-    return mockStopApp()
-    // return this.httpService.authServerRequest<Lan.PostStopAppRes>(server, Method.post, `/apps/${app.id}/stop`)
+    // return mockStopApp()
+    return this.httpService.authServerRequest<Lan.PostStopAppRes>(server, Method.post, `/apps/${app.id}/stop`)
       .then(mapApiInstalledApp)
   }
 
   async updateAppConfig (server: S9Server, app: AppInstalled, config: object): Promise<void> {
     // @TODO remove
-    await mockUpdateAppConfig()
-    // await this.httpService.authServerRequest<Lan.PostUpdateAppConfigRes>(server, Method.patch, `/apps/installed/${app.id}/config`, { }, { config })
+    // await mockUpdateAppConfig()
+    await this.httpService.authServerRequest<Lan.PostUpdateAppConfigRes>(server, Method.patch, `/apps/installed/${app.id}/config`, { }, { config })
   }
 }
 
