@@ -15,32 +15,24 @@
 
   <ion-item-group>
     <ion-item>
-      <ion-label position="stacked" color="medium">App Name</ion-label>
-      <ion-text color="medium">
-        <p>{{ server.agentApp.title }}</p>
-      </ion-text>
+      <ion-label position="stacked">App Name</ion-label>
+      <ion-text color="medium"><h5>{{ server.agentApp.title }}</h5></ion-text>
     </ion-item>
     <ion-item>
-      <ion-label position="stacked" color="medium">Installed Version</ion-label>
-      <ion-text color="medium">
-        <p>{{ server.agentApp.versionInstalled }}</p>
-      </ion-text>
+      <ion-label position="stacked">Installed Version</ion-label>
+      <ion-text color="medium"><h5>{{ server.agentApp.versionInstalled }}</h5></ion-text>
     </ion-item>
     <ion-item>
-      <ion-label position="stacked" color="medium">Status</ion-label>
+      <ion-label position="stacked">Status</ion-label>
       <s9-status [status]="server.status"></s9-status>
     </ion-item>
     <ion-item>
-      <ion-label position="stacked" color="medium">Last Status Check</ion-label>
-      <ion-text color="medium">
-        <p>{{ server.agentApp.statusAt | date: 'short' }}</p>
-      </ion-text>
+      <ion-label position="stacked">Last Status Check</ion-label>
+      <ion-text color="medium"><h5>{{ server.agentApp.statusAt | date: 'short' }}</h5></ion-text>
     </ion-item>
     <ion-item>
-      <ion-label position="stacked" color="medium">Tor Address</ion-label>
-      <ion-text color="medium">
-        <p>{{ server.agentApp.torAddress }}</p>
-      </ion-text>
+      <ion-label position="stacked">Tor Address</ion-label>
+      <ion-text color="medium"><h5>{{ server.agentApp.torAddress }}</h5></ion-text>
       <ion-note slot="end">
         <ion-button (click)="copyTor()" fill="outline" size="small">
           Copy

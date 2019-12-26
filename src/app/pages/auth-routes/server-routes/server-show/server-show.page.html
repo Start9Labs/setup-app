@@ -39,8 +39,8 @@
             <img [src]="server.agentApp.iconURL" alt="icon" />
           </ion-avatar>
           <ion-label>
-            <h3>{{ server.agentApp.title }}</h3>
-            <p>version: {{ server.agentApp.versionInstalled }}</p>
+            <h2>{{ server.agentApp.title }}</h2>
+            <h3>{{ server.agentApp.versionInstalled }}</h3>
           </ion-label>
           <ion-note slot="end">
             <s9-status [status]="server.agentApp.status"></s9-status>
@@ -52,8 +52,8 @@
             <img [src]="app.iconURL" alt="icon" />
           </ion-avatar>
           <ion-label>
-            <h3>{{ app.title }}</h3>
-            <p>version: {{ app.versionInstalled }}</p>
+            <h2>{{ app.title }}</h2>
+            <h3>{{ app.versionInstalled }}</h3>
           </ion-label>
           <ion-note slot="end">
             <s9-status [status]="app.status"></s9-status>
@@ -70,10 +70,8 @@
         </ion-item>
         <ion-item-divider>Server Specs</ion-item-divider>
         <ion-item *ngFor="let spec of server.specs | keyvalue">
-          <ion-label position="stacked" color="medium">{{ spec.key }}</ion-label>
-          <ion-text color="medium">
-            <p>{{ spec.value }}</p>
-          </ion-text>
+          <ion-label position="stacked">{{ spec.key }}</ion-label>
+          <ion-text color="medium"><h5>{{ spec.value }}</h5></ion-text>
         </ion-item>
       </ion-item-group>
 

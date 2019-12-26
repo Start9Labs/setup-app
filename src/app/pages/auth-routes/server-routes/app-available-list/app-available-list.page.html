@@ -26,12 +26,12 @@
           </ion-avatar>
           <ion-label>
             <h1>{{ app.title }}</h1>
-            <ion-text *ngIf="app.versionInstalled" color="success"><p>Installed</p></ion-text>
-            <ion-text *ngIf="!app.versionInstalled" color="warning"><p>Not installed</p></ion-text>
+            <ion-text *ngIf="app.versionInstalled" color="success"><h2>Installed</h2></ion-text>
+            <ion-text *ngIf="!app.versionInstalled" color="warning"><h2>Not installed</h2></ion-text>
           </ion-label>
         </ion-item>
       <ion-card-content>
-        {{ app.descriptionShort }}
+        <ion-text color="medium"><h2>{{ app.descriptionShort }}</h2></ion-text>
       </ion-card-content>
     </ion-card>
     

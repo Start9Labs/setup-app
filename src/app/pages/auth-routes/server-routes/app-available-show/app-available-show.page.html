@@ -56,18 +56,17 @@
       <ion-item-group>
         <ion-item>
           <ion-label class="ion-text-wrap">
-            <h3>Description</h3>
+            <h2>Description</h2>
             <br />
-            <p>{{ app.descriptionLong }}</p>
+            <ion-text color="medium"><h2>{{ app.descriptionLong }}</h2></ion-text>
           </ion-label>
         </ion-item>
         <ion-item-divider></ion-item-divider>
         <ion-item>
           <ion-label class="ion-text-wrap">
-            <h3>New in {{ app.versionLatest }}</h3>
-            <p>Last updated 12/16/2019</p>
+            <h2>New in {{ app.versionLatest }}</h2>
             <br />
-            <p [innerHTML]="app.releaseNotes"></p>
+            <ion-text color="medium"><h2 [innerHTML]="app.releaseNotes"></h2></ion-text>
           </ion-label>
         </ion-item>
       </ion-item-group>
