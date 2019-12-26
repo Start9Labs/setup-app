@@ -7,8 +7,8 @@
     </ion-buttons>
     <ion-title>{{ app.title }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button [disabled]="!edited && app.status !== 'NEEDS_CONFIG'" (click)="save()" color="primary">
-        Save
+      <ion-button (click)="save()" color="primary">
+        <b>Save</b>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -16,11 +16,10 @@
 
 <ion-content>
 
-  <ion-item-group class="ion-text-wrap">
+  <ion-item-group *ngIf="!loading" class="ion-text-wrap">
     <div *ngIf="app.status === 'NEEDS_CONFIG'">
       <ion-item-divider><ion-text>Initial Config</ion-text></ion-item-divider>
       <ion-item>
-        <!-- <ion-label position="stacked" color="success">* Inital Setup</ion-label> -->
         <ion-text color="warning">
           <p>
             To use the default configuration for {{ app.title }}, click "SAVE" now.

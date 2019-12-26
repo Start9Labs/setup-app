@@ -114,7 +114,7 @@ function appendDefaultOptions (httpOptions: HttpOptions): HttpOptions {
 }
 
 export interface HttpOptions {
-  params?: { [key: string]: string }
+  params?: { [key: string]: string | undefined }
   headers?: HttpHeaders
   responseType?: 'json' | 'text'
   observe?: 'response'

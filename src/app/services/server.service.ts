@@ -74,6 +74,12 @@ export class ServerService {
       })
   }
 
+  async getAppLogs (server: S9Server, appId: string, params: Lan.GetAppLogsReq = { }): Promise<string[]> {
+    // @TODO remove
+    // return mockGetAppLogs()
+    return this.httpService.authServerRequest<Lan.GetAppLogsRes>(server, Method.get, `/apps/installed/${appId}/logs`, { params })
+  }
+
   async installApp (server: S9Server, appId: string, version: string): Promise<AppInstalled> {
     const body: Lan.PostInstallAppReq = {
       id: appId,
@@ -143,6 +149,11 @@ async function mockGetAvailableApps (): Promise<Lan.GetAppsAvailableRes> {
 // @TODO remove
 async function mockGetInstalledApps (): Promise<Lan.GetAppsInstalledRes> {
   return [mockApiAppInstalled]
+}
+
+// @TODO remove
+async function mockGetAppLogs (): Promise<Lan.GetAppLogsRes> {
+  return mockApiAppLogs
 }
 
 // @TODO remove
@@ -226,6 +237,26 @@ const mockApiAppInstalled: ApiAppInstalled = {
   status: AppHealthStatus.RUNNING,
   iconURL: 'assets/img/bitcoin_core.png',
 }
+
+// @TODO remove
+const mockApiAppLogs: string[] = [
+  '[ng] ℹ ｢wdm｣: Compiled successfully.',
+  '[ng] ℹ ｢wdm｣: Compiling...',
+  '[ng] Date: 2019-12-26T14:20:30.872Z - Hash: 2b2e5abb3cba2164aea0',
+  '[ng] 114 unchanged chunks',
+  '[ng] chunk {app-logs-app-logs-module} app-logs-app-logs-module.js, app-logs-app-logs-module.js.map (app-logs-app-logs-module) 7.86 kB  [rendered]',
+  '[ng] Time: 1244ms',
+  '[ng] ℹ ｢wdm｣: Compiled successfully.',
+  '[ng] ℹ ｢wdm｣: Compiling...',
+  '[ng] Date: 2019-12-26T14:21:01.685Z - Hash: bb3f5d0e11f2cd2dd57b',
+  '[ng] 114 unchanged chunks',
+  '[ng] chunk {app-logs-app-logs-module} app-logs-app-logs-module.js, app-logs-app-logs-module.js.map (app-logs-app-logs-module) 7.86 kB  [rendered]',
+  '[ng] Time: 1185ms',
+  '[ng] ℹ ｢wdm｣: Compiled successfully.',
+  '[ng] ℹ ｢wdm｣: Compiling...',
+  '[ng] Date: 2019-12-26T14:23:13.812Z - Hash: 9342e11e6b8e16ad2f70',
+  '[ng] 114 unchanged chunks',
+]
 
 const mockApiAppConfig: Lan.GetAppConfigRes = {
   // config spec

@@ -1,11 +1,12 @@
 import { Component } from '@angular/core'
-import { AlertController, NavController, LoadingController } from '@ionic/angular'
+import { AlertController, NavController, LoadingController, ActionSheetController } from '@ionic/angular'
 import { ServerService } from 'src/app/services/server.service'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
-import { AppInstalled } from 'src/app/models/s9-app'
+import { AppInstalled, AppHealthStatus } from 'src/app/models/s9-app'
 import { S9Server } from 'src/app/models/s9-server'
 import { ClipboardService } from 'src/app/services/clipboard.service'
+import { ActionSheetButton } from '@ionic/core'
 
 @Component({
   selector: 'app-app-installed-show',
@@ -19,6 +20,7 @@ export class AppInstalledShowPage {
 
   constructor (
     private readonly alertCtrl: AlertController,
+    private readonly actionCtrl: ActionSheetController,
     private readonly serverService: ServerService,
     private readonly route: ActivatedRoute,
     private readonly serverModel: S9ServerModel,
@@ -46,6 +48,65 @@ export class AppInstalledShowPage {
 
   async copyTor () {
     await this.clipboardService.copy(this.server.torAddress)
+  }
+
+  async presentAction () {
+    const buttons: ActionSheetButton[] = [
+      {
+        text: 'Config',
+        icon: 'construct',
+        handler: () => {
+          this.navCtrl.navigateForward(['/servers', this.server.id, 'apps', 'installed', this.app.id, 'config'])
+        },
+      },
+      {
+        text: 'Logs',
+        icon: 'paper',
+        handler: () => {
+          this.navCtrl.navigateForward(['/servers', this.server.id, 'apps', 'installed', this.app.id, 'logs'])
+        },
+      },
+      {
+        text: 'Store Listing',
+        icon: 'appstore',
+        handler: () => {
+          this.navCtrl.navigateForward(['/servers', this.server.id, 'apps', 'available', this.app.id])
+        },
+      },
+    ]
+
+    if (this.app.status === AppHealthStatus.RUNNING) {
+      buttons.push({
+        text: 'Stop',
+        icon: 'square',
+        handler: () => {
+          this.stop()
+        },
+      })
+    } else {
+      buttons.push({
+        text: 'Start',
+        icon: 'play',
+        handler: () => {
+          this.start()
+        },
+      })
+    }
+
+    buttons.push({
+      text: 'Uninstall',
+      cssClass: 'alert-danger',
+      icon: 'trash',
+      handler: () => {
+        this.presentAlertUninstall()
+      },
+    })
+
+    const action = await this.actionCtrl.create({
+      buttons,
+    })
+
+    await action.present()
   }
 
   async stop (): Promise<void> {

@@ -1,0 +1,23 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="'servers/' + server.id + '/apps/installed/' + app.id"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Logs</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" color="light">
+
+  <p *ngFor="let log of logs">
+    {{ log }}
+  </p>
+
+  <div class="ion-text-center ion-padding">
+    <ion-button *ngIf="loading" fill="outline">
+      Load More
+    </ion-button>
+    <ion-spinner *ngIf="loading" name="lines" color="warning"></ion-spinner>
+  </div>
+
+</ion-content>
