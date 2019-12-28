@@ -20,7 +20,7 @@
     </ion-item>
     <ion-item>
       <ion-label position="stacked">Installed Version</ion-label>
-      <ion-text color="medium"><h5>{{ server.agent.versionInstalled }}</h5></ion-text>
+      <ion-text color="medium"><h5>{{ server.versionInstalled }}</h5></ion-text>
     </ion-item>
     <ion-item>
       <ion-label position="stacked">Status</ion-label>
@@ -41,10 +41,10 @@
     </ion-item>
   </ion-item-group>
 
-  <ion-item-group *ngIf="compareVersions(server.agent.versionInstalled, server.agent.versionLatest) === -1">
+  <ion-item-group *ngIf="compareVersions(server.versionInstalled, server.versionLatest) === -1">
     <ion-item-divider></ion-item-divider>
     <ion-item button detail="false" (click)="presentAlertUpdate()">
-      <ion-label color="primary">Update to {{ server.agent.versionLatest }}</ion-label>
+      <ion-label color="primary">Update to {{ server.versionLatest }}</ion-label>
     </ion-item>
   </ion-item-group>
 

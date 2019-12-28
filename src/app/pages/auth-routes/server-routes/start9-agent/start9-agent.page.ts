@@ -45,7 +45,7 @@ export class Start9AgentPage {
   async presentAlertUpdate () {
     const alert = await this.alertCtrl.create({
       header: 'Confirm',
-      message: `Update Agent to ${this.server.agent.versionLatest}?`,
+      message: `Update Agent to ${this.server.versionLatest}?`,
       buttons: [
         {
           text: 'Cancel',
