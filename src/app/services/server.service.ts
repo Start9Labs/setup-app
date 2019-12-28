@@ -22,17 +22,24 @@ export class ServerService {
     // return mockGetServer()
     return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.get, '')
       .then(res => {
-        return mapApiServer(server, res)
+        const toReturn = {
+          updating: false,
+          apps: [],
+          ...server,
+          ...res,
+          statusAt: new Date(),
+        }
+        return {
+          ...toReturn,
+          agent: toS9Agent(toReturn),
+        }
       })
   }
 
-  async updateAgent (server: S9Server) {
+  async updateAgent (server: S9Server): Promise<void> {
     // @TODO remove
-    return mockPostUpdateAgent()
-    // return this.httpService.authServerRequest<Lan.PostUpdateAgentRes>(server, Method.post, '/update', { }, { version: server.versionLatest })
-      .then(res => {
-        return mapApiServer(server, res)
-      })
+    // await mockPostUpdateAgent()
+    await this.httpService.authServerRequest<Lan.PostUpdateAgentRes>(server, Method.post, '/update', { }, { version: server.versionLatest })
   }
 
   async getAvailableApps (server: S9Server): Promise<AppAvailablePreview[]> {
@@ -123,20 +130,6 @@ export class ServerService {
   }
 }
 
-function mapApiServer (server: S9Server  | S9BuilderWith<'zeroconfService' | 'privkey' | 'versionInstalled' | 'torAddress'>, apiServer: Lan.GetServerRes): S9Server {
-  const toReturn = {
-    updating: false,
-    apps: [],
-    ...server,
-    ...apiServer,
-    statusAt: new Date(),
-  }
-  return {
-    ...toReturn,
-    agent: toS9Agent(toReturn),
-  }
-}
-
 function mapApiInstalledApp (app: ApiAppInstalled): AppInstalled {
   return {
     ...app,
@@ -150,8 +143,8 @@ async function mockGetServer (): Promise<Lan.GetServerRes> {
 }
 
 // @TODO remove
-async function mockPostUpdateAgent (): Promise<Lan.GetServerRes> {
-  return mockApiServer
+async function mockPostUpdateAgent (): Promise<Lan.PostUpdateAgentRes> {
+  return { }
 }
 
 

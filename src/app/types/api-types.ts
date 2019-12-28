@@ -56,7 +56,7 @@ export module Lan {
   export type PostInstallAppReq = { id: string, version: string }
   export type PostInstallAppRes = ApiAppInstalled
   export type PostUpdateAgentReq = { version: string }
-  export type PostUpdateAgentRes = GetServerRes
+  export type PostUpdateAgentRes = TwoHundredOK
   export type PostUninstallAppReq = { id: string }
   export type PostUninstallAppRes = TwoHundredOK
   export type PostStartAppReq = { }
