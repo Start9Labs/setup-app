@@ -34,16 +34,16 @@
         </ion-item>
         <ion-item-divider>Installed on {{ server.friendlyName }}</ion-item-divider>
         <!-- agent app -->
-        <ion-item [routerLink]="['/servers', server.id, 'apps', 'installed', server.agentApp.id]">
+        <ion-item [routerLink]="['/servers', server.id, 'apps', 'installed', server.agent.id]">
           <ion-avatar slot="start">
-            <img [src]="server.agentApp.iconURL" alt="icon" />
+            <img [src]="server.agent.iconURL" alt="icon" />
           </ion-avatar>
           <ion-label>
-            <h2>{{ server.agentApp.title }}</h2>
-            <h3>{{ server.agentApp.versionInstalled }}</h3>
+            <h2>{{ server.agent.title }}</h2>
+            <h3>{{ server.agent.versionInstalled }}</h3>
           </ion-label>
           <ion-note slot="end">
-            <s9-status [status]="server.agentApp.status"></s9-status>
+            <s9-status [status]="server.agent.status"></s9-status>
           </ion-note>
         </ion-item>
         <!-- installed apps -->

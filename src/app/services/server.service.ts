@@ -3,7 +3,7 @@ import { HttpService } from './http.service'
 import { Method } from '../types/enums'
 import { S9ServerModel } from '../models/server-model'
 import { AppInstalled, AppAvailablePreview, AppAvailableFull, AppHealthStatus, AppConfigSpec } from '../models/s9-app'
-import { S9Server, toS9AgentApp } from '../models/s9-server'
+import { S9Server, toS9Agent } from '../models/s9-server'
 import { Lan, ApiAppAvailablePreview, ApiAppAvailableFull, ApiAppInstalled } from '../types/api-types'
 import { S9BuilderWith } from './setup.service'
 import * as configUtil from '../util/config.util'
@@ -22,17 +22,16 @@ export class ServerService {
     // return mockGetServer()
     return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.get, '')
       .then(res => {
-        const toReturn = {
-          updating: false,
-          apps: [],
-          ...server,
-          ...res,
-          statusAt: new Date(),
-        }
-        return {
-          ...toReturn,
-          agentApp: toS9AgentApp(toReturn),
-        }
+        return mapApiServer(server, res)
+      })
+  }
+
+  async updateAgent (server: S9Server) {
+    // @TODO remove
+    return mockPostUpdateAgent()
+    // return this.httpService.authServerRequest<Lan.PostUpdateAgentRes>(server, Method.post, '/update', { }, { version: server.versionLatest })
+      .then(res => {
+        return mapApiServer(server, res)
       })
   }
 
@@ -124,6 +123,20 @@ export class ServerService {
   }
 }
 
+function mapApiServer (server: S9Server  | S9BuilderWith<'zeroconfService' | 'privkey' | 'versionInstalled' | 'torAddress'>, apiServer: Lan.GetServerRes): S9Server {
+  const toReturn = {
+    updating: false,
+    apps: [],
+    ...server,
+    ...apiServer,
+    statusAt: new Date(),
+  }
+  return {
+    ...toReturn,
+    agent: toS9Agent(toReturn),
+  }
+}
+
 function mapApiInstalledApp (app: ApiAppInstalled): AppInstalled {
   return {
     ...app,
@@ -135,6 +148,12 @@ function mapApiInstalledApp (app: ApiAppInstalled): AppInstalled {
 async function mockGetServer (): Promise<Lan.GetServerRes> {
   return mockApiServer
 }
+
+// @TODO remove
+async function mockPostUpdateAgent (): Promise<Lan.GetServerRes> {
+  return mockApiServer
+}
+
 
 // @TODO remove
 async function mockGetAvailableApp (): Promise<Lan.GetAppAvailableRes> {

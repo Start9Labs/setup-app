@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { S9Server, toS9AgentApp, ServerSpecs, getLanIP } from '../models/s9-server'
+import { S9Server, toS9Agent, ServerSpecs, getLanIP } from '../models/s9-server'
 import { HttpService } from './http.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { Method } from 'src/app/types/enums'
@@ -94,7 +94,7 @@ export class SetupService {
           ssClone.versionLatest = res.versionLatest
           ssClone.status = res.status
           ssClone.statusAt = res.statusAt
-          ssClone.agentApp = res.agentApp
+          ssClone.agent = res.agent
         })
         .catch(console.error)
     }
@@ -134,7 +134,7 @@ export class SetupService {
 
   // @TODO remove
   mockServer (ss: S9ServerBuilder): Required<S9ServerBuilder> {
-    const toReturn: Omit<Required<S9ServerBuilder>, 'agentApp'> = {
+    const toReturn: Omit<Required<S9ServerBuilder>, 'agent'> = {
       id: ss.id,
       friendlyName: ss.friendlyName,
       torAddress: 'agent-tor-address.onion',
@@ -159,7 +159,7 @@ export class SetupService {
     }
     return {
       ...toReturn,
-      agentApp: toS9AgentApp(toReturn),
+      agent: toS9Agent(toReturn),
     }
   }
 
@@ -186,7 +186,7 @@ export interface S9ServerBuilder {
   torAddress?: string
   zeroconfService?: ZeroconfService
 
-  agentApp?: AppInstalled
+  agent?: AppInstalled
 }
 
 export function hasValues<T extends keyof S9ServerBuilder> (t: T[], s: S9ServerBuilder): s is S9BuilderWith<T> {
@@ -209,7 +209,7 @@ export function fromUserInput (id: string, friendlyName: string): S9ServerBuilde
 }
 
 export function toS9Server (sb: Required<S9ServerBuilder>): S9Server {
-  const { id, friendlyName, status, statusAt, versionInstalled, versionLatest, privkey, torAddress, zeroconfService, specs, agentApp } = sb
+  const { id, friendlyName, status, statusAt, versionInstalled, versionLatest, privkey, torAddress, zeroconfService, specs, agent } = sb
   return {
     id,
     friendlyName,
@@ -217,7 +217,7 @@ export function toS9Server (sb: Required<S9ServerBuilder>): S9Server {
     statusAt,
     versionInstalled,
     versionLatest,
-    agentApp,
+    agent,
     specs,
     privkey,
     torAddress,
@@ -247,5 +247,5 @@ const defaultBuilder: Required<S9ServerBuilder> = {
   registered:       undefined as any,
   torAddress:       undefined as any,
   zeroconfService:  undefined as any,
-  agentApp:         undefined as any,
+  agent:         undefined as any,
 }

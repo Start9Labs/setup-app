@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="'servers/' + server.id"></ion-back-button>
     </ion-buttons>
-    <ion-title>{{ server.agentApp.title }}</ion-title>
+    <ion-title>{{ server.agent.title }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -16,11 +16,11 @@
   <ion-item-group>
     <ion-item>
       <ion-label position="stacked">App Name</ion-label>
-      <ion-text color="medium"><h5>{{ server.agentApp.title }}</h5></ion-text>
+      <ion-text color="medium"><h5>{{ server.agent.title }}</h5></ion-text>
     </ion-item>
     <ion-item>
       <ion-label position="stacked">Installed Version</ion-label>
-      <ion-text color="medium"><h5>{{ server.agentApp.versionInstalled }}</h5></ion-text>
+      <ion-text color="medium"><h5>{{ server.agent.versionInstalled }}</h5></ion-text>
     </ion-item>
     <ion-item>
       <ion-label position="stacked">Status</ion-label>
@@ -28,16 +28,23 @@
     </ion-item>
     <ion-item>
       <ion-label position="stacked">Last Status Check</ion-label>
-      <ion-text color="medium"><h5>{{ server.agentApp.statusAt | date: 'short' }}</h5></ion-text>
+      <ion-text color="medium"><h5>{{ server.agent.statusAt | date: 'short' }}</h5></ion-text>
     </ion-item>
     <ion-item>
       <ion-label position="stacked">Tor Address</ion-label>
-      <ion-text color="medium"><h5>{{ server.agentApp.torAddress }}</h5></ion-text>
+      <ion-text color="medium"><h5>{{ server.agent.torAddress }}</h5></ion-text>
       <ion-note slot="end">
         <ion-button (click)="copyTor()" fill="outline" size="small">
           Copy
         </ion-button>
       </ion-note>
+    </ion-item>
+  </ion-item-group>
+
+  <ion-item-group *ngIf="compareVersions(server.agent.versionInstalled, server.agent.versionLatest) === -1">
+    <ion-item-divider></ion-item-divider>
+    <ion-item button detail="false" (click)="presentAlertUpdate()">
+      <ion-label color="primary">Update to {{ server.agent.versionLatest }}</ion-label>
     </ion-item>
   </ion-item-group>
 

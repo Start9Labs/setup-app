@@ -3,6 +3,9 @@ import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
 import { S9Server } from 'src/app/models/s9-server'
 import { ClipboardService } from 'src/app/services/clipboard.service'
+import { AlertController, LoadingController } from '@ionic/angular'
+import { ServerService } from 'src/app/services/server.service'
+import * as compareVersions from 'compare-versions'
 
 @Component({
   selector: 'app-start9-agent',
@@ -12,11 +15,15 @@ import { ClipboardService } from 'src/app/services/clipboard.service'
 export class Start9AgentPage {
   error: string
   server: S9Server
+  compareVersions = compareVersions
 
   constructor (
     private readonly route: ActivatedRoute,
     private readonly serverModel: S9ServerModel,
     private readonly clipboardService: ClipboardService,
+    private readonly alertCtrl: AlertController,
+    private readonly loadingCtrl: LoadingController,
+    private readonly serverService: ServerService,
   ) { }
 
   ngOnInit () {
@@ -33,5 +40,40 @@ export class Start9AgentPage {
 
   async copyTor () {
     await this.clipboardService.copy(this.server.torAddress)
+  }
+
+  async presentAlertUpdate () {
+    const alert = await this.alertCtrl.create({
+      header: 'Confirm',
+      message: `Update Agent to ${this.server.agent.versionLatest}?`,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: 'Update',
+          handler: async () => {
+            this.update()
+          },
+        },
+      ],
+    })
+    await alert.present()
+  }
+
+  async update () {
+    const loader = await this.loadingCtrl.create({
+      message: `Updating...`,
+    })
+    await loader.present()
+
+    try {
+      await this.serverService.updateAgent(this.server)
+    } catch (e) {
+      this.error = e.message
+    } finally {
+      await loader.dismiss()
+    }
   }
 }

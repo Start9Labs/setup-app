@@ -100,7 +100,7 @@ export class AppAvailableShowPage {
 
   async uninstall (): Promise<void> {
     const loader = await this.loadingCtrl.create({
-      message: `Uninstalling`,
+      message: `Uninstalling...`,
     })
     await loader.present()
 

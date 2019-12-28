@@ -18,7 +18,7 @@ export interface S9Server extends S9ServerStorable {
   status: AppHealthStatus
   statusAt: Date
   specs: ServerSpecs
-  agentApp: AppInstalled
+  agent: AppInstalled
   apps: AppInstalled[]
   versionLatest: string
   privkey: string // derive from mnemonic + torAddress
@@ -33,7 +33,7 @@ export function getLanIP (zcs: ZeroconfService): string  {
 
 export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): S9Server {
   const { friendlyName, torAddress, zeroconfService, id, versionInstalled } = ss
-  const toReturn: Omit<S9Server, 'agentApp'> = {
+  const toReturn: Omit<S9Server, 'agent'> = {
     id,
     friendlyName,
     torAddress,
@@ -50,7 +50,7 @@ export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): 
 
   return {
     ...toReturn,
-    agentApp: toS9AgentApp(toReturn),
+    agent: toS9Agent(toReturn),
   }
 }
 
@@ -71,7 +71,7 @@ export function idFromSerial (serialNo: string): string {
   return CryptoJS.SHA256(serialNo).toString(CryptoJS.enc.Hex).substr(0, 8)
 }
 
-export function toS9AgentApp (ss: S9Server | Omit<S9Server, 'agentApp'> | Omit<Required<S9ServerBuilder>, 'agentApp'>): AppInstalled {
+export function toS9Agent (ss: S9Server | Omit<S9Server, 'agent'> | Omit<Required<S9ServerBuilder>, 'agent'>): AppInstalled {
   return {
     id: 'start9Agent',
     title: 'Start9 Agent',
