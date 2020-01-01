@@ -39,7 +39,6 @@
     "cordova-ios": "^5.1.1",
     "cordova-plugin-add-swift-support": "^2.0.1",
     "cordova-plugin-network-information": "^2.0.2",
-    "cordova-plugin-secure-storage-echo": "^5.0.1",
     "cordova-plugin-wifiwizard2": "git+https://github.com/tripflex/wifiwizard2.git",
     "cordova-plugin-zeroconf": "^1.4.0",
     "core-js": "^2.6.11",
@@ -97,7 +96,6 @@
       },
       "cordova-plugin-ionic-keyboard": {},
       "cordova-plugin-zeroconf": {},
-      "cordova-plugin-secure-storage-echo": {},
       "cordova-plugin-network-information": {},
       "cordova-clipboard": {}
     },
