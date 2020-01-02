@@ -3,7 +3,6 @@ import { S9ServerModel, clone } from '../models/server-model'
 import { pauseFor } from 'src/app/util/misc.util'
 import { ServerService } from '../services/server.service'
 import { AppHealthStatus } from '../models/s9-app'
-import { ZeroconfDaemon } from './zeroconf-daemon'
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +12,6 @@ export class SyncDaemon {
   private static readonly ms = 10000
 
   constructor (
-    private readonly zeroconfDaemon: ZeroconfDaemon,
     private readonly serverService: ServerService,
     private readonly serverModel: S9ServerModel,
   ) { }
