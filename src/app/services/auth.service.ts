@@ -17,10 +17,8 @@ export class AuthService {
 
   async init () {
     // returns undefined if key does not exist
-    const mnemonic = await this.storage.get('mnemonic')
+    const mnemonic = await this.storage.get('mnemonic') as cryptoUtil.Hex
     if (mnemonic) {
-      console.log(mnemonic)
-      console.log(await cryptoUtil.decrypt(mnemonic, ''))
       this.mnemonic = JSON.parse(await cryptoUtil.decrypt(mnemonic, ''))
       this.authState.next(AuthStatus.authed)
     } else {
@@ -32,7 +30,8 @@ export class AuthService {
     if (!cryptoUtil.checkMnemonic(mnemonic)) {
       throw new Error('invalid mnemonic')
     }
-    await this.storage.set('mnemonic', cryptoUtil.encrypt(JSON.stringify(mnemonic), ''))
+    const encrypted = cryptoUtil.encrypt(JSON.stringify(mnemonic), '')
+    await this.storage.set('mnemonic', encrypted)
     this.mnemonic = mnemonic
     this.authState.next(AuthStatus.authed)
   }
