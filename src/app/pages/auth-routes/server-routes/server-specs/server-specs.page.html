@@ -1,0 +1,19 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="'servers/' + server.id"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Server Specs</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding-top">
+
+  <ion-item-group>
+    <ion-item *ngFor="let spec of server.specs | keyvalue">
+      <ion-label position="stacked">{{ spec.key }}</ion-label>
+      <ion-text color="medium"><h5>{{ spec.value }}</h5></ion-text>
+    </ion-item>
+  </ion-item-group>
+
+</ion-content>

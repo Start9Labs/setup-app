@@ -1,88 +1,59 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="servers"></ion-back-button>
+      <ion-back-button defaultHref="'servers'"></ion-back-button>
     </ion-buttons>
     <ion-title>{{ server.friendlyName }}</ion-title>
-  </ion-toolbar>
-  <ion-toolbar>
-    <ion-segment [(ngModel)]="view">
-      <ion-segment-button value="apps">
-        <ion-label>Apps</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="about">
-        <ion-label>About</ion-label>
-      </ion-segment-button>
-    </ion-segment>
+    <ion-buttons slot="end">
+      <ion-button (click)="presentAction()">
+        <ion-icon name="more"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
 
-  <ion-item *ngIf="error" style="margin-bottom: 16px;">
+  <ion-item *ngIf="error">
     <ion-text class="ion-text-wrap" color="danger">{{error}}</ion-text>
   </ion-item>
 
-  <div [ngSwitch]="view">
+  <ion-item-group>
+    <ion-item>
+      <ion-label position="stacked">Status</ion-label>
+      <h5><s9-status [status]="server.status"></s9-status></h5>
+    </ion-item>
+  </ion-item-group>
 
-    <div *ngSwitchCase="'apps'">
-      <ion-item-group>
-        <ion-item-divider>Get Apps</ion-item-divider>
-        <ion-item [routerLink]="['/servers', server.id, 'apps', 'available']">
-          <ion-icon slot="start" size="large" name="apps" color="primary"></ion-icon>
-          <ion-text color="primary">Sovereign App Store</ion-text>
-        </ion-item>
-        <ion-item-divider>Installed on {{ server.friendlyName }}</ion-item-divider>
-        <!-- agent app -->
-        <ion-item [routerLink]="['/servers', server.id, 'apps', 'installed', server.agent.id]">
-          <ion-avatar slot="start">
-            <img [src]="server.agent.iconURL" alt="icon" />
-          </ion-avatar>
-          <ion-label>
-            <h2>{{ server.agent.title }}</h2>
-            <h3>{{ server.agent.versionInstalled }}</h3>
-          </ion-label>
-          <ion-note slot="end">
-            <s9-status [status]="server.agent.status"></s9-status>
-          </ion-note>
-        </ion-item>
-        <!-- installed apps -->
-        <ion-item *ngFor="let app of server.apps" [routerLink]="['/servers', server.id, 'apps', 'installed', app.id]">
-          <ion-avatar slot="start">
-            <img [src]="app.iconURL" alt="icon" />
-          </ion-avatar>
-          <ion-label>
-            <h2>{{ app.title }}</h2>
-            <h3>{{ app.versionInstalled }}</h3>
-          </ion-label>
-          <ion-note slot="end">
-            <s9-status [status]="app.status"></s9-status>
-          </ion-note>
-        </ion-item>
-      </ion-item-group>
-    </div>
-
-    <div *ngSwitchCase="'about'">
-      <ion-item-group>
-        <ion-item-divider>Server Friendly Name</ion-item-divider>
-        <ion-item button detail="false" (click)="presentAlertEditName()">
-          <ion-label>{{ server.friendlyName }}</ion-label>
-        </ion-item>
-        <ion-item-divider>Server Specs</ion-item-divider>
-        <ion-item *ngFor="let spec of server.specs | keyvalue">
-          <ion-label position="stacked">{{ spec.key }}</ion-label>
-          <ion-text color="medium"><h5>{{ spec.value }}</h5></ion-text>
-        </ion-item>
-      </ion-item-group>
-
-      <ion-item-group>
-        <ion-item-divider></ion-item-divider>
-        <ion-item button detail="false" (click)="presentAlertForget()">
-          <ion-label color="danger">Forget Server</ion-label>
-        </ion-item>
-      </ion-item-group>
-    </div>
-
-  </div>
+  <ion-item-group>
+    <ion-item-divider>Apps</ion-item-divider>
+    <ion-item [routerLink]="['/servers', server.id, 'apps', 'available']">
+      <ion-icon slot="start" size="large" name="apps" color="primary"></ion-icon>
+      <ion-text color="primary">Sovereign App Store</ion-text>
+    </ion-item>
+    <!-- agent app -->
+    <ion-item [routerLink]="['/servers', server.id, 'apps', 'installed', 'start9Agent']">
+      <ion-avatar slot="start">
+        <img src="assets/img/agent.png" alt="icon" />
+      </ion-avatar>
+      <ion-label>
+        <h2>Start9 Agent</h2>
+        <h3>{{ server.versionInstalled }}</h3>
+      </ion-label>
+    </ion-item>
+    <!-- installed apps -->
+    <ion-item *ngFor="let app of server.apps" [routerLink]="['/servers', server.id, 'apps', 'installed', app.id]">
+      <ion-avatar slot="start">
+        <img [src]="app.iconURL" alt="icon" />
+      </ion-avatar>
+      <ion-label>
+        <h2>{{ app.title }}</h2>
+        <h3>{{ app.versionInstalled }}</h3>
+      </ion-label>
+      <ion-note slot="end">
+        <s9-status [status]="app.status"></s9-status>
+      </ion-note>
+    </ion-item>
+  </ion-item-group>
 
 </ion-content>

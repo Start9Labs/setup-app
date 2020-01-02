@@ -1,11 +1,12 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { S9ServerModel } from 'src/app/models/server-model'
+import { S9ServerModel, clone } from 'src/app/models/server-model'
 import { S9Server } from 'src/app/models/s9-server'
 import { ClipboardService } from 'src/app/services/clipboard.service'
 import { AlertController, LoadingController } from '@ionic/angular'
 import { ServerService } from 'src/app/services/server.service'
 import * as compareVersions from 'compare-versions'
+import { AppHealthStatus } from 'src/app/models/s9-app'
 
 @Component({
   selector: 'app-start9-agent',
@@ -63,13 +64,12 @@ export class Start9AgentPage {
   }
 
   async update () {
-    const loader = await this.loadingCtrl.create({
-      message: `Updating...`,
-    })
+    const loader = await this.loadingCtrl.create()
     await loader.present()
 
     try {
       await this.serverService.updateAgent(this.server)
+      this.serverModel.saveServer({ ...this.server, status: AppHealthStatus.UPDATING })
     } catch (e) {
       this.error = e.message
     } finally {

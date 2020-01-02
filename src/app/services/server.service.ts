@@ -3,7 +3,7 @@ import { HttpService } from './http.service'
 import { Method } from '../types/enums'
 import { S9ServerModel } from '../models/server-model'
 import { AppInstalled, AppAvailablePreview, AppAvailableFull, AppHealthStatus, AppConfigSpec } from '../models/s9-app'
-import { S9Server, toS9Agent } from '../models/s9-server'
+import { S9Server } from '../models/s9-server'
 import { Lan, ApiAppAvailablePreview, ApiAppAvailableFull, ApiAppInstalled } from '../types/api-types'
 import { S9BuilderWith } from './setup.service'
 import * as configUtil from '../util/config.util'
@@ -22,16 +22,12 @@ export class ServerService {
     // return mockGetServer()
     return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.get, '')
       .then(res => {
-        const toReturn = {
+        return {
           updating: false,
           apps: [],
           ...server,
           ...res,
           statusAt: new Date(),
-        }
-        return {
-          ...toReturn,
-          agent: toS9Agent(toReturn),
         }
       })
   }

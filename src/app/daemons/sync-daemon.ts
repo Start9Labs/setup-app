@@ -3,6 +3,7 @@ import { S9ServerModel, clone } from '../models/server-model'
 import { pauseFor } from 'src/app/util/misc.util'
 import { ServerService } from '../services/server.service'
 import { AppHealthStatus } from '../models/s9-app'
+import { ZeroconfDaemon } from './zeroconf-daemon'
 
 @Injectable({
   providedIn: 'root',
@@ -12,6 +13,7 @@ export class SyncDaemon {
   private static readonly ms = 10000
 
   constructor (
+    private readonly zeroconfDaemon: ZeroconfDaemon,
     private readonly serverService: ServerService,
     private readonly serverModel: S9ServerModel,
   ) { }
@@ -23,6 +25,7 @@ export class SyncDaemon {
       console.log('syncing servers: ', this.serverModel.servers)
 
       Promise.all(this.serverModel.servers.map(async server => {
+        // return if already updating
         if (server.updating) { return }
 
         let serverClone = clone({ ...server, updating: true })

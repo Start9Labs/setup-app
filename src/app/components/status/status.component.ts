@@ -32,9 +32,15 @@ export class StatusComponent {
       case AppHealthStatus.UNREACHABLE:
         this.display = 'Unreachable'
         this.color = 'danger'
+        break
       case AppHealthStatus.STOPPED:
         this.display = 'Stopped'
         this.color = 'danger'
+        break
+      case AppHealthStatus.UPDATING:
+        this.display = 'Updating'
+        this.color = 'warning'
+        break
       case AppHealthStatus.DEAD:
         this.display = 'Dead'
         this.color = 'danger'

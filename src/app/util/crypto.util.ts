@@ -68,12 +68,13 @@ export async function encrypt (data: string, pin: string): Promise<Hex> {
 export async function decrypt (encrypted: Hex, pin: string): Promise<string> {
   const key = await getKey(pin)
   let encBuf = arrayBufferFromHex(encrypted)
+
   const arrayBuff = await window.crypto.subtle.decrypt({
     name: 'AES-CTR',
     counter: encBuf.slice(0, 16),
     length: 64,
   }, key, encBuf.slice(16))
-  console.log(arrayBuff)
+
   return new TextDecoder().decode(arrayBuff)
 }
 

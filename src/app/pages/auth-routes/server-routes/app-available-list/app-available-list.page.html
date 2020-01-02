@@ -20,16 +20,16 @@
     </ion-item>
 
     <ion-card *ngFor="let app of apps" [routerLink]="[app.id]">
-        <ion-item>
-          <ion-avatar slot="start">
-            <img [src]="app.iconURL" alt="icon" />
-          </ion-avatar>
-          <ion-label>
-            <h1>{{ app.title }}</h1>
-            <ion-text *ngIf="app.versionInstalled" color="success"><h2>Installed</h2></ion-text>
-            <ion-text *ngIf="!app.versionInstalled" color="warning"><h2>Not installed</h2></ion-text>
-          </ion-label>
-        </ion-item>
+      <ion-item>
+        <ion-avatar slot="start">
+          <img [src]="app.iconURL" alt="icon" />
+        </ion-avatar>
+        <ion-label>
+          <h1>{{ app.title }}</h1>
+          <ion-text *ngIf="app.versionInstalled" color="success"><h2>Installed</h2></ion-text>
+          <ion-text *ngIf="!app.versionInstalled" color="warning"><h2>Not installed</h2></ion-text>
+        </ion-label>
+      </ion-item>
       <ion-card-content>
         <ion-text color="medium"><h2>{{ app.descriptionShort }}</h2></ion-text>
       </ion-card-content>

@@ -1,3 +1,4 @@
 <ion-text [color]="color">
-  <h3>{{ display }}<span *ngIf="display === 'Connecting'" class="loading"></span></h3>
+  {{ display }}
+  <span *ngIf="['Connecting', 'Updating'].includes(display)">...</span>
 </ion-text>

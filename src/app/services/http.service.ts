@@ -64,7 +64,7 @@ export class HttpService {
         call = () => this.http.delete<T>(url, newOptions as any)
         break
       default: // makes tsc happy
-          call = () => this.http.get<T>(url, newOptions as any)
+        call = () => this.http.get<T>(url, newOptions as any)
     }
 
     try {
@@ -77,7 +77,7 @@ export class HttpService {
         throw new Error(`Expected HTTP Event Type, got ${response.type}`)
       }
     } catch (e) {
-      console.error(e)
+      console.error('http request error:', e)
       const error: HttpErrorResponse = e
       const message = error.error || error
       throw new Error(message)

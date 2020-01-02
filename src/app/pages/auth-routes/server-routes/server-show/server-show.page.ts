@@ -1,9 +1,10 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
-import { NavController, AlertController } from '@ionic/angular'
+import { NavController, AlertController, ActionSheetController } from '@ionic/angular'
 import { S9Server } from 'src/app/models/s9-server'
-import { ClipboardService } from 'src/app/services/clipboard.service'
+import { ActionSheetButton } from '@ionic/core'
+import { AppHealthStatus } from 'src/app/models/s9-app'
 
 @Component({
   selector: 'page-server-show',
@@ -20,8 +21,8 @@ export class ServerShowPage {
     private readonly route: ActivatedRoute,
     private readonly serverModel: S9ServerModel,
     private readonly navCtrl: NavController,
+    private readonly actionCtrl: ActionSheetController,
     private readonly alertCtrl: AlertController,
-    private readonly clipboardService: ClipboardService,
   ) { }
 
   ngOnInit () {
@@ -35,8 +36,39 @@ export class ServerShowPage {
     }
   }
 
-  async copyTor () {
-    await this.clipboardService.copy(this.server.torAddress)
+  async presentAction () {
+    const buttons: ActionSheetButton[] = []
+
+    if (this.server.status === AppHealthStatus.RUNNING) {
+      buttons.push({
+        text: 'Server Specs',
+        handler: () => {
+          this.navCtrl.navigateForward(['/servers', this.server.id, 'specs'])
+        },
+      })
+    }
+
+    buttons.push(
+      {
+        text: 'Edit Friendly Name',
+        handler: () => {
+          this.presentAlertEditName()
+        },
+      },
+      {
+        text: 'Forget Server',
+        cssClass: 'alert-danger',
+        handler: () => {
+          this.presentAlertForget()
+        },
+      },
+    )
+
+    const action = await this.actionCtrl.create({
+      buttons,
+    })
+
+    await action.present()
   }
 
   async presentAlertEditName () {

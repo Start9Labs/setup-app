@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Zeroconf, ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { Subscription } from 'rxjs'
+import { Platform } from '@ionic/angular'
 
 @Injectable({
   providedIn: 'root',
@@ -10,10 +11,13 @@ export class ZeroconfDaemon {
   private zeroconfMonitor: Subscription
 
   constructor (
-    public zeroconf: Zeroconf,
+    private readonly platform: Platform,
+    private readonly zeroconf: Zeroconf,
   ) { }
 
   start () {
+    if (!this.platform.is('cordova')) { return }
+
     this.zeroconfMonitor = this.zeroconf.watch('_http._tcp.', 'local.').subscribe(async result => {
       const { action, service } = result
       console.log(`zeroconf service ${action}`, service)
@@ -39,7 +43,9 @@ export class ZeroconfDaemon {
   }
 
   reset () {
+    this.stop()
     this.zeroconf.reInit()
+    this.start()
   }
 
   getService (s9id: string): ZeroconfService | undefined {
