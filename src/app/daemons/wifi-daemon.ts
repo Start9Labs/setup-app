@@ -18,15 +18,15 @@ export class WifiDaemon {
   ) { }
 
   start () {
-    this.enableDisconnectionMonitor()
-    this.enableConnectionMonitor()
-    this.enableChangeMonitor()
+    if (!this.connectionMonitor) { this.enableConnectionMonitor() }
+    if (!this.disconnectionMonitor) { this.enableDisconnectionMonitor() }
+    if (!this.changeMonitor) { this.enableChangeMonitor() }
   }
 
   stop () {
     if (this.connectionMonitor) { this.connectionMonitor.unsubscribe() }
-    if (this.connectionMonitor) { this.disconnectionMonitor.unsubscribe() }
-    if (this.connectionMonitor) { this.changeMonitor.unsubscribe() }
+    if (this.disconnectionMonitor) { this.disconnectionMonitor.unsubscribe() }
+    if (this.changeMonitor) { this.changeMonitor.unsubscribe() }
   }
 
   enableConnectionMonitor () {

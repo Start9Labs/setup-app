@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { S9Server } from 'src/app/models/s9-server'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
-import { AppAvailableFull } from 'src/app/models/s9-app'
+import { AppAvailableFull, AppHealthStatus } from 'src/app/models/s9-app'
 import { ServerService } from 'src/app/services/server.service'
 import { NavController, AlertController, LoadingController } from '@ionic/angular'
 import * as compareVersions from 'compare-versions'
@@ -56,7 +56,9 @@ export class AppAvailableShowPage {
         {
           text: 'Install',
           cssClass: 'alert-success',
-          handler: () => { this.install(version) },
+          handler: () => {
+            this.install(version)
+          },
         },
       ],
     })
@@ -75,7 +77,9 @@ export class AppAvailableShowPage {
         {
           text: 'Uninstall',
           cssClass: 'alert-danger',
-          handler: () => { this.uninstall() },
+          handler: () => {
+            this.uninstall()
+          },
         },
       ],
     })
@@ -83,9 +87,7 @@ export class AppAvailableShowPage {
   }
 
   async install (version: string) {
-    const loader = await this.loadingCtrl.create({
-      message: `Installing. This could take a while...`,
-    })
+    const loader = await this.loadingCtrl.create()
     await loader.present()
 
     try {

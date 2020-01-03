@@ -32,13 +32,24 @@ export class S9ServerModel {
     return this.servers.find(s => s.id === id)
   }
 
+  getServerIndex (id: string): S9Server | undefined {
+    return this.servers.find(s => s.id === id)
+  }
+
   getServerCount (): number {
     return this.servers.length
   }
 
   async addApp (server: S9Server, app: AppInstalled) {
     const serverClone = clone(server)
-    serverClone.apps.push(app)
+    const existing = serverClone.apps.find(a => a.id === app.id)
+    if (existing) {
+      Object.keys(app).forEach(key => {
+        existing[key] = app[key]
+      })
+    } else {
+      serverClone.apps.push(app)
+    }
     await this.saveServer(serverClone)
   }
 
@@ -52,12 +63,19 @@ export class S9ServerModel {
   async reCacheServer (server: S9Server): Promise<void> {
     const ser = this.servers.find(s => s.id === server.id)
 
-    if (!ser) {
-      this.servers.push(server)
-    } else {
+    if (ser) {
       Object.keys(server).forEach(key => {
         ser[key] = server[key]
       })
+    } else {
+      this.servers.push(server)
+    }
+  }
+
+  async updateServer (server: S9Server): Promise<void> {
+    const index = this.servers.findIndex(s => s.id === server.id)
+    if (index > -1) {
+      await this.saveServer(server)
     }
   }
 
@@ -68,8 +86,10 @@ export class S9ServerModel {
 
   async forgetServer (id: string): Promise<void> {
     const index = this.servers.findIndex(s => s.id === id)
-    this.servers.splice(index, 1)
-    await this.saveAll()
+    if (index > -1) {
+      this.servers.splice(index, 1)
+      await this.saveAll()
+    }
   }
 
   private async saveAll (): Promise<void> {

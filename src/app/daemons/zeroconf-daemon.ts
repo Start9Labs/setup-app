@@ -16,7 +16,7 @@ export class ZeroconfDaemon {
   ) { }
 
   start () {
-    if (!this.platform.is('cordova')) { return }
+    if (!this.platform.is('cordova') || this.zeroconfMonitor) { return }
 
     this.zeroconfMonitor = this.zeroconf.watch('_http._tcp.', 'local.').subscribe(async result => {
       const { action, service } = result
@@ -29,6 +29,7 @@ export class ZeroconfDaemon {
           case 'added':
           case 'resolved':
             this.zeroconfServices[service.name] = service
+            break
           case 'removed':
             // no need to delete these... worst case we end up with some extras in the listing of services
             // delete this.zeroconfServices[service.name]

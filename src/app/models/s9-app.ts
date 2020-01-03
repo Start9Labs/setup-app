@@ -19,7 +19,7 @@ export interface AppAvailableFull extends AppAvailablePreview {
 }
 
 export interface AppInstalled extends BaseApp {
-  torAddress: string
+  torAddress?: string
   status: AppHealthStatus
   statusAt: Date
 }
@@ -98,6 +98,8 @@ export type DefaultString = string | { charset: string, length: string }
 export enum AppHealthStatus {
   UNKNOWN = 'UNKNOWN',
   UNREACHABLE = 'UNREACHABLE',
+  INSTALLING = 'INSTALLING',
+  INSTALL_FAILED = 'INSTALL_FAILED',
   NEEDS_CONFIG = 'NEEDS_CONFIG',
   RUNNING = 'RUNNING',
   STOPPED = 'STOPPED',

@@ -9,7 +9,8 @@ import { AppHealthStatus } from '../models/s9-app'
 })
 export class SyncDaemon {
   private going = false
-  private static readonly ms = 10000
+  private paused = false
+  private static readonly ms = 4000
 
   constructor (
     private readonly serverService: ServerService,
@@ -17,9 +18,12 @@ export class SyncDaemon {
   ) { }
 
   async start (): Promise<void> {
+    if (this.going) { return }
+
     this.going = true
 
     while (this.going) {
+      if (this.paused) { break }
       console.log('syncing servers: ', this.serverModel.servers)
 
       Promise.all(this.serverModel.servers.map(async server => {
@@ -56,10 +60,12 @@ export class SyncDaemon {
 
         serverClone.updating = false
 
-        await this.serverModel.saveServer(serverClone)
+        await this.serverModel.updateServer(serverClone)
       }))
 
+      this.paused = true
       await pauseFor(SyncDaemon.ms)
+      this.paused = false
     }
   }
 
