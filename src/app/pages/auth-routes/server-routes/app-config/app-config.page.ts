@@ -20,7 +20,6 @@ export class AppConfigPage {
   initialConfigStringified: string
   config: object
   edited = false
-  freshInstall = 0
 
   constructor (
     private readonly navCtrl: NavController,
@@ -30,11 +29,6 @@ export class AppConfigPage {
     private readonly loadingCtrl: LoadingController,
     private readonly alertCtrl: AlertController,
   ) {
-    this.route.queryParams.subscribe(params => {
-      if (params && params.freshInstall) {
-        this.freshInstall = 1
-      }
-    })
   }
 
   async ngOnInit () {
@@ -53,9 +47,6 @@ export class AppConfigPage {
       this.spec = spec
       this.config = config
       this.initialConfigStringified = JSON.stringify(this.config)
-      if (this.freshInstall) {
-        await this.presentAlertFreshInstall()
-      }
     } catch (e) {
       this.error = e.message
     } finally {
@@ -90,15 +81,6 @@ export class AppConfigPage {
     } finally {
       await loader.dismiss()
     }
-  }
-
-  async presentAlertFreshInstall () {
-    const alert = await this.alertCtrl.create({
-      header: `${this.app.title} Installed!`,
-      message: 'Now take a moment to configure your new app. You can use the standard defults or create a custom configuration.',
-      buttons: ['Ok'],
-    })
-    await alert.present()
   }
 
   async presentAlertUnsaved () {

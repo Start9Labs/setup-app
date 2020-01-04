@@ -104,7 +104,7 @@ export class SetupService {
   async getVersion (ss: S9BuilderWith<'zeroconfService'>): Promise<string | undefined> {
     try {
       const host = getLanIP(ss.zeroconfService)
-      const { version } = await this.httpService.request<Lan.GetVersionRes>(Method.get, `https://${host}/version`, { }, { }, SetupService.timeout)
+      const { version } = await this.httpService.request<Lan.GetVersionRes>(Method.get, `http://${host}/version`, { }, { }, SetupService.timeout)
       return version
     } catch (e) {
       return undefined

@@ -8,15 +8,17 @@ import { Platform } from '@ionic/angular'
 })
 export class ZeroconfDaemon {
   private zeroconfServices: { [hostname: string]: ZeroconfService } = { }
-  private zeroconfMonitor: Subscription
+  private zeroconfMonitor: Subscription | undefined
 
   constructor (
     private readonly platform: Platform,
     private readonly zeroconf: Zeroconf,
   ) { }
 
-  start () {
-    if (!this.platform.is('cordova') || this.zeroconfMonitor) { return }
+  async start () {
+    // return this.mock()
+
+    if (!this.platform.is('cordova')) { return }
 
     this.zeroconfMonitor = this.zeroconf.watch('_http._tcp.', 'local.').subscribe(async result => {
       const { action, service } = result
@@ -39,13 +41,14 @@ export class ZeroconfDaemon {
       })
   }
 
-  stop () {
-    if (this.zeroconfMonitor) { this.zeroconfMonitor.unsubscribe() } // kills the subscription
+  async stop () {
+    if (this.zeroconfMonitor) { this.zeroconfMonitor = undefined } // kills the subscription
+    this.zeroconfServices = { }
   }
 
-  reset () {
-    this.stop()
-    this.zeroconf.reInit()
+  async reset () {
+    await this.zeroconf.reInit()
+    this.stop
     this.start()
   }
 

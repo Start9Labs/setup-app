@@ -25,6 +25,10 @@
     </ion-item>
   </ion-item-group>
 
+  <ion-button *ngIf="app.status === 'NEEDS_CONFIG'" style="margin: 16px 0;" expand="block" fill="outline" [routerLink]="['config']">
+    Config
+  </ion-button>
+
   <ion-item-group class="ion-text-wrap">
     <ion-item-divider></ion-item-divider>
     <ion-item>

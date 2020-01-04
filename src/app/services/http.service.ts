@@ -71,6 +71,7 @@ export class HttpService {
       const response = await call()
         .pipe(timeout(TIMEOUT))
         .toPromise()
+
       if (response.type === HttpEventType.Response) {
         return response.body as T
       } else {
@@ -94,7 +95,7 @@ export class HttpService {
 
 function s9Url (ss: S9Server | S9BuilderWith<'zeroconfService' | 'versionInstalled'>, path: string): string {
   const host = getLanIP(ss.zeroconfService) || ss.torAddress
-  return `https://${host}/v${ss.versionInstalled.charAt(0)}${path}`
+  return `http://${host}/v${ss.versionInstalled.charAt(0)}${path}`
 }
 
 function appendAuthOptions (ss: S9Server | S9BuilderWith<'privkey'>, httpOptions: HttpOptions): HttpOptions  {
@@ -102,8 +103,8 @@ function appendAuthOptions (ss: S9Server | S9BuilderWith<'privkey'>, httpOptions
 
   const optClone = clone(httpOptions)
 
-  const nowish = Math.floor((new Date().getTime() - 1000) / 1000)
-  const tokenPayload = { 'iss': 'start9-companion', 'iat': nowish, 'exp': nowish + 7 }
+  const past = Math.floor((new Date().getTime() - 30000) / 1000)
+  const tokenPayload = { 'iss': 'start9-companion', 'iat': past, 'exp': past + 60 }
   const token = new TokenSigner('ES256K', ss.privkey).sign(tokenPayload)
   headers = headers.set('Authorization', 'Bearer ' + token)
   optClone.headers = headers

@@ -244,6 +244,7 @@ const mockApiAppInstalled: ApiAppInstalled = {
   torAddress: 'sample-bitcoin-tor-address',
   status: AppHealthStatus.RUNNING,
   iconURL: 'assets/img/bitcoin_core.png',
+  events: [],
 }
 
 // @TODO remove

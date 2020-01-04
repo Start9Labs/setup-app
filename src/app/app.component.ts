@@ -74,13 +74,11 @@ export class AppComponent {
 
   private startDaemons () {
     // detects new LAN services
-    // @TODO remove
-    // this.zeroconfDaemon.mock()
     this.zeroconfDaemon.start()
-    // syncs servers in S9ServerModel
-    this.syncDaemon.start()
     // monitors wifi connectivity
     this.wifiDaemon.start()
+    // syncs servers in S9ServerModel
+    this.syncDaemon.start()
   }
 
   private stopDaemons () {

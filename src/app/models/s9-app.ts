@@ -22,11 +22,19 @@ export interface AppInstalled extends BaseApp {
   torAddress?: string
   status: AppHealthStatus
   statusAt: Date
+  events: AppEvent[]
 }
 
 export interface AppVersion {
   version: string
   releaseNotes: string
+}
+
+export interface AppEvent {
+  id: string
+  created_at: string
+  code: number
+  message: string
 }
 
 export type AppConfigSpec = { [key: string]: ValueSpec }

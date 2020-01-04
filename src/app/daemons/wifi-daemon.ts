@@ -8,9 +8,8 @@ import { ZeroconfDaemon } from './zeroconf-daemon'
   providedIn: 'root',
 })
 export class WifiDaemon {
-  private connectionMonitor: Subscription
-  private disconnectionMonitor: Subscription
-  private changeMonitor: Subscription
+  private connectionMonitor: Subscription | undefined
+  private disconnectionMonitor: Subscription | undefined
 
   constructor (
     private readonly zeroconfDaemon: ZeroconfDaemon,
@@ -20,13 +19,11 @@ export class WifiDaemon {
   start () {
     if (!this.connectionMonitor) { this.enableConnectionMonitor() }
     if (!this.disconnectionMonitor) { this.enableDisconnectionMonitor() }
-    if (!this.changeMonitor) { this.enableChangeMonitor() }
   }
 
   stop () {
-    if (this.connectionMonitor) { this.connectionMonitor.unsubscribe() }
-    if (this.disconnectionMonitor) { this.disconnectionMonitor.unsubscribe() }
-    if (this.changeMonitor) { this.changeMonitor.unsubscribe() }
+    if (this.connectionMonitor) { this.connectionMonitor = undefined }
+    if (this.disconnectionMonitor) { this.disconnectionMonitor = undefined }
   }
 
   enableConnectionMonitor () {
@@ -43,23 +40,14 @@ export class WifiDaemon {
     })
   }
 
-  // @TODO test whether onChange method actually works. There are known issues. Android and iOS
-  enableChangeMonitor () {
-    this.changeMonitor = this.network.onChange().subscribe(() => {
-      console.log('network changed')
-      this.manageZeroconfDaemon()
-    })
-  }
-
   private manageZeroconfDaemon () {
     let pollingForConnection = setInterval(() => {
-      if (this.network.type && this.network.type !== 'none') {
+      console.log('polling for network')
+      if (this.network.type !== 'none') {
         clearInterval(pollingForConnection)
         if (this.network.type === 'wifi') {
-          console.log('wifi connection obtained')
+          console.log('connected to wifi')
           this.zeroconfDaemon.reset()
-        } else {
-          this.zeroconfDaemon.stop()
         }
       }
     }, 500)

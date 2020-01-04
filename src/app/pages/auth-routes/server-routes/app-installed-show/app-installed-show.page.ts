@@ -51,14 +51,21 @@ export class AppInstalledShowPage {
   }
 
   async presentAction () {
-    const buttons: ActionSheetButton[] = [
-      {
-        text: 'Config',
-        icon: 'construct',
-        handler: () => {
-          this.navCtrl.navigateForward(['/servers', this.server.id, 'apps', 'installed', this.app.id, 'config'])
+    const buttons : ActionSheetButton[] = []
+
+    if ([AppHealthStatus.NEEDS_CONFIG, AppHealthStatus.RUNNING, AppHealthStatus.STOPPED].includes(this.app.status)) {
+      buttons.push(
+        {
+          text: 'Config',
+          icon: 'construct',
+          handler: () => {
+            this.navCtrl.navigateForward(['/servers', this.server.id, 'apps', 'installed', this.app.id, 'config'])
+          },
         },
-      },
+      )
+    }
+
+    buttons.push(
       {
         text: 'Logs',
         icon: 'paper',
@@ -73,7 +80,7 @@ export class AppInstalledShowPage {
           this.navCtrl.navigateForward(['/servers', this.server.id, 'apps', 'available', this.app.id])
         },
       },
-    ]
+    )
 
     if (this.app.status === AppHealthStatus.RUNNING) {
       buttons.push({

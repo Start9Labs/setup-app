@@ -1,4 +1,4 @@
-import { AppHealthStatus, AppVersion, AppConfigSpec } from '../models/s9-app'
+import { AppHealthStatus, AppVersion, AppConfigSpec, AppEvent } from '../models/s9-app'
 import { ServerSpecs } from '../models/s9-server'
 
 export type TwoHundredOK = { never?: never } // hack for the unit type
@@ -25,12 +25,6 @@ export interface ApiAppInstalled extends ApiAppBase {
   events: AppEvent[]
   torAddress?: string
   progress?: number
-}
-
-export interface AppEvent {
-  id: string
-  code: number
-  message: string
 }
 
 export type ApiAppConfig = AppConfigSpec
