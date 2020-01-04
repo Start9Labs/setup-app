@@ -69,7 +69,7 @@ export class Start9AgentPage {
 
     try {
       await this.serverService.updateAgent(this.server)
-      this.serverModel.saveServer({ ...this.server, status: AppHealthStatus.UPDATING })
+      this.serverModel.saveServer({ ...this.server, status: AppHealthStatus.DOWNLOADING })
     } catch (e) {
       this.error = e.message
     } finally {

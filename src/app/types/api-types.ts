@@ -22,9 +22,15 @@ export interface ApiAppAvailableFull extends ApiAppAvailablePreview {
 
 export interface ApiAppInstalled extends ApiAppBase {
   status: AppHealthStatus
+  events: AppEvent[]
   torAddress?: string
   progress?: number
-  error?: string
+}
+
+export interface AppEvent {
+  id: string
+  code: number
+  message: string
 }
 
 export type ApiAppConfig = AppConfigSpec

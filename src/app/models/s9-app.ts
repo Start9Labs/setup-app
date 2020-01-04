@@ -98,12 +98,11 @@ export type DefaultString = string | { charset: string, length: string }
 export enum AppHealthStatus {
   UNKNOWN = 'UNKNOWN',
   UNREACHABLE = 'UNREACHABLE',
+  DOWNLOADING = 'DOWNLOADING',
   INSTALLING = 'INSTALLING',
-  INSTALL_FAILED = 'INSTALL_FAILED',
   NEEDS_CONFIG = 'NEEDS_CONFIG',
   RUNNING = 'RUNNING',
   STOPPED = 'STOPPED',
-  UPDATING = 'UPDATING',
   RESTARTING = 'RESTARTING',
   REMOVING = 'REMOVING',
   DEAD = 'DEAD',
