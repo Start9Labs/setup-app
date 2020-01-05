@@ -10,7 +10,7 @@ import { AppHealthStatus } from '../models/s9-app'
 export class SyncDaemon {
   private going = false
   private paused = false
-  private static readonly ms = 4000
+  private static readonly ms = 10000
 
   constructor (
     private readonly serverService: ServerService,

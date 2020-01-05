@@ -19,10 +19,11 @@ export interface AppAvailableFull extends AppAvailablePreview {
 }
 
 export interface AppInstalled extends BaseApp {
-  torAddress?: string
   status: AppHealthStatus
   statusAt: Date
-  events: AppEvent[]
+  torAddress?: string
+  progress?: number
+  events?: AppEvent[]
 }
 
 export interface AppVersion {

@@ -22,12 +22,19 @@ export interface ApiAppAvailableFull extends ApiAppAvailablePreview {
 
 export interface ApiAppInstalled extends ApiAppBase {
   status: AppHealthStatus
-  events: AppEvent[]
   torAddress?: string
   progress?: number
 }
 
 export type ApiAppConfig = AppConfigSpec
+
+export interface ApiServer {
+  status: AppHealthStatus
+  versionInstalled: string
+  versionLatest: string
+  specs: ServerSpecs
+  events: AppEvent[]
+}
 
 export module Lan {
   export type GetVersionReq = { }
@@ -37,12 +44,7 @@ export module Lan {
   export type PostRegisterReq = { pubKey: string, productKey: string }
   export type PostRegisterRes = TwoHundredOK
   export type GetServerReq = { }
-  export type GetServerRes = {
-    status: AppHealthStatus
-    versionInstalled: string
-    versionLatest: string
-    specs: ServerSpecs
-  }
+  export type GetServerRes = ApiServer
   export type GetAppAvailableReq = { }
   export type GetAppAvailableRes = ApiAppAvailableFull
   export type GetAppsAvailableReq = { }

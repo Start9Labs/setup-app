@@ -206,6 +206,7 @@ const mockApiServer: Lan.GetServerRes = {
     'Ethernet': 'Gigabit',
     'Disk': '512 GB Flash (280 GB available)',
   },
+  events: [],
 }
 
 // @TODO remove
@@ -244,7 +245,6 @@ const mockApiAppInstalled: ApiAppInstalled = {
   torAddress: 'sample-bitcoin-tor-address',
   status: AppHealthStatus.RUNNING,
   iconURL: 'assets/img/bitcoin_core.png',
-  events: [],
 }
 
 // @TODO remove

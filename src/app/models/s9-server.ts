@@ -1,6 +1,6 @@
 import * as CryptoJS from 'crypto-js'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
-import { AppInstalled, AppHealthStatus } from './s9-app'
+import { AppInstalled, AppHealthStatus, AppEvent } from './s9-app'
 import { deriveKeys } from '../util/crypto.util'
 
 export interface S9ServerStorable {
@@ -19,6 +19,7 @@ export interface S9Server extends S9ServerStorable {
   apps: AppInstalled[]
   versionLatest: string
   privkey: string // derive from mnemonic + torAddress
+  events: AppEvent[]
 }
 
 export type ServerSpecs = { [key: string]: string | number }
@@ -43,6 +44,7 @@ export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): 
     privkey: deriveKeys(mnemonic, id).privkey,
     apps: [],
     specs: { },
+    events: [],
   }
 }
 

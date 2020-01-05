@@ -44,7 +44,7 @@ export class SetupService {
   }
 
   private async setupAttempt (ss: S9ServerBuilder, productKey: string): Promise<S9ServerBuilder> {
-    const ssClone = clone(ss)
+    let ssClone = clone(ss)
 
     // enable lan
     if (!hasValues(['zeroconfService'], ssClone)) {
@@ -90,10 +90,7 @@ export class SetupService {
       this.message = `getting server`
       await this.serverService.getServer(ssClone)
         .then(res => {
-          ssClone.versionInstalled = res.versionInstalled
-          ssClone.versionLatest = res.versionLatest
-          ssClone.status = res.status
-          ssClone.statusAt = res.statusAt
+          ssClone = { ...ssClone, ...res }
         })
         .catch(console.error)
     }
@@ -202,20 +199,11 @@ export function fromUserInput (id: string, friendlyName: string): S9ServerBuilde
 }
 
 export function toS9Server (sb: Required<S9ServerBuilder>): S9Server {
-  const { id, friendlyName, status, statusAt, versionInstalled, versionLatest, privkey, torAddress, zeroconfService, specs } = sb
   return {
-    id,
-    friendlyName,
-    status,
-    statusAt,
-    versionInstalled,
-    versionLatest,
-    specs,
-    privkey,
-    torAddress,
-    zeroconfService,
+    ...sb,
     apps: [],
     updating: false,
+    events: [],
   }
 }
 
