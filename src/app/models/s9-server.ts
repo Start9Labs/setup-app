@@ -7,7 +7,6 @@ export interface S9ServerStorable {
   id: string
   friendlyName: string
   torAddress: string
-  zeroconfService: ZeroconfService
   versionInstalled: string
 }
 
@@ -30,12 +29,11 @@ export function getLanIP (zcs: ZeroconfService): string  {
 }
 
 export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): S9Server {
-  const { friendlyName, torAddress, zeroconfService, id, versionInstalled } = ss
+  const { friendlyName, torAddress, id, versionInstalled } = ss
   return {
     id,
     friendlyName,
     torAddress,
-    zeroconfService,
     versionInstalled,
     versionLatest: '0.0.0',
     updating: false,
@@ -49,13 +47,12 @@ export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): 
 }
 
 export function toStorableServer (ss: S9Server): S9ServerStorable {
-  const { friendlyName, torAddress, zeroconfService, id, versionInstalled } = ss
+  const { friendlyName, torAddress, id, versionInstalled } = ss
 
   return {
     id,
     friendlyName,
     torAddress,
-    zeroconfService,
     versionInstalled,
   }
 }

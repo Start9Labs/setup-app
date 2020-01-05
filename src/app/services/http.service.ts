@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core'
-import { HttpClient, HttpEventType, HttpErrorResponse, HttpHeaders, HttpEvent } from '@angular/common/http'
+import { HttpClient, HttpEventType, HttpHeaders, HttpEvent } from '@angular/common/http'
 import { Method } from '../types/enums'
 import { Observable } from 'rxjs'
 import { timeout } from 'rxjs/operators'
 import { getLanIP, S9Server } from '../models/s9-server'
 import { TokenSigner } from 'jsontokens'
 import { S9BuilderWith } from './setup.service'
+import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 const APP_VERSION = '1.0.0'
 
 @Injectable({
@@ -14,6 +15,7 @@ const APP_VERSION = '1.0.0'
 export class HttpService {
 
   constructor (
+    private readonly zeroconfDaemon: ZeroconfDaemon,
     private readonly http: HttpClient,
   ) { }
 
@@ -37,7 +39,7 @@ export class HttpService {
     body: any = { },
     TIMEOUT = 30000,
   ): Promise<T> {
-    const url = s9Url(ss, path)
+    const url = this.s9Url(ss, path)
     return this.request(method, url, httpOptions, body, TIMEOUT)
   }
 
@@ -90,11 +92,13 @@ export class HttpService {
       throw new Error('Request error: ' + message)
     }
   }
-}
 
-function s9Url (ss: S9Server | S9BuilderWith<'zeroconfService' | 'versionInstalled'>, path: string): string {
-  const host = getLanIP(ss.zeroconfService) || ss.torAddress
-  return `http://${host}/v${ss.versionInstalled.charAt(0)}${path}`
+  s9Url (ss: S9Server | S9BuilderWith<'zeroconfService' | 'versionInstalled'>, path: string): string {
+    const zeroconfService = this.zeroconfDaemon.getService(ss.id)
+    if (!zeroconfService) { throw new Error('S9 Server not found on LAN') }
+    const host = getLanIP(zeroconfService) || ss.torAddress
+    return `http://${host}/v${ss.versionInstalled.charAt(0)}${path}`
+  }
 }
 
 function appendAuthOptions (ss: S9Server | S9BuilderWith<'privkey'>, httpOptions: HttpOptions): HttpOptions  {

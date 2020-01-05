@@ -57,11 +57,11 @@ export module Lan {
   export type GetAppLogsRes = string[]
   export type GetAppsInstalledReq = { }
   export type GetAppsInstalledRes = ApiAppInstalled[]
-  export type PostInstallAppReq = { id: string, version: string }
+  export type PostInstallAppReq = { version: string }
   export type PostInstallAppRes = ApiAppInstalled
   export type PostUpdateAgentReq = { version: string }
   export type PostUpdateAgentRes = TwoHundredOK
-  export type PostUninstallAppReq = { id: string }
+  export type PostUninstallAppReq = { }
   export type PostUninstallAppRes = TwoHundredOK
   export type PostStartAppReq = { }
   export type PostStartAppRes = ApiAppInstalled

@@ -16,6 +16,10 @@
 
 <ion-content>
 
+  <ion-item *ngIf="error">
+    <ion-text class="ion-text-wrap" color="danger">{{error}}</ion-text>
+  </ion-item>
+
   <ion-item-group *ngIf="!loading" class="ion-text-wrap">
     <div *ngIf="app.status === 'NEEDS_CONFIG'">
       <ion-item-divider><ion-text>Initial Config</ion-text></ion-item-divider>

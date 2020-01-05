@@ -41,13 +41,13 @@ export class ServerService {
   async getAvailableApps (server: S9Server): Promise<AppAvailablePreview[]> {
     // @TODO remove
     // return mockGetAvailableApps()
-    return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(server, Method.get, '/apps/available')
+    return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(server, Method.get, '/apps/store')
   }
 
   async getAvailableApp (server: S9Server, appId: string): Promise<AppAvailableFull> {
     // @TODO remove
     // return mockGetAvailableApp()
-    return this.httpService.authServerRequest<Lan.GetAppAvailableRes>(server, Method.get, `/apps/available/${appId}`)
+    return this.httpService.authServerRequest<Lan.GetAppAvailableRes>(server, Method.get, `/apps/${appId}/store`)
       .then(res => {
         return {
           ...res,
@@ -67,7 +67,7 @@ export class ServerService {
   async getAppConfig (server: S9Server, appId: string): Promise<{ spec: AppConfigSpec, config: object }> {
     // @TODO remove
     // return mockGetAppConfig()
-    return this.httpService.authServerRequest<Lan.GetAppConfigRes>(server, Method.get, `/apps/installed/${appId}/config`)
+    return this.httpService.authServerRequest<Lan.GetAppConfigRes>(server, Method.get, `/apps/${appId}/config`)
       .then(({ spec, config }) => {
         return {
           spec,
@@ -79,29 +79,25 @@ export class ServerService {
   async getAppLogs (server: S9Server, appId: string, params: Lan.GetAppLogsReq = { }): Promise<string[]> {
     // @TODO remove
     // return mockGetAppLogs()
-    return this.httpService.authServerRequest<Lan.GetAppLogsRes>(server, Method.get, `/apps/installed/${appId}/logs`, { params })
+    return this.httpService.authServerRequest<Lan.GetAppLogsRes>(server, Method.get, `/apps/${appId}/logs`, { params })
   }
 
   async installApp (server: S9Server, appId: string, version: string): Promise<AppInstalled> {
     const body: Lan.PostInstallAppReq = {
-      id: appId,
       version,
     }
     // @TODO remove
     // const installed = await mockInstallApp()
-    const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.post, `/apps/install`, { }, body, 240000)
+    const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.post, `/apps/${appId}/install`, { }, body, 240000)
       .then(mapApiInstalledApp)
     await this.s9Model.cacheApp(server.id, installed)
     return installed
   }
 
   async uninstallApp (server: S9Server, appId: string): Promise<void> {
-    const body: Lan.PostUninstallAppReq = {
-      id: appId,
-    }
     // @TODO remove
     // await mockUninstallApp()
-    await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(server, Method.post, `/apps/uninstall`, { }, body)
+    await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(server, Method.post, `/apps/${appId}/uninstall`)
     await this.s9Model.removeApp(server.id, appId)
   }
 
@@ -122,7 +118,7 @@ export class ServerService {
   async updateAppConfig (server: S9Server, app: AppInstalled, config: object): Promise<void> {
     // @TODO remove
     // await mockUpdateAppConfig()
-    await this.httpService.authServerRequest<Lan.PostUpdateAppConfigRes>(server, Method.patch, `/apps/installed/${app.id}/config`, { }, { config })
+    await this.httpService.authServerRequest<Lan.PostUpdateAppConfigRes>(server, Method.patch, `/apps/${app.id}/config`, { }, { config })
   }
 }
 
@@ -316,7 +312,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
                 description: 'the name of the rule maker',
                 nullable: false,
                 default: {
-                  charset: 'abcdefghijklmnopqrstuvwxyz0123456789',
+                  charset: 'a-g,2-9',
                   length: '6..12',
                 },
               },
@@ -349,7 +345,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
           description: 'rpc password',
           nullable: false,
           default: {
-            charset: 'abcdefghijklmnopqrstuvwxyz0123456789',
+            charset: 'a-z,A-Z,2-9',
             length: '10..50',
           },
         },
