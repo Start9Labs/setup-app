@@ -94,7 +94,7 @@ export class ServerShowPage {
             if (this.server.friendlyName === inputValue) { return }
             // set new value and mark edited
             this.server = { ...this.server, friendlyName: inputValue || this.server.id }
-            this.serverModel.saveServer(this.server)
+            this.serverModel.updateServer(this.server)
           },
         },
       ],

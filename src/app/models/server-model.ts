@@ -23,6 +23,8 @@ export class S9ServerModel {
     })
   }
 
+  // SERVERS
+
   async load (mnemonic: string[]): Promise<void> {
     const fromStorage: S9ServerStore = await this.storage.get('servers') || []
     this.servers = fromStorage.map(s => fromStorableServer(s, mnemonic))
@@ -32,55 +34,27 @@ export class S9ServerModel {
     return this.servers.find(s => s.id === id)
   }
 
-  getServerIndex (id: string): S9Server | undefined {
-    return this.servers.find(s => s.id === id)
-  }
+  cacheServer (server: S9Server, upsert = true): void {
+    const target = this.getServer(server.id)
 
-  getServerCount (): number {
-    return this.servers.length
-  }
-
-  async addApp (server: S9Server, app: AppInstalled) {
-    const serverClone = clone(server)
-    const existing = serverClone.apps.find(a => a.id === app.id)
-    if (existing) {
-      Object.keys(app).forEach(key => {
-        existing[key] = app[key]
-      })
-    } else {
-      serverClone.apps.push(app)
-    }
-    await this.saveServer(serverClone)
-  }
-
-  async removeApp (server: S9Server, appId: string) {
-    const serverClone = clone(server)
-    const index = serverClone.apps.findIndex(a => a.id === appId)
-    serverClone.apps.splice(index, 1)
-    await this.saveServer(serverClone)
-  }
-
-  async reCacheServer (server: S9Server): Promise<void> {
-    const ser = this.servers.find(s => s.id === server.id)
-
-    if (ser) {
+    if (target) {
       Object.keys(server).forEach(key => {
-        ser[key] = server[key]
+        if (!Array.isArray(server[key])) {
+          target[key] = server[key]
+        }
       })
-    } else {
+    } else if (!target && upsert) {
       this.servers.push(server)
     }
   }
 
-  async updateServer (server: S9Server): Promise<void> {
-    const index = this.servers.findIndex(s => s.id === server.id)
-    if (index > -1) {
-      await this.saveServer(server)
-    }
+  async createServer (server: S9Server): Promise<void> {
+    this.cacheServer(server)
+    await this.saveAll()
   }
 
-  async saveServer (server: S9Server): Promise<void> {
-    this.reCacheServer(server)
+  async updateServer (server: S9Server): Promise<void> {
+    this.cacheServer(server, false)
     await this.saveAll()
   }
 
@@ -95,10 +69,30 @@ export class S9ServerModel {
   private async saveAll (): Promise<void> {
     await this.storage.set('servers', this.servers.map(toStorableServer))
   }
-}
 
-export function clone<T extends { }> (t: T): T {
-  return JSON.parse(JSON.stringify(t))
+  // APPS
+
+  cacheApp (serverId: string, app: AppInstalled) {
+    const server = this.getServer(serverId)
+    if (!server) { return }
+
+    const existing = server.apps.find(a => a.id === app.id)
+    if (existing) {
+      Object.keys(app).forEach(key => {
+        existing[key] = app[key]
+      })
+    } else {
+      server.apps.push(app)
+    }
+  }
+
+  async removeApp (serverId: string, appId: string) {
+    const server = this.getServer(serverId)
+    if (!server) { return }
+
+    const index = server.apps.findIndex(a => a.id === appId)
+    server.apps.splice(index, 1)
+  }
 }
 
 type S9ServerStore = S9ServerStorable[]

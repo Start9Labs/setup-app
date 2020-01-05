@@ -25,3 +25,28 @@ export function update<T> (t: Valued<T>, u: Valued<T>): Valued<T> {
 export function fromObject<T> (o : Valued<T>): T[] {
   return Object.values(o)
 }
+
+export function deepCloneUnknown<T> (value: T): T {
+  if (typeof value !== 'object' || value === null) {
+    return value
+  }
+  if (Array.isArray(value)) {
+    return deepCloneArray(value)
+  }
+  return deepCloneObject(value)
+}
+
+export function deepCloneObject<T> (source: T) {
+  const result = { }
+  Object.keys(source).forEach(key => {
+    const value = source[key]
+    result[key] = deepCloneUnknown(value)
+  }, { })
+  return result as T
+}
+
+export function deepCloneArray (collection: any) {
+  return collection.map(value => {
+    return deepCloneUnknown(value)
+  })
+}

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
-import { S9ServerModel, clone } from '../models/server-model'
-import { pauseFor } from 'src/app/util/misc.util'
+import { S9ServerModel } from '../models/server-model'
+import { pauseFor, deepCloneObject } from 'src/app/util/misc.util'
 import { ServerService } from '../services/server.service'
 import { AppHealthStatus } from '../models/s9-app'
 
@@ -30,10 +30,10 @@ export class SyncDaemon {
         // return if already updating
         if (server.updating) { return }
 
-        let serverClone = clone({ ...server, updating: true })
+        let serverClone = deepCloneObject({ ...server, updating: true })
 
         // save "updating: true" on the cached version of the server
-        this.serverModel.reCacheServer(serverClone)
+        this.serverModel.cacheServer(serverClone)
 
         try {
           const [serverRes, apps] = await Promise.all([
@@ -44,8 +44,12 @@ export class SyncDaemon {
           serverClone = {
             ...serverClone,
             ...serverRes,
-            apps,
           }
+
+          apps.forEach(app => {
+            this.serverModel.cacheApp(serverClone.id, app)
+          })
+
 
         } catch (e) {
           // @TODO create function for resetting s9Server to initial state

@@ -1,6 +1,5 @@
 import * as bip39 from 'bip39'
 import * as bip32 from 'bip32'
-import { clone } from '../models/server-model'
 
 export type Hex = string & { __type: 'hex' }
 export function isHex (s: string): s is Hex {

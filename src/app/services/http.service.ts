@@ -5,7 +5,6 @@ import { Observable } from 'rxjs'
 import { timeout } from 'rxjs/operators'
 import { getLanIP, S9Server } from '../models/s9-server'
 import { TokenSigner } from 'jsontokens'
-import { clone } from '../models/server-model'
 import { S9BuilderWith } from './setup.service'
 const APP_VERSION = '1.0.0'
 
@@ -99,26 +98,24 @@ function s9Url (ss: S9Server | S9BuilderWith<'zeroconfService' | 'versionInstall
 }
 
 function appendAuthOptions (ss: S9Server | S9BuilderWith<'privkey'>, httpOptions: HttpOptions): HttpOptions  {
-  let headers: HttpHeaders = httpOptions.headers || new HttpHeaders()
-
-  const optClone = clone(httpOptions)
-
   const past = Math.floor((new Date().getTime() - 30000) / 1000)
   const tokenPayload = { 'iss': 'start9-companion', 'iat': past, 'exp': past + 60 }
   const token = new TokenSigner('ES256K', ss.privkey).sign(tokenPayload)
+
+  let headers: HttpHeaders = httpOptions.headers || new HttpHeaders()
   headers = headers.set('Authorization', 'Bearer ' + token)
-  optClone.headers = headers
-  return optClone
+  httpOptions.headers = headers
+
+  return httpOptions
 }
 
 function appendDefaultOptions (httpOptions: HttpOptions): HttpOptions {
   let headers: HttpHeaders = httpOptions.headers || new HttpHeaders()
-
-  const optClone = clone(httpOptions)
   headers = headers.set('app-version', APP_VERSION)
-  optClone.headers = headers
-  optClone.observe = 'response'
-  return optClone
+  httpOptions.headers = headers
+  httpOptions.observe = 'response'
+
+  return httpOptions
 }
 
 export interface HttpOptions {

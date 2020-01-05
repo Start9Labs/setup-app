@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { S9ServerModel, clone } from 'src/app/models/server-model'
+import { S9ServerModel } from 'src/app/models/server-model'
 import { S9Server } from 'src/app/models/s9-server'
 import { ClipboardService } from 'src/app/services/clipboard.service'
 import { AlertController, LoadingController } from '@ionic/angular'
@@ -69,7 +69,7 @@ export class Start9AgentPage {
 
     try {
       await this.serverService.updateAgent(this.server)
-      this.serverModel.saveServer({ ...this.server, status: AppHealthStatus.DOWNLOADING })
+      this.serverModel.updateServer({ ...this.server, status: AppHealthStatus.DOWNLOADING })
     } catch (e) {
       this.error = e.message
     } finally {

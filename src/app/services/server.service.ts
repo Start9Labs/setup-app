@@ -91,7 +91,7 @@ export class ServerService {
     // const installed = await mockInstallApp()
     const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.post, `/apps/install`, { }, body, 240000)
       .then(mapApiInstalledApp)
-    await this.s9Model.addApp(server, installed)
+    await this.s9Model.cacheApp(server.id, installed)
     return installed
   }
 
@@ -102,7 +102,7 @@ export class ServerService {
     // @TODO remove
     // await mockUninstallApp()
     await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(server, Method.post, `/apps/uninstall`, { }, body)
-    await this.s9Model.removeApp(server, appId)
+    await this.s9Model.removeApp(server.id, appId)
   }
 
   async startApp (server: S9Server, app: AppInstalled): Promise<AppInstalled> {

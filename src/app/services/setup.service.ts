@@ -3,7 +3,6 @@ import { S9Server, ServerSpecs, getLanIP } from '../models/s9-server'
 import { HttpService } from './http.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { Method } from 'src/app/types/enums'
-import { clone } from '../models/server-model'
 import { pauseFor } from 'src/app/util/misc.util'
 import * as cryptoUtil from '../util/crypto.util'
 import { AuthService } from './auth.service'
@@ -44,58 +43,57 @@ export class SetupService {
   }
 
   private async setupAttempt (ss: S9ServerBuilder, productKey: string): Promise<S9ServerBuilder> {
-    let ssClone = clone(ss)
 
     // enable lan
-    if (!hasValues(['zeroconfService'], ssClone)) {
+    if (!hasValues(['zeroconfService'], ss)) {
       this.message = `getting zeroconf service`
-      ssClone.zeroconfService = this.zeroconfDaemon.getService(ssClone.id)
+      ss.zeroconfService = this.zeroconfDaemon.getService(ss.id)
     }
 
     // tor acquisition
-    if (hasValues(['zeroconfService'], ssClone) && !hasValues(['versionInstalled'], ssClone)) {
+    if (hasValues(['zeroconfService'], ss) && !hasValues(['versionInstalled'], ss)) {
       this.message = `getting server version installed`
-      ssClone.versionInstalled = await this.getVersion(ssClone)
+      ss.versionInstalled = await this.getVersion(ss)
     }
 
     // tor acquisition
-    if (hasValues(['zeroconfService', 'versionInstalled'], ssClone) && !hasValues(['torAddress'], ssClone)) {
+    if (hasValues(['zeroconfService', 'versionInstalled'], ss) && !hasValues(['torAddress'], ss)) {
       this.message = `getting tor address`
-      ssClone.torAddress = await this.getTor(ssClone)
+      ss.torAddress = await this.getTor(ss)
     }
 
     // derive keys
-    if (hasValues(['zeroconfService', 'versionInstalled', 'torAddress'], ssClone) && !hasValues(['pubkey', 'privkey'], ssClone)) {
+    if (hasValues(['zeroconfService', 'versionInstalled', 'torAddress'], ss) && !hasValues(['pubkey', 'privkey'], ss)) {
       this.message = 'getting mnemonic'
       if (this.authService.mnemonic) {
         this.message = `deriving keys`
-        const { privkey, pubkey } = cryptoUtil.deriveKeys(this.authService.mnemonic, ssClone.id)
-        ssClone.privkey = privkey
-        ssClone.pubkey = pubkey
+        const { privkey, pubkey } = cryptoUtil.deriveKeys(this.authService.mnemonic, ss.id)
+        ss.privkey = privkey
+        ss.pubkey = pubkey
       }
     }
 
     // register pubkey
-    if (hasValues(['zeroconfService', 'versionInstalled', 'torAddress', 'pubkey', 'privkey'], ssClone) && !ssClone.registered) {
+    if (hasValues(['zeroconfService', 'versionInstalled', 'torAddress', 'pubkey', 'privkey'], ss) && !ss.registered) {
       this.message = `registering pubkey`
-      ssClone.registered = await this.registerPubkey(ssClone, productKey) // true or false
+      ss.registered = await this.registerPubkey(ss, productKey) // true or false
     }
 
     // get server
     if (
-      hasValues(['zeroconfService', 'versionInstalled', 'torAddress', 'pubkey', 'privkey'], ssClone) &&
+      hasValues(['zeroconfService', 'versionInstalled', 'torAddress', 'pubkey', 'privkey'], ss) &&
       ss.registered &&
       ss.status !== AppHealthStatus.RUNNING
     ) {
       this.message = `getting server`
-      await this.serverService.getServer(ssClone)
+      await this.serverService.getServer(ss)
         .then(res => {
-          ssClone = { ...ssClone, ...res }
+          ss = { ...ss, ...res }
         })
         .catch(console.error)
     }
 
-    return ssClone
+    return ss
   }
 
   async getVersion (ss: S9BuilderWith<'zeroconfService'>): Promise<string | undefined> {
@@ -184,7 +182,7 @@ export function hasValues<T extends keyof S9ServerBuilder> (t: T[], s: S9ServerB
 }
 
 export function isFullySetup (ss: S9ServerBuilder): ss is Required<S9ServerBuilder> {
-  return hasValues(builderKeys(), ss) && ss.registered && (ss.status === AppHealthStatus.RUNNING)
+  return hasValues(builderKeys(), ss) && ss.registered && ss.status === AppHealthStatus.RUNNING
 }
 
 export function fromUserInput (id: string, friendlyName: string): S9ServerBuilder {

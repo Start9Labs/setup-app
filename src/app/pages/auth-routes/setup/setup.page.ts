@@ -23,15 +23,15 @@ export class SetupPage {
 
   async submit (): Promise<void> {
     const id = idFromSerial(this.productKey)
-    const newServer = fromUserInput(id, this.friendlyName || id)
+    const serverData = fromUserInput(id, this.friendlyName || id)
 
     const loader = await this.loadingCtrl.create({ message: 'Setting up server...'})
     await loader.present()
 
     // attempt to acquire all connection info for new server + check status asynchronously
     try {
-      const setupServer = await this.setupService.setup(newServer, this.productKey)
-      await this.s9Model.saveServer(setupServer)
+      const server = await this.setupService.setup(serverData, this.productKey)
+      await this.s9Model.createServer(server)
       await this.navController.navigateRoot(['/servers'])
     } catch (e) {
       this.error = `Error: ${e.message}`
