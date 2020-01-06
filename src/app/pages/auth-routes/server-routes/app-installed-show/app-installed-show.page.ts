@@ -123,7 +123,9 @@ export class AppInstalledShowPage {
     await loader.present()
 
     try {
-      this.app = await this.serverService.stopApp(this.server, this.app)
+      await this.serverService.stopApp(this.server, this.app)
+      this.app.status = AppHealthStatus.STOPPED
+      this.app.statusAt = new Date()
     } catch (e) {
       this.error = e.message
     } finally {
@@ -138,7 +140,9 @@ export class AppInstalledShowPage {
     await loader.present()
 
     try {
-      this.app = await this.serverService.startApp(this.server, this.app)
+      await this.serverService.startApp(this.server, this.app)
+      this.app.status = AppHealthStatus.RUNNING
+      this.app.statusAt = new Date()
     } catch (e) {
       this.error = e.message
     } finally {

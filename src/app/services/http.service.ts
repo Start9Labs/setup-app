@@ -80,6 +80,8 @@ export class HttpService {
       }
     } catch (e) {
       console.error('http request error:', e)
+      // @TODO remove
+      console.error('stringified error:', JSON.stringify(e))
       let message: string
       if (e.error && typeof e.error === 'object') {
         message = e.error.message || e.message || JSON.stringify(e.error)
@@ -89,6 +91,7 @@ export class HttpService {
       } else {
         message = e.message || JSON.stringify(e)
       }
+      console.log('error message: ', message)
       throw new Error('Request error: ' + message)
     }
   }
