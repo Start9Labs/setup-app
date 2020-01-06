@@ -41,14 +41,14 @@ export interface AppEvent {
 export type AppConfigSpec = { [key: string]: ValueSpec }
 
 export type ValueSpec = ValueSpecString |
-                        ValueSpecBoolean |
-                        ValueSpecEnum |
-                        ValueSpecList |
-                        ValueSpecObject
+  ValueSpecBoolean |
+  ValueSpecEnum |
+  ValueSpecList |
+  ValueSpecObject
 
 export type ListValueSpec = ListValueSpecString |
-                            ListValueSpecEnum |
-                            ListValueSpecObject
+  ListValueSpecEnum |
+  ListValueSpecObject
 
 export interface ValueSpecBase {
   type: string
@@ -112,6 +112,7 @@ export enum AppHealthStatus {
   NEEDS_CONFIG = 'NEEDS_CONFIG',
   RUNNING = 'RUNNING',
   STOPPED = 'STOPPED',
+  EXITED = 'EXITED',
   RESTARTING = 'RESTARTING',
   REMOVING = 'REMOVING',
   DEAD = 'DEAD',
