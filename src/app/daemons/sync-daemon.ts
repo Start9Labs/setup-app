@@ -9,7 +9,7 @@ import { AppHealthStatus } from '../models/s9-app'
 })
 export class SyncDaemon {
   private going = false
-  private paused = false
+  private initialPass = true
   private static readonly ms = 10000
 
   constructor (
@@ -23,7 +23,6 @@ export class SyncDaemon {
     this.going = true
 
     while (this.going) {
-      if (this.paused) { break }
       console.log('syncing servers: ', this.serverModel.servers)
 
       Promise.all(this.serverModel.servers.map(async server => {
@@ -55,7 +54,7 @@ export class SyncDaemon {
           // @TODO create function for resetting s9Server to initial state
           serverClone = {
             ...serverClone,
-            status: AppHealthStatus.UNREACHABLE,
+            status: this.initialPass ? AppHealthStatus.UNKNOWN : AppHealthStatus.UNREACHABLE,
             statusAt: new Date(),
             apps: [],
             specs: { },
@@ -67,9 +66,9 @@ export class SyncDaemon {
         await this.serverModel.updateServer(serverClone)
       }))
 
-      this.paused = true
       await pauseFor(SyncDaemon.ms)
-      this.paused = false
+
+      this.initialPass = false
     }
   }
 
