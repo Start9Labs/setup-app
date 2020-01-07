@@ -8,8 +8,8 @@ import { AppHealthStatus } from '../models/s9-app'
   providedIn: 'root',
 })
 export class SyncDaemon {
-  private going = false
-  private initialPass = true
+  private going: boolean
+  private initialPass: boolean
   private static readonly ms = 10000
 
   constructor (
@@ -19,7 +19,7 @@ export class SyncDaemon {
 
   async start (): Promise<void> {
     if (this.going) { return }
-
+    this.initialPass = true
     this.going = true
 
     while (this.going) {
