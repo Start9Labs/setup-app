@@ -12,6 +12,7 @@
     "strictNullChecks": true,
     "importHelpers": true,
     "target": "es2015",
+    "skipLibCheck": true,
     "typeRoots": [
       "node_modules/@types"
     ],
@@ -21,7 +22,7 @@
     ]
   },
   "angularCompilerOptions": {
-    // "fullTemplateTypeCheck": true,
+    "fullTemplateTypeCheck": true,
     "strictInjectionParameters": true
   }
 }
