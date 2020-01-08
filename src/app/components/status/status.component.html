@@ -1,3 +1,3 @@
 <ion-text [color]="color">
-  {{ display }}<span *ngIf="['Connecting', 'Restarting', 'Removing', 'Downloading', 'Installing'].includes(display)">...</span>
+  {{ display }}<span *ngIf="['UNKNOWN', 'REMOVING', 'RESTARTING', 'DOWNLOADING', 'INSTALLING'].includes(status)">...</span>
 </ion-text>
