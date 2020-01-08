@@ -90,7 +90,7 @@ export class AppInstalledShowPage {
           this.stop()
         },
       })
-    } else {
+    } else if ([AppHealthStatus.STOPPED, AppHealthStatus.EXITED]) {
       buttons.push({
         text: 'Start',
         icon: 'play',

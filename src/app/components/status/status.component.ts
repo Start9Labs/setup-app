@@ -16,10 +16,16 @@ export class StatusComponent {
   ngOnChanges () {
     switch (this.status) {
       case AppHealthStatus.UNKNOWN:
-      case AppHealthStatus.REMOVING:
-      case AppHealthStatus.RESTARTING:
         this.display = 'Connecting'
         this.color = 'dark'
+        break
+      case AppHealthStatus.REMOVING:
+        this.display = 'Removing'
+        this.color = 'danger'
+        break
+      case AppHealthStatus.RESTARTING:
+        this.display = 'Restarting'
+        this.color = 'warning'
         break
       case AppHealthStatus.NEEDS_CONFIG:
         this.display = 'Needs Config'
