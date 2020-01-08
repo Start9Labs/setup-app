@@ -50,9 +50,9 @@ export class SetupService {
       ss.zeroconfService = this.zeroconfDaemon.getService(ss.id)
     }
 
-    // tor acquisition
+    // agent version
     if (hasValues(['zeroconfService'], ss) && !hasValues(['versionInstalled'], ss)) {
-      this.message = `getting server version installed`
+      this.message = `getting agent version`
       ss.versionInstalled = await this.getVersion(ss)
     }
 
