@@ -1,5 +1,5 @@
 {
-  "name": "start-9-companion",
+  "name": "start9-companion",
   "version": "0.0.1",
   "author": "Start9 Labs",
   "homepage": "https://start9labs.com",
@@ -83,7 +83,7 @@
     "tslint": "~5.15.0",
     "typescript": "~3.4.3"
   },
-  "description": "Start9 Companion App",
+  "description": "Companion app for the Start9 Personal Server",
   "cordova": {
     "plugins": {
       "wifiwizard2": {},
