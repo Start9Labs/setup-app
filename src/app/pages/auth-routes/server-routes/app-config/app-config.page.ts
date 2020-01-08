@@ -72,8 +72,10 @@ export class AppConfigPage {
       await this.serverService.updateAppConfig(this.server, this.app, this.config)
       if (this.app.status === AppHealthStatus.RUNNING) {
         loader.message = `Restarting ${this.app.title}`
-        await this.serverService.stopApp(this.server, this.app)
         await this.serverService.startApp(this.server, this.app)
+      } else {
+        this.app.status = AppHealthStatus.STOPPED
+        this.app.statusAt = new Date()
       }
       await this.navigateBack()
     } catch (e) {
