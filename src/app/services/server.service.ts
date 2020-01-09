@@ -137,22 +137,22 @@ export class ServerService {
     app.statusAt = new Date()
   }
 
-  async addSSHKey (server: S9Server, key: string): Promise<void> {
+  async addSSHKey (server: S9Server, sshKey: string): Promise<void> {
     const body: Lan.PostAddSSHKeyReq = {
-      key,
+      sshKey,
     }
     // @TODO remove
     // await mockAddSSHKey()
-    await this.httpService.authServerRequest<Lan.PostAddSSHKeyRes>(server, Method.post, `/server/${server.id}/sshKeys`, { }, body)
+    await this.httpService.authServerRequest<Lan.PostAddSSHKeyRes>(server, Method.post, `/sshKeys`, { }, body)
   }
 
-  async removeSSHKey (server: S9Server, key: string): Promise<void> {
+  async removeSSHKey (server: S9Server, sshKey: string): Promise<void> {
     const body: Lan.PostRemoveSSHKeyReq = {
-      key,
+      sshKey,
     }
     // @TODO remove
     // await mockRemoveSSHKey()
-    await this.httpService.authServerRequest<Lan.PostRemoveSSHKeyRes>(server, Method.delete, `/server/${server.id}/sshKeys`, { }, body)
+    await this.httpService.authServerRequest<Lan.PostRemoveSSHKeyRes>(server, Method.delete, `/sshKeys`, { }, body)
   }
 }
 
