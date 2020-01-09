@@ -69,17 +69,20 @@ export class AppConfigPage {
     await loader.present()
 
     try {
-      const originalStatus = this.app.status
-
-      // save config and set app status to STOPPED
+      // save config
       await this.serverService.updateAppConfig(this.server, this.app, this.config)
-      this.app.status = AppHealthStatus.STOPPED
-      this.app.statusAt = new Date()
 
       // if status was RUNNING beforehand, restart the app
-      if (originalStatus === AppHealthStatus.RUNNING) {
-        loader.message = `Restarting ${this.app.title}`
+      if (this.app.status = AppHealthStatus.RUNNING) {
+        loader.message = `Restarting ${this.app.title}. This could take a while...`
+        // stop app
+        await this.serverService.stopApp(this.server, this.app)
+        // start app
         await this.serverService.startApp(this.server, this.app)
+      // if not RUNNING beforehand, set status to STOPPED
+      } else {
+        this.app.status = AppHealthStatus.STOPPED
+        this.app.statusAt = new Date()
       }
 
       await this.navigateBack()

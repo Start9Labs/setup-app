@@ -90,7 +90,7 @@ export class AppInstalledShowPage {
           this.stop()
         },
       })
-    } else if ([AppHealthStatus.STOPPED, AppHealthStatus.EXITED].includes(this.app.status)) {
+    } else if (this.app.status === AppHealthStatus.STOPPED) {
       buttons.push({
         text: 'Start',
         icon: 'play',
@@ -124,8 +124,6 @@ export class AppInstalledShowPage {
 
     try {
       await this.serverService.stopApp(this.server, this.app)
-      this.app.status = AppHealthStatus.STOPPED
-      this.app.statusAt = new Date()
     } catch (e) {
       this.error = e.message
     } finally {
@@ -141,8 +139,6 @@ export class AppInstalledShowPage {
 
     try {
       await this.serverService.startApp(this.server, this.app)
-      this.app.status = AppHealthStatus.RUNNING
-      this.app.statusAt = new Date()
     } catch (e) {
       this.error = e.message
     } finally {

@@ -101,18 +101,20 @@ export class ServerService {
     await this.s9Model.removeApp(server.id, appId)
   }
 
-  async startApp (server: S9Server, app: AppInstalled): Promise<AppInstalled> {
+  async startApp (server: S9Server, app: AppInstalled): Promise<void> {
     // @TODO remove
-    // return mockStartApp()
-    return this.httpService.authServerRequest<Lan.PostStartAppRes>(server, Method.post, `/apps/${app.id}/start`)
-      .then(mapApiInstalledApp)
+    // await mockStartApp()
+    await this.httpService.authServerRequest<Lan.PostStartAppRes>(server, Method.post, `/apps/${app.id}/start`)
+    app.status = AppHealthStatus.RUNNING
+    app.statusAt = new Date()
   }
 
-  async stopApp (server: S9Server, app: AppInstalled): Promise<AppInstalled> {
+  async stopApp (server: S9Server, app: AppInstalled): Promise<void> {
     // @TODO remove
-    // return mockStopApp()
-    return this.httpService.authServerRequest<Lan.PostStopAppRes>(server, Method.post, `/apps/${app.id}/stop`)
-      .then(mapApiInstalledApp)
+    // await mockStopApp()
+    await this.httpService.authServerRequest<Lan.PostStopAppRes>(server, Method.post, `/apps/${app.id}/stop`)
+    app.status = AppHealthStatus.STOPPED
+    app.statusAt = new Date()
   }
 
   async updateAppConfig (server: S9Server, app: AppInstalled, config: object): Promise<void> {
@@ -177,12 +179,12 @@ async function mockUninstallApp (): Promise<Lan.PostUninstallAppRes> {
 
 // @TODO remove
 async function mockStartApp (): Promise<Lan.PostStartAppRes> {
-  return mockApiAppInstalled
+  return { }
 }
 
 // @TODO remove
 async function mockStopApp (): Promise<Lan.PostStopAppRes> {
-  return mockApiAppInstalled
+  return { }
 }
 
 // @TODO remove

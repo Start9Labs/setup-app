@@ -29,7 +29,7 @@
     Config
   </ion-button>
 
-  <ion-button *ngIf="['STOPPED', 'EXITED'].includes(app.status)" style="margin: 16px 0;" expand="block" fill="outline" color="success" (click)="start()">
+  <ion-button *ngIf="app.status === 'STOPPED'" style="margin: 16px 0;" expand="block" fill="outline" color="success" (click)="start()">
     Start
   </ion-button>
 
