@@ -118,7 +118,7 @@ export class AppInstalledShowPage {
 
   async stop (): Promise<void> {
     const loader = await this.loadingCtrl.create({
-      message: `Stopping ${this.app.title}`,
+      message: `Stopping ${this.app.title}. This could take a while...`,
     })
     await loader.present()
 
@@ -133,7 +133,7 @@ export class AppInstalledShowPage {
 
   async start (): Promise<void> {
     const loader = await this.loadingCtrl.create({
-      message: `Starting ${this.app.title}`,
+      message: `Starting ${this.app.title}...`,
     })
     await loader.present()
 

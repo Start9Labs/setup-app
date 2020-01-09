@@ -33,9 +33,12 @@ export class ServerService {
   }
 
   async updateAgent (server: S9Server): Promise<void> {
+    const body: Lan.PostUpdateAgentReq = {
+      version: server.versionLatest,
+    }
     // @TODO remove
     // await mockPostUpdateAgent()
-    await this.httpService.authServerRequest<Lan.PostUpdateAgentRes>(server, Method.post, '/update', { }, { version: server.versionLatest })
+    await this.httpService.authServerRequest<Lan.PostUpdateAgentRes>(server, Method.post, '/update', { }, body)
   }
 
   async getAvailableApps (server: S9Server): Promise<AppAvailablePreview[]> {
@@ -118,9 +121,30 @@ export class ServerService {
   }
 
   async updateAppConfig (server: S9Server, app: AppInstalled, config: object): Promise<void> {
+    const body: Lan.PostUpdateAppConfigReq = {
+      config,
+    }
     // @TODO remove
     // await mockUpdateAppConfig()
-    await this.httpService.authServerRequest<Lan.PostUpdateAppConfigRes>(server, Method.patch, `/apps/${app.id}/config`, { }, { config })
+    await this.httpService.authServerRequest<Lan.PostUpdateAppConfigRes>(server, Method.patch, `/apps/${app.id}/config`, { }, body)
+  }
+
+  async addSSHKey (server: S9Server, key: string): Promise<void> {
+    const body: Lan.PostAddSSHKeyReq = {
+      key,
+    }
+    // @TODO remove
+    // await mockAddSSHKey()
+    await this.httpService.authServerRequest<Lan.PostAddSSHKeyRes>(server, Method.post, `/server/${server.id}/sshKeys`, { }, body)
+  }
+
+  async removeSSHKey (server: S9Server, key: string): Promise<void> {
+    const body: Lan.PostRemoveSSHKeyReq = {
+      key,
+    }
+    // @TODO remove
+    // await mockRemoveSSHKey()
+    await this.httpService.authServerRequest<Lan.PostRemoveSSHKeyRes>(server, Method.delete, `/server/${server.id}/sshKeys`, { }, body)
   }
 }
 
@@ -191,6 +215,15 @@ async function mockStopApp (): Promise<Lan.PostStopAppRes> {
 async function mockUpdateAppConfig (): Promise<Lan.PostUpdateAppConfigRes> {
   return { }
 }
+// @TODO remove
+async function mockAddSSHKey (): Promise<Lan.PostAddSSHKeyRes> {
+  return { }
+}
+
+// @TODO remove
+async function mockRemoveSSHKey (): Promise<Lan.PostRemoveSSHKeyRes> {
+  return { }
+}
 
 // @TODO remove
 const mockApiServer: Lan.GetServerRes = {
@@ -204,6 +237,7 @@ const mockApiServer: Lan.GetServerRes = {
     'Ethernet': 'Gigabit',
     'Disk': '512 GB Flash (280 GB available)',
   },
+  sshKeys: [],
   events: [],
 }
 

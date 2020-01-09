@@ -69,6 +69,12 @@
   }
 }
 
+.center {
+  display: block;
+  margin: auto;
+  height: 100%;
+}
+
 ion-note {
   max-width: 160px;
   overflow: hidden;

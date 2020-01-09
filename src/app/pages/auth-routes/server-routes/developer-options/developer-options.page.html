@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="'servers/' + server.id"></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      Developer Options
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding-top">
+
+  <ion-item-group>
+    <ion-item button detail="false" [routerLink]="['/servers', server.id, 'developer-options', 'ssh-keys']">
+      SSH keys
+    </ion-item>
+  </ion-item-group>
+
+</ion-content>

@@ -3,15 +3,13 @@
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="'servers/' + server.id"></ion-back-button>
     </ion-buttons>
-    <ion-title>Apps</ion-title>
+    <ion-title>Sovereign App Store</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding-top">
 
-  <div *ngIf="loading">
-    Loading
-  </div>
+  <ion-spinner *ngIf="loading" class="center"></ion-spinner>
 
   <div *ngIf="!loading">
 

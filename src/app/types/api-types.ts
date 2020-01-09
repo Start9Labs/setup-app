@@ -33,6 +33,7 @@ export interface ApiServer {
   versionInstalled: string
   versionLatest: string
   specs: ServerSpecs
+  sshKeys: string[]
   events: AppEvent[]
 }
 
@@ -69,4 +70,8 @@ export module Lan {
   export type PostStopAppRes = TwoHundredOK
   export type PostUpdateAppConfigReq = { }
   export type PostUpdateAppConfigRes = TwoHundredOK
+  export type PostAddSSHKeyReq = { key: string }
+  export type PostAddSSHKeyRes = TwoHundredOK
+  export type PostRemoveSSHKeyReq = { key: string }
+  export type PostRemoveSSHKeyRes = TwoHundredOK
 }

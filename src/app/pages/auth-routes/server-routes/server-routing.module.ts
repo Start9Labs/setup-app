@@ -11,6 +11,14 @@ const routes: Routes = [
     loadChildren: () => import('./server-specs/server-specs.module').then(m => m.ServerSpecsPageModule),
   },
   {
+    path: 'developer-options',
+    loadChildren: () => import('./developer-options/developer-options.module').then(m => m.DeveloperOptionsPageModule),
+  },
+  {
+    path: 'developer-options/ssh-keys',
+    loadChildren: () => import('./ssh-keys/ssh-keys.module').then(m => m.SSHKeysPageModule),
+  },
+  {
     path: 'apps/available',
     loadChildren: () => import('./app-available-list/app-available-list.module').then(m => m.AppAvailableListPageModule),
   },
@@ -19,7 +27,7 @@ const routes: Routes = [
     loadChildren: () => import('./app-available-show/app-available-show.module').then(m => m.AppAvailableShowPageModule),
   },
   {
-    path: 'apps/installed/start9Agent',
+    path: 'apps/installed/start9-agent',
     loadChildren: () => import('./start9-agent/start9-agent.module').then(m => m.Start9AgentPageModule),
   },
   {

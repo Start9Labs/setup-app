@@ -73,7 +73,7 @@ export class AppConfigPage {
       await this.serverService.updateAppConfig(this.server, this.app, this.config)
 
       // if status was RUNNING beforehand, restart the app
-      if (this.app.status = AppHealthStatus.RUNNING) {
+      if (this.app.status === AppHealthStatus.RUNNING) {
         loader.message = `Restarting ${this.app.title}. This could take a while...`
         // stop app
         await this.serverService.stopApp(this.server, this.app)

@@ -16,6 +16,7 @@ export interface S9Server extends S9ServerStorable {
   statusAt: Date
   specs: ServerSpecs
   apps: AppInstalled[]
+  sshKeys: string[]
   versionLatest: string
   privkey: string // derive from mnemonic + torAddress
   events: AppEvent[]
@@ -41,6 +42,7 @@ export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): 
     statusAt: new Date(),
     privkey: deriveKeys(mnemonic, id).privkey,
     apps: [],
+    sshKeys: [],
     specs: { },
     events: [],
   }

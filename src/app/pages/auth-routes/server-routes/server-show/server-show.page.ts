@@ -41,7 +41,7 @@ export class ServerShowPage {
 
     if (this.server.status === AppHealthStatus.RUNNING) {
       buttons.push({
-        text: 'View Specs',
+        text: 'View specs',
         handler: () => {
           this.navCtrl.navigateForward(['/servers', this.server.id, 'specs'])
         },
@@ -50,9 +50,15 @@ export class ServerShowPage {
 
     buttons.push(
       {
-        text: 'Edit Label',
+        text: 'Edit label',
         handler: () => {
           this.presentAlertEditName()
+        },
+      },
+      {
+        text: 'Developer options',
+        handler: () => {
+          this.navCtrl.navigateForward(['/servers', this.server.id, 'developer'])
         },
       },
       {
