@@ -41,7 +41,7 @@ export class ServerShowPage {
 
     if (this.server.status === AppHealthStatus.RUNNING) {
       buttons.push({
-        text: 'Server Specs',
+        text: 'View Specs',
         handler: () => {
           this.navCtrl.navigateForward(['/servers', this.server.id, 'specs'])
         },
@@ -50,13 +50,13 @@ export class ServerShowPage {
 
     buttons.push(
       {
-        text: 'Edit Friendly Name',
+        text: 'Edit Label',
         handler: () => {
           this.presentAlertEditName()
         },
       },
       {
-        text: 'Forget Server',
+        text: 'Forget',
         cssClass: 'alert-danger',
         handler: () => {
           this.presentAlertForget()
@@ -73,12 +73,12 @@ export class ServerShowPage {
 
   async presentAlertEditName () {
     const alert = await this.alertCtrl.create({
-      header: 'Friendly Name',
+      header: 'Label',
       inputs: [
         {
           name: 'inputValue',
           type: 'text',
-          value: this.server.friendlyName,
+          value: this.server.label,
           placeholder: this.server.id,
         },
       ],
@@ -91,9 +91,9 @@ export class ServerShowPage {
           handler: (data: { inputValue: string }) => {
             const inputValue = data.inputValue
             // return if no change
-            if (this.server.friendlyName === inputValue) { return }
+            if (this.server.label === inputValue) { return }
             // set new value and mark edited
-            this.server = { ...this.server, friendlyName: inputValue || this.server.id }
+            this.server = { ...this.server, label: inputValue || this.server.id }
             this.serverModel.updateServer(this.server)
           },
         },
@@ -106,7 +106,7 @@ export class ServerShowPage {
   async presentAlertForget () {
     const alert = await this.alertCtrl.create({
       header: 'Caution',
-      message: `Are you sure you want to forget ${this.server.friendlyName} on this device?`,
+      message: `Are you sure you want to forget ${this.server.label} on this device?`,
       buttons: [
         {
           text: 'Cancel',

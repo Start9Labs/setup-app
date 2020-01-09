@@ -5,7 +5,7 @@ import { deriveKeys } from '../util/crypto.util'
 
 export interface S9ServerStorable {
   id: string
-  friendlyName: string
+  label: string
   torAddress: string
   versionInstalled: string
 }
@@ -29,10 +29,10 @@ export function getLanIP (zcs: ZeroconfService): string  {
 }
 
 export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): S9Server {
-  const { friendlyName, torAddress, id, versionInstalled } = ss
+  const { label, torAddress, id, versionInstalled } = ss
   return {
     id,
-    friendlyName,
+    label,
     torAddress,
     versionInstalled,
     versionLatest: '0.0.0',
@@ -47,11 +47,11 @@ export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): 
 }
 
 export function toStorableServer (ss: S9Server): S9ServerStorable {
-  const { friendlyName, torAddress, id, versionInstalled } = ss
+  const { label, torAddress, id, versionInstalled } = ss
 
   return {
     id,
-    friendlyName,
+    label,
     torAddress,
     versionInstalled,
   }

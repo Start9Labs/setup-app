@@ -99,7 +99,7 @@ export class HttpService {
   s9Url (ss: S9Server | S9BuilderWith<'zeroconfService' | 'versionInstalled'>, path: string): string {
     const zeroconfService = this.zeroconfDaemon.getService(ss.id)
     if (!zeroconfService) { throw new Error('S9 Server not found on LAN') }
-    const host = getLanIP(zeroconfService) || ss.torAddress
+    const host = getLanIP(zeroconfService)
     return `http://${host}/v${ss.versionInstalled.charAt(0)}${path}`
   }
 }

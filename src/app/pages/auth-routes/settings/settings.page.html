@@ -10,16 +10,6 @@
 <ion-content>
 
   <ion-item-group>
-    <ion-item-divider>General</ion-item-divider>
-    <ion-item href="https://start9labs.com/pages/setup-instructions" target="_blank">
-      Instructions
-    </ion-item>
-    <ion-item href="https://start9labs.com/pages/frequently-asked-questions" target="_blank">
-      FAQ
-    </ion-item>
-  </ion-item-group>
-
-  <ion-item-group>
     <ion-item-divider>Security</ion-item-divider>
     <ion-item button (click)="presentAlertWarnRecovery()">
       View Recovery Phrase
@@ -34,6 +24,9 @@
       <div slot="end">
         <ion-icon name="star" color="warning"></ion-icon> <ion-icon name="star" color="warning"></ion-icon> <ion-icon name="star" color="warning"></ion-icon> <ion-icon name="star" color="warning"></ion-icon> <ion-icon name="star" color="warning"></ion-icon>
       </div>
+    </ion-item>
+    <ion-item href="https://start9labs.com/pages/faq" target="_blank">
+      View FAQ
     </ion-item>
     <ion-item button detail="false" (click)="presentActionContact()">
       Contact support

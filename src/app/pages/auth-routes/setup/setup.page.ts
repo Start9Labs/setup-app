@@ -11,7 +11,7 @@ import { SetupService, fromUserInput } from 'src/app/services/setup.service'
 })
 export class SetupPage {
   public error = ''
-  public friendlyName = ''
+  public label = ''
   public productKey = ''
 
   constructor (
@@ -23,7 +23,7 @@ export class SetupPage {
 
   async submit (): Promise<void> {
     const id = idFromSerial(this.productKey)
-    const serverData = fromUserInput(id, this.friendlyName || id)
+    const serverData = fromUserInput(id, this.label || id)
 
     const loader = await this.loadingCtrl.create({ message: 'Setting up server...'})
     await loader.present()

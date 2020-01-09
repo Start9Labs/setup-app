@@ -130,7 +130,7 @@ export class SetupService {
   mockServer (ss: S9ServerBuilder): Required<S9ServerBuilder> {
     return {
       id: ss.id,
-      friendlyName: ss.friendlyName,
+      label: ss.label,
       torAddress: 'agent-tor-address-isaverylongaddresssothaticantestwrapping.onion',
       versionInstalled: '0.1.0',
       versionLatest: '0.1.0',
@@ -161,7 +161,7 @@ export type S9BuilderWith<T extends keyof S9ServerBuilder> = S9ServerBuilder & {
 
 export interface S9ServerBuilder {
   id: string
-  friendlyName: string
+  label: string
 
   status: AppHealthStatus
   statusAt: Date
@@ -185,10 +185,10 @@ export function isFullySetup (ss: S9ServerBuilder): ss is Required<S9ServerBuild
   return hasValues(builderKeys(), ss) && ss.registered && ss.status === AppHealthStatus.RUNNING
 }
 
-export function fromUserInput (id: string, friendlyName: string): S9ServerBuilder {
+export function fromUserInput (id: string, label: string): S9ServerBuilder {
   return {
     id,
-    friendlyName,
+    label,
     status: AppHealthStatus.UNKNOWN,
     statusAt: new Date(),
     specs: { },
@@ -214,7 +214,7 @@ function builderKeys (): (keyof S9ServerBuilder)[] {
 
 const defaultBuilder: Required<S9ServerBuilder> = {
   id:               undefined as any,
-  friendlyName:     undefined as any,
+  label:            undefined as any,
   status:           undefined as any,
   statusAt:         undefined as any,
   versionInstalled: undefined as any,
