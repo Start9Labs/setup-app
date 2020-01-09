@@ -129,6 +129,14 @@ export class ServerService {
     await this.httpService.authServerRequest<Lan.PostUpdateAppConfigRes>(server, Method.patch, `/apps/${app.id}/config`, { }, body)
   }
 
+  async wipeAppData (server: S9Server, app: AppInstalled): Promise<void> {
+    // @TODO remove
+    // await mockWipeAppData()
+    await this.httpService.authServerRequest<Lan.PostWipeAppDataRes>(server, Method.post, `/apps/${app.id}/wipe`)
+    app.status = AppHealthStatus.NEEDS_CONFIG
+    app.statusAt = new Date()
+  }
+
   async addSSHKey (server: S9Server, key: string): Promise<void> {
     const body: Lan.PostAddSSHKeyReq = {
       key,
@@ -215,6 +223,12 @@ async function mockStopApp (): Promise<Lan.PostStopAppRes> {
 async function mockUpdateAppConfig (): Promise<Lan.PostUpdateAppConfigRes> {
   return { }
 }
+
+// @TODO remove
+async function mockWipeAppData (): Promise<Lan.PostWipeAppDataRes> {
+  return { }
+}
+
 // @TODO remove
 async function mockAddSSHKey (): Promise<Lan.PostAddSSHKeyRes> {
   return { }
@@ -275,7 +289,7 @@ const mockApiAppInstalled: ApiAppInstalled = {
   versionInstalled: '0.18.1',
   title: 'Bitcoin Core',
   torAddress: 'sample-bitcoin-tor-address',
-  status: AppHealthStatus.RUNNING,
+  status: AppHealthStatus.RECOVERABLE,
   iconURL: 'assets/img/bitcoin_core.png',
 }
 

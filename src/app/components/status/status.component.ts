@@ -28,6 +28,7 @@ export class StatusComponent {
         this.color = 'warning'
         break
       case AppHealthStatus.NEEDS_CONFIG:
+      case AppHealthStatus.RECOVERABLE:
         this.display = 'Needs Config'
         this.color = 'warning'
         break

@@ -17,7 +17,6 @@ export class AppConfigPage {
   server: S9Server
   app: AppInstalled
   spec: AppConfigSpec
-  initialConfigStringified: string
   config: object
   edited = false
 
@@ -32,21 +31,29 @@ export class AppConfigPage {
   }
 
   async ngOnInit () {
+    const serverId = this.route.snapshot.paramMap.get('serverId') as string
+    const server = this.serverModel.getServer(serverId)
+    if (!server) throw new Error (`No server found with ID: ${serverId}`)
+    this.server = server
+
+    const appId = this.route.snapshot.paramMap.get('appId') as string
+    const app = server.apps.find(app => app.id === appId)
+    if (!app) throw new Error (`No app found on ${serverId} with ID: ${appId}`)
+    this.app = app
+
+    if (this.app.status === AppHealthStatus.RECOVERABLE) {
+      await this.presentAlertRecoverable()
+    } else {
+      await this.getConfig()
+    }
+  }
+
+  async getConfig () {
     try {
-      const serverId = this.route.snapshot.paramMap.get('serverId') as string
-      const server = this.serverModel.getServer(serverId)
-      if (!server) throw new Error (`No server found with ID: ${serverId}`)
-      this.server = server
-
-      const appId = this.route.snapshot.paramMap.get('appId') as string
-      const app = server.apps.find(app => app.id === appId)
-      if (!app) throw new Error (`No app found on ${serverId} with ID: ${appId}`)
-      this.app = app
-
-      const { spec, config } = await this.serverService.getAppConfig(this.server, appId)
+      const { spec, config } = await this.serverService.getAppConfig(this.server, this.app.id)
       this.spec = spec
       this.config = config
-      this.initialConfigStringified = JSON.stringify(this.config)
+      this.loading = false
     } catch (e) {
       this.error = e.message
     } finally {
@@ -55,7 +62,7 @@ export class AppConfigPage {
   }
 
   async cancel () {
-    if (JSON.stringify(this.config) !== this.initialConfigStringified) {
+    if (this.edited) {
       await this.presentAlertUnsaved()
     } else {
       await this.navigateBack()
@@ -93,6 +100,52 @@ export class AppConfigPage {
     }
   }
 
+  async presentAlertRecoverable () {
+    const alert = await this.alertCtrl.create({
+      header: 'Keep existing data?',
+      message: `Data for ${this.app.title} was found on this device. Would you like to keep it?`,
+      buttons: [
+        {
+          text: `Wipe Data`,
+          cssClass: 'alert-danger',
+          handler: () => {
+            this.presentAlertConfirmWipeData()
+          },
+        },
+        {
+          text: 'Keep Data',
+          handler: () => {
+            this.getConfig()
+          },
+        },
+      ],
+    })
+    await alert.present()
+  }
+
+  async presentAlertConfirmWipeData () {
+    const alert = await this.alertCtrl.create({
+      header: 'Confirm',
+      message: `Are you sure you want to wipe data for ${this.app.title}? It will be treated as a fresh install.`,
+      buttons: [
+        {
+          text: 'Cancel',
+          handler: () => {
+            this.getConfig()
+          },
+        },
+        {
+          text: `Wipe Data`,
+          cssClass: 'alert-danger',
+          handler: () => {
+            this.wipeAppData()
+          },
+        },
+      ],
+    })
+    await alert.present()
+  }
+
   async presentAlertUnsaved () {
     const alert = await this.alertCtrl.create({
       header: 'Unsaved Changes',
@@ -112,6 +165,22 @@ export class AppConfigPage {
       ],
     })
     await alert.present()
+  }
+
+  async wipeAppData () {
+    const loader = await this.loadingCtrl.create({
+      message: 'Wiping Data. This could take a while...',
+    })
+    await loader.present()
+
+    try {
+      await this.serverService.wipeAppData(this.server, this.app)
+      await this.getConfig()
+    } catch (e) {
+      this.error = e.message
+    } finally {
+      await loader.dismiss()
+    }
   }
 
   async navigateBack () {

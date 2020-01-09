@@ -74,4 +74,6 @@ export module Lan {
   export type PostAddSSHKeyRes = TwoHundredOK
   export type PostRemoveSSHKeyReq = { key: string }
   export type PostRemoveSSHKeyRes = TwoHundredOK
+  export type PostWipeAppDataReq = { }
+  export type PostWipeAppDataRes = TwoHundredOK
 }

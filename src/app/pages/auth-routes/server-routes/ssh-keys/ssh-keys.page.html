@@ -15,13 +15,13 @@
     <ion-text class="ion-text-wrap" color="danger">{{error}}</ion-text>
   </ion-item>
 
-  <ion-item-group *ngIf="!keys.length">
+  <ion-item-group *ngIf="!server.sshKeys.length">
     <ion-item>
       <ion-label class="ion-text-wrap">
         <h3><ion-text color="danger">Warning</ion-text></h3>
         <br />
         <h2>
-          <ion-text color="danger">Adding SSH keys to your server voids the warranty.</ion-text>
+          <ion-text color="medium">Adding SSH keys to your server voids the warranty.</ion-text>
         </h2>
       </ion-label>
     </ion-item>
@@ -30,12 +30,12 @@
   <ion-item-group>
     <ion-item-sliding *ngFor="let key of server.sshKeys; let i = index">
       <ion-item-options side="end">
-        <ion-item-option color="danger" (click)="remove(i)">
+        <ion-item-option color="danger" (click)="remove(key, i)">
           <ion-icon slot="icon-only" name="trash"></ion-icon>
         </ion-item-option>
       </ion-item-options>
       <ion-item>
-        <ion-label>{{ key }}</ion-label>
+        <ion-label class="ion-text-wrap">{{ key }}</ion-label>
       </ion-item>
     </ion-item-sliding>
   </ion-item-group>

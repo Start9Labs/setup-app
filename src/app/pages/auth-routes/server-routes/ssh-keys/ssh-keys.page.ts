@@ -75,7 +75,7 @@ export class SSHKeysPage {
     }
   }
 
-  async remove (key: string) {
+  async remove (key: string, index: number) {
     const loader = await this.loadingCtrl.create({
       message: 'Removing SSH key...',
     })
@@ -83,7 +83,6 @@ export class SSHKeysPage {
 
     try {
       await this.serverService.removeSSHKey(this.server, key)
-      const index = this.server.sshKeys.findIndex(k => k === key)
       this.server.sshKeys.splice(index, 1)
     } catch (e) {
       this.error = e.message

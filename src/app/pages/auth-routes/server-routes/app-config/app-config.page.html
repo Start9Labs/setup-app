@@ -20,17 +20,19 @@
     <ion-text class="ion-text-wrap" color="danger">{{error}}</ion-text>
   </ion-item>
 
+  <ion-spinner *ngIf="loading" class="center"></ion-spinner>
+
   <ion-item-group *ngIf="!loading" class="ion-text-wrap">
-    <div *ngIf="app.status === 'NEEDS_CONFIG'">
+    <div *ngIf="['NEEDS_CONFIG', 'RECOVERABLE'].includes(app.status)">
       <ion-item-divider><ion-text>Initial Config</ion-text></ion-item-divider>
       <ion-item>
         <ion-text color="warning">
-          <h3>
-            To use the default configuration for {{ app.title }}, click "SAVE" now.
+          <h5>
+            To use the {{ app.status === 'NEEDS_CONFIG' ? 'default' : 'existing' }} configuration for {{ app.title }}, click "SAVE" now.
             <br />
             <br />
             Otherwise, configure below and click "SAVE" when finished.
-          </h3>
+          </h5>
         </ion-text>
       </ion-item>
     </div>

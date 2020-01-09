@@ -25,7 +25,7 @@
     </ion-item>
   </ion-item-group>
 
-  <ion-button *ngIf="app.status === 'NEEDS_CONFIG'" style="margin: 16px 0;" expand="block" fill="outline" color="warning" [routerLink]="['config']">
+  <ion-button *ngIf="['NEEDS_CONFIG', 'RECOVERABLE'].includes(app.status)" style="margin: 16px 0;" expand="block" fill="outline" color="warning" [routerLink]="['config']">
     Config
   </ion-button>
 

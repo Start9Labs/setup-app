@@ -144,6 +144,11 @@ export function getRandomCharInSet (charset: string): string {
   throw new Error('unreachable')
 }
 
+export async function hash (data: string): Promise<Hex> {
+  const arrayBuf = await window.crypto.subtle.digest('SHA-256', Buffer.from(data, 'utf-8').buffer)
+  return hexFromArrayBuffer(arrayBuf)
+}
+
 export async function encrypt (data: string, pin: string): Promise<Hex> {
   const key = await getKey(pin)
   let encoded = new TextEncoder().encode(data)

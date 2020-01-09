@@ -58,7 +58,7 @@ export class ServerShowPage {
       {
         text: 'Developer options',
         handler: () => {
-          this.navCtrl.navigateForward(['/servers', this.server.id, 'developer'])
+          this.navCtrl.navigateForward(['/servers', this.server.id, 'developer-options'])
         },
       },
       {
