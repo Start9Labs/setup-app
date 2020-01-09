@@ -26,14 +26,10 @@ export class ServerShowPage {
   ) { }
 
   ngOnInit () {
-    try {
-      const id = this.route.snapshot.paramMap.get('serverId') as string
-      const server = this.serverModel.getServer(id)
-      if (!server) throw new Error (`No server found with ID: ${id}`)
-      this.server = server
-    } catch (e) {
-      this.error = e.message
-    }
+    const id = this.route.snapshot.paramMap.get('serverId') as string
+    const server = this.serverModel.getServer(id)
+    if (!server) throw new Error (`No server found with ID: ${id}`)
+    this.server = server
   }
 
   async presentAction () {

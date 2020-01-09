@@ -57,6 +57,7 @@ export class SyncDaemon {
             status: this.initialPass ? AppHealthStatus.UNKNOWN : AppHealthStatus.UNREACHABLE,
             statusAt: new Date(),
             apps: [],
+            sshKeys: [],
             specs: { },
           }
         }

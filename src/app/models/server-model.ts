@@ -39,7 +39,7 @@ export class S9ServerModel {
 
     if (target) {
       Object.keys(server).forEach(key => {
-        if (!Array.isArray(server[key])) {
+        if (key !== 'apps') {
           target[key] = server[key]
         }
       })
