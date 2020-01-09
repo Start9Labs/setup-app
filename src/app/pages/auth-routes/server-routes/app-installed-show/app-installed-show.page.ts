@@ -47,7 +47,7 @@ export class AppInstalledShowPage {
   }
 
   async copyTor () {
-    await this.clipboardService.copy(this.server.torAddress)
+    await this.clipboardService.copy(this.app.torAddress || '')
   }
 
   async presentAction () {
