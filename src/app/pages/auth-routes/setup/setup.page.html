@@ -17,13 +17,13 @@
 
   <ion-item-group style="margin-bottom: 40px;">
     <ion-item>
-      <ion-input maxlength="8" placeholder="Enter Product ID" [(ngModel)]="productKey"></ion-input>
+      <ion-input maxlength="8" placeholder="Product ID (located on device)" [(ngModel)]="productKey"></ion-input>
     </ion-item>
     <ion-item>
-      <ion-input maxlength="20" placeholder="Local label (optional)" [(ngModel)]="label"></ion-input>
+      <ion-input placeholder="Friendly Name (ex My Server)" [(ngModel)]="label"></ion-input>
     </ion-item>
   </ion-item-group>
-  <ion-button [disabled]="productKey.length !== 8" expand="block" fill="outline" (click)="submit()">
+  <ion-button [disabled]="productKey.length !== 8 || !label" expand="block" fill="outline" (click)="submit()">
     Connect
   </ion-button>
 

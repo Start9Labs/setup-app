@@ -40,7 +40,8 @@ export class ServerShowPage {
   async presentAction () {
     const buttons: ActionSheetButton[] = [
       {
-        text: 'Edit label',
+        text: 'Edit friendly name',
+        icon: 'pricetag',
         handler: () => {
           this.presentAlertEditName()
         },
@@ -50,13 +51,15 @@ export class ServerShowPage {
     if (this.server.status === AppHealthStatus.RUNNING) {
       buttons.push(
         {
-          text: 'View specs',
+          text: 'Server info',
+          icon: 'information-circle',
           handler: () => {
             this.navCtrl.navigateForward(['/servers', this.server.id, 'specs'])
           },
         },
         {
           text: 'Developer options',
+          icon: 'code',
           handler: () => {
             this.navCtrl.navigateForward(['/servers', this.server.id, 'developer-options'])
           },
@@ -66,8 +69,9 @@ export class ServerShowPage {
 
     buttons.push(
       {
-        text: 'Forget',
+        text: 'Forget Server',
         cssClass: 'alert-danger',
+        icon: 'trash',
         handler: () => {
           this.presentAlertForget()
         },

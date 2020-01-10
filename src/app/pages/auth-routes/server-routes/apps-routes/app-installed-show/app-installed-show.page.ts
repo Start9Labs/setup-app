@@ -56,7 +56,7 @@ export class AppInstalledShowPage {
     if ([AppHealthStatus.NEEDS_CONFIG, AppHealthStatus.RECOVERABLE, AppHealthStatus.RUNNING, AppHealthStatus.STOPPED].includes(this.app.status)) {
       buttons.push(
         {
-          text: 'Config',
+          text: 'App Config',
           icon: 'construct',
           handler: () => {
             this.navCtrl.navigateForward(['/servers', this.server.id, 'apps', 'installed', this.app.id, 'config'])
@@ -67,7 +67,7 @@ export class AppInstalledShowPage {
 
     buttons.push(
       {
-        text: 'Logs',
+        text: 'View Logs',
         icon: 'paper',
         handler: () => {
           this.navCtrl.navigateForward(['/servers', this.server.id, 'apps', 'installed', this.app.id, 'logs'])
@@ -81,24 +81,6 @@ export class AppInstalledShowPage {
         },
       },
     )
-
-    if (this.app.status === AppHealthStatus.RUNNING) {
-      buttons.push({
-        text: 'Stop',
-        icon: 'square',
-        handler: () => {
-          this.stop()
-        },
-      })
-    } else if (this.app.status === AppHealthStatus.STOPPED) {
-      buttons.push({
-        text: 'Start',
-        icon: 'play',
-        handler: () => {
-          this.start()
-        },
-      })
-    }
 
     buttons.push({
       text: 'Uninstall',

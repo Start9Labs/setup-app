@@ -23,9 +23,11 @@ export class SetupPage {
 
   async submit (): Promise<void> {
     const id = idFromSerial(this.productKey)
-    const serverData = fromUserInput(id, this.label || id)
+    const serverData = fromUserInput(id, this.label)
 
-    const loader = await this.loadingCtrl.create({ message: 'Setting up server...'})
+    const loader = await this.loadingCtrl.create({
+      message: 'Setting up server...',
+    })
     await loader.present()
 
     // attempt to acquire all connection info for new server + check status asynchronously

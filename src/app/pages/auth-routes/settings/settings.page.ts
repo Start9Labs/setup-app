@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { AlertController, Platform, ActionSheetController } from '@ionic/angular'
+import { AlertController, Platform } from '@ionic/angular'
 import { AuthService } from 'src/app/services/auth.service'
 
 @Component({
@@ -10,10 +10,9 @@ import { AuthService } from 'src/app/services/auth.service'
 export class SettingsPage {
 
   constructor (
-    readonly platform: Platform,
+    private readonly platform: Platform,
     private readonly alertCtrl: AlertController,
     private readonly authService: AuthService,
-    private readonly actionSheetCtrl: ActionSheetController,
   ) { }
 
   async goToInstructions () {
@@ -78,29 +77,8 @@ export class SettingsPage {
     await alert.present()
   }
 
-  async presentActionContact () {
-    const phone = '+17207440490'
-    const email = 'support@start9labs.com'
-
-    const actionSheet = await this.actionSheetCtrl.create({
-      buttons: [
-        {
-          text: 'Call',
-          icon: 'call',
-          handler: () => {
-            window.open('tel:' + phone, '_system')
-          },
-        },
-        {
-          text: 'Email',
-          icon: 'mail',
-          handler: () => {
-            window.open('mailto:' + email + '?&subject=General Inquiry', '_system')
-          },
-        },
-      ],
-    })
-    await actionSheet.present()
+  openEmail () {
+    window.open('mailto:support@start9labs.com', '_system')
   }
 
   rateApp () {
