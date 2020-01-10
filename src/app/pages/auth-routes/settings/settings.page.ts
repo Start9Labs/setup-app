@@ -26,6 +26,7 @@ export class SettingsPage {
 
   async presentAlertWarnRecovery () {
     const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
       header: 'Caution',
       message: 'Please make sure no one is snooping. And remember to keep your recovery phrase private and secure.',
       buttons: [
@@ -47,6 +48,7 @@ export class SettingsPage {
 
   async presentAlertViewRecovery () {
     const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
       header: 'Recovery Phrase',
       message: `${this.authService.mnemonic!.join(' ')}`,
       buttons: ['Close'],
@@ -56,6 +58,7 @@ export class SettingsPage {
 
   async presentAlertWipeKeychain () {
     const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
       header: 'Wait!',
       message: 'Are you sure you want to wipe the keychain on this device? All servers will be forgotten. You will need your recovery phrase to regain access to your servers.',
       buttons: [

@@ -9,7 +9,7 @@ import { ClipboardService } from 'src/app/services/clipboard.service'
 import { ActionSheetButton } from '@ionic/core'
 
 @Component({
-  selector: 'app-app-installed-show',
+  selector: 'app-installed-show',
   templateUrl: './app-installed-show.page.html',
   styleUrls: ['./app-installed-show.page.scss'],
 })
@@ -53,7 +53,7 @@ export class AppInstalledShowPage {
   async presentAction () {
     const buttons : ActionSheetButton[] = []
 
-    if ([AppHealthStatus.NEEDS_CONFIG, AppHealthStatus.RUNNING, AppHealthStatus.STOPPED].includes(this.app.status)) {
+    if ([AppHealthStatus.NEEDS_CONFIG, AppHealthStatus.RECOVERABLE, AppHealthStatus.RUNNING, AppHealthStatus.STOPPED].includes(this.app.status)) {
       buttons.push(
         {
           text: 'Config',
@@ -148,6 +148,7 @@ export class AppInstalledShowPage {
 
   async presentAlertUninstall () {
     const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
       header: 'Caution',
       message: `Are you sure you want to uninstall ${this.app.title}?`,
       buttons: [

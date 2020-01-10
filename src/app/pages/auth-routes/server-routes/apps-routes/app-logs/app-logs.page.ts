@@ -6,7 +6,7 @@ import { S9Server } from 'src/app/models/s9-server'
 import { AppInstalled } from 'src/app/models/s9-app'
 
 @Component({
-  selector: 'app-app-logs',
+  selector: 'app-logs',
   templateUrl: './app-logs.page.html',
   styleUrls: ['./app-logs.page.scss'],
 })

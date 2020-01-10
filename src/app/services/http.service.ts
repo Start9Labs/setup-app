@@ -128,6 +128,7 @@ function appendDefaultOptions (httpOptions: HttpOptions): HttpOptions {
 export interface HttpOptions {
   params?: { [key: string]: string | undefined }
   headers?: HttpHeaders
+  body?: any // for DELETE requests only
   responseType?: 'json' | 'text'
   observe?: 'response'
 }

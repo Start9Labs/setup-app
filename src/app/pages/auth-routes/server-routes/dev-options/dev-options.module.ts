@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import { IonicModule } from '@ionic/angular'
 import { RouterModule, Routes } from '@angular/router'
-import { SSHKeysPage } from './ssh-keys.page'
+import { DevOptionsPage } from './dev-options.page'
 
 const routes: Routes = [
   {
     path: '',
-    component: SSHKeysPage,
+    component: DevOptionsPage,
   },
 ]
 
@@ -19,6 +19,6 @@ const routes: Routes = [
     IonicModule,
     RouterModule.forChild(routes),
   ],
-  declarations: [SSHKeysPage],
+  declarations: [DevOptionsPage],
 })
-export class SSHKeysPageModule { }
+export class DevOptionsPageModule { }

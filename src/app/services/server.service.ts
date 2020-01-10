@@ -152,7 +152,7 @@ export class ServerService {
     }
     // @TODO remove
     // await mockRemoveSSHKey()
-    await this.httpService.authServerRequest<Lan.PostRemoveSSHKeyRes>(server, Method.delete, `/sshKeys`, { }, body)
+    await this.httpService.authServerRequest<Lan.PostRemoveSSHKeyRes>(server, Method.delete, `/sshKeys`, { body })
   }
 }
 

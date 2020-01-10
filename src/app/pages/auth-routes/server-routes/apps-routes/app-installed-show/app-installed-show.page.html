@@ -37,7 +37,7 @@
     Stop
   </ion-button>
 
-  <ion-button *ngIf="['DEAD'].includes(app.status)" style="margin: 16px 0;" expand="block" fill="outline" color="primary" (click)="presentAlertUninstall()">
+  <ion-button *ngIf="app.status === 'DEAD'" style="margin: 16px 0;" expand="block" fill="outline" color="primary" (click)="presentAlertUninstall()">
     Uninstall
   </ion-button>
 

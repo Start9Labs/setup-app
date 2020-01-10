@@ -1,28 +1,24 @@
 import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { FormsModule } from '@angular/forms'
-import { Routes, RouterModule } from '@angular/router'
-
 import { IonicModule } from '@ionic/angular'
-
-import { Start9AgentPage } from './start9-agent.page'
-import { StatusComponentModule } from 'src/app/components/status/status.components.module'
+import { RouterModule, Routes } from '@angular/router'
+import { DevSSHKeysPage } from './dev-ssh-keys.page'
 
 const routes: Routes = [
   {
     path: '',
-    component: Start9AgentPage,
+    component: DevSSHKeysPage,
   },
 ]
 
 @NgModule({
   imports: [
     CommonModule,
-    StatusComponentModule,
     FormsModule,
     IonicModule,
     RouterModule.forChild(routes),
   ],
-  declarations: [Start9AgentPage],
+  declarations: [DevSSHKeysPage],
 })
-export class Start9AgentPageModule { }
+export class DevSSHKeysPageModule { }

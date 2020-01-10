@@ -6,7 +6,7 @@ import { S9ServerModel } from 'src/app/models/server-model'
 import { S9Server } from 'src/app/models/s9-server'
 
 @Component({
-  selector: 'app-app-available-list',
+  selector: 'app-available-list',
   templateUrl: './app-available-list.page.html',
   styleUrls: ['./app-available-list.page.scss'],
 })

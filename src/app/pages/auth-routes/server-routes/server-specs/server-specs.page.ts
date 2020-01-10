@@ -4,7 +4,7 @@ import { S9ServerModel } from 'src/app/models/server-model'
 import { S9Server } from 'src/app/models/s9-server'
 
 @Component({
-  selector: 'app-server-specs',
+  selector: 'server-specs',
   templateUrl: './server-specs.page.html',
   styleUrls: ['./server-specs.page.scss'],
 })

@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core'
 import { AppConfigSpec, ValueSpec, ValueSpecString, ValueSpecObject } from 'src/app/models/s9-app'
 import { ModalController, AlertController } from '@ionic/angular'
-import { AppConfigNestedPage } from 'src/app/pages/auth-routes/server-routes/app-config-nested/app-config-nested.page'
+import { AppConfigNestedPage } from 'src/app/pages/auth-routes/server-routes/apps-routes/app-config-nested/app-config-nested.page'
 import * as configUtil from '../../util/config.util'
 
 @Component({
@@ -41,6 +41,7 @@ export class ObjectConfigComponent {
 
   async presentAlertObjectCreate (keyval: { key: string, value: ValueSpecObject }) {
     const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
       header: `Create ${keyval.key}?`,
       message: `${keyval.key} has multiple fields. You will be able to edit them before saving.`,
       buttons: [
@@ -61,6 +62,7 @@ export class ObjectConfigComponent {
 
   async presentAlertConfigValue (keyval: { key: string, value: ValueSpecString }) {
     const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
       header: keyval.key,
       inputs: [
         {

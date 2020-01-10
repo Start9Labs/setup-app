@@ -6,11 +6,11 @@ import { AlertController, LoadingController } from '@ionic/angular'
 import { ServerService } from 'src/app/services/server.service'
 
 @Component({
-  selector: 'page-ssh-keys',
-  templateUrl: 'ssh-keys.page.html',
-  styleUrls: ['ssh-keys.page.scss'],
+  selector: 'dev-ssh-keys',
+  templateUrl: 'dev-ssh-keys.page.html',
+  styleUrls: ['dev-ssh-keys.page.scss'],
 })
-export class SSHKeysPage {
+export class DevSSHKeysPage {
   error = ''
   server: S9Server
 
@@ -34,6 +34,7 @@ export class SSHKeysPage {
 
   async presentAlertAdd () {
     const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
       header: 'New Key',
       inputs: [
         {

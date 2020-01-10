@@ -4,11 +4,11 @@ import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
 
 @Component({
-  selector: 'page-developer-options',
-  templateUrl: 'developer-options.page.html',
-  styleUrls: ['developer-options.page.scss'],
+  selector: 'dev-options',
+  templateUrl: 'dev-options.page.html',
+  styleUrls: ['dev-options.page.scss'],
 })
-export class DeveloperOptionsPage {
+export class DevOptionsPage {
   server: S9Server
 
   constructor (

@@ -4,7 +4,7 @@
       <ion-back-button defaultHref="'servers'"></ion-back-button>
     </ion-buttons>
     <ion-title>{{ server.label }}</ion-title>
-    <ion-buttons slot="end" class="ion-padding-right">
+    <ion-buttons slot="end" class="ion-padding-end">
       <ion-button (click)="presentAction()">
         <ion-icon name="more"></ion-icon>
       </ion-button>
@@ -25,23 +25,18 @@
     </ion-item>
   </ion-item-group>
 
+  <ion-button *ngIf="server.status === 'RUNNING' && compareVersions(server.versionInstalled, server.versionLatest) === -1" style="margin: 16px 0;" expand="block" fill="outline" (click)="presentAlertUpdate()">
+    Update Agent to {{ server.versionLatest }}
+  </ion-button>
+
   <ion-item-group>
     <ion-item-divider>Apps</ion-item-divider>
+
     <ion-item [routerLink]="['/servers', server.id, 'apps', 'available']">
       <ion-icon slot="start" size="large" name="apps" color="primary"></ion-icon>
       <ion-text color="primary">Sovereign App Store</ion-text>
     </ion-item>
-    <!-- agent app -->
-    <ion-item [routerLink]="['/servers', server.id, 'apps', 'installed', 'start9-agent']">
-      <ion-avatar slot="start">
-        <img src="assets/img/agent.png" alt="icon" />
-      </ion-avatar>
-      <ion-label>
-        <h2>Start9 Agent</h2>
-        <h3>{{ server.versionInstalled }}</h3>
-      </ion-label>
-    </ion-item>
-    <!-- installed apps -->
+
     <ion-item *ngFor="let app of server.apps" [routerLink]="['/servers', server.id, 'apps', 'installed', app.id]">
       <ion-avatar slot="start">
         <img [src]="app.iconURL" alt="icon" />

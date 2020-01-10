@@ -7,12 +7,12 @@ import { AppInstalled, AppConfigSpec, AppHealthStatus } from 'src/app/models/s9-
 import { ServerService } from 'src/app/services/server.service'
 
 @Component({
-  selector: 'app-app-config',
+  selector: 'app-config',
   templateUrl: './app-config.page.html',
   styleUrls: ['./app-config.page.scss'],
 })
 export class AppConfigPage {
-  loading = true
+  loading = false
   error: string
   server: S9Server
   app: AppInstalled
@@ -49,11 +49,11 @@ export class AppConfigPage {
   }
 
   async getConfig () {
+    this.loading = true
     try {
       const { spec, config } = await this.serverService.getAppConfig(this.server, this.app.id)
       this.spec = spec
       this.config = config
-      this.loading = false
     } catch (e) {
       this.error = e.message
     } finally {
@@ -102,6 +102,7 @@ export class AppConfigPage {
 
   async presentAlertRecoverable () {
     const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
       header: 'Keep existing data?',
       message: `Data for ${this.app.title} was found on this device. Would you like to keep it?`,
       buttons: [
@@ -125,6 +126,7 @@ export class AppConfigPage {
 
   async presentAlertConfirmWipeData () {
     const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
       header: 'Confirm',
       message: `Are you sure you want to wipe data for ${this.app.title}? It will be treated as a fresh install.`,
       buttons: [
@@ -148,6 +150,7 @@ export class AppConfigPage {
 
   async presentAlertUnsaved () {
     const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
       header: 'Unsaved Changes',
       message: 'You have unsaved changes. Are you sure you want to leave?',
       buttons: [

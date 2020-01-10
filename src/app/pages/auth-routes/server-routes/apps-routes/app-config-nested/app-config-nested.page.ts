@@ -1,10 +1,10 @@
 import { Component, Input } from '@angular/core'
 import { ModalController, AlertController } from '@ionic/angular'
 import { ValueSpec, ValueSpecList, ValueSpecString, ValueSpecObject, ListValueSpecObject } from 'src/app/models/s9-app'
-import * as configUtil from '../../../../util/config.util'
+import * as configUtil from '../../../../../util/config.util'
 
 @Component({
-  selector: 'app-app-config-nested',
+  selector: 'app-config-nested',
   templateUrl: './app-config-nested.page.html',
   styleUrls: ['./app-config-nested.page.scss'],
 })
@@ -102,6 +102,7 @@ export class AppConfigNestedPage {
 
   async presentAlertConfigValueEdit (index: number) {
     const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
       header: this.keyval.key,
       inputs: [
         {
@@ -142,6 +143,7 @@ export class AppConfigNestedPage {
 
   async presentAlertStringCreate () {
     const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
       header: this.keyval.key,
       inputs: [
         {
@@ -181,6 +183,7 @@ export class AppConfigNestedPage {
   async presentAlertObjectCreate () {
     const objectSpec = (this.keyval.value as ValueSpecList).spec as ValueSpecObject
     const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
       header: `Create ${this.keyval.key}?`,
       message: `${this.keyval.key} has multiple fields. You will be able to make edits before saving.`,
       buttons: [
@@ -200,6 +203,7 @@ export class AppConfigNestedPage {
 
   async presentAlertMinReached () {
     const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
       header: 'Minimum Reached',
       message: `The minimum number of ${this.keyval.key} is ${this.min}.`,
       buttons: ['Ok'],
@@ -209,6 +213,7 @@ export class AppConfigNestedPage {
 
   async presentAlertMaxReached () {
     const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
       header: 'Limit Reached',
       message: `The maximum number of ${this.keyval.key} is ${this.max}.`,
       buttons: ['Ok'],
@@ -218,6 +223,7 @@ export class AppConfigNestedPage {
 
   async presentAlertDelete (index: number) {
     const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
       header: 'Caution',
       message: `Are you sure you want to delete this entry?`,
       buttons: [

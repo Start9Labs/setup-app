@@ -1,19 +1,19 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 import { IonicModule } from '@ionic/angular'
 
-import { DeveloperOptionsPage } from './developer-options.page'
+import { DevSSHKeysPage } from './dev-ssh-keys.page'
 
-describe('DeveloperOptionsPage', () => {
-  let component: DeveloperOptionsPage
-  let fixture: ComponentFixture<DeveloperOptionsPage>
+describe('DevSSHKeysPage', () => {
+  let component: DevSSHKeysPage
+  let fixture: ComponentFixture<DevSSHKeysPage>
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [DeveloperOptionsPage],
+      declarations: [DevSSHKeysPage],
       imports: [IonicModule.forRoot()],
     }).compileComponents()
 
-    fixture = TestBed.createComponent(DeveloperOptionsPage)
+    fixture = TestBed.createComponent(DevSSHKeysPage)
     component = fixture.componentInstance
     fixture.detectChanges()
   }))

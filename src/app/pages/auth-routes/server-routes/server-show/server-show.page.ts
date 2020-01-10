@@ -1,13 +1,15 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
-import { NavController, AlertController, ActionSheetController } from '@ionic/angular'
+import { NavController, AlertController, ActionSheetController, LoadingController } from '@ionic/angular'
 import { S9Server } from 'src/app/models/s9-server'
 import { ActionSheetButton } from '@ionic/core'
 import { AppHealthStatus } from 'src/app/models/s9-app'
+import * as compareVersions from 'compare-versions'
+import { ServerService } from 'src/app/services/server.service'
 
 @Component({
-  selector: 'page-server-show',
+  selector: 'server-show',
   templateUrl: 'server-show.page.html',
   styleUrls: ['server-show.page.scss'],
 })
@@ -16,6 +18,7 @@ export class ServerShowPage {
   view: 'apps' | 'about' = 'apps'
   server: S9Server
   edited = false
+  compareVersions = compareVersions
 
   constructor (
     private readonly route: ActivatedRoute,
@@ -23,6 +26,8 @@ export class ServerShowPage {
     private readonly navCtrl: NavController,
     private readonly actionCtrl: ActionSheetController,
     private readonly alertCtrl: AlertController,
+    private readonly loadingCtrl: LoadingController,
+    private readonly serverService: ServerService,
   ) { }
 
   ngOnInit () {
@@ -33,30 +38,33 @@ export class ServerShowPage {
   }
 
   async presentAction () {
-    const buttons: ActionSheetButton[] = []
-
-    if (this.server.status === AppHealthStatus.RUNNING) {
-      buttons.push({
-        text: 'View specs',
-        handler: () => {
-          this.navCtrl.navigateForward(['/servers', this.server.id, 'specs'])
-        },
-      })
-    }
-
-    buttons.push(
+    const buttons: ActionSheetButton[] = [
       {
         text: 'Edit label',
         handler: () => {
           this.presentAlertEditName()
         },
       },
-      {
-        text: 'Developer options',
-        handler: () => {
-          this.navCtrl.navigateForward(['/servers', this.server.id, 'developer-options'])
+    ]
+
+    if (this.server.status === AppHealthStatus.RUNNING) {
+      buttons.push(
+        {
+          text: 'View specs',
+          handler: () => {
+            this.navCtrl.navigateForward(['/servers', this.server.id, 'specs'])
+          },
         },
-      },
+        {
+          text: 'Developer options',
+          handler: () => {
+            this.navCtrl.navigateForward(['/servers', this.server.id, 'developer-options'])
+          },
+        },
+      )
+    }
+
+    buttons.push(
       {
         text: 'Forget',
         cssClass: 'alert-danger',
@@ -75,6 +83,7 @@ export class ServerShowPage {
 
   async presentAlertEditName () {
     const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
       header: 'Label',
       inputs: [
         {
@@ -105,8 +114,44 @@ export class ServerShowPage {
     await alert.present()
   }
 
+  async presentAlertUpdate () {
+    const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
+      header: 'Confirm',
+      message: `Update Agent OS to ${this.server.versionLatest}?`,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: 'Update',
+          handler: async () => {
+            this.update()
+          },
+        },
+      ],
+    })
+    await alert.present()
+  }
+
+  async update () {
+    const loader = await this.loadingCtrl.create()
+    await loader.present()
+
+    try {
+      await this.serverService.updateAgent(this.server)
+      this.serverModel.updateServer({ ...this.server, status: AppHealthStatus.DOWNLOADING })
+    } catch (e) {
+      this.error = e.message
+    } finally {
+      await loader.dismiss()
+    }
+  }
+
   async presentAlertForget () {
     const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
       header: 'Caution',
       message: `Are you sure you want to forget ${this.server.label} on this device?`,
       buttons: [

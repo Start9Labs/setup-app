@@ -8,7 +8,7 @@ import { NavController, AlertController, LoadingController } from '@ionic/angula
 import * as compareVersions from 'compare-versions'
 
 @Component({
-  selector: 'app-app-available-show',
+  selector: 'app-available-show',
   templateUrl: './app-available-show.page.html',
   styleUrls: ['./app-available-show.page.scss'],
 })
@@ -46,6 +46,7 @@ export class AppAvailableShowPage {
 
   async presentAlertInstall (version: string) {
     const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
       header: 'Caution',
       message: `Are you sure you want to install ${this.app.title} ${version}?`,
       buttons: [
@@ -67,6 +68,7 @@ export class AppAvailableShowPage {
 
   async presentAlertUninstall () {
     const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
       header: 'Caution',
       message: `Are you sure you want to uninstall ${this.app.title}?`,
       buttons: [

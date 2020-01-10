@@ -6,7 +6,7 @@
       </ion-button>
     </ion-buttons>
     <ion-title>{{ app.title }}</ion-title>
-    <ion-buttons slot="end">
+    <ion-buttons *ngIf="config" slot="end">
       <ion-button (click)="save()" color="primary">
         <b>Save</b>
       </ion-button>
