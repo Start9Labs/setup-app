@@ -4,20 +4,26 @@
       <ion-back-button [defaultHref]="'servers/' + server.id + '/apps/installed/' + app.id"></ion-back-button>
     </ion-buttons>
     <ion-title>Logs</ion-title>
+    <ion-buttons slot="end" class="ion-padding-end">
+      <ion-button (click)="getLogs()" color="primary">
+        <ion-icon name="refresh"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding" color="light">
+<ion-content #content class="ion-padding" color="light">
 
-  <p *ngFor="let log of logs">
+  <ion-spinner *ngIf="loading" class="center" name="lines" color="warning"></ion-spinner>
+
+  <ion-virtual-scroll *ngIf="!loading" [items]="logs" approxItemHeight="500px">
+    <p *virtualItem="let log">
+      {{ log }}
+    </p>
+  </ion-virtual-scroll>
+
+  <!-- <p *ngFor="let log of logs">
     {{ log }}
-  </p>
-
-  <div class="ion-text-center ion-padding">
-    <ion-button *ngIf="!loading" fill="outline">
-      Load More
-    </ion-button>
-    <ion-spinner *ngIf="loading" name="lines" color="warning"></ion-spinner>
-  </div>
+  </p> -->
 
 </ion-content>

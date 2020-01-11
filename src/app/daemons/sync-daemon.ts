@@ -35,10 +35,13 @@ export class SyncDaemon {
         this.serverModel.cacheServer(serverClone)
 
         try {
-          const [serverRes, apps] = await Promise.all([
-            this.serverService.getServer(server),
-            this.serverService.getInstalledApps(server),
-          ])
+          const serverRes = await this.serverService.getServer(server)
+          const apps = await this.serverService.getInstalledApps(server)
+
+          // const [serverRes, apps] = await Promise.all([
+          //   this.serverService.getServer(server),
+          //   this.serverService.getInstalledApps(server),
+          // ])
 
           serverClone = {
             ...serverClone,

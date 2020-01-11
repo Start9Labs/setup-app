@@ -4,11 +4,11 @@ import { SplashScreen } from '@ionic-native/splash-screen/ngx'
 import { StatusBar } from '@ionic-native/status-bar/ngx'
 import { S9ServerModel } from './models/server-model'
 import { SyncDaemon } from './daemons/sync-daemon'
-import { WifiDaemon } from './daemons/wifi-daemon'
 import { ZeroconfDaemon } from './daemons/zeroconf-daemon'
 import { AuthService } from './services/auth.service'
 import { Router } from '@angular/router'
 import { AuthStatus } from './types/enums'
+import { Subscription } from 'rxjs'
 
 @Component({
   selector: 'app-root',
@@ -16,6 +16,8 @@ import { AuthStatus } from './types/enums'
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
+  private pauseSub: Subscription | undefined
+  private resumeSub: Subscription | undefined
 
   constructor (
     public platform: Platform,
@@ -23,7 +25,6 @@ export class AppComponent {
     public statusBar: StatusBar,
     public s9ServerModel: S9ServerModel,
     public zeroconfDaemon: ZeroconfDaemon,
-    public wifiDaemon: WifiDaemon,
     public syncDaemon: SyncDaemon,
     public authService: AuthService,
     public router: Router,
@@ -62,10 +63,26 @@ export class AppComponent {
   private async handleAuthChange (authStatus: AuthStatus) {
     if (authStatus === AuthStatus.authed) {
       this.startDaemons()
+      if (!this.pauseSub) {
+        this.pauseSub = this.platform.pause.subscribe(async () => {
+          await this.syncDaemon.stop()
+          await this.zeroconfDaemon.stop()
+        })
+      }
+      if (!this.resumeSub) {
+        this.resumeSub = this.platform.resume.subscribe(async () => {
+          await this.zeroconfDaemon.reset()
+          await this.syncDaemon.start()
+        })
+      }
       this.router.navigate([''])
     } else if (authStatus === AuthStatus.unauthed) {
       this.s9ServerModel.servers = []
       this.stopDaemons()
+      if (this.resumeSub) {
+        this.resumeSub.unsubscribe()
+        this.resumeSub = undefined
+      }
       this.router.navigate(['welcome'])
     } else {
       return
@@ -75,8 +92,6 @@ export class AppComponent {
   private startDaemons () {
     // detects new LAN services
     this.zeroconfDaemon.start()
-    // monitors wifi connectivity
-    this.wifiDaemon.start()
     // syncs servers in S9ServerModel
     this.syncDaemon.start()
   }
@@ -84,6 +99,5 @@ export class AppComponent {
   private stopDaemons () {
     this.syncDaemon.stop()
     this.zeroconfDaemon.stop()
-    this.wifiDaemon.stop()
   }
 }

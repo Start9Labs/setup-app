@@ -43,6 +43,7 @@ export class AppConfigPage {
 
     if (this.app.status === AppHealthStatus.RECOVERABLE) {
       await this.presentAlertRecoverable()
+      this.edited = true
     } else {
       await this.getConfig()
     }

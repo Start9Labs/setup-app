@@ -1,9 +1,10 @@
-import { Component } from '@angular/core'
+import { Component, ViewChild, NgZone } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { S9ServerModel } from 'src/app/models/server-model'
 import { ServerService } from 'src/app/services/server.service'
 import { S9Server } from 'src/app/models/s9-server'
 import { AppInstalled } from 'src/app/models/s9-app'
+import { IonContent } from '@ionic/angular'
 
 @Component({
   selector: 'app-logs',
@@ -11,18 +12,18 @@ import { AppInstalled } from 'src/app/models/s9-app'
   styleUrls: ['./app-logs.page.scss'],
 })
 export class AppLogsPage {
+  @ViewChild(IonContent, { static: false }) private content: IonContent
   loading = true
   error: string | undefined
   server: S9Server
   app: AppInstalled
   logs: string[] = []
-  lastDate = new Date(new Date().valueOf() - 10000)
-  page = 1
 
   constructor (
     private readonly route: ActivatedRoute,
     private readonly serverModel: S9ServerModel,
     private readonly serverService: ServerService,
+    private readonly zone: NgZone,
   ) { }
 
   async ngOnInit () {
@@ -41,12 +42,16 @@ export class AppLogsPage {
 
   async getLogs () {
     this.loading = true
+    this.logs = []
     try {
-      this.logs = await this.serverService.getAppLogs(this.server, this.app.id, { after: this.lastDate.toISOString(), page: this.page.toString() })
-      this.lastDate = new Date()
+      const logs = await this.serverService.getAppLogs(this.server, this.app.id)
+      this.loading = false
+      this.zone.run(() => {
+        this.logs = logs
+      })
+      setTimeout(async () => await this.content.scrollToBottom(100), 200)
     } catch (e) {
       this.error = e.message
-    } finally {
       this.loading = false
     }
   }

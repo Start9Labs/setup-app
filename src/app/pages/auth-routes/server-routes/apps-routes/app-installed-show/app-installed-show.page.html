@@ -4,8 +4,8 @@
       <ion-back-button [defaultHref]="'servers/' + server.id"></ion-back-button>
     </ion-buttons>
     <ion-title>{{ app.title }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="presentAction()">
+    <ion-buttons slot="end" class="ion-padding-end">
+      <ion-button (click)="presentAction()" color="primary">
         <ion-icon name="more"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -15,7 +15,7 @@
 <ion-content>
 
   <ion-item *ngIf="error" style="margin-bottom: 16px;">
-    <ion-text class="ion-text-wrap" color="danger">{{error}}</ion-text>
+    <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
   </ion-item>
 
   <ion-item-group>

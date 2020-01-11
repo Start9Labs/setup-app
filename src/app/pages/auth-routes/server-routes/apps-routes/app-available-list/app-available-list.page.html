@@ -9,12 +9,12 @@
 
 <ion-content class="ion-padding-top">
 
-  <ion-spinner *ngIf="loading" class="center"></ion-spinner>
+  <ion-spinner *ngIf="loading" class="center" name="lines" color="warning"></ion-spinner>
 
   <div *ngIf="!loading">
 
     <ion-item *ngIf="error" style="margin-bottom: 16px;">
-      <ion-text class="ion-text-wrap" color="danger">{{error}}</ion-text>
+      <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
     </ion-item>
 
     <ion-card *ngFor="let app of apps" [routerLink]="[app.id]">
