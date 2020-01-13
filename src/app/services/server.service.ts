@@ -7,6 +7,7 @@ import { S9Server } from '../models/s9-server'
 import { Lan, ApiAppAvailablePreview, ApiAppAvailableFull, ApiAppInstalled } from '../types/api-types'
 import { S9BuilderWith } from './setup.service'
 import * as configUtil from '../util/config.util'
+import { pauseFor } from '../util/misc.util'
 
 @Injectable({
   providedIn: 'root',
@@ -19,8 +20,8 @@ export class ServerService {
 
   async getServer (server: S9Server | S9BuilderWith<'zeroconfService' | 'privkey' | 'versionInstalled' | 'torAddress'>): Promise<S9Server> {
     // @TODO remove
-    // return mockGetServer()
-    return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.get, '')
+    return mockGetServer()
+    // return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.get, '')
       .then(res => {
         return {
           updating: false,
@@ -37,20 +38,20 @@ export class ServerService {
       version: server.versionLatest,
     }
     // @TODO remove
-    // await mockPostUpdateAgent()
-    await this.httpService.authServerRequest<Lan.PostUpdateAgentRes>(server, Method.post, '/update', { }, body)
+    await mockPostUpdateAgent()
+    // await this.httpService.authServerRequest<Lan.PostUpdateAgentRes>(server, Method.post, '/update', { }, body)
   }
 
   async getAvailableApps (server: S9Server): Promise<AppAvailablePreview[]> {
     // @TODO remove
-    // return mockGetAvailableApps()
-    return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(server, Method.get, '/apps/store')
+    return mockGetAvailableApps()
+    // return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(server, Method.get, '/apps/store')
   }
 
   async getAvailableApp (server: S9Server, appId: string): Promise<AppAvailableFull> {
     // @TODO remove
-    // return mockGetAvailableApp()
-    return this.httpService.authServerRequest<Lan.GetAppAvailableRes>(server, Method.get, `/apps/${appId}/store`)
+    return mockGetAvailableApp()
+    // return this.httpService.authServerRequest<Lan.GetAppAvailableRes>(server, Method.get, `/apps/${appId}/store`)
       .then(res => {
         return {
           ...res,
@@ -62,15 +63,15 @@ export class ServerService {
 
   async getInstalledApps (server: S9Server): Promise<AppInstalled[]> {
     // @TODO remove
-    // return mockGetInstalledApps()
-    return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.get, `/apps/installed`)
+    return mockGetInstalledApps()
+    // return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.get, `/apps/installed`)
       .then(res => res.map(mapApiInstalledApp))
   }
 
   async getAppConfig (server: S9Server, appId: string): Promise<{ spec: AppConfigSpec, config: object }> {
     // @TODO remove
-    // return mockGetAppConfig()
-    return this.httpService.authServerRequest<Lan.GetAppConfigRes>(server, Method.get, `/apps/${appId}/config`)
+    return mockGetAppConfig()
+    // return this.httpService.authServerRequest<Lan.GetAppConfigRes>(server, Method.get, `/apps/${appId}/config`)
       .then(({ spec, config }) => {
         return {
           spec,
@@ -81,8 +82,8 @@ export class ServerService {
 
   async getAppLogs (server: S9Server, appId: string, params: Lan.GetAppLogsReq = { }): Promise<string[]> {
     // @TODO remove
-    // return mockGetAppLogs()
-    return this.httpService.authServerRequest<Lan.GetAppLogsRes>(server, Method.get, `/apps/${appId}/logs`, { params })
+    return mockGetAppLogs()
+    // return this.httpService.authServerRequest<Lan.GetAppLogsRes>(server, Method.get, `/apps/${appId}/logs`, { params })
   }
 
   async installApp (server: S9Server, appId: string, version: string): Promise<AppInstalled> {
@@ -90,8 +91,8 @@ export class ServerService {
       version,
     }
     // @TODO remove
-    // const installed = await mockInstallApp()
-    const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.post, `/apps/${appId}/install`, { }, body, 240000)
+    const installed = await mockInstallApp()
+    // const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.post, `/apps/${appId}/install`, { }, body, 240000)
       .then(mapApiInstalledApp)
     await this.s9Model.cacheApp(server.id, installed)
     return installed
@@ -99,23 +100,23 @@ export class ServerService {
 
   async uninstallApp (server: S9Server, appId: string): Promise<void> {
     // @TODO remove
-    // await mockUninstallApp()
-    await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(server, Method.post, `/apps/${appId}/uninstall`)
+    await mockUninstallApp()
+    // await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(server, Method.post, `/apps/${appId}/uninstall`)
     await this.s9Model.removeApp(server.id, appId)
   }
 
   async startApp (server: S9Server, app: AppInstalled): Promise<void> {
     // @TODO remove
-    // await mockStartApp()
-    await this.httpService.authServerRequest<Lan.PostStartAppRes>(server, Method.post, `/apps/${app.id}/start`)
+    await mockStartApp()
+    // await this.httpService.authServerRequest<Lan.PostStartAppRes>(server, Method.post, `/apps/${app.id}/start`)
     app.status = AppHealthStatus.RUNNING
     app.statusAt = new Date()
   }
 
   async stopApp (server: S9Server, app: AppInstalled): Promise<void> {
     // @TODO remove
-    // await mockStopApp()
-    await this.httpService.authServerRequest<Lan.PostStopAppRes>(server, Method.post, `/apps/${app.id}/stop`)
+    await mockStopApp()
+    // await this.httpService.authServerRequest<Lan.PostStopAppRes>(server, Method.post, `/apps/${app.id}/stop`)
     app.status = AppHealthStatus.STOPPED
     app.statusAt = new Date()
   }
@@ -125,14 +126,14 @@ export class ServerService {
       config,
     }
     // @TODO remove
-    // await mockUpdateAppConfig()
-    await this.httpService.authServerRequest<Lan.PostUpdateAppConfigRes>(server, Method.patch, `/apps/${app.id}/config`, { }, body)
+    await mockUpdateAppConfig()
+    // await this.httpService.authServerRequest<Lan.PostUpdateAppConfigRes>(server, Method.patch, `/apps/${app.id}/config`, { }, body)
   }
 
   async wipeAppData (server: S9Server, app: AppInstalled): Promise<void> {
     // @TODO remove
-    // await mockWipeAppData()
-    await this.httpService.authServerRequest<Lan.PostWipeAppDataRes>(server, Method.post, `/apps/${app.id}/wipe`)
+    await mockWipeAppData()
+    // await this.httpService.authServerRequest<Lan.PostWipeAppDataRes>(server, Method.post, `/apps/${app.id}/wipe`)
     app.status = AppHealthStatus.NEEDS_CONFIG
     app.statusAt = new Date()
   }
@@ -142,8 +143,8 @@ export class ServerService {
       sshKey,
     }
     // @TODO remove
-    // await mockAddSSHKey()
-    await this.httpService.authServerRequest<Lan.PostAddSSHKeyRes>(server, Method.post, `/sshKeys`, { }, body)
+    await mockAddSSHKey()
+    // await this.httpService.authServerRequest<Lan.PostAddSSHKeyRes>(server, Method.post, `/sshKeys`, { }, body)
   }
 
   async removeSSHKey (server: S9Server, sshKey: string): Promise<void> {
@@ -151,8 +152,8 @@ export class ServerService {
       sshKey,
     }
     // @TODO remove
-    // await mockRemoveSSHKey()
-    await this.httpService.authServerRequest<Lan.PostRemoveSSHKeyRes>(server, Method.delete, `/sshKeys`, { body })
+    await mockRemoveSSHKey()
+    // await this.httpService.authServerRequest<Lan.PostRemoveSSHKeyRes>(server, Method.delete, `/sshKeys`, { body })
   }
 }
 
@@ -165,77 +166,92 @@ function mapApiInstalledApp (app: ApiAppInstalled): AppInstalled {
 
 // @TODO remove
 async function mockGetServer (): Promise<Lan.GetServerRes> {
+  await pauseFor(1000)
   return mockApiServer
 }
 
 // @TODO remove
 async function mockPostUpdateAgent (): Promise<Lan.PostUpdateAgentRes> {
+  await pauseFor(1000)
   return { }
 }
 
 
 // @TODO remove
 async function mockGetAvailableApp (): Promise<Lan.GetAppAvailableRes> {
+  await pauseFor(1000)
   return mockApiAppAvailableFull
 }
 
 // @TODO remove
 async function mockGetAvailableApps (): Promise<Lan.GetAppsAvailableRes> {
+  await pauseFor(1000)
   return [mockApiAppAvailablePreview, mockApiAppAvailablePreview, mockApiAppAvailablePreview]
 }
 
 // @TODO remove
 async function mockGetInstalledApps (): Promise<Lan.GetAppsInstalledRes> {
+  await pauseFor(1000)
   return [mockApiAppInstalled]
 }
 
 // @TODO remove
 async function mockGetAppLogs (): Promise<Lan.GetAppLogsRes> {
+  await pauseFor(1000)
   return mockApiAppLogs
 }
 
 // @TODO remove
 async function mockGetAppConfig (): Promise<Lan.GetAppConfigRes> {
+  await pauseFor(1000)
   return mockApiAppConfig
 }
 
 // @TODO remove
 async function mockInstallApp (): Promise<Lan.PostInstallAppRes> {
+  await pauseFor(1000)
   return mockApiAppInstalled
 }
 
 // @TODO remove
 async function mockUninstallApp (): Promise<Lan.PostUninstallAppRes> {
+  await pauseFor(1000)
   return { }
 }
 
 // @TODO remove
 async function mockStartApp (): Promise<Lan.PostStartAppRes> {
+  await pauseFor(1000)
   return { }
 }
 
 // @TODO remove
 async function mockStopApp (): Promise<Lan.PostStopAppRes> {
+  await pauseFor(1000)
   return { }
 }
 
 // @TODO remove
 async function mockUpdateAppConfig (): Promise<Lan.PostUpdateAppConfigRes> {
+  await pauseFor(1000)
   return { }
 }
 
 // @TODO remove
 async function mockWipeAppData (): Promise<Lan.PostWipeAppDataRes> {
+  await pauseFor(1000)
   return { }
 }
 
 // @TODO remove
 async function mockAddSSHKey (): Promise<Lan.PostAddSSHKeyRes> {
+  await pauseFor(1000)
   return { }
 }
 
 // @TODO remove
 async function mockRemoveSSHKey (): Promise<Lan.PostRemoveSSHKeyRes> {
+  await pauseFor(1000)
   return { }
 }
 
@@ -295,6 +311,7 @@ const mockApiAppInstalled: ApiAppInstalled = {
 
 // @TODO remove
 const mockApiAppLogs: string[] = [
+  '****** START *****',
   '[ng] ℹ ｢wdm｣: Compiled successfully.',
   '[ng] ℹ ｢wdm｣: Compiling...',
   '[ng] Date: 2019-12-26T14:20:30.872Z - Hash: 2b2e5abb3cba2164aea0',
@@ -311,6 +328,71 @@ const mockApiAppLogs: string[] = [
   '[ng] ℹ ｢wdm｣: Compiling...',
   '[ng] Date: 2019-12-26T14:23:13.812Z - Hash: 9342e11e6b8e16ad2f70',
   '[ng] 114 unchanged chunks',
+  '[ng] ℹ ｢wdm｣: Compiled successfully.',
+  '[ng] ℹ ｢wdm｣: Compiling...',
+  '[ng] Date: 2019-12-26T14:20:30.872Z - Hash: 2b2e5abb3cba2164aea0',
+  '[ng] 114 unchanged chunks',
+  '[ng] chunk {app-logs-app-logs-module} app-logs-app-logs-module.js, app-logs-app-logs-module.js.map (app-logs-app-logs-module) 7.86 kB  [rendered]',
+  '[ng] Time: 1244ms',
+  '[ng] ℹ ｢wdm｣: Compiled successfully.',
+  '[ng] ℹ ｢wdm｣: Compiling...',
+  '[ng] Date: 2019-12-26T14:21:01.685Z - Hash: bb3f5d0e11f2cd2dd57b',
+  '[ng] 114 unchanged chunks',
+  '[ng] chunk {app-logs-app-logs-module} app-logs-app-logs-module.js, app-logs-app-logs-module.js.map (app-logs-app-logs-module) 7.86 kB  [rendered]',
+  '[ng] Time: 1185ms',
+  '[ng] ℹ ｢wdm｣: Compiled successfully.',
+  '[ng] ℹ ｢wdm｣: Compiling...',
+  '[ng] Date: 2019-12-26T14:23:13.812Z - Hash: 9342e11e6b8e16ad2f70',
+  '[ng] 114 unchanged chunks',
+  '[ng] ℹ ｢wdm｣: Compiled successfully.',
+  '[ng] ℹ ｢wdm｣: Compiling...',
+  '[ng] Date: 2019-12-26T14:20:30.872Z - Hash: 2b2e5abb3cba2164aea0',
+  '[ng] 114 unchanged chunks',
+  '[ng] chunk {app-logs-app-logs-module} app-logs-app-logs-module.js, app-logs-app-logs-module.js.map (app-logs-app-logs-module) 7.86 kB  [rendered]',
+  '[ng] Time: 1244ms',
+  '[ng] ℹ ｢wdm｣: Compiled successfully.',
+  '[ng] ℹ ｢wdm｣: Compiling...',
+  '[ng] Date: 2019-12-26T14:21:01.685Z - Hash: bb3f5d0e11f2cd2dd57b',
+  '[ng] 114 unchanged chunks',
+  '[ng] chunk {app-logs-app-logs-module} app-logs-app-logs-module.js, app-logs-app-logs-module.js.map (app-logs-app-logs-module) 7.86 kB  [rendered]',
+  '[ng] Time: 1185ms',
+  '[ng] ℹ ｢wdm｣: Compiled successfully.',
+  '[ng] ℹ ｢wdm｣: Compiling...',
+  '[ng] Date: 2019-12-26T14:23:13.812Z - Hash: 9342e11e6b8e16ad2f70',
+  '[ng] 114 unchanged chunks',
+  '[ng] ℹ ｢wdm｣: Compiled successfully.',
+  '[ng] ℹ ｢wdm｣: Compiling...',
+  '[ng] Date: 2019-12-26T14:20:30.872Z - Hash: 2b2e5abb3cba2164aea0',
+  '[ng] 114 unchanged chunks',
+  '[ng] chunk {app-logs-app-logs-module} app-logs-app-logs-module.js, app-logs-app-logs-module.js.map (app-logs-app-logs-module) 7.86 kB  [rendered]',
+  '[ng] Time: 1244ms',
+  '[ng] ℹ ｢wdm｣: Compiled successfully.',
+  '[ng] ℹ ｢wdm｣: Compiling...',
+  '[ng] Date: 2019-12-26T14:21:01.685Z - Hash: bb3f5d0e11f2cd2dd57b',
+  '[ng] 114 unchanged chunks',
+  '[ng] chunk {app-logs-app-logs-module} app-logs-app-logs-module.js, app-logs-app-logs-module.js.map (app-logs-app-logs-module) 7.86 kB  [rendered]',
+  '[ng] Time: 1185ms',
+  '[ng] ℹ ｢wdm｣: Compiled successfully.',
+  '[ng] ℹ ｢wdm｣: Compiling...',
+  '[ng] Date: 2019-12-26T14:23:13.812Z - Hash: 9342e11e6b8e16ad2f70',
+  '[ng] 114 unchanged chunks',
+  '[ng] ℹ ｢wdm｣: Compiled successfully.',
+  '[ng] ℹ ｢wdm｣: Compiling...',
+  '[ng] Date: 2019-12-26T14:20:30.872Z - Hash: 2b2e5abb3cba2164aea0',
+  '[ng] 114 unchanged chunks',
+  '[ng] chunk {app-logs-app-logs-module} app-logs-app-logs-module.js, app-logs-app-logs-module.js.map (app-logs-app-logs-module) 7.86 kB  [rendered]',
+  '[ng] Time: 1244ms',
+  '[ng] ℹ ｢wdm｣: Compiled successfully.',
+  '[ng] ℹ ｢wdm｣: Compiling...',
+  '[ng] Date: 2019-12-26T14:21:01.685Z - Hash: bb3f5d0e11f2cd2dd57b',
+  '[ng] 114 unchanged chunks',
+  '[ng] chunk {app-logs-app-logs-module} app-logs-app-logs-module.js, app-logs-app-logs-module.js.map (app-logs-app-logs-module) 7.86 kB  [rendered]',
+  '[ng] Time: 1185ms',
+  '[ng] ℹ ｢wdm｣: Compiled successfully.',
+  '[ng] ℹ ｢wdm｣: Compiling...',
+  '[ng] Date: 2019-12-26T14:23:13.812Z - Hash: 9342e11e6b8e16ad2f70',
+  '[ng] 114 unchanged chunks',
+  '****** FINISH *****',
 ]
 
 const mockApiAppConfig: Lan.GetAppConfigRes = {

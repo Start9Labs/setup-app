@@ -9,17 +9,10 @@ import { AuthService } from 'src/app/services/auth.service'
 export class KeychainRestorePage {
   error: string
   mnemonic: string
-  isMnemonicEntered = false
 
   constructor (
     private readonly authService: AuthService,
   ) { }
-
-  checkLength (e: any) {
-    const length = e.target.value.trim().replace(/ +/g, ' ').split(' ').length
-    this.isMnemonicEntered = length === 12
-    this.error = length > 12 ? 'Too many words. Mnemonic should be 12 words in length.' : ''
-  }
 
   async login () {
     try {

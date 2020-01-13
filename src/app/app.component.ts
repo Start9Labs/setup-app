@@ -75,7 +75,7 @@ export class AppComponent {
           await this.syncDaemon.start()
         })
       }
-      this.router.navigate([''])
+      await this.router.navigate(['/'])
     } else if (authStatus === AuthStatus.unauthed) {
       this.s9ServerModel.servers = []
       this.stopDaemons()
@@ -83,7 +83,7 @@ export class AppComponent {
         this.resumeSub.unsubscribe()
         this.resumeSub = undefined
       }
-      this.router.navigate(['welcome'])
+      await this.router.navigate(['/welcome'])
     } else {
       return
     }

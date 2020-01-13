@@ -66,6 +66,8 @@ export class DevSSHKeysPage {
   async add (key: string) {
     const loader = await this.loadingCtrl.create({
       message: 'Adding SSH key...',
+      spinner: 'lines',
+      cssClass: 'loader',
     })
     await loader.present()
 
@@ -82,6 +84,8 @@ export class DevSSHKeysPage {
   async remove (key: string, index: number) {
     const loader = await this.loadingCtrl.create({
       message: 'Removing SSH key...',
+      spinner: 'lines',
+      cssClass: 'loader',
     })
     await loader.present()
 

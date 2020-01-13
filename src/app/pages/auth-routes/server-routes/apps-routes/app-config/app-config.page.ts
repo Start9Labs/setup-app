@@ -73,6 +73,8 @@ export class AppConfigPage {
   async save () {
     const loader = await this.loadingCtrl.create({
       message: 'Saving config...',
+      spinner: 'lines',
+      cssClass: 'loader',
     })
     await loader.present()
 
@@ -174,6 +176,8 @@ export class AppConfigPage {
   async wipeAppData () {
     const loader = await this.loadingCtrl.create({
       message: 'Wiping Data. This could take a while...',
+      spinner: 'lines',
+      cssClass: 'loader',
     })
     await loader.present()
 
@@ -188,6 +192,6 @@ export class AppConfigPage {
   }
 
   async navigateBack () {
-    return this.navCtrl.navigateBack(`/servers/${this.server.id}/apps/installed/${this.app.id}`)
+    return this.navCtrl.navigateBack(['/servers', this.server.id, 'apps', 'installed', this.app.id])
   }
 }

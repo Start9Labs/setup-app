@@ -27,6 +27,8 @@ export class SetupPage {
 
     const loader = await this.loadingCtrl.create({
       message: 'Setting up server...',
+      spinner: 'lines',
+      cssClass: 'loader',
     })
     await loader.present()
 
@@ -34,7 +36,7 @@ export class SetupPage {
     try {
       const server = await this.setupService.setup(serverData, this.productKey)
       await this.s9Model.createServer(server)
-      await this.navController.navigateRoot(['/servers'])
+      await this.navController.navigateRoot(['/'])
     } catch (e) {
       this.error = `Error: ${e.message}`
     } finally {

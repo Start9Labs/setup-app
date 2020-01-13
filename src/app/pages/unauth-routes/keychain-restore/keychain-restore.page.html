@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="welcome"></ion-back-button>
+      <ion-back-button defaultHref="['/welcome']"></ion-back-button>
     </ion-buttons>
     <ion-title>
       Restore Keychain
@@ -23,7 +23,7 @@
     <ion-text class="ion-text-wrap" color="danger">{{error}}</ion-text>
   </ion-item>
 
-  <ion-button [disabled]="!isMnemonicEntered" style="margin-top: 30px" expand="block" fill="outline" (click)="login()">
+  <ion-button [disabled]="!mnemonic" style="margin-top: 30px" expand="block" fill="outline" (click)="login()">
     Continue
   </ion-button>
 

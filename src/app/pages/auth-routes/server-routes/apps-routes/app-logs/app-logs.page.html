@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button [defaultHref]="'servers/' + server.id + '/apps/installed/' + app.id"></ion-back-button>
+      <ion-back-button [defaultHref]="['/servers', server.id, 'apps', 'installed', + app.id]"></ion-back-button>
     </ion-buttons>
     <ion-title>Logs</ion-title>
     <ion-buttons slot="end" class="ion-padding-end">
@@ -12,18 +12,14 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content #content class="ion-padding" color="light">
+<ion-content #content color="light">
 
   <ion-spinner *ngIf="loading" class="center" name="lines" color="warning"></ion-spinner>
 
-  <ion-virtual-scroll *ngIf="!loading" [items]="logs" approxItemHeight="500px">
-    <p *virtualItem="let log">
+  <ion-virtual-scroll *ngIf="!loading" [items]="logs" approxItemHeight="60px">
+    <ion-item *virtualItem="let log">
       {{ log }}
-    </p>
+    </ion-item>
   </ion-virtual-scroll>
-
-  <!-- <p *ngFor="let log of logs">
-    {{ log }}
-  </p> -->
 
 </ion-content>

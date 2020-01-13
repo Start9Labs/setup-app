@@ -54,14 +54,14 @@ export class ServerShowPage {
           text: 'Server info',
           icon: 'information-circle',
           handler: () => {
-            this.navCtrl.navigateForward(['/servers', this.server.id, 'specs'])
+            this.navCtrl.navigateForward(['specs'], { relativeTo: this.route })
           },
         },
         {
           text: 'Developer options',
           icon: 'code',
           handler: () => {
-            this.navCtrl.navigateForward(['/servers', this.server.id, 'developer-options'])
+            this.navCtrl.navigateForward(['developer-options'], { relativeTo: this.route })
           },
         },
       )
@@ -140,7 +140,10 @@ export class ServerShowPage {
   }
 
   async update () {
-    const loader = await this.loadingCtrl.create()
+    const loader = await this.loadingCtrl.create({
+      spinner: 'lines',
+      cssClass: 'loader',
+    })
     await loader.present()
 
     try {
@@ -178,6 +181,6 @@ export class ServerShowPage {
   async forget () {
     this.edited = false
     await this.serverModel.forgetServer(this.server.id)
-    await this.navCtrl.navigateRoot(['/servers'])
+    await this.navCtrl.navigateRoot(['/'])
   }
 }

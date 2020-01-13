@@ -59,7 +59,7 @@ export class AppInstalledShowPage {
           text: 'App Config',
           icon: 'construct',
           handler: () => {
-            this.navCtrl.navigateForward(['/servers', this.server.id, 'apps', 'installed', this.app.id, 'config'])
+            this.navCtrl.navigateForward(['config'], { relativeTo: this.route })
           },
         },
       )
@@ -70,7 +70,7 @@ export class AppInstalledShowPage {
         text: 'View Logs',
         icon: 'paper',
         handler: () => {
-          this.navCtrl.navigateForward(['/servers', this.server.id, 'apps', 'installed', this.app.id, 'logs'])
+          this.navCtrl.navigateForward(['logs'], { relativeTo: this.route })
         },
       },
       {
@@ -101,6 +101,8 @@ export class AppInstalledShowPage {
   async stop (): Promise<void> {
     const loader = await this.loadingCtrl.create({
       message: `Stopping ${this.app.title}. This could take a while...`,
+      spinner: 'lines',
+      cssClass: 'loader',
     })
     await loader.present()
 
@@ -116,6 +118,8 @@ export class AppInstalledShowPage {
   async start (): Promise<void> {
     const loader = await this.loadingCtrl.create({
       message: `Starting ${this.app.title}...`,
+      spinner: 'lines',
+      cssClass: 'loader',
     })
     await loader.present()
 
@@ -153,6 +157,8 @@ export class AppInstalledShowPage {
   async uninstall (): Promise<void> {
     const loader = await this.loadingCtrl.create({
       message: `Uninstalling ${this.app.title}`,
+      spinner: 'lines',
+      cssClass: 'loader',
     })
     await loader.present()
 

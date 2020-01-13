@@ -173,6 +173,10 @@ export async function decrypt (encrypted: Hex, pin: string): Promise<string> {
     length: 64,
   }, key, encBuf.slice(16))
 
+  console.log(arrayBuff)
+
+  console.log(new TextDecoder().decode(arrayBuff))
+
   return new TextDecoder().decode(arrayBuff)
 }
 

@@ -45,10 +45,10 @@ export class AppLogsPage {
     this.logs = []
     try {
       const logs = await this.serverService.getAppLogs(this.server, this.app.id)
-      this.loading = false
       this.zone.run(() => {
         this.logs = logs
       })
+      this.loading = false
       setTimeout(async () => await this.content.scrollToBottom(100), 200)
     } catch (e) {
       this.error = e.message

@@ -89,7 +89,10 @@ export class AppAvailableShowPage {
   }
 
   async install (version: string) {
-    const loader = await this.loadingCtrl.create()
+    const loader = await this.loadingCtrl.create({
+      spinner: 'lines',
+      cssClass: 'loader',
+    })
     await loader.present()
 
     try {
@@ -105,6 +108,8 @@ export class AppAvailableShowPage {
   async uninstall (): Promise<void> {
     const loader = await this.loadingCtrl.create({
       message: `Uninstalling...`,
+      spinner: 'lines',
+      cssClass: 'loader',
     })
     await loader.present()
 

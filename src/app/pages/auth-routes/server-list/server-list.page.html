@@ -25,7 +25,7 @@
     </ion-item>
   </ion-item-group>
 
-  <ion-card *ngFor="let server of serverModel.servers" [routerLink]="['/servers', server.id]">
+  <ion-card *ngFor="let server of serverModel.servers" [routerLink]="[server.id]">
     <ion-item>
       <ion-avatar slot="start">
         <img src="assets/img/cube.png" alt="icon" />
