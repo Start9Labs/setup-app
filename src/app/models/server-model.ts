@@ -86,9 +86,16 @@ export interface S9Server extends S9ServerStorable {
 
 export type ServerSpecs = { [key: string]: string | number }
 
-export function getLanIP (zcs: ZeroconfService): string  {
+export function getLanIP (zcs: ZeroconfService): string {
   const { ipv4Addresses, ipv6Addresses } = zcs
-  return ipv4Addresses.concat(ipv6Addresses)[0] + ':5959'
+
+  let url: string
+  if (ipv4Addresses.length) {
+    url = ipv4Addresses[0]
+  } else {
+    url = `[${ipv6Addresses[0]}]`
+  }
+  return url + ':5959'
 }
 
 export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): S9Server {

@@ -21,7 +21,7 @@ export class AppModel {
   }
 
   getApps (serverId: string): AppInstalled[] {
-    return this.apps[serverId] || []
+    return this.apps[serverId]
   }
 
   getApp (serverId: string, appId: string): AppInstalled | undefined {

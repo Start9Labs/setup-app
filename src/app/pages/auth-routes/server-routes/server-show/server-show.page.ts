@@ -19,6 +19,7 @@ export class ServerShowPage {
   server: S9Server
   apps: AppInstalled[]
   edited = false
+  loading = true
   compareVersions = compareVersions
 
   constructor (
@@ -32,13 +33,35 @@ export class ServerShowPage {
     private readonly serverService: ServerService,
   ) { }
 
-  ngOnInit () {
+  async ngOnInit () {
     const serverId = this.route.snapshot.paramMap.get('serverId') as string
     const server = this.serverModel.getServer(serverId)
     if (!server) throw new Error (`No server found with ID: ${serverId}`)
     this.server = server
 
     this.apps = this.appModel.getApps(serverId)
+
+    try {
+      const apps = await this.serverService.getInstalledApps(server)
+      // clear cache of removed apps
+      this.appModel.getApps(server.id).forEach((app, index) => {
+        if (!apps.find(a => a.id === app.id)) {
+          this.appModel.getApps(server.id).splice(index, 1)
+        }
+      })
+      // update cache with new app data
+      apps.forEach(app => {
+        this.appModel.cacheApp(server.id, app)
+      })
+    } catch (e) {
+      this.appModel.getApps(server.id).forEach(app => {
+        app.status = AppHealthStatus.UNREACHABLE
+        app.statusAt = new Date()
+      })
+      this.error = e.message
+    } finally {
+      this.loading = false
+    }
   }
 
   async presentAction () {

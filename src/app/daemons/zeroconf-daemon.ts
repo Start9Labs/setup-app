@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs'
 import { Platform } from '@ionic/angular'
 import { ServerModel } from '../models/server-model'
 import { ServerService } from '../services/server.service'
+import { AppHealthStatus } from '../models/app-model'
 
 @Injectable({
   providedIn: 'root',
@@ -50,15 +51,21 @@ export class ZeroconfDaemon {
       service.name.startsWith('start9-')
       && ['added', 'resolved'].includes(action)
       && !this.serverModel.zeroconfServices[service.name]
-      && service.ipv4Addresses.concat(service.ipv6Addresses).length > 0
+      && service.ipv4Addresses.length
     ) {
       console.log(`discovered start9 server: ${service.name}`)
       this.serverModel.zeroconfServices[service.name] = service
       const server = this.serverModel.getServer(service.name.split('-')[1])
       if (server) {
-        const serverRes = await this.serverService.getServer(server)
-        Object.assign(server, serverRes)
-        await this.serverModel.saveAll()
+        try {
+          console.log('ZEROCONF making request')
+          const serverRes = await this.serverService.getServer(server)
+          Object.assign(server, serverRes)
+          await this.serverModel.saveAll()
+        } catch (e) {
+          server.status = AppHealthStatus.UNREACHABLE
+          server.statusAt = new Date()
+        }
       }
     }
   }

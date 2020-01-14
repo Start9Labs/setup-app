@@ -14,10 +14,6 @@
 
 <ion-content>
 
-  <ion-item *ngIf="error">
-    <ion-text class="ion-text-wrap" color="danger">{{error}}</ion-text>
-  </ion-item>
-
   <ion-item-group>
     <ion-item>
       <ion-label position="stacked">Status</ion-label>
@@ -31,6 +27,10 @@
 
   <ion-item-group>
     <ion-item-divider>Apps</ion-item-divider>
+
+    <ion-item *ngIf="error && !loading">
+      <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
+    </ion-item>
 
     <ion-item [routerLink]="['apps', 'available']">
       <ion-icon slot="start" size="large" name="apps" color="primary"></ion-icon>
@@ -50,5 +50,9 @@
       </ion-note>
     </ion-item>
   </ion-item-group>
+
+  <div *ngIf="loading && !apps.length" class="apps-spinner">
+    <ion-spinner name="lines" color="warning"></ion-spinner>
+  </div>
 
 </ion-content>
