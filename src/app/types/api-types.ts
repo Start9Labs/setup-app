@@ -1,5 +1,5 @@
-import { AppHealthStatus, AppVersion, AppConfigSpec, AppEvent } from '../models/s9-app'
-import { ServerSpecs } from '../models/s9-server'
+import { AppHealthStatus, AppVersion, AppConfigSpec, AppEvent } from '../models/app-model'
+import { ServerSpecs } from '../models/server-model'
 
 export type TwoHundredOK = { never?: never } // hack for the unit type
 

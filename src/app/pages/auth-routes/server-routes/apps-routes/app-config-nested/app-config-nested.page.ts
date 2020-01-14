@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core'
 import { ModalController, AlertController } from '@ionic/angular'
-import { ValueSpec, ValueSpecList, ValueSpecString, ValueSpecObject, ListValueSpecObject } from 'src/app/models/s9-app'
+import { ValueSpec, ValueSpecList, ValueSpecString, ValueSpecObject, ListValueSpecObject } from 'src/app/models/app-model'
 import * as configUtil from '../../../../../util/config.util'
 
 @Component({

@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { Platform } from '@ionic/angular'
 import { SplashScreen } from '@ionic-native/splash-screen/ngx'
 import { StatusBar } from '@ionic-native/status-bar/ngx'
-import { S9ServerModel } from './models/server-model'
+import { ServerModel } from './models/server-model'
 import { SyncDaemon } from './daemons/sync-daemon'
 import { ZeroconfDaemon } from './daemons/zeroconf-daemon'
 import { AuthService } from './services/auth.service'
@@ -23,7 +23,7 @@ export class AppComponent {
     public platform: Platform,
     public splashScreen: SplashScreen,
     public statusBar: StatusBar,
-    public s9ServerModel: S9ServerModel,
+    public serverModel: ServerModel,
     public zeroconfDaemon: ZeroconfDaemon,
     public syncDaemon: SyncDaemon,
     public authService: AuthService,
@@ -39,7 +39,7 @@ export class AppComponent {
       // load data if authenticated
       if (this.authService.isAuthenticated()) {
         // isAuthenticated() => true means mnemonic is present, hence the bang.
-        await this.s9ServerModel.load(this.authService.mnemonic!)
+        await this.serverModel.load(this.authService.mnemonic!)
       }
       // subscribe to auth status
       this.authService.authState.subscribe(authStatus => {
@@ -77,7 +77,7 @@ export class AppComponent {
       }
       await this.router.navigate(['/'])
     } else if (authStatus === AuthStatus.unauthed) {
-      this.s9ServerModel.servers = []
+      this.serverModel.servers = []
       this.stopDaemons()
       if (this.resumeSub) {
         this.resumeSub.unsubscribe()
@@ -92,7 +92,7 @@ export class AppComponent {
   private startDaemons () {
     // detects new LAN services
     this.zeroconfDaemon.start()
-    // syncs servers in S9ServerModel
+    // syncs servers in ServerModel
     this.syncDaemon.start()
   }
 

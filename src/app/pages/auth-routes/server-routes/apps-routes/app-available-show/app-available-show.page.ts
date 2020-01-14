@@ -1,8 +1,8 @@
 import { Component } from '@angular/core'
-import { S9Server } from 'src/app/models/s9-server'
+import { S9Server } from 'src/app/models/server-model'
 import { ActivatedRoute } from '@angular/router'
-import { S9ServerModel } from 'src/app/models/server-model'
-import { AppAvailableFull, AppHealthStatus } from 'src/app/models/s9-app'
+import { ServerModel } from 'src/app/models/server-model'
+import { AppAvailableFull, AppHealthStatus } from 'src/app/models/app-model'
 import { ServerService } from 'src/app/services/server.service'
 import { NavController, AlertController, LoadingController } from '@ionic/angular'
 import * as compareVersions from 'compare-versions'
@@ -22,7 +22,7 @@ export class AppAvailableShowPage {
   constructor (
     private readonly navCtrl: NavController,
     private readonly route: ActivatedRoute,
-    private readonly serverModel: S9ServerModel,
+    private readonly serverModel: ServerModel,
     private readonly serverService: ServerService,
     private readonly alertCtrl: AlertController,
     private readonly loadingCtrl: LoadingController,

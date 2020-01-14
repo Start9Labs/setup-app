@@ -1,18 +1,22 @@
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
-import { S9ServerStorable, toStorableServer, fromStorableServer, S9Server } from './s9-server'
-import { AppInstalled } from './s9-app'
+import { AppHealthStatus, AppEvent, AppModel } from './app-model'
 import { AuthService } from '../services/auth.service'
+import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
+import { deriveKeys } from '../util/crypto.util'
+import * as CryptoJS from 'crypto-js'
 
 @Injectable({
   providedIn: 'root',
 })
-export class S9ServerModel {
+export class ServerModel {
   servers: S9Server[] = []
+  zeroconfServices: { [hostname: string]: ZeroconfService } = { }
 
   constructor (
     private readonly storage: Storage,
     private readonly authService: AuthService,
+    private readonly appModel: AppModel,
   ) {
     this.authService.authState.subscribe(isAuthed => {
       if (isAuthed) {
@@ -23,38 +27,21 @@ export class S9ServerModel {
     })
   }
 
-  // SERVERS
-
   async load (mnemonic: string[]): Promise<void> {
     const fromStorage: S9ServerStore = await this.storage.get('servers') || []
-    this.servers = fromStorage.map(s => fromStorableServer(s, mnemonic))
+    fromStorage.forEach(s => {
+      this.servers.push(fromStorableServer(s, mnemonic))
+      this.appModel.apps[s.id] = []
+    })
   }
 
   getServer (id: string): S9Server | undefined {
     return this.servers.find(s => s.id === id)
   }
 
-  cacheServer (server: S9Server, upsert = true): void {
-    const target = this.getServer(server.id)
-
-    if (target) {
-      Object.keys(server).forEach(key => {
-        if (key !== 'apps') {
-          target[key] = server[key]
-        }
-      })
-    } else if (!target && upsert) {
-      this.servers.push(server)
-    }
-  }
-
   async createServer (server: S9Server): Promise<void> {
-    this.cacheServer(server)
-    await this.saveAll()
-  }
-
-  async updateServer (server: S9Server): Promise<void> {
-    this.cacheServer(server, false)
+    this.servers.push(server)
+    this.appModel.apps[server.id] = []
     await this.saveAll()
   }
 
@@ -64,35 +51,76 @@ export class S9ServerModel {
       this.servers.splice(index, 1)
       await this.saveAll()
     }
+    delete this.appModel.apps[id]
   }
 
-  private async saveAll (): Promise<void> {
+  async saveAll (): Promise<void> {
     await this.storage.set('servers', this.servers.map(toStorableServer))
   }
 
-  // APPS
-
-  cacheApp (serverId: string, app: AppInstalled) {
-    const server = this.getServer(serverId)
-    if (!server) { return }
-
-    const existing = server.apps.find(a => a.id === app.id)
-    if (existing) {
-      Object.keys(app).forEach(key => {
-        existing[key] = app[key]
-      })
-    } else {
-      server.apps.push(app)
-    }
-  }
-
-  async removeApp (serverId: string, appId: string) {
-    const server = this.getServer(serverId)
-    if (!server) { return }
-
-    const index = server.apps.findIndex(a => a.id === appId)
-    server.apps.splice(index, 1)
+  getZeroconf (serverId: string): ZeroconfService | undefined {
+    return this.zeroconfServices[`start9-${serverId}`]
   }
 }
 
 type S9ServerStore = S9ServerStorable[]
+
+export interface S9ServerStorable {
+  id: string
+  label: string
+  torAddress: string
+  versionInstalled: string
+}
+
+export interface S9Server extends S9ServerStorable {
+  updating: boolean
+  status: AppHealthStatus
+  statusAt: Date
+  specs: ServerSpecs
+  sshKeys: string[]
+  versionLatest: string
+  privkey: string // derive from mnemonic + torAddress
+  events: AppEvent[]
+  zeroconf?: ZeroconfService
+}
+
+export type ServerSpecs = { [key: string]: string | number }
+
+export function getLanIP (zcs: ZeroconfService): string  {
+  const { ipv4Addresses, ipv6Addresses } = zcs
+  return ipv4Addresses.concat(ipv6Addresses)[0] + ':5959'
+}
+
+export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): S9Server {
+  const { label, torAddress, id, versionInstalled } = ss
+  return {
+    id,
+    label,
+    torAddress,
+    versionInstalled,
+    versionLatest: '0.0.0',
+    updating: false,
+    status: AppHealthStatus.UNKNOWN,
+    statusAt: new Date(),
+    privkey: deriveKeys(mnemonic, id).privkey,
+    sshKeys: [],
+    specs: { },
+    events: [],
+  }
+}
+
+export function toStorableServer (ss: S9Server): S9ServerStorable {
+  const { label, torAddress, id, versionInstalled } = ss
+
+  return {
+    id,
+    label,
+    torAddress,
+    versionInstalled,
+  }
+}
+
+export function idFromSerial (serialNo: string): string {
+  // sha256 hash is big endian
+  return CryptoJS.SHA256(serialNo).toString(CryptoJS.enc.Hex).substr(0, 8)
+}

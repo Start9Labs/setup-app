@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
-import { S9Server } from 'src/app/models/s9-server'
+import { S9Server } from 'src/app/models/server-model'
 import { ActivatedRoute } from '@angular/router'
-import { S9ServerModel } from 'src/app/models/server-model'
+import { ServerModel } from 'src/app/models/server-model'
 
 @Component({
   selector: 'dev-options',
@@ -13,7 +13,7 @@ export class DevOptionsPage {
 
   constructor (
     private readonly route: ActivatedRoute,
-    private readonly serverModel: S9ServerModel,
+    private readonly serverModel: ServerModel,
   ) { }
 
   ngOnInit () {

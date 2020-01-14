@@ -1,9 +1,9 @@
 import { Component } from '@angular/core'
 import { NavController, LoadingController, AlertController } from '@ionic/angular'
 import { ActivatedRoute } from '@angular/router'
-import { S9ServerModel } from 'src/app/models/server-model'
-import { S9Server } from 'src/app/models/s9-server'
-import { AppInstalled, AppConfigSpec, AppHealthStatus } from 'src/app/models/s9-app'
+import { ServerModel } from 'src/app/models/server-model'
+import { S9Server } from 'src/app/models/server-model'
+import { AppInstalled, AppConfigSpec, AppHealthStatus, AppModel } from 'src/app/models/app-model'
 import { ServerService } from 'src/app/services/server.service'
 
 @Component({
@@ -23,7 +23,8 @@ export class AppConfigPage {
   constructor (
     private readonly navCtrl: NavController,
     private readonly route: ActivatedRoute,
-    private readonly serverModel: S9ServerModel,
+    private readonly serverModel: ServerModel,
+    private readonly appModel: AppModel,
     private readonly serverService: ServerService,
     private readonly loadingCtrl: LoadingController,
     private readonly alertCtrl: AlertController,
@@ -37,7 +38,7 @@ export class AppConfigPage {
     this.server = server
 
     const appId = this.route.snapshot.paramMap.get('appId') as string
-    const app = server.apps.find(app => app.id === appId)
+    const app = this.appModel.getApp(serverId, appId)
     if (!app) throw new Error (`No app found on ${serverId} with ID: ${appId}`)
     this.app = app
 

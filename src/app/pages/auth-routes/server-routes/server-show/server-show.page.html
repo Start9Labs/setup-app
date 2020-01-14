@@ -37,7 +37,7 @@
       <ion-text color="primary">Sovereign App Store</ion-text>
     </ion-item>
 
-    <ion-item *ngFor="let app of server.apps" [routerLink]="['apps', 'installed', app.id]">
+    <ion-item *ngFor="let app of apps" [routerLink]="['apps', 'installed', app.id]">
       <ion-avatar slot="start">
         <img [src]="app.iconURL" alt="icon" />
       </ion-avatar>

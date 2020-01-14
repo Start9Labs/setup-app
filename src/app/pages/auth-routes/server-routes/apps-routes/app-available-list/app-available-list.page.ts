@@ -1,9 +1,9 @@
 import { Component } from '@angular/core'
 import { ServerService } from 'src/app/services/server.service'
-import { AppAvailablePreview } from 'src/app/models/s9-app'
+import { AppAvailablePreview } from 'src/app/models/app-model'
 import { ActivatedRoute } from '@angular/router'
-import { S9ServerModel } from 'src/app/models/server-model'
-import { S9Server } from 'src/app/models/s9-server'
+import { ServerModel } from 'src/app/models/server-model'
+import { S9Server } from 'src/app/models/server-model'
 
 @Component({
   selector: 'app-available-list',
@@ -18,7 +18,7 @@ export class AppAvailableListPage {
 
   constructor (
     private readonly route: ActivatedRoute,
-    private readonly serverModel: S9ServerModel,
+    private readonly serverModel: ServerModel,
     private readonly serverService: ServerService,
   ) { }
 

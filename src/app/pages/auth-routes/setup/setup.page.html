@@ -20,7 +20,7 @@
       <ion-input maxlength="8" placeholder="Product ID (located on device)" [(ngModel)]="productKey"></ion-input>
     </ion-item>
     <ion-item>
-      <ion-input placeholder="Friendly Name (ex My Server)" [(ngModel)]="label"></ion-input>
+      <ion-input placeholder="Friendly Name (ex. My Server)" [(ngModel)]="label"></ion-input>
     </ion-item>
   </ion-item-group>
   <ion-button [disabled]="productKey.length !== 8 || !label" expand="block" fill="outline" (click)="submit()">

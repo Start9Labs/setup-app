@@ -1,6 +1,6 @@
 import { Component, NgZone } from '@angular/core'
-import { S9ServerModel } from 'src/app/models/server-model'
-import { S9Server } from 'src/app/models/s9-server'
+import { ServerModel } from 'src/app/models/server-model'
+import { S9Server } from 'src/app/models/server-model'
 import { ActivatedRoute } from '@angular/router'
 import { AlertController, LoadingController } from '@ionic/angular'
 import { ServerService } from 'src/app/services/server.service'
@@ -16,7 +16,7 @@ export class DevSSHKeysPage {
 
   constructor (
     private readonly route: ActivatedRoute,
-    private readonly serverModel: S9ServerModel,
+    private readonly serverModel: ServerModel,
     private readonly loadingCtrl: LoadingController,
     private readonly alertCtrl: AlertController,
     private readonly serverService: ServerService,

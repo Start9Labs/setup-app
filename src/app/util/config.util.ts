@@ -1,4 +1,4 @@
-import { ValueSpec, ValueSpecList, AppConfigSpec, WithStandalone, ListValueSpecObject, ListValueSpecString, ListValueSpecEnum, ValueSpecString, ValueSpecEnum, ValueSpecBoolean, DefaultString } from '../models/s9-app'
+import { ValueSpec, ValueSpecList, AppConfigSpec, WithStandalone, ListValueSpecObject, ListValueSpecString, ListValueSpecEnum, ValueSpecString, ValueSpecEnum, ValueSpecBoolean, DefaultString } from '../models/app-model'
 import * as cryptoUtil from './crypto.util'
 const MAX_ENTROPY = 100
 

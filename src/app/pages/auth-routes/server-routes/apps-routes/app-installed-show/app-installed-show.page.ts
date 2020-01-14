@@ -2,9 +2,9 @@ import { Component } from '@angular/core'
 import { AlertController, NavController, LoadingController, ActionSheetController } from '@ionic/angular'
 import { ServerService } from 'src/app/services/server.service'
 import { ActivatedRoute } from '@angular/router'
-import { S9ServerModel } from 'src/app/models/server-model'
-import { AppInstalled, AppHealthStatus } from 'src/app/models/s9-app'
-import { S9Server } from 'src/app/models/s9-server'
+import { ServerModel } from 'src/app/models/server-model'
+import { AppInstalled, AppHealthStatus, AppModel } from 'src/app/models/app-model'
+import { S9Server } from 'src/app/models/server-model'
 import { ClipboardService } from 'src/app/services/clipboard.service'
 import { ActionSheetButton } from '@ionic/core'
 
@@ -23,7 +23,8 @@ export class AppInstalledShowPage {
     private readonly actionCtrl: ActionSheetController,
     private readonly serverService: ServerService,
     private readonly route: ActivatedRoute,
-    private readonly serverModel: S9ServerModel,
+    private readonly serverModel: ServerModel,
+    private readonly appModel: AppModel,
     private readonly navCtrl: NavController,
     private readonly clipboardService: ClipboardService,
     private readonly loadingCtrl: LoadingController,
@@ -36,8 +37,9 @@ export class AppInstalledShowPage {
       if (!server) throw new Error (`No server found with ID: ${serverId}`)
 
       const appId = this.route.snapshot.paramMap.get('appId') as string
-      const app = server.apps.find(app => app.id === appId)
+      const app = this.appModel.getApp(serverId, appId)
       if (!app) throw new Error (`No app found on ${serverId} with ID: ${appId}`)
+      this.app = app
 
       this.server = server
       this.app = app

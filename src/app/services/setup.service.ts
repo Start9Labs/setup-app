@@ -1,14 +1,13 @@
 import { Injectable } from '@angular/core'
-import { S9Server, ServerSpecs, getLanIP } from '../models/s9-server'
+import { S9Server, ServerSpecs, getLanIP, ServerModel } from '../models/server-model'
 import { HttpService } from './http.service'
-import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { Method } from 'src/app/types/enums'
 import { pauseFor } from 'src/app/util/misc.util'
 import * as cryptoUtil from '../util/crypto.util'
 import { AuthService } from './auth.service'
 import { Lan } from '../types/api-types'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
-import { AppHealthStatus } from '../models/s9-app'
+import { AppHealthStatus } from '../models/app-model'
 import { ServerService } from './server.service'
 
 @Injectable({
@@ -22,19 +21,18 @@ export class SetupService {
 
   constructor (
     private readonly httpService: HttpService,
-    private readonly zeroconfDaemon: ZeroconfDaemon,
+    private readonly serverModel: ServerModel,
     private readonly authService: AuthService,
     private readonly serverService: ServerService,
   ) { }
 
-  async setup (ss: S9ServerBuilder, productKey: string): Promise<S9Server> {
-    let serverBuilder = ss
+  async setup (builder: S9ServerBuilder, productKey: string): Promise<S9Server> {
     for (let i = 0; i < SetupService.setupAttempts; i ++) {
       // @TODO delete
-      serverBuilder = this.mockServer(serverBuilder)
-      // serverBuilder = await this.setupAttempt(serverBuilder, productKey)
-      if (isFullySetup(serverBuilder)) {
-        return toS9Server(serverBuilder)
+      // builder = this.mockServer(builder)
+      builder = await this.setupAttempt(builder, productKey)
+      if (isFullySetup(builder)) {
+        return toS9Server(builder)
       }
       await pauseFor(SetupService.waitForMS)
     }
@@ -42,63 +40,63 @@ export class SetupService {
     throw new Error(`failed ${this.message}`)
   }
 
-  private async setupAttempt (ss: S9ServerBuilder, productKey: string): Promise<S9ServerBuilder> {
+  private async setupAttempt (builder: S9ServerBuilder, productKey: string): Promise<S9ServerBuilder> {
 
     // enable lan
-    if (!hasValues(['zeroconfService'], ss)) {
+    if (!hasValues(['zeroconf'], builder)) {
       this.message = `getting zeroconf service`
-      ss.zeroconfService = this.zeroconfDaemon.getService(ss.id)
+      builder.zeroconf = this.serverModel.getZeroconf(builder.id)
     }
 
     // agent version
-    if (hasValues(['zeroconfService'], ss) && !hasValues(['versionInstalled'], ss)) {
+    if (hasValues(['zeroconf'], builder) && !hasValues(['versionInstalled'], builder)) {
       this.message = `getting agent version`
-      ss.versionInstalled = await this.getVersion(ss)
+      builder.versionInstalled = await this.getVersion(builder)
     }
 
     // tor acquisition
-    if (hasValues(['zeroconfService', 'versionInstalled'], ss) && !hasValues(['torAddress'], ss)) {
+    if (hasValues(['zeroconf', 'versionInstalled'], builder) && !hasValues(['torAddress'], builder)) {
       this.message = `getting tor address`
-      ss.torAddress = await this.getTor(ss)
+      builder.torAddress = await this.getTor(builder)
     }
 
     // derive keys
-    if (hasValues(['zeroconfService', 'versionInstalled', 'torAddress'], ss) && !hasValues(['pubkey', 'privkey'], ss)) {
+    if (hasValues(['zeroconf', 'versionInstalled', 'torAddress'], builder) && !hasValues(['pubkey', 'privkey'], builder)) {
       this.message = 'getting mnemonic'
       if (this.authService.mnemonic) {
         this.message = `deriving keys`
-        const { privkey, pubkey } = cryptoUtil.deriveKeys(this.authService.mnemonic, ss.id)
-        ss.privkey = privkey
-        ss.pubkey = pubkey
+        const { privkey, pubkey } = cryptoUtil.deriveKeys(this.authService.mnemonic, builder.id)
+        builder.privkey = privkey
+        builder.pubkey = pubkey
       }
     }
 
     // register pubkey
-    if (hasValues(['zeroconfService', 'versionInstalled', 'torAddress', 'pubkey', 'privkey'], ss) && !ss.registered) {
+    if (hasValues(['zeroconf', 'versionInstalled', 'torAddress', 'pubkey', 'privkey'], builder) && !builder.registered) {
       this.message = `registering pubkey`
-      ss.registered = await this.registerPubkey(ss, productKey) // true or false
+      builder.registered = await this.registerPubkey(builder, productKey) // true or false
     }
 
     // get server
     if (
-      hasValues(['zeroconfService', 'versionInstalled', 'torAddress', 'pubkey', 'privkey'], ss) &&
-      ss.registered &&
-      ss.status !== AppHealthStatus.RUNNING
+      hasValues(['zeroconf', 'versionInstalled', 'torAddress', 'pubkey', 'privkey'], builder) &&
+      builder.registered &&
+      builder.status !== AppHealthStatus.RUNNING
     ) {
       this.message = `getting server`
-      await this.serverService.getServer(ss)
-        .then(res => {
-          ss = { ...ss, ...res }
+      await this.serverService.getServer(builder)
+        .then(serverRes => {
+          builder = { ...builder, ...serverRes }
         })
         .catch(console.error)
     }
 
-    return ss
+    return builder
   }
 
-  async getVersion (ss: S9BuilderWith<'zeroconfService'>): Promise<string | undefined> {
+  async getVersion (builder: S9BuilderWith<'zeroconf'>): Promise<string | undefined> {
     try {
-      const host = getLanIP(ss.zeroconfService)
+      const host = getLanIP(builder.zeroconf)
       const { version } = await this.httpService.request<Lan.GetVersionRes>(Method.get, `http://${host}/version`, { }, { }, SetupService.timeout)
       return version
     } catch (e) {
@@ -106,20 +104,20 @@ export class SetupService {
     }
   }
 
-  async getTor (ss: S9BuilderWith<'zeroconfService' | 'versionInstalled'>): Promise<string | undefined> {
+  async getTor (builder: S9BuilderWith<'zeroconf' | 'versionInstalled'>): Promise<string | undefined> {
     try {
-      const { torAddress } = await this.httpService.serverRequest<Lan.GetTorRes>(ss, Method.get, '/tor', { }, { }, SetupService.timeout)
+      const { torAddress } = await this.httpService.serverRequest<Lan.GetTorRes>(builder, Method.get, '/tor', { }, { }, SetupService.timeout)
       return torAddress
     } catch (e) {
       return undefined
     }
   }
 
-  async registerPubkey (ss: S9BuilderWith<'zeroconfService' | 'versionInstalled' | 'pubkey'>, productKey: string): Promise<boolean> {
-    const { pubkey } = ss
+  async registerPubkey (builder: S9BuilderWith<'zeroconf' | 'versionInstalled' | 'pubkey'>, productKey: string): Promise<boolean> {
+    const { pubkey } = builder
     try {
       const body: Lan.PostRegisterReq = { pubKey: pubkey, productKey }
-      await this.httpService.serverRequest<Lan.PostRegisterRes>(ss, Method.post, '/register', { }, body, SetupService.timeout)
+      await this.httpService.serverRequest<Lan.PostRegisterRes>(builder, Method.post, '/register', { }, body, SetupService.timeout)
       return true
     } catch (e) {
       return false
@@ -127,23 +125,23 @@ export class SetupService {
   }
 
   // @TODO remove
-  mockServer (ss: S9ServerBuilder): Required<S9ServerBuilder> {
+  mockServer (builder: S9ServerBuilder): Required<S9ServerBuilder> {
     return {
-      id: ss.id,
-      label: ss.label,
+      id: builder.id,
+      label: builder.label,
       torAddress: 'agent-tor-address-isaverylongaddresssothaticantestwrapping.onion',
       versionInstalled: '0.1.0',
       versionLatest: '0.1.0',
       status: AppHealthStatus.RUNNING,
       statusAt: new Date(),
-      specs: ss.specs,
+      specs: builder.specs,
       privkey: 'testprivkey',
       pubkey: 'testpubkey',
       registered: true,
-      zeroconfService: {
+      zeroconf: {
         domain: 'local.',
         type: '_http._tcp',
-        name: `start9-${ss.id}`,
+        name: `start9-${builder.id}`,
         hostname: '',
         ipv4Addresses: ['192.168.20.1'],
         ipv6Addresses: ['end9823u0ej2fb'],
@@ -174,7 +172,7 @@ export interface S9ServerBuilder {
   registered: boolean
 
   torAddress?: string
-  zeroconfService?: ZeroconfService
+  zeroconf?: ZeroconfService
 }
 
 export function hasValues<T extends keyof S9ServerBuilder> (t: T[], s: S9ServerBuilder): s is S9BuilderWith<T> {
@@ -196,10 +194,9 @@ export function fromUserInput (id: string, label: string): S9ServerBuilder {
   }
 }
 
-export function toS9Server (sb: Required<S9ServerBuilder>): S9Server {
+export function toS9Server (builder: Required<S9ServerBuilder>): S9Server {
   return {
-    ...sb,
-    apps: [],
+    ...builder,
     updating: false,
     sshKeys: [],
     events: [],
@@ -225,5 +222,5 @@ const defaultBuilder: Required<S9ServerBuilder> = {
   pubkey:           undefined as any,
   registered:       undefined as any,
   torAddress:       undefined as any,
-  zeroconfService:  undefined as any,
+  zeroconf:         undefined as any,
 }

@@ -1,4 +1,50 @@
 import { Omit } from '../util/misc.util'
+import { Injectable } from '@angular/core'
+import { AuthService } from '../services/auth.service'
+
+@Injectable({
+  providedIn: 'root',
+})
+export class AppModel {
+  apps: { [serverId: string]: AppInstalled[] } = { }
+
+  constructor (
+    private readonly authService: AuthService,
+  ) {
+    this.authService.authState.subscribe(isAuthed => {
+      if (isAuthed) {
+        return
+      } else {
+        this.apps = { }
+      }
+    })
+  }
+
+  getApps (serverId: string): AppInstalled[] {
+    return this.apps[serverId] || []
+  }
+
+  getApp (serverId: string, appId: string): AppInstalled | undefined {
+    return this.apps[serverId].find(a => a.id === appId)
+  }
+
+  cacheApp (serverId: string, app: AppInstalled) {
+    let existing = this.getApp(serverId, app.id)
+
+    if (existing) {
+      Object.assign(existing, app)
+    } else {
+      this.apps[serverId].push(app)
+    }
+  }
+
+  async removeApp (serverId: string, appId: string) {
+    const index = this.apps[serverId].findIndex(a => a.id === appId)
+    if (index > -1) {
+      this.apps[serverId].splice(index, 1)
+    }
+  }
+}
 
 export interface BaseApp {
   id: string

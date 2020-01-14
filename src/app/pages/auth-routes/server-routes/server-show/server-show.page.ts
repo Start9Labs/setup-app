@@ -1,10 +1,10 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { S9ServerModel } from 'src/app/models/server-model'
+import { ServerModel } from 'src/app/models/server-model'
 import { NavController, AlertController, ActionSheetController, LoadingController } from '@ionic/angular'
-import { S9Server } from 'src/app/models/s9-server'
+import { S9Server } from 'src/app/models/server-model'
 import { ActionSheetButton } from '@ionic/core'
-import { AppHealthStatus } from 'src/app/models/s9-app'
+import { AppHealthStatus, AppInstalled, AppModel } from 'src/app/models/app-model'
 import * as compareVersions from 'compare-versions'
 import { ServerService } from 'src/app/services/server.service'
 
@@ -17,12 +17,14 @@ export class ServerShowPage {
   error: string
   view: 'apps' | 'about' = 'apps'
   server: S9Server
+  apps: AppInstalled[]
   edited = false
   compareVersions = compareVersions
 
   constructor (
     private readonly route: ActivatedRoute,
-    private readonly serverModel: S9ServerModel,
+    private readonly serverModel: ServerModel,
+    private readonly appModel: AppModel,
     private readonly navCtrl: NavController,
     private readonly actionCtrl: ActionSheetController,
     private readonly alertCtrl: AlertController,
@@ -31,10 +33,12 @@ export class ServerShowPage {
   ) { }
 
   ngOnInit () {
-    const id = this.route.snapshot.paramMap.get('serverId') as string
-    const server = this.serverModel.getServer(id)
-    if (!server) throw new Error (`No server found with ID: ${id}`)
+    const serverId = this.route.snapshot.paramMap.get('serverId') as string
+    const server = this.serverModel.getServer(serverId)
+    if (!server) throw new Error (`No server found with ID: ${serverId}`)
     this.server = server
+
+    this.apps = this.appModel.getApps(serverId)
   }
 
   async presentAction () {
@@ -88,13 +92,13 @@ export class ServerShowPage {
   async presentAlertEditName () {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
-      header: 'Label',
+      header: 'Friendly Name',
       inputs: [
         {
           name: 'inputValue',
           type: 'text',
           value: this.server.label,
-          placeholder: this.server.id,
+          placeholder: '(ex. My Server)',
         },
       ],
       buttons: [
@@ -107,9 +111,13 @@ export class ServerShowPage {
             const inputValue = data.inputValue
             // return if no change
             if (this.server.label === inputValue) { return }
-            // set new value and mark edited
-            this.server = { ...this.server, label: inputValue || this.server.id }
-            this.serverModel.updateServer(this.server)
+            // throw error if no server name
+            if (!inputValue) {
+              alert.message = 'Server must have a name'
+              return false
+            }
+            this.server.label = inputValue
+            this.serverModel.saveAll()
           },
         },
       ],
@@ -148,7 +156,8 @@ export class ServerShowPage {
 
     try {
       await this.serverService.updateAgent(this.server)
-      this.serverModel.updateServer({ ...this.server, status: AppHealthStatus.DOWNLOADING })
+      this.server.status = AppHealthStatus.DOWNLOADING
+      this.server.statusAt = new Date()
     } catch (e) {
       this.error = e.message
     } finally {

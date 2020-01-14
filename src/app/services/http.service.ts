@@ -3,10 +3,9 @@ import { HttpClient, HttpEventType, HttpHeaders, HttpEvent } from '@angular/comm
 import { Method } from '../types/enums'
 import { Observable } from 'rxjs'
 import { timeout } from 'rxjs/operators'
-import { getLanIP, S9Server } from '../models/s9-server'
+import { getLanIP, S9Server, ServerModel } from '../models/server-model'
 import { TokenSigner } from 'jsontokens'
 import { S9BuilderWith } from './setup.service'
-import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 const APP_VERSION = '1.0.0'
 
 @Injectable({
@@ -15,31 +14,31 @@ const APP_VERSION = '1.0.0'
 export class HttpService {
 
   constructor (
-    private readonly zeroconfDaemon: ZeroconfDaemon,
     private readonly http: HttpClient,
+    private readonly serverModel: ServerModel,
   ) { }
 
   async authServerRequest<T> (
-    ss: S9Server | S9BuilderWith<'zeroconfService' | 'versionInstalled' | 'privkey'>,
+    server: S9Server | S9BuilderWith<'versionInstalled' | 'privkey'>,
     method: Method,
     path: string,
     httpOptions: HttpOptions = { },
     body: any = { },
     TIMEOUT = 30000,
   ): Promise<T> {
-    const authOptions = appendAuthOptions(ss, httpOptions)
-    return this.serverRequest(ss, method, path, authOptions, body, TIMEOUT)
+    const authOptions = appendAuthOptions(server, httpOptions)
+    return this.serverRequest(server, method, path, authOptions, body, TIMEOUT)
   }
 
   async serverRequest<T> (
-    ss: S9Server | S9BuilderWith<'zeroconfService' | 'versionInstalled'>,
+    server: S9Server | S9BuilderWith<'versionInstalled'>,
     method: Method,
     path: string,
     httpOptions: HttpOptions = { },
     body: any = { },
     TIMEOUT = 30000,
   ): Promise<T> {
-    const url = this.s9Url(ss, path)
+    const url = this.s9Url(server, path)
     return this.request(method, url, httpOptions, body, TIMEOUT)
   }
 
@@ -96,18 +95,18 @@ export class HttpService {
     }
   }
 
-  s9Url (ss: S9Server | S9BuilderWith<'zeroconfService' | 'versionInstalled'>, path: string): string {
-    const zeroconfService = this.zeroconfDaemon.getService(ss.id)
+  s9Url (server: S9Server | S9BuilderWith<'versionInstalled'>, path: string): string {
+    const zeroconfService = this.serverModel.getZeroconf(server.id)
     if (!zeroconfService) { throw new Error('S9 Server not found on LAN') }
     const host = getLanIP(zeroconfService)
-    return `http://${host}/v${ss.versionInstalled.charAt(0)}${path}`
+    return `http://${host}/v${server.versionInstalled.charAt(0)}${path}`
   }
 }
 
-function appendAuthOptions (ss: S9Server | S9BuilderWith<'privkey'>, httpOptions: HttpOptions): HttpOptions  {
+function appendAuthOptions (server: S9Server | S9BuilderWith<'privkey'>, httpOptions: HttpOptions): HttpOptions  {
   const past = Math.floor((new Date().getTime() - 30000) / 1000)
   const tokenPayload = { 'iss': 'start9-companion', 'iat': past, 'exp': past + 60 }
-  const token = new TokenSigner('ES256K', ss.privkey).sign(tokenPayload)
+  const token = new TokenSigner('ES256K', server.privkey).sign(tokenPayload)
 
   let headers: HttpHeaders = httpOptions.headers || new HttpHeaders()
   headers = headers.set('Authorization', 'Bearer ' + token)

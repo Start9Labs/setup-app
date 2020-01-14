@@ -1,9 +1,9 @@
 import { Component, ViewChild, NgZone } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { S9ServerModel } from 'src/app/models/server-model'
+import { ServerModel } from 'src/app/models/server-model'
 import { ServerService } from 'src/app/services/server.service'
-import { S9Server } from 'src/app/models/s9-server'
-import { AppInstalled } from 'src/app/models/s9-app'
+import { S9Server } from 'src/app/models/server-model'
+import { AppInstalled, AppModel } from 'src/app/models/app-model'
 import { IonContent } from '@ionic/angular'
 
 @Component({
@@ -21,7 +21,8 @@ export class AppLogsPage {
 
   constructor (
     private readonly route: ActivatedRoute,
-    private readonly serverModel: S9ServerModel,
+    private readonly serverModel: ServerModel,
+    private readonly appModel: AppModel,
     private readonly serverService: ServerService,
     private readonly zone: NgZone,
   ) { }
@@ -33,7 +34,7 @@ export class AppLogsPage {
     this.server = server
 
     const appId = this.route.snapshot.paramMap.get('appId') as string
-    const app = server.apps.find(app => app.id === appId)
+    const app = this.appModel.getApp(serverId, appId)
     if (!app) throw new Error (`No app found on ${serverId} with ID: ${appId}`)
     this.app = app
 

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { S9ServerModel } from 'src/app/models/server-model'
+import { ServerModel } from 'src/app/models/server-model'
 
 @Component({
   selector: 'page-server-list',
@@ -9,7 +9,7 @@ import { S9ServerModel } from 'src/app/models/server-model'
 export class ServerListPage {
 
   constructor (
-    readonly serverModel: S9ServerModel,
+    readonly serverModel: ServerModel,
   ) { }
 
 }

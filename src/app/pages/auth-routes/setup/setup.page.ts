@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { NavController, LoadingController } from '@ionic/angular'
-import { S9ServerModel } from 'src/app/models/server-model'
-import { idFromSerial } from 'src/app/models/s9-server'
+import { ServerModel } from 'src/app/models/server-model'
+import { idFromSerial } from 'src/app/models/server-model'
 import { SetupService, fromUserInput } from 'src/app/services/setup.service'
 
 @Component({
@@ -17,7 +17,7 @@ export class SetupPage {
   constructor (
     private readonly navController: NavController,
     private readonly setupService: SetupService,
-    private readonly s9Model: S9ServerModel,
+    private readonly s9Model: ServerModel,
     private readonly loadingCtrl: LoadingController,
   ) { }
 

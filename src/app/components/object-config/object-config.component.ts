@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core'
-import { AppConfigSpec, ValueSpec, ValueSpecString, ValueSpecObject } from 'src/app/models/s9-app'
+import { AppConfigSpec, ValueSpec, ValueSpecString, ValueSpecObject } from 'src/app/models/app-model'
 import { ModalController, AlertController } from '@ionic/angular'
 import { AppConfigNestedPage } from 'src/app/pages/auth-routes/server-routes/apps-routes/app-config-nested/app-config-nested.page'
 import * as configUtil from '../../util/config.util'

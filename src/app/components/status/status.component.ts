@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core'
-import { AppHealthStatus } from 'src/app/models/s9-app'
+import { AppHealthStatus } from 'src/app/models/app-model'
 
 @Component({
   selector: 's9-status',
