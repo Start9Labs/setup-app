@@ -1,6 +1,8 @@
 import { Component } from '@angular/core'
 import { AlertController, Platform } from '@ionic/angular'
 import { AuthService } from 'src/app/services/auth.service'
+import { SyncDaemon } from 'src/app/daemons/sync-daemon'
+import { AlertOptions } from '@ionic/core'
 
 @Component({
   selector: 'app-settings',
@@ -8,19 +10,25 @@ import { AuthService } from 'src/app/services/auth.service'
   styleUrls: ['./settings.page.scss'],
 })
 export class SettingsPage {
+  syncInterval: string
+  syncIntervalInterface: AlertOptions = {
+    header: 'Sync Interval',
+    message: 'Frequency to sync server data',
+  }
 
   constructor (
     private readonly platform: Platform,
     private readonly alertCtrl: AlertController,
     private readonly authService: AuthService,
+    private readonly syncDaemon: SyncDaemon,
   ) { }
 
-  async goToInstructions () {
-    return true
+  ngOnInit () {
+    this.syncInterval = String(this.syncDaemon.syncInterval)
   }
 
-  async goToFAQ () {
-    return true
+  async updateSyncInterval () {
+    await this.syncDaemon.updateSyncInterval(Number(this.syncInterval))
   }
 
   async presentAlertWarnRecovery () {

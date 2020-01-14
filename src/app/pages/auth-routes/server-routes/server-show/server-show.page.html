@@ -14,10 +14,18 @@
 
 <ion-content>
 
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content refreshingSpinner="lines">
+    </ion-refresher-content>
+  </ion-refresher>
+
   <ion-item-group>
     <ion-item>
-      <ion-label position="stacked">Status</ion-label>
-      <h5><s9-status [status]="server.status"></s9-status></h5>
+      <ion-label>
+        <h5>Status</h5>
+        <h1><s9-status [status]="server.status"></s9-status></h1>
+      </ion-label>
+      <ion-spinner slot="end" *ngIf="server.updating" name="dots" color="warning"></ion-spinner>
     </ion-item>
   </ion-item-group>
 

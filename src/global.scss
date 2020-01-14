@@ -80,3 +80,8 @@ ion-note {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+ion-refresher ion-refresher-content {
+  // background: #000;
+  --color: var(--ion-color-warning) !important;
+}

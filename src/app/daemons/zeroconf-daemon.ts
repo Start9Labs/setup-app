@@ -1,25 +1,54 @@
 import { Injectable } from '@angular/core'
-import { Zeroconf, ZeroconfService, ZeroconfResult } from '@ionic-native/zeroconf/ngx'
+import { Zeroconf, ZeroconfResult, ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { Subscription } from 'rxjs'
 import { Platform } from '@ionic/angular'
-import { ServerModel } from '../models/server-model'
-import { ServerService } from '../services/server.service'
-import { AppHealthStatus } from '../models/app-model'
+import { AuthService } from '../services/auth.service'
+import { AuthStatus } from '../types/enums'
 
 @Injectable({
   providedIn: 'root',
 })
 export class ZeroconfDaemon {
+  services: { [hostname: string]: ZeroconfService } = { }
   private zeroconfSub: Subscription | undefined
+  private pauseSub: Subscription | undefined
+  private resumeSub: Subscription | undefined
 
   constructor (
     private readonly platform: Platform,
     private readonly zeroconf: Zeroconf,
-    private readonly serverModel: ServerModel,
-    private readonly serverService: ServerService,
+    private readonly authService: AuthService,
   ) { }
 
-  async start () {
+  init () {
+    this.authService.authState.subscribe(authStatus => {
+      if (authStatus === AuthStatus.authed) {
+        if (!this.pauseSub) {
+          this.pauseSub = this.platform.pause.subscribe(() => {
+            this.stop()
+          })
+        }
+        if (!this.resumeSub) {
+          this.resumeSub = this.platform.resume.subscribe(() => {
+            this.reset()
+          })
+        }
+        this.start()
+      } else if (authStatus === AuthStatus.unauthed) {
+        if (this.pauseSub) {
+          this.pauseSub.unsubscribe()
+          this.pauseSub = undefined
+        }
+        if (this.resumeSub) {
+          this.resumeSub.unsubscribe()
+          this.resumeSub = undefined
+        }
+        this.stop()
+      }
+    })
+  }
+
+  start () {
     // return this.mock()
 
     if (!this.platform.is('cordova')) { return }
@@ -34,7 +63,7 @@ export class ZeroconfDaemon {
       this.zeroconfSub.unsubscribe()
       this.zeroconfSub = undefined
     }
-    this.serverModel.zeroconfServices = { }
+    this.services = { }
   }
 
   async reset () {
@@ -50,23 +79,11 @@ export class ZeroconfDaemon {
     if (
       service.name.startsWith('start9-')
       && ['added', 'resolved'].includes(action)
-      && !this.serverModel.zeroconfServices[service.name]
+      && !this.services[service.name]
       && service.ipv4Addresses.length
     ) {
       console.log(`discovered start9 server: ${service.name}`)
-      this.serverModel.zeroconfServices[service.name] = service
-      const server = this.serverModel.getServer(service.name.split('-')[1])
-      if (server) {
-        try {
-          console.log('ZEROCONF making request')
-          const serverRes = await this.serverService.getServer(server)
-          Object.assign(server, serverRes)
-          await this.serverModel.saveAll()
-        } catch (e) {
-          server.status = AppHealthStatus.UNREACHABLE
-          server.statusAt = new Date()
-        }
-      }
+      this.services[service.name] = service
     }
   }
 
@@ -77,7 +94,7 @@ export class ZeroconfDaemon {
       service: {
         domain: 'local.',
         type: '_http._tcp',
-        name: 'start9-9c56cc51',
+        name: 'start9-1f3ce404',
         hostname: '',
         ipv4Addresses: ['192.168.20.1'],
         ipv6Addresses: ['end9823u0ej2fb'],

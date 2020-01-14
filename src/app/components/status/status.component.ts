@@ -16,7 +16,7 @@ export class StatusComponent {
   ngOnChanges () {
     switch (this.status) {
       case AppHealthStatus.UNKNOWN:
-        this.display = 'Connecting'
+        this.display = 'Unknown'
         this.color = 'dark'
         break
       case AppHealthStatus.REMOVING:

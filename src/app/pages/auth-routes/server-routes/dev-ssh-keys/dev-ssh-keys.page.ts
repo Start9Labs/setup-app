@@ -1,4 +1,4 @@
-import { Component, NgZone } from '@angular/core'
+import { Component } from '@angular/core'
 import { ServerModel } from 'src/app/models/server-model'
 import { S9Server } from 'src/app/models/server-model'
 import { ActivatedRoute } from '@angular/router'
@@ -20,16 +20,13 @@ export class DevSSHKeysPage {
     private readonly loadingCtrl: LoadingController,
     private readonly alertCtrl: AlertController,
     private readonly serverService: ServerService,
-    private readonly zone: NgZone,
   ) { }
 
   ngOnInit () {
     const serverId = this.route.snapshot.paramMap.get('serverId') as string
     const server = this.serverModel.getServer(serverId)
     if (!server) throw new Error (`No server found with ID: ${serverId}`)
-    this.zone.run(() => {
-      this.server = server
-    })
+    this.server = server
   }
 
   async presentAlertAdd () {

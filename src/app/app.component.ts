@@ -8,7 +8,8 @@ import { ZeroconfDaemon } from './daemons/zeroconf-daemon'
 import { AuthService } from './services/auth.service'
 import { Router } from '@angular/router'
 import { AuthStatus } from './types/enums'
-import { Subscription } from 'rxjs'
+import { AppModel } from './models/app-model'
+import { pauseFor } from './util/misc.util'
 
 @Component({
   selector: 'app-root',
@@ -16,24 +17,23 @@ import { Subscription } from 'rxjs'
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
-  private pauseSub: Subscription | undefined
-  private resumeSub: Subscription | undefined
 
   constructor (
-    public platform: Platform,
-    public splashScreen: SplashScreen,
-    public statusBar: StatusBar,
-    public serverModel: ServerModel,
-    public zeroconfDaemon: ZeroconfDaemon,
-    public syncDaemon: SyncDaemon,
-    public authService: AuthService,
-    public router: Router,
+    private readonly platform: Platform,
+    private readonly splashScreen: SplashScreen,
+    private readonly statusBar: StatusBar,
+    private readonly serverModel: ServerModel,
+    private readonly appModel: AppModel,
+    private readonly zeroconfDaemon: ZeroconfDaemon,
+    private readonly syncDaemon: SyncDaemon,
+    private readonly authService: AuthService,
+    private readonly router: Router,
   ) {
     // set dark theme.
     // @TODO there should be a way to make this the default.
     document.body.classList.toggle('dark', true)
     // wait for platform reday
-    platform.ready().then(async () => {
+    this.platform.ready().then(async () => {
       // init auth service to obtain initial status
       await this.authService.init()
       // load data if authenticated
@@ -45,13 +45,15 @@ export class AppComponent {
       this.authService.authState.subscribe(authStatus => {
         this.handleAuthChange(authStatus)
       })
+      // init daemons
+      this.initDaemons()
       // do Cordova things if Cordova
       if (platform.is('cordova')) {
         // style status bar for iOS and Android
         if (platform.is('ios')) {
-          statusBar.styleDefault()
+          this.statusBar.styleDefault()
         } else {
-          statusBar.styleLightContent()
+          this.statusBar.styleLightContent()
         }
         setTimeout(() => {
           this.splashScreen.hide()
@@ -60,44 +62,20 @@ export class AppComponent {
     })
   }
 
+  private async initDaemons () {
+    this.serverModel.init()
+    this.appModel.init()
+    this.syncDaemon.init()
+    this.zeroconfDaemon.init()
+  }
+
   private async handleAuthChange (authStatus: AuthStatus) {
     if (authStatus === AuthStatus.authed) {
-      this.startDaemons()
-      if (!this.pauseSub) {
-        this.pauseSub = this.platform.pause.subscribe(async () => {
-          await this.syncDaemon.stop()
-          await this.zeroconfDaemon.stop()
-        })
-      }
-      if (!this.resumeSub) {
-        this.resumeSub = this.platform.resume.subscribe(async () => {
-          await this.zeroconfDaemon.reset()
-          await this.syncDaemon.start()
-        })
-      }
       await this.router.navigate(['/'])
     } else if (authStatus === AuthStatus.unauthed) {
-      this.serverModel.servers = []
-      this.stopDaemons()
-      if (this.resumeSub) {
-        this.resumeSub.unsubscribe()
-        this.resumeSub = undefined
-      }
       await this.router.navigate(['/welcome'])
     } else {
       return
     }
-  }
-
-  private startDaemons () {
-    // detects new LAN services
-    this.zeroconfDaemon.start()
-    // syncs servers in ServerModel
-    this.syncDaemon.start()
-  }
-
-  private stopDaemons () {
-    this.syncDaemon.stop()
-    this.zeroconfDaemon.stop()
   }
 }

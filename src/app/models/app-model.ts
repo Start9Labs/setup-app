@@ -1,6 +1,7 @@
 import { Omit } from '../util/misc.util'
 import { Injectable } from '@angular/core'
 import { AuthService } from '../services/auth.service'
+import { AuthStatus } from '../types/enums'
 
 @Injectable({
   providedIn: 'root',
@@ -10,11 +11,11 @@ export class AppModel {
 
   constructor (
     private readonly authService: AuthService,
-  ) {
-    this.authService.authState.subscribe(isAuthed => {
-      if (isAuthed) {
-        return
-      } else {
+  ) { }
+
+  init () {
+    this.authService.authState.subscribe(authStatus => {
+      if (authStatus === AuthStatus.unauthed) {
         this.apps = { }
       }
     })
@@ -69,7 +70,6 @@ export interface AppInstalled extends BaseApp {
   statusAt: Date
   torAddress?: string
   progress?: number
-  events?: AppEvent[]
 }
 
 export interface AppVersion {
