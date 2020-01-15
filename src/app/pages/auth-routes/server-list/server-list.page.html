@@ -4,7 +4,7 @@
       Servers
     </ion-title>
     <ion-buttons slot="end" class="ion-padding-end">
-      <ion-button [routerLink]="['/settings']" color="primary">
+      <ion-button [routerLink]="['/auth', 'settings']" color="primary">
         <ion-icon name="settings"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -47,7 +47,7 @@
   </div>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button [routerLink]="['/setup']" class="fab-button">
+    <ion-fab-button [routerLink]="['/auth', 'setup']" class="fab-button">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>

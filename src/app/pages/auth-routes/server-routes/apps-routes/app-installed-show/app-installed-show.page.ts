@@ -79,7 +79,7 @@ export class AppInstalledShowPage {
         text: 'Store Listing',
         icon: 'appstore',
         handler: () => {
-          this.navCtrl.navigateForward(['/servers', this.server.id, 'apps', 'available', this.app.id])
+          this.navCtrl.navigateForward(['/auth', 'servers', this.server.id, 'apps', 'available', this.app.id])
         },
       },
     )

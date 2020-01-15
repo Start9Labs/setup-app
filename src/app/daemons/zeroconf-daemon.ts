@@ -22,7 +22,7 @@ export class ZeroconfDaemon {
 
   init () {
     this.authService.authState.subscribe(authStatus => {
-      if (authStatus === AuthStatus.authed) {
+      if (authStatus === AuthStatus.VERIFIED) {
         if (!this.pauseSub) {
           this.pauseSub = this.platform.pause.subscribe(() => {
             this.stop()
@@ -34,7 +34,7 @@ export class ZeroconfDaemon {
           })
         }
         this.start()
-      } else if (authStatus === AuthStatus.unauthed) {
+      } else {
         if (this.pauseSub) {
           this.pauseSub.unsubscribe()
           this.pauseSub = undefined
@@ -49,7 +49,7 @@ export class ZeroconfDaemon {
   }
 
   start () {
-    // return this.mock()
+    return this.mock()
 
     if (!this.platform.is('cordova')) { return }
 

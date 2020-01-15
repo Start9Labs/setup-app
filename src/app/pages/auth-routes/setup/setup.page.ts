@@ -5,14 +5,14 @@ import { idFromSerial } from 'src/app/models/server-model'
 import { SetupService, fromUserInput } from 'src/app/services/setup.service'
 
 @Component({
-  selector: 'page-setup',
+  selector: 'setup',
   templateUrl: 'setup.page.html',
   styleUrls: ['setup.page.scss'],
 })
 export class SetupPage {
-  public error = ''
-  public label = ''
-  public productKey = ''
+  error = ''
+  label = ''
+  productKey = ''
 
   constructor (
     private readonly navController: NavController,
@@ -26,7 +26,7 @@ export class SetupPage {
     const serverData = fromUserInput(id, this.label)
 
     const loader = await this.loadingCtrl.create({
-      message: 'Setting up server...',
+      message: 'Setting up server. This could take a while...',
       spinner: 'lines',
       cssClass: 'loader',
     })
@@ -36,7 +36,7 @@ export class SetupPage {
     try {
       const server = await this.setupService.setup(serverData, this.productKey)
       await this.s9Model.createServer(server)
-      await this.navController.navigateRoot(['/'])
+      await this.navController.navigateRoot(['/auth'])
     } catch (e) {
       this.error = `Error: ${e.message}`
     } finally {

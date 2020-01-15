@@ -29,8 +29,8 @@ export class SetupService {
   async setup (builder: S9ServerBuilder, productKey: string): Promise<S9Server> {
     for (let i = 0; i < SetupService.setupAttempts; i ++) {
       // @TODO delete
-      // builder = this.mockServer(builder)
-      builder = await this.setupAttempt(builder, productKey)
+      builder = this.mockServer(builder)
+      // builder = await this.setupAttempt(builder, productKey)
       if (isFullySetup(builder)) {
         return toS9Server(builder)
       }
@@ -97,7 +97,7 @@ export class SetupService {
   async getVersion (builder: S9BuilderWith<'zeroconf'>): Promise<string | undefined> {
     try {
       const host = getLanIP(builder.zeroconf)
-      const { version } = await this.httpService.request<Lan.GetVersionRes>(Method.get, `http://${host}/version`, { }, { }, SetupService.timeout)
+      const { version } = await this.httpService.request<Lan.GetVersionRes>(Method.GET, `http://${host}/version`, { }, { }, SetupService.timeout)
       return version
     } catch (e) {
       return undefined
@@ -106,7 +106,7 @@ export class SetupService {
 
   async getTor (builder: S9BuilderWith<'zeroconf' | 'versionInstalled'>): Promise<string | undefined> {
     try {
-      const { torAddress } = await this.httpService.serverRequest<Lan.GetTorRes>(builder, Method.get, '/tor', { }, { }, SetupService.timeout)
+      const { torAddress } = await this.httpService.serverRequest<Lan.GetTorRes>(builder, Method.GET, '/tor', { }, { }, SetupService.timeout)
       return torAddress
     } catch (e) {
       return undefined
@@ -117,7 +117,7 @@ export class SetupService {
     const { pubkey } = builder
     try {
       const body: Lan.PostRegisterReq = { pubKey: pubkey, productKey }
-      await this.httpService.serverRequest<Lan.PostRegisterRes>(builder, Method.post, '/register', { }, body, SetupService.timeout)
+      await this.httpService.serverRequest<Lan.PostRegisterRes>(builder, Method.POST, '/register', { }, body, SetupService.timeout)
       return true
     } catch (e) {
       return false

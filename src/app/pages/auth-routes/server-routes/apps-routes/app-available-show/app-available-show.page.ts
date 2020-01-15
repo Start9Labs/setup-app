@@ -97,7 +97,7 @@ export class AppAvailableShowPage {
 
     try {
       await this.serverService.installApp(this.server, this.app.id, version)
-      await this.navCtrl.navigateBack(['/servers', this.server.id])
+      await this.navCtrl.navigateBack(['/auth', 'servers', this.server.id])
     } catch (e) {
       this.error = e.message
     } finally {
@@ -115,7 +115,7 @@ export class AppAvailableShowPage {
 
     try {
       await this.serverService.uninstallApp(this.server, this.app.id)
-      await this.navCtrl.navigateBack(['/servers', this.server.id])
+      await this.navCtrl.navigateBack(['/auth', 'servers', this.server.id])
     } catch (e) {
       this.error = e.message
     } finally {

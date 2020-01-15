@@ -8,46 +8,79 @@ import { AuthStatus } from '../types/enums'
   providedIn: 'root',
 })
 export class AuthService {
-  readonly authState = new BehaviorSubject(AuthStatus.uninitialized)
+  readonly authState = new BehaviorSubject(AuthStatus.UNINITIALIZED)
+  mnemonicEncrypted: cryptoUtil.Hex | null = null
   mnemonic: string[] | undefined
+  passcodeEnabled = false
 
   constructor (
     private readonly storage: Storage,
   ) { }
 
   async init () {
-    // returns undefined if key does not exist
-    const mnemonic = await this.storage.get('mnemonic') as cryptoUtil.Hex
-    if (mnemonic) {
-      this.mnemonic = JSON.parse(await cryptoUtil.decrypt(mnemonic, ''))
-      this.authState.next(AuthStatus.authed)
+    // returns null if key does not exist
+    this.mnemonicEncrypted = await this.storage.get('mnemonic') as cryptoUtil.Hex
+
+    if (this.mnemonicEncrypted) {
+      try {
+        await this.authenticate('')
+      } catch (e) {
+        this.passcodeEnabled = true
+        this.authState.next(AuthStatus.UNVERIFIED)
+      }
     } else {
-      this.authState.next(AuthStatus.unauthed)
+      this.authState.next(AuthStatus.MISSING)
     }
   }
 
-  async login (mnemonic: string[]) {
+  async authenticate (passcode: string): Promise<void> {
+    const decrypted = await cryptoUtil.decrypt(this.mnemonicEncrypted!, passcode)
+    this.mnemonic = JSON.parse(decrypted)
+    this.authState.next(AuthStatus.VERIFIED)
+  }
+
+  async login (mnemonic: string[]): Promise<void> {
     if (!cryptoUtil.checkMnemonic(mnemonic)) {
       throw new Error('invalid mnemonic')
     }
-    const encrypted = cryptoUtil.encrypt(JSON.stringify(mnemonic), '')
-    await this.storage.set('mnemonic', encrypted)
+
     this.mnemonic = mnemonic
-    this.authState.next(AuthStatus.authed)
+    this.passcodeEnabled = false
+
+    await this.encryptMnemonic('')
+
+    this.authState.next(AuthStatus.VERIFIED)
   }
 
-  async logout () {
-    await this.storage.remove('servers')
-    await this.storage.remove('mnemonic')
-    this.authState.next(AuthStatus.unauthed)
+  async encryptMnemonic (pin: string) {
+    const mnemonicEncrypted = await cryptoUtil.encrypt(JSON.stringify(this.mnemonic), pin)
+    this.mnemonicEncrypted = mnemonicEncrypted
+
+    await this.storage.set('mnemonic', mnemonicEncrypted)
+  }
+
+  async logout (): Promise<void> {
+    this.mnemonicEncrypted = null
     this.mnemonic = undefined
+    this.passcodeEnabled = false
+    await this.storage.clear()
+    this.authState.next(AuthStatus.MISSING)
   }
 
-  isAuthenticated (): boolean {
-    return this.authState.value === AuthStatus.authed && !!this.mnemonic
+  async changePasscode (passcode: string): Promise<void> {
+    await this.encryptMnemonic(passcode)
+    this.passcodeEnabled = !!passcode
   }
 
-  isUnauthenticated (): boolean {
-    return this.authState.value === AuthStatus.unauthed
+  isUnverified (): boolean {
+    return this.authState.value === AuthStatus.UNVERIFIED && !!this.mnemonicEncrypted && !this.mnemonic
+  }
+
+  isVerified (): boolean {
+    return this.authState.value === AuthStatus.VERIFIED && !!this.mnemonicEncrypted && !!this.mnemonic
+  }
+
+  isMissing (): boolean {
+    return this.authState.value === AuthStatus.MISSING && !this.mnemonicEncrypted && !this.mnemonic
   }
 }

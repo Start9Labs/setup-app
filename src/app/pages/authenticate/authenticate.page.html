@@ -1,0 +1,21 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Authenticate
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding-top">
+
+  <ion-item-group>
+    <ion-item>
+      <ion-input maxLength="4" type="tel" placeholder="Enter 4-digit passcode" [(ngModel)]="passcode" (ngModelChange)="handleInput($event)"></ion-input>
+    </ion-item>
+  </ion-item-group>
+
+  <ion-item *ngIf="error" style="margin-top: 16px;">
+    <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
+  </ion-item>
+
+</ion-content>

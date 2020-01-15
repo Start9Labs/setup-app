@@ -23,6 +23,10 @@ const routes: Routes = [
     path: 'settings',
     loadChildren: () => import('./settings/settings.module').then(m => m.SettingsPageModule),
   },
+  {
+    path: 'settings/passcode',
+    loadChildren: () => import('./passcode/passcode.module').then(m => m.PasscodePageModule),
+  },
 ]
 
 @NgModule({

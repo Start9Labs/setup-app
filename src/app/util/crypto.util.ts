@@ -150,7 +150,8 @@ export async function hash (data: string): Promise<Hex> {
 }
 
 export async function encrypt (data: string, pin: string): Promise<Hex> {
-  const key = await getKey(pin)
+  data = (await hash(data)).slice(0, 8) + data
+  const key = await getKey(String(pin))
   let encoded = new TextEncoder().encode(data)
   let iv = window.crypto.getRandomValues(new Uint8Array(16))
 
@@ -173,11 +174,12 @@ export async function decrypt (encrypted: Hex, pin: string): Promise<string> {
     length: 64,
   }, key, encBuf.slice(16))
 
-  console.log(arrayBuff)
+  let data = new TextDecoder().decode(arrayBuff)
+  if ((await hash(data.slice(8))).slice(0, 8) !== data.slice(0, 8)) {
+    throw new Error(`Invalid pin`)
+  }
 
-  console.log(new TextDecoder().decode(arrayBuff))
-
-  return new TextDecoder().decode(arrayBuff)
+  return data.slice(8)
 }
 
 async function getKey (pin: string): Promise<CryptoKey> {

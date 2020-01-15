@@ -36,17 +36,12 @@ export class AppComponent {
     this.platform.ready().then(async () => {
       // init auth service to obtain initial status
       await this.authService.init()
-      // load data if authenticated
-      if (this.authService.isAuthenticated()) {
-        // isAuthenticated() => true means mnemonic is present, hence the bang.
-        await this.serverModel.load(this.authService.mnemonic!)
-      }
       // subscribe to auth status
       this.authService.authState.subscribe(authStatus => {
         this.handleAuthChange(authStatus)
       })
       // init daemons
-      this.initDaemons()
+      this.initDaemonsAndModels()
       // do Cordova things if Cordova
       if (platform.is('cordova')) {
         // style status bar for iOS and Android
@@ -62,7 +57,7 @@ export class AppComponent {
     })
   }
 
-  private async initDaemons () {
+  private async initDaemonsAndModels () {
     this.serverModel.init()
     this.appModel.init()
     this.syncDaemon.init()
@@ -70,12 +65,12 @@ export class AppComponent {
   }
 
   private async handleAuthChange (authStatus: AuthStatus) {
-    if (authStatus === AuthStatus.authed) {
-      await this.router.navigate(['/'])
-    } else if (authStatus === AuthStatus.unauthed) {
-      await this.router.navigate(['/welcome'])
-    } else {
-      return
+    if (authStatus === AuthStatus.VERIFIED) {
+      await this.router.navigate(['/auth'])
+    } else if (authStatus === AuthStatus.MISSING) {
+      await this.router.navigate(['/unauth'])
+    } else if (authStatus === AuthStatus.UNVERIFIED) {
+      await this.router.navigate(['/authenticate'])
     }
   }
 }

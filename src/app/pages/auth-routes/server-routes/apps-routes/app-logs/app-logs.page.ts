@@ -17,7 +17,7 @@ export class AppLogsPage {
   error: string | undefined
   server: S9Server
   app: AppInstalled
-  logs: string[] = []
+  logs: string
 
   constructor (
     private readonly route: ActivatedRoute,
@@ -43,12 +43,11 @@ export class AppLogsPage {
 
   async getLogs () {
     this.loading = true
-    this.logs = []
+    this.logs = ''
+
     try {
       const logs = await this.serverService.getAppLogs(this.server, this.app.id)
-      this.zone.run(() => {
-        this.logs = logs
-      })
+      this.logs = logs.join('\n\n')
       this.loading = false
       setTimeout(async () => await this.content.scrollToBottom(100), 200)
     } catch (e) {

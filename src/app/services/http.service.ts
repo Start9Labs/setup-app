@@ -51,16 +51,16 @@ export class HttpService {
 
     let call: () => Observable<HttpEvent<T>>
     switch (method) {
-      case Method.get:
+      case Method.GET:
         call = () => this.http.get<T>(url, newOptions as any)
         break
-      case Method.post:
+      case Method.POST:
         call = () => this.http.post<T>(url, body, newOptions as any)
         break
-      case Method.patch:
+      case Method.PATCH:
         call = () => this.http.patch<T>(url, body, newOptions as any)
         break
-      case Method.delete:
+      case Method.DELETE:
         call = () => this.http.delete<T>(url, newOptions as any)
         break
       default: // makes tsc happy

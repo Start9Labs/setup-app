@@ -31,7 +31,7 @@ export class SyncDaemon {
 
   async init () {
     this.authService.authState.subscribe(async authStatus => {
-      if (authStatus === AuthStatus.authed) {
+      if (authStatus === AuthStatus.VERIFIED) {
         if (!this.pauseSub) {
           this.pauseSub = this.platform.pause.subscribe(() => {
             this.stop()
@@ -47,7 +47,7 @@ export class SyncDaemon {
           await this.updateSyncInterval(10000)
         }
         this.start()
-      } else if (authStatus === AuthStatus.unauthed) {
+      } else {
         if (this.pauseSub) {
           this.pauseSub.unsubscribe()
           this.pauseSub = undefined
@@ -88,23 +88,20 @@ export class SyncDaemon {
     this.syncing = true
 
     await Promise.all(this.serverModel.servers.map(async server => {
-      await this.syncServer(server)
+      await Promise.all([
+        this.syncServer(server),
+        server.viewing ? this.syncApps(server) : Promise.resolve(),
+      ])
     }))
 
     this.syncing = false
   }
 
   async syncServer (server: S9Server): Promise<void> {
-    // return if already updating
-    if (server.updating) { return }
-
     server.updating = true
 
     try {
-      const [serverRes] = await Promise.all([
-        this.serverService.getServer(server),
-        server.viewing ? this.syncApps(server) : Promise.resolve(),
-      ])
+      const serverRes = await this.serverService.getServer(server)
       Object.assign(server, serverRes)
       await this.serverModel.saveAll()
     } catch (e) {

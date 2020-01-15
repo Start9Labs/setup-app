@@ -1,12 +1,13 @@
 export enum Method {
-  get = 'GET',
-  post = 'POST',
-  patch = 'PATCH',
-  delete = 'DELETE',
+  GET = 'GET',
+  POST = 'POST',
+  PATCH = 'PATCH',
+  DELETE = 'DELETE',
 }
 
 export enum AuthStatus {
-  uninitialized,
-  authed,
-  unauthed,
+  UNINITIALIZED = 'UNINITIALIZED',
+  UNVERIFIED = 'UNVERIFIED',
+  VERIFIED = 'VERIFIED',
+  MISSING = 'MISSING',
 }

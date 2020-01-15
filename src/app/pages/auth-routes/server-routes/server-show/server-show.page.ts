@@ -42,7 +42,7 @@ export class ServerShowPage {
     this.server = server
     this.server.viewing = true
     this.apps = this.appModel.getApps(serverId)
-    this.syncDaemon.syncServer(this.server)
+    this.getServerAndApps()
   }
 
   ngOnDestroy () {
@@ -50,8 +50,19 @@ export class ServerShowPage {
   }
 
   async doRefresh (event: any) {
-    await this.syncDaemon.syncServer(this.server)
+    await this.getServerAndApps()
     event.target.complete()
+  }
+
+  async getServerAndApps () {
+    this.loading = true
+
+    await Promise.all([
+      this.syncDaemon.syncServer(this.server),
+      this.syncDaemon.syncApps(this.server),
+    ])
+
+    this.loading = false
   }
 
   async presentAction () {
@@ -203,6 +214,6 @@ export class ServerShowPage {
   async forget () {
     this.edited = false
     await this.serverModel.forgetServer(this.server.id)
-    await this.navCtrl.navigateRoot(['/'])
+    await this.navCtrl.navigateRoot(['/auth'])
   }
 }

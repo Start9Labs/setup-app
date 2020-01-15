@@ -15,7 +15,7 @@ export class AppModel {
 
   init () {
     this.authService.authState.subscribe(authStatus => {
-      if (authStatus === AuthStatus.unauthed) {
+      if (authStatus !== AuthStatus.VERIFIED) {
         this.apps = { }
       }
     })

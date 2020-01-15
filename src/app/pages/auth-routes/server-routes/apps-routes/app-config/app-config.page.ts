@@ -193,6 +193,6 @@ export class AppConfigPage {
   }
 
   async navigateBack () {
-    return this.navCtrl.navigateBack(['/servers', this.server.id, 'apps', 'installed', this.app.id])
+    return this.navCtrl.navigateBack(['/auth', 'servers', this.server.id, 'apps', 'installed', this.app.id])
   }
 }

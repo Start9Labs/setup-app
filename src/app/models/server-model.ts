@@ -22,8 +22,10 @@ export class ServerModel {
   ) { }
 
   init () {
-    this.authService.authState.subscribe(authStatus => {
-      if (authStatus === AuthStatus.unauthed) {
+    this.authService.authState.subscribe(async authStatus => {
+      if (authStatus === AuthStatus.VERIFIED) {
+        await this.load(this.authService.mnemonic!)
+      } else {
         this.servers = []
       }
     })
