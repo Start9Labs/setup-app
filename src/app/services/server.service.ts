@@ -133,6 +133,12 @@ export class ServerService {
     app.statusAt = new Date()
   }
 
+  async getSSHKeys (server: S9Server): Promise<string[]> {
+    // @TODO remove
+    // return mockGetSSHKeys()
+    return this.httpService.authServerRequest<Lan.GetSSHKeysRes>(server, Method.GET, `/sshKeys`)
+  }
+
   async addSSHKey (server: S9Server, sshKey: string): Promise<void> {
     const body: Lan.PostAddSSHKeyReq = {
       sshKey,
@@ -236,6 +242,12 @@ async function mockUpdateAppConfig (): Promise<Lan.PostUpdateAppConfigRes> {
 async function mockWipeAppData (): Promise<Lan.PostWipeAppDataRes> {
   await pauseFor(1000)
   return { }
+}
+
+// @TODO remove
+async function mockGetSSHKeys (): Promise<Lan.GetSSHKeysRes> {
+  await pauseFor(1000)
+  return mockSSHKeys
 }
 
 // @TODO remove
@@ -388,6 +400,11 @@ const mockApiAppLogs: string[] = [
   '[ng] Date: 2019-12-26T14:23:13.812Z - Hash: 9342e11e6b8e16ad2f70',
   '[ng] 114 unchanged chunks',
   '****** FINISH *****',
+]
+
+const mockSSHKeys = [
+  '12:f8:7e:78:61:b4:bf:e2:de:24:15:96:4e:d4:72:53',
+  '00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff',
 ]
 
 const mockApiAppConfig: Lan.GetAppConfigRes = {

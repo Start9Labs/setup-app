@@ -14,7 +14,7 @@ import { IonContent } from '@ionic/angular'
 export class AppLogsPage {
   @ViewChild(IonContent, { static: false }) private content: IonContent
   loading = true
-  error: string | undefined
+  error = ''
   server: S9Server
   app: AppInstalled
   logs: string

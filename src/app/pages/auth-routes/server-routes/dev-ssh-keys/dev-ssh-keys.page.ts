@@ -12,7 +12,9 @@ import { ServerService } from 'src/app/services/server.service'
 })
 export class DevSSHKeysPage {
   error = ''
+  loading = true
   server: S9Server
+  SSHKeys: string[]
 
   constructor (
     private readonly route: ActivatedRoute,
@@ -22,11 +24,28 @@ export class DevSSHKeysPage {
     private readonly serverService: ServerService,
   ) { }
 
-  ngOnInit () {
+  async ngOnInit () {
     const serverId = this.route.snapshot.paramMap.get('serverId') as string
     const server = this.serverModel.getServer(serverId)
     if (!server) throw new Error (`No server found with ID: ${serverId}`)
     this.server = server
+
+    await this.getSSHKeys()
+  }
+
+  async doRefresh (event: any) {
+    await this.getSSHKeys()
+    event.target.complete()
+  }
+
+  async getSSHKeys () {
+    try {
+      this.SSHKeys = await this.serverService.getSSHKeys(this.server)
+    } catch (e) {
+      this.error = e.message
+    } finally {
+      this.loading = false
+    }
   }
 
   async presentAlertAdd () {

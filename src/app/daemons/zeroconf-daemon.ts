@@ -53,8 +53,8 @@ export class ZeroconfDaemon {
 
     if (!this.platform.is('cordova')) { return }
 
-    this.zeroconfSub = this.zeroconf.watch('_http._tcp.', 'local.').subscribe(async result => {
-      await this.handleServiceUpdate(result)
+    this.zeroconfSub = this.zeroconf.watch('_http._tcp.', 'local.').subscribe(result => {
+      this.handleServiceUpdate(result)
     })
   }
 
@@ -72,7 +72,7 @@ export class ZeroconfDaemon {
     this.start()
   }
 
-  async handleServiceUpdate (result: ZeroconfResult) {
+  handleServiceUpdate (result: ZeroconfResult) {
     const { action, service } = result
     console.log(`zeroconf service ${action}`, service)
 
