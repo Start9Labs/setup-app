@@ -12,7 +12,7 @@ export class AppConfigNestedPage {
   @Input() keyval: { key: string, value: ValueSpec }
   @Input() value: any[] | object
   min: number
-  max: number
+  max: number | undefined
   edited = false
 
   constructor (
@@ -22,9 +22,12 @@ export class AppConfigNestedPage {
 
   ngOnInit () {
     if (this.keyval.value.type === 'list') {
-      const [min, max] = this.keyval.value.length.split('..').map(Number)
-      this.min = min
-      this.max = max
+      const range = this.keyval.value.range
+      const leftInclusive = range.startsWith('[')
+      const rightInclusive = range.endsWith(']')
+      const [minStr, maxStr] = range.split(',').map(a => a.trim())
+      this.min = minStr === '(*' ? 0 : (Number(minStr.slice(1)) + (leftInclusive ? 0 : 1))
+      this.max = maxStr === '*)' ? undefined : (Number(maxStr.slice(0, -1)) - (rightInclusive ? 0 : 1))
     }
   }
 
@@ -35,7 +38,7 @@ export class AppConfigNestedPage {
     if (spec.type === 'list' && spec.spec.type === 'enum') {
       if (listLength < this.min) {
         return this.presentAlertMinReached()
-      } else if (listLength > this.max) {
+      } else if (this.max && listLength > this.max) {
         return this.presentAlertMaxReached()
       }
     }

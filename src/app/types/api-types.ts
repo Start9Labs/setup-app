@@ -1,4 +1,4 @@
-import { AppHealthStatus, AppVersion, AppConfigSpec, AppEvent } from '../models/app-model'
+import { AppHealthStatus, AppVersion, AppConfigSpec, AppEvent, Rules } from '../models/app-model'
 import { ServerSpecs } from '../models/server-model'
 
 export type TwoHundredOK = { never?: never } // hack for the unit type
@@ -53,7 +53,11 @@ export module Lan {
   export type GetAppInstalledReq = { }
   export type GetAppInstalledRes = ApiAppInstalled
   export type GetAppConfigReq = { }
-  export type GetAppConfigRes = { spec: ApiAppConfig, config: object | null }
+  export type GetAppConfigRes = {
+    spec: ApiAppConfig,
+    config: object | null
+    rules: Rules[]
+  }
   export type GetAppLogsReq = { after?: string, before?: string, page?: string, perPage?: string }
   export type GetAppLogsRes = string[]
   export type GetAppsInstalledReq = { }

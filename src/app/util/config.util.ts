@@ -1,4 +1,4 @@
-import { ValueSpec, ValueSpecList, AppConfigSpec, WithStandalone, ListValueSpecObject, ListValueSpecString, ListValueSpecEnum, ValueSpecString, ValueSpecEnum, ValueSpecBoolean, DefaultString } from '../models/app-model'
+import { ValueSpec, ValueSpecList, AppConfigSpec, WithStandalone, ListValueSpecObject, ListValueSpecString, ListValueSpecEnum, ValueSpecString, ValueSpecEnum, ValueSpecBoolean, DefaultString, ListValueSpecNumber } from '../models/app-model'
 import * as cryptoUtil from './crypto.util'
 const MAX_ENTROPY = 100
 
@@ -16,6 +16,8 @@ export function mapSpecToConfigValue (spec: ValueSpec, value: any): any {
       return mapSpecToConfigObject(spec, value)
     case 'string':
       return mapSpecToConfigString(spec, value)
+    case 'number':
+      return mapSpecToConfigNumber(spec, value)
     case 'list':
       return mapSpecToConfigList(spec, value)
     case 'enum':
@@ -69,6 +71,21 @@ export function mapSpecToConfigString (spec: ListValueSpecString, value: string)
   return value
 }
 
+export function mapSpecToConfigNumber (spec: ListValueSpecNumber, value: number) {
+  if (typeof value !== 'number') {
+    console.log('not an number: ', spec, value)
+    spec.invalid = true
+    return value
+  }
+
+  // @TODO make sure it's within range
+  if (!inRange()) {
+    spec.invalid = true
+  }
+
+  return value
+}
+
 export function mapSpecToConfigEnum (spec: ListValueSpecEnum, value: string) {
   if (typeof value !== 'string') {
     console.log('not an enum: ', spec, value)
@@ -83,7 +100,7 @@ export function mapSpecToConfigEnum (spec: ListValueSpecEnum, value: string) {
   return value
 }
 
-export function mapSpecToConfigList (spec: ValueSpecList, value: string[] | object[]): string[] | object[] {
+export function mapSpecToConfigList (spec: ValueSpecList, value: string[] | number[] | object[]): string[] | number[] | object[] {
   if (!Array.isArray(value)) {
     console.log('not an array', spec, value)
     spec.invalid = true
@@ -92,7 +109,7 @@ export function mapSpecToConfigList (spec: ValueSpecList, value: string[] | obje
 
   const listSpec = spec.spec
 
-  let fn: (val: object | string) => string | object = () => ({ })
+  let fn: (val: object | string | number) => string | object | number = () => ({ })
   switch (listSpec.type) {
     case 'object':
       fn = (val: object) => mapSpecToConfigObject(listSpec, val)
@@ -100,12 +117,15 @@ export function mapSpecToConfigList (spec: ValueSpecList, value: string[] | obje
     case 'string':
       fn = (val: string) => mapSpecToConfigString(listSpec, val)
       break
+    case 'number':
+      fn = (val: number) => mapSpecToConfigNumber(listSpec, val)
+      break
     case 'enum':
       fn = (val: string) => mapSpecToConfigEnum(listSpec, val)
       break
   }
   // map nested values
-  value.forEach((val: string | object, i: number) => {
+  value.forEach((val: string | number | object, i: number) => {
     value[i] = fn(val)
   })
   // * MUT * add list elements until min satisfied
@@ -114,7 +134,7 @@ export function mapSpecToConfigList (spec: ValueSpecList, value: string[] | obje
   return value
 }
 
-export function getDefaultConfigValue (spec: ValueSpec): object | string | object[] | string[] | boolean | null {
+export function getDefaultConfigValue (spec: ValueSpec): object | string | number | object[] | string[] | boolean | null {
   if (spec.type !== 'list' && spec.type !== 'boolean' && spec.nullable) {
     return null
   }
@@ -124,6 +144,8 @@ export function getDefaultConfigValue (spec: ValueSpec): object | string | objec
       return getDefaultObject(spec.spec)
     case 'string':
       return getDefaultString(spec.default!)
+    case 'number':
+      return getDefaultNumber(spec.default!)
     case 'list':
       return getDefaultList(spec)
     case 'enum':
@@ -170,6 +192,10 @@ export function getDefaultString (defaultVal: string | DefaultString): string {
 
     return s
   }
+}
+
+export function getDefaultNumber (defaultVal: number): number {
+  return defaultVal
 }
 
 export function getDefaultEnum (defaultVal: string): string {

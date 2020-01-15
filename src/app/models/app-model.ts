@@ -87,14 +87,16 @@ export interface AppEvent {
 export type AppConfigSpec = { [key: string]: ValueSpec }
 
 export type ValueSpec = ValueSpecString |
-  ValueSpecBoolean |
-  ValueSpecEnum |
-  ValueSpecList |
-  ValueSpecObject
+                        ValueSpecNumber |
+                        ValueSpecBoolean |
+                        ValueSpecEnum |
+                        ValueSpecList |
+                        ValueSpecObject
 
 export type ListValueSpec = ListValueSpecString |
-  ListValueSpecEnum |
-  ListValueSpecObject
+                            ListValueSpecNumber |
+                            ListValueSpecEnum |
+                            ListValueSpecObject
 
 export interface ValueSpecBase {
   type: string
@@ -117,6 +119,15 @@ export interface ListValueSpecString extends ValueSpecBase {
 
 export interface ValueSpecString extends ListValueSpecString, WithStandalone {
   default?: DefaultString
+}
+
+export interface ListValueSpecNumber extends ValueSpecBase {
+  type: 'number'
+  range: string
+}
+
+export interface ValueSpecNumber extends ListValueSpecNumber, WithStandalone {
+  default?: number
 }
 
 export interface ListValueSpecEnum extends ValueSpecBase {
@@ -144,11 +155,16 @@ export interface ValueSpecList extends ValueSpecBase {
   type: 'list'
   spec: ListValueSpec
   description: string
-  length: string // '0..1' (inclusive) OR '0..' (right unbounded)
-  default: string[] | DefaultString[] | object[]
+  range: string // '[0,1]' (inclusive) OR '[0,*)' (right unbounded), normal math rules
+  default: string[] | number[] | DefaultString[] | object[]
 }
 
-export type DefaultString = string | { charset: string, length: string }
+export type DefaultString = string | { charset: string, len: number }
+
+export interface Rules {
+  rule: string
+  description: string
+}
 
 export enum AppHealthStatus {
   UNKNOWN = 'UNKNOWN',
