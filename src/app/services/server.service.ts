@@ -274,7 +274,6 @@ const mockApiServer: Lan.GetServerRes = {
     'Ethernet': 'Gigabit',
     'Disk': '512 GB Flash (280 GB available)',
   },
-  sshKeys: [],
   events: [],
 }
 

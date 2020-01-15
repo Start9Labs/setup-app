@@ -89,7 +89,7 @@ export class DevSSHKeysPage {
 
     try {
       await this.serverService.addSSHKey(this.server, key)
-      this.server.sshKeys.push(key)
+      this.SSHKeys.push(key)
     } catch (e) {
       this.error = e.message
     } finally {
@@ -107,7 +107,7 @@ export class DevSSHKeysPage {
 
     try {
       await this.serverService.removeSSHKey(this.server, key)
-      this.server.sshKeys.splice(index, 1)
+      this.SSHKeys.splice(index, 1)
     } catch (e) {
       this.error = e.message
     } finally {

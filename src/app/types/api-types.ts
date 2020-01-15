@@ -33,7 +33,6 @@ export interface ApiServer {
   versionInstalled: string
   versionLatest: string
   specs: ServerSpecs
-  sshKeys: string[]
   events: AppEvent[]
 }
 
