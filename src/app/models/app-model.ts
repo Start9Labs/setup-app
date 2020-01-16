@@ -92,6 +92,7 @@ export interface ValueSpecBase {
 export interface WithStandalone {
   description: string
   nullable: boolean
+  name: string
 }
 
 export interface ListValueSpecString extends ValueSpecBase {

@@ -4,7 +4,7 @@
     <ion-button *ngIf="keyval.value.description" class="help-button" fill="clear" size="small" slot="start" (click)="presentDescription(keyval, $event)">
       <ion-icon size="small" slot="icon-only" name="help-circle"></ion-icon>
     </ion-button>
-    <ion-label>{{ keyval.key }}</ion-label>
+    <ion-label>{{ keyval.value.name }}</ion-label>
     <ion-note slot="end">{{ config[keyval.key] }}</ion-note>
   </ion-item>
   <!-- boolean -->
@@ -12,7 +12,7 @@
     <ion-button *ngIf="keyval.value.description" class="help-button" fill="clear" size="small" slot="start" (click)="presentDescription(keyval, $event)">
       <ion-icon size="small" slot="icon-only" name="help-circle"></ion-icon>
     </ion-button>
-    <ion-label>{{ keyval.key }}</ion-label>
+    <ion-label>{{ keyval.value.name }}</ion-label>
     <ion-toggle slot="end" [(ngModel)]="config[keyval.key]" (ngModelChange)="markEdited()"></ion-toggle>
   </ion-item>
   <!-- enum -->
@@ -20,8 +20,8 @@
     <ion-button *ngIf="keyval.value.description" class="help-button" fill="clear" size="small" slot="start" (click)="presentDescription(keyval, $event)">
       <ion-icon size="small" slot="icon-only" name="help-circle"></ion-icon>
     </ion-button>
-    <ion-label>{{ keyval.key }}</ion-label>
-    <ion-select slot="end" [interfaceOptions]="setSelectHeader(keyval.key)" placeholder="Select One" [(ngModel)]="config[keyval.key]" (ngModelChange)="markEdited()">
+    <ion-label>{{ keyval.value.name }}</ion-label>
+    <ion-select slot="end" [interfaceOptions]="setSelectHeader(keyval.value.name)" placeholder="Select One" [(ngModel)]="config[keyval.key]" (ngModelChange)="markEdited()">
       <ion-select-option *ngFor="let option of keyval.value.values" [value]="option">{{ option }}</ion-select-option>
     </ion-select>
   </ion-item>
@@ -30,7 +30,7 @@
     <ion-button *ngIf="keyval.value.description" class="help-button" fill="clear" size="small" slot="start" (click)="presentDescription(keyval, $event)">
       <ion-icon size="small" slot="icon-only" name="help-circle"></ion-icon>
     </ion-button>
-    <ion-label>{{ keyval.key }}</ion-label>
+    <ion-label>{{ keyval.value.name }}</ion-label>
     <ion-icon slot="end" *ngIf="config[keyval.key]" name="arrow-forward"></ion-icon>
   </ion-item>
   <!-- list -->
@@ -38,7 +38,7 @@
     <ion-button *ngIf="keyval.value.description" class="help-button" fill="clear" size="small" slot="start" (click)="presentDescription(keyval, $event)">
       <ion-icon size="small" slot="icon-only" name="help-circle"></ion-icon>
     </ion-button>
-    <ion-label>{{ keyval.key }}</ion-label>
+    <ion-label>{{ keyval.value.name }}</ion-label>
     <ion-icon slot="end" name="arrow-forward"></ion-icon>
   </ion-item>
 </div>

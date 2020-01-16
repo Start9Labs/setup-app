@@ -1,6 +1,70 @@
-import { ValueSpec, ValueSpecList, AppConfigSpec, WithStandalone, ListValueSpecObject, ListValueSpecString, ListValueSpecEnum, ValueSpecString, ValueSpecEnum, ValueSpecBoolean, DefaultString, ListValueSpecNumber } from '../models/app-model'
+import { ValueSpec, ValueSpecList, AppConfigSpec, WithStandalone, ListValueSpecObject, ListValueSpecString, ListValueSpecEnum, DefaultString, ListValueSpecNumber } from '../models/app-model'
 import * as cryptoUtil from './crypto.util'
-const MAX_ENTROPY = 100
+
+export class Range {
+  min?: number
+  max?: number
+  minInclusive: boolean
+  maxInclusive: boolean
+
+  static from (s: string): Range {
+    const r = new Range()
+    r.minInclusive = s.startsWith('[')
+    r.maxInclusive = s.endsWith(']')
+    const [minStr, maxStr] = s.split(',').map(a => a.trim())
+    r.min = minStr === '(*' ? undefined : Number(minStr.slice(1))
+    r.max = maxStr === '*)' ? undefined : Number(maxStr.slice(0, -1))
+    return r
+  }
+
+  checkIncludes (n: number) {
+    if (this.min && ((!this.minInclusive && this.min == n || (this.min > n)))) {
+      throw new Error(`Value must be greater than${this.minInclusive ? ' or equal to' : ''} ${this.min}.`)
+    }
+    if (this.max && ((!this.maxInclusive && this.max == n || (this.max < n)))) {
+      throw new Error(`Value must be less than${this.maxInclusive ? ' or equal to' : ''} ${this.max}.`)
+    }
+  }
+
+  includes (n: number): boolean {
+    try {
+      this.checkIncludes(n)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  integralMin (): number | undefined {
+    if (this.min) {
+      const ceil = Math.ceil(this.min)
+      if (this.minInclusive) {
+        return ceil
+      } else {
+        if (ceil === this.min) {
+          return ceil + 1
+        } else {
+          return ceil
+        }
+      }
+    }
+  }
+
+  integralMax (): number | undefined {
+    if (this.max) {
+      const floor = Math.floor(this.max)
+      if (this.maxInclusive) {
+        return floor
+      } else {
+        if (floor === this.max) {
+          return floor - 1
+        } else {
+          return floor
+        }
+      }
+    }
+  }
+}
 
 export function mapSpecToConfigValue (spec: ValueSpec, value: any): any {
   // if value is null and spec is not nullable, mark invalid and return
@@ -78,11 +142,10 @@ export function mapSpecToConfigNumber (spec: ListValueSpecNumber, value: number)
     return value
   }
 
-  // @TODO ****
   // @TODO make sure it's within range
-  // if (!inRange()) {
-  //   spec.invalid = true
-  // }
+  if (Range.from(spec.range).includes(value)) {
+    spec.invalid = true
+  }
 
   return value
 }
@@ -165,31 +228,12 @@ export function getDefaultObject (spec: AppConfigSpec): object {
   return obj
 }
 
-export function getDefaultListString (defaultVal: string | DefaultString, i: number): string {
-  if (typeof defaultVal === 'string') {
-    return defaultVal
-  } else {
-    // @TODO ****
-    // const [min, max] = defaultVal.length.split('..').map(Number)
-    // const length = cryptoUtil.getRandomNumberInRange(min, max || MAX_ENTROPY)
-    let s = ''
-    for (let i = 0; i < length; i++) {
-      s = s + cryptoUtil.getRandomCharInSet(defaultVal.charset)
-    }
-
-    return s
-  }
-}
-
 export function getDefaultString (defaultVal: string | DefaultString): string {
   if (typeof defaultVal === 'string') {
     return defaultVal
   } else {
-      // @TODO ****
-    // const [min, max] = defaultVal.length.split('..').map(Number)
-    // const length = cryptoUtil.getRandomNumberInRange(min, max || MAX_ENTROPY)
     let s = ''
-    for (let i = 0; i < length; i++) {
+    for (let i = 0; i < defaultVal.len; i++) {
       s = s + cryptoUtil.getRandomCharInSet(defaultVal.charset)
     }
 
@@ -225,10 +269,11 @@ export function getDefaultList (spec: ValueSpecList, list: any[] = []): object[]
       break
   }
 
-  // @TODO ****
-  // for (let i = list.length; i < Number(spec.length.split('..')[0]); i++) {
-  //   list.push(fn(i))
-  // }
+  const len = Range.from(spec.range).integralMin() || 0
+
+  for (let i = list.length; i < len; i++) {
+    list.push(fn(i))
+  }
 
   return list
 }
