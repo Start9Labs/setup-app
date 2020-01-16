@@ -39,6 +39,11 @@ export class AuthService {
     this.authState.next(AuthStatus.VERIFIED)
   }
 
+  uninit (): void {
+    this.clearCache()
+    this.authState.next(AuthStatus.UNINITIALIZED)
+  }
+
   async login (mnemonic: string[]): Promise<void> {
     if (!cryptoUtil.checkMnemonic(mnemonic)) {
       throw new Error('invalid mnemonic')
@@ -60,9 +65,7 @@ export class AuthService {
   }
 
   async logout (): Promise<void> {
-    this.mnemonicEncrypted = null
-    this.mnemonic = undefined
-    this.passcodeEnabled = false
+    this.clearCache()
     await this.storage.clear()
     this.authState.next(AuthStatus.MISSING)
   }
@@ -70,6 +73,12 @@ export class AuthService {
   async changePasscode (passcode: string): Promise<void> {
     await this.encryptMnemonic(passcode)
     this.passcodeEnabled = !!passcode
+  }
+
+  async clearCache () {
+    this.mnemonicEncrypted = null
+    this.mnemonic = undefined
+    this.passcodeEnabled = false
   }
 
   isUnverified (): boolean {

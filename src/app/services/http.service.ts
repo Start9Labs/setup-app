@@ -3,7 +3,7 @@ import { HttpClient, HttpEventType, HttpHeaders, HttpEvent } from '@angular/comm
 import { Method } from '../types/enums'
 import { Observable } from 'rxjs'
 import { timeout } from 'rxjs/operators'
-import { getLanIP, S9Server, ServerModel } from '../models/server-model'
+import { getLanIP, S9Server } from '../models/server-model'
 import { TokenSigner } from 'jsontokens'
 import { S9BuilderWith } from './setup.service'
 const APP_VERSION = '1.0.0'
@@ -15,7 +15,6 @@ export class HttpService {
 
   constructor (
     private readonly http: HttpClient,
-    private readonly serverModel: ServerModel,
   ) { }
 
   async authServerRequest<T> (
@@ -96,9 +95,8 @@ export class HttpService {
   }
 
   s9Url (server: S9Server | S9BuilderWith<'versionInstalled'>, path: string): string {
-    const zeroconfService = this.serverModel.getZeroconf(server.id)
-    if (!zeroconfService) { throw new Error('S9 Server not found on LAN') }
-    const host = getLanIP(zeroconfService)
+    if (!server.zeroconf) { throw new Error('S9 Server not found on LAN') }
+    const host = getLanIP(server.zeroconf)
     return `http://${host}/v${server.versionInstalled.charAt(0)}${path}`
   }
 }

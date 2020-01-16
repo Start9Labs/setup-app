@@ -3,7 +3,8 @@ import { Zeroconf, ZeroconfResult, ZeroconfService } from '@ionic-native/zerocon
 import { Subscription } from 'rxjs'
 import { Platform } from '@ionic/angular'
 import { AuthService } from '../services/auth.service'
-import { AuthStatus } from '../types/enums'
+import { ServerModel } from '../models/server-model'
+import { ServerDaemon } from './server-daemon'
 
 @Injectable({
   providedIn: 'root',
@@ -11,47 +12,25 @@ import { AuthStatus } from '../types/enums'
 export class ZeroconfDaemon {
   services: { [hostname: string]: ZeroconfService } = { }
   private zeroconfSub: Subscription | undefined
-  private pauseSub: Subscription | undefined
-  private resumeSub: Subscription | undefined
 
   constructor (
     private readonly platform: Platform,
     private readonly zeroconf: Zeroconf,
     private readonly authService: AuthService,
+    private readonly serverModel: ServerModel,
+    private readonly serverDaemon: ServerDaemon,
   ) { }
 
   init () {
-    this.authService.authState.subscribe(authStatus => {
-      if (authStatus === AuthStatus.VERIFIED) {
-        if (!this.pauseSub) {
-          this.pauseSub = this.platform.pause.subscribe(() => {
-            this.stop()
-          })
-        }
-        if (!this.resumeSub) {
-          this.resumeSub = this.platform.resume.subscribe(() => {
-            this.reset()
-          })
-        }
-        this.start()
-      } else {
-        if (this.pauseSub) {
-          this.pauseSub.unsubscribe()
-          this.pauseSub = undefined
-        }
-        if (this.resumeSub) {
-          this.resumeSub.unsubscribe()
-          this.resumeSub = undefined
-        }
-        this.stop()
-      }
-    })
+    this.start()
   }
 
-  start () {
-    // return this.mock()
+  async start (reInit = false) {
+    return this.mock()
 
     if (!this.platform.is('cordova')) { return }
+
+    if (reInit) { await this.zeroconf.reInit() }
 
     this.zeroconfSub = this.zeroconf.watch('_http._tcp.', 'local.').subscribe(result => {
       this.handleServiceUpdate(result)
@@ -66,31 +45,33 @@ export class ZeroconfDaemon {
     this.services = { }
   }
 
-  async reset () {
-    this.stop()
-    await this.zeroconf.reInit()
-    this.start()
-  }
-
   handleServiceUpdate (result: ZeroconfResult) {
     const { action, service } = result
     console.log(`zeroconf service ${action}`, service)
 
     if (
       service.name.startsWith('start9-')
-      && ['added', 'resolved'].includes(action)
-      && !this.services[service.name]
+      && action === 'resolved'
       && service.ipv4Addresses.length
     ) {
       console.log(`discovered start9 server: ${service.name}`)
       this.services[service.name] = service
+      const server = this.serverModel.getServer(service.name.split('-')[1])
+      if (server) {
+        server.zeroconf = service
+        this.serverDaemon.syncServer(server)
+      }
     }
+  }
+
+  getService (serverId: string): ZeroconfService | undefined {
+    return this.services[`start9-${serverId}`]
   }
 
   // @TODO remove
   async mock () {
     const result: ZeroconfResult = {
-      action: 'added',
+      action: 'resolved',
       service: {
         domain: 'local.',
         type: '_http._tcp',

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { S9Server, ServerSpecs, getLanIP, ServerModel } from '../models/server-model'
+import { S9Server, ServerSpecs, getLanIP } from '../models/server-model'
 import { HttpService } from './http.service'
 import { Method } from 'src/app/types/enums'
 import { pauseFor } from 'src/app/util/misc.util'
@@ -9,6 +9,7 @@ import { Lan } from '../types/api-types'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { AppHealthStatus } from '../models/app-model'
 import { ServerService } from './server.service'
+import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 
 @Injectable({
   providedIn: 'root',
@@ -21,16 +22,16 @@ export class SetupService {
 
   constructor (
     private readonly httpService: HttpService,
-    private readonly serverModel: ServerModel,
     private readonly authService: AuthService,
     private readonly serverService: ServerService,
+    private readonly zeroconfDaemon: ZeroconfDaemon,
   ) { }
 
   async setup (builder: S9ServerBuilder, productKey: string): Promise<S9Server> {
     for (let i = 0; i < SetupService.setupAttempts; i ++) {
       // @TODO delete
-      // builder = this.mockServer(builder)
-      builder = await this.setupAttempt(builder, productKey)
+      builder = this.mockServer(builder)
+      // builder = await this.setupAttempt(builder, productKey)
       if (isFullySetup(builder)) {
         return toS9Server(builder)
       }
@@ -45,7 +46,7 @@ export class SetupService {
     // enable lan
     if (!hasValues(['zeroconf'], builder)) {
       this.message = `getting zeroconf service`
-      builder.zeroconf = this.serverModel.getZeroconf(builder.id)
+      builder.zeroconf = this.zeroconfDaemon.getService(builder.id)
     }
 
     // agent version
@@ -198,7 +199,6 @@ export function toS9Server (builder: Required<S9ServerBuilder>): S9Server {
   return {
     ...builder,
     updating: false,
-    viewing: false,
     badge: 0,
     notifications: [],
   }

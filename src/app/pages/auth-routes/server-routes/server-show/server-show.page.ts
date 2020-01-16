@@ -7,7 +7,7 @@ import { ActionSheetButton } from '@ionic/core'
 import { AppHealthStatus, AppInstalled, AppModel } from 'src/app/models/app-model'
 import * as compareVersions from 'compare-versions'
 import { ServerService } from 'src/app/services/server.service'
-import { SyncDaemon } from 'src/app/daemons/sync-daemon'
+import { ServerDaemon } from 'src/app/daemons/server-daemon'
 
 @Component({
   selector: 'server-show',
@@ -32,7 +32,7 @@ export class ServerShowPage {
     private readonly alertCtrl: AlertController,
     private readonly loadingCtrl: LoadingController,
     private readonly serverService: ServerService,
-    private readonly syncDaemon: SyncDaemon,
+    private readonly serverDaemon: ServerDaemon,
   ) { }
 
   async ngOnInit () {
@@ -40,13 +40,8 @@ export class ServerShowPage {
     const server = this.serverModel.getServer(serverId)
     if (!server) throw new Error (`No server found with ID: ${serverId}`)
     this.server = server
-    this.server.viewing = true
     this.apps = this.appModel.getApps(serverId)
     this.getServerAndApps()
-  }
-
-  ngOnDestroy () {
-    this.server.viewing = false
   }
 
   async doRefresh (event: any) {
@@ -58,11 +53,32 @@ export class ServerShowPage {
     this.loading = true
 
     await Promise.all([
-      this.syncDaemon.syncServer(this.server),
-      this.syncDaemon.syncApps(this.server),
+      this.serverDaemon.syncServer(this.server),
+      this.getApps(),
     ])
 
     this.loading = false
+  }
+
+  async getApps (): Promise<void> {
+    try {
+      const apps = await this.serverService.getInstalledApps(this.server)
+      // clear cache of removed apps
+      this.appModel.getApps(this.server.id).forEach((app, index) => {
+        if (!apps.find(a => a.id === app.id)) {
+          this.appModel.getApps(this.server.id).splice(index, 1)
+        }
+      })
+      // update cache with new app data
+      apps.forEach(app => {
+        this.appModel.cacheApp(this.server.id, app)
+      })
+    } catch (e) {
+      this.appModel.getApps(this.server.id).forEach(app => {
+        app.status = AppHealthStatus.UNREACHABLE
+        app.statusAt = new Date()
+      })
+    }
   }
 
   async presentAction () {

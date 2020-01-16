@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { AlertController, Platform } from '@ionic/angular'
 import { AuthService } from 'src/app/services/auth.service'
-import { SyncDaemon } from 'src/app/daemons/sync-daemon'
+import { ServerDaemon } from 'src/app/daemons/server-daemon'
 import { AlertOptions } from '@ionic/core'
 
 @Component({
@@ -20,15 +20,15 @@ export class SettingsPage {
     private readonly platform: Platform,
     private readonly alertCtrl: AlertController,
     private readonly authService: AuthService,
-    private readonly syncDaemon: SyncDaemon,
+    private readonly serverDaemon: ServerDaemon,
   ) { }
 
   ngOnInit () {
-    this.syncInterval = String(this.syncDaemon.syncInterval)
+    this.syncInterval = String(this.serverDaemon.syncInterval)
   }
 
   async updateSyncInterval () {
-    await this.syncDaemon.updateSyncInterval(Number(this.syncInterval))
+    await this.serverDaemon.updateSyncInterval(Number(this.syncInterval))
   }
 
   async presentAlertWarnRecovery () {

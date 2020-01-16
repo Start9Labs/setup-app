@@ -1,7 +1,5 @@
 import { Omit } from '../util/misc.util'
 import { Injectable } from '@angular/core'
-import { AuthService } from '../services/auth.service'
-import { AuthStatus } from '../types/enums'
 
 @Injectable({
   providedIn: 'root',
@@ -9,16 +7,10 @@ import { AuthStatus } from '../types/enums'
 export class AppModel {
   apps: { [serverId: string]: AppInstalled[] } = { }
 
-  constructor (
-    private readonly authService: AuthService,
-  ) { }
+  constructor () { }
 
-  init () {
-    this.authService.authState.subscribe(authStatus => {
-      if (authStatus !== AuthStatus.VERIFIED) {
-        this.apps = { }
-      }
-    })
+  clearCache () {
+    this.apps = { }
   }
 
   getApps (serverId: string): AppInstalled[] {

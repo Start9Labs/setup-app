@@ -14,6 +14,7 @@ import { ActionSheetButton } from '@ionic/core'
   styleUrls: ['./app-installed-show.page.scss'],
 })
 export class AppInstalledShowPage {
+  loading = true
   error: string
   server: S9Server
   app: AppInstalled
@@ -30,19 +31,30 @@ export class AppInstalledShowPage {
     private readonly loadingCtrl: LoadingController,
   ) { }
 
-  ngOnInit () {
+  async ngOnInit () {
     try {
       const serverId = this.route.snapshot.paramMap.get('serverId') as string
       const server = this.serverModel.getServer(serverId)
       if (!server) throw new Error (`No server found with ID: ${serverId}`)
+      this.server = server
 
       const appId = this.route.snapshot.paramMap.get('appId') as string
       const app = this.appModel.getApp(serverId, appId)
-      if (!app) throw new Error (`No app found on ${serverId} with ID: ${appId}`)
-      this.app = app
 
-      this.server = server
-      this.app = app
+      if (app) {
+        this.app = app
+      }
+
+      this.app = await this.getApp(appId) as AppInstalled
+      this.loading = false
+    } catch (e) {
+      this.error = e.message
+    }
+  }
+
+  async getApp (appId: string): Promise<AppInstalled | undefined> {
+    try {
+      return this.serverService.getInstalledApp(this.server, appId)
     } catch (e) {
       this.error = e.message
     }

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { ServerModel } from 'src/app/models/server-model'
-import { SyncDaemon } from 'src/app/daemons/sync-daemon'
+import { ServerDaemon } from 'src/app/daemons/server-daemon'
 
 @Component({
   selector: 'page-server-list',
@@ -11,11 +11,11 @@ export class ServerListPage {
 
   constructor (
     public serverModel: ServerModel,
-    public syncDaemon: SyncDaemon,
+    public serverDaemon: ServerDaemon,
   ) { }
 
   async doRefresh (event: any) {
-    await this.syncDaemon.syncServers()
+    await this.serverDaemon.syncServers()
     event.target.complete()
   }
 }

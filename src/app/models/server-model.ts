@@ -1,12 +1,9 @@
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
 import { AppHealthStatus, AppModel } from './app-model'
-import { AuthService } from '../services/auth.service'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { deriveKeys } from '../util/crypto.util'
 import * as CryptoJS from 'crypto-js'
-import { AuthStatus } from '../types/enums'
-import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 
 @Injectable({
   providedIn: 'root',
@@ -16,19 +13,11 @@ export class ServerModel {
 
   constructor (
     private readonly storage: Storage,
-    private readonly authService: AuthService,
-    private readonly zeroconfDaemon: ZeroconfDaemon,
     private readonly appModel: AppModel,
   ) { }
 
-  init () {
-    this.authService.authState.subscribe(async authStatus => {
-      if (authStatus === AuthStatus.VERIFIED) {
-        await this.load(this.authService.mnemonic!)
-      } else {
-        this.servers = []
-      }
-    })
+  clearCache () {
+    this.servers = []
   }
 
   async load (mnemonic: string[]): Promise<void> {
@@ -61,10 +50,6 @@ export class ServerModel {
   async saveAll (): Promise<void> {
     await this.storage.set('servers', this.servers.map(toStorableServer))
   }
-
-  getZeroconf (serverId: string): ZeroconfService | undefined {
-    return this.zeroconfDaemon.services[`start9-${serverId}`]
-  }
 }
 
 type S9ServerStore = S9ServerStorable[]
@@ -78,7 +63,6 @@ export interface S9ServerStorable {
 
 export interface S9Server extends S9ServerStorable {
   updating: boolean
-  viewing: boolean
   status: AppHealthStatus
   statusAt: Date
   specs: ServerSpecs
@@ -121,7 +105,6 @@ export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): 
     versionInstalled,
     versionLatest: '0.0.0',
     updating: false,
-    viewing: false,
     status: AppHealthStatus.UNKNOWN,
     statusAt: new Date(),
     privkey: deriveKeys(mnemonic, id).privkey,
