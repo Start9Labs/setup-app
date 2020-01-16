@@ -199,8 +199,7 @@ export function toS9Server (builder: Required<S9ServerBuilder>): S9Server {
     ...builder,
     updating: false,
     viewing: false,
-    sshKeys: [],
-    events: [],
+    notifications: [],
   }
 }
 

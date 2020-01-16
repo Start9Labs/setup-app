@@ -7,6 +7,10 @@ const routes: Routes = [
     loadChildren: () => import('./server-show/server-show.module').then(m => m.ServerShowPageModule),
   },
   {
+    path: 'notifications',
+    loadChildren: () => import('./server-notifications/server-notifications.module').then(m => m.ServerNotificationsPageModule),
+  },
+  {
     path: 'specs',
     loadChildren: () => import('./server-specs/server-specs.module').then(m => m.ServerSpecsPageModule),
   },

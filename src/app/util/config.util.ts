@@ -78,10 +78,11 @@ export function mapSpecToConfigNumber (spec: ListValueSpecNumber, value: number)
     return value
   }
 
+  // @TODO ****
   // @TODO make sure it's within range
-  if (!inRange()) {
-    spec.invalid = true
-  }
+  // if (!inRange()) {
+  //   spec.invalid = true
+  // }
 
   return value
 }
@@ -168,8 +169,9 @@ export function getDefaultListString (defaultVal: string | DefaultString, i: num
   if (typeof defaultVal === 'string') {
     return defaultVal
   } else {
-    const [min, max] = defaultVal.length.split('..').map(Number)
-    const length = cryptoUtil.getRandomNumberInRange(min, max || MAX_ENTROPY)
+    // @TODO ****
+    // const [min, max] = defaultVal.length.split('..').map(Number)
+    // const length = cryptoUtil.getRandomNumberInRange(min, max || MAX_ENTROPY)
     let s = ''
     for (let i = 0; i < length; i++) {
       s = s + cryptoUtil.getRandomCharInSet(defaultVal.charset)
@@ -183,8 +185,9 @@ export function getDefaultString (defaultVal: string | DefaultString): string {
   if (typeof defaultVal === 'string') {
     return defaultVal
   } else {
-    const [min, max] = defaultVal.length.split('..').map(Number)
-    const length = cryptoUtil.getRandomNumberInRange(min, max || MAX_ENTROPY)
+      // @TODO ****
+    // const [min, max] = defaultVal.length.split('..').map(Number)
+    // const length = cryptoUtil.getRandomNumberInRange(min, max || MAX_ENTROPY)
     let s = ''
     for (let i = 0; i < length; i++) {
       s = s + cryptoUtil.getRandomCharInSet(defaultVal.charset)
@@ -222,9 +225,10 @@ export function getDefaultList (spec: ValueSpecList, list: any[] = []): object[]
       break
   }
 
-  for (let i = list.length; i < Number(spec.length.split('..')[0]); i++) {
-    list.push(fn(i))
-  }
+  // @TODO ****
+  // for (let i = list.length; i < Number(spec.length.split('..')[0]); i++) {
+  //   list.push(fn(i))
+  // }
 
   return list
 }

@@ -49,7 +49,7 @@ export class ZeroconfDaemon {
   }
 
   start () {
-    // return this.mock()
+    return this.mock()
 
     if (!this.platform.is('cordova')) { return }
 

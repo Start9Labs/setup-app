@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
-import { AppHealthStatus, AppEvent, AppModel } from './app-model'
+import { AppHealthStatus, AppModel } from './app-model'
 import { AuthService } from '../services/auth.service'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { deriveKeys } from '../util/crypto.util'
@@ -84,8 +84,17 @@ export interface S9Server extends S9ServerStorable {
   specs: ServerSpecs
   versionLatest: string
   privkey: string // derive from mnemonic + torAddress
-  events: AppEvent[]
+  notifications: S9Notification[]
   zeroconf?: ZeroconfService
+}
+
+export interface S9Notification {
+  id: string
+  appId: string
+  created_at: string
+  code: string
+  title: string
+  message: string
 }
 
 export type ServerSpecs = { [key: string]: string | number }
@@ -116,7 +125,7 @@ export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): 
     statusAt: new Date(),
     privkey: deriveKeys(mnemonic, id).privkey,
     specs: { },
-    events: [],
+    notifications: [],
   }
 }
 

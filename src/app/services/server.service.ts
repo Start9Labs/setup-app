@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 import { HttpService } from './http.service'
 import { Method } from '../types/enums'
 import { AppInstalled, AppAvailablePreview, AppAvailableFull, AppHealthStatus, AppConfigSpec, AppModel, Rules } from '../models/app-model'
-import { S9Server } from '../models/server-model'
+import { S9Server, S9Notification } from '../models/server-model'
 import { Lan, ApiAppAvailablePreview, ApiAppAvailableFull, ApiAppInstalled, ApiServer } from '../types/api-types'
 import { S9BuilderWith } from './setup.service'
 import * as configUtil from '../util/config.util'
@@ -19,8 +19,27 @@ export class ServerService {
 
   async getServer (server: S9Server | S9BuilderWith<'zeroconf' | 'privkey' | 'versionInstalled' | 'torAddress'>): Promise<ApiServer> {
     // @TODO remove
-    // return mockGetServer()
-    return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.GET, '')
+    return mockGetServer()
+    // return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.GET, '')
+  }
+
+  async getNotifications (server: S9Server, page: number, perPage: number): Promise<S9Notification[]> {
+    const params: Lan.GetNotificationsReq = {
+      page: String(page),
+      perPage: String(perPage),
+    }
+    // @TODO remove
+    return mockGetNotifications()
+    // return this.httpService.authServerRequest<Lan.GetNotificationsRes>(server, Method.GET, `/notifications`, { params })
+  }
+
+  async deleteNotification (server: S9Server, id: string): Promise<void> {
+    const body: Lan.DeleteNotificationReq = {
+      id,
+    }
+    // @TODO remove
+    await mockDeleteNotification()
+    // await this.httpService.authServerRequest<Lan.DeleteNotificationRes>(server, Method.DELETE, `/notifications`, { body })
   }
 
   async updateAgent (server: S9Server): Promise<void> {
@@ -53,8 +72,8 @@ export class ServerService {
 
   async getInstalledApps (server: S9Server): Promise<AppInstalled[]> {
     // @TODO remove
-    // return mockGetInstalledApps()
-    return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.GET, `/apps/installed`)
+    return mockGetInstalledApps()
+    // return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.GET, `/apps/installed`)
       .then(res => res.map(mapApiInstalledApp))
   }
 
@@ -135,26 +154,26 @@ export class ServerService {
 
   async getSSHKeys (server: S9Server): Promise<string[]> {
     // @TODO remove
-    // return mockGetSSHKeys()
-    return this.httpService.authServerRequest<Lan.GetSSHKeysRes>(server, Method.GET, `/sshKeys`)
+    return mockGetSSHKeys()
+    // return this.httpService.authServerRequest<Lan.GetSSHKeysRes>(server, Method.GET, `/sshKeys`)
   }
 
-  async addSSHKey (server: S9Server, sshKey: string): Promise<void> {
+  async addSSHKey (server: S9Server, sshKey: string): Promise<string> {
     const body: Lan.PostAddSSHKeyReq = {
       sshKey,
     }
     // @TODO remove
-    // await mockAddSSHKey()
-    await this.httpService.authServerRequest<Lan.PostAddSSHKeyRes>(server, Method.POST, `/sshKeys`, { }, body)
+    // return mockAddSSHKey()
+    return this.httpService.authServerRequest<Lan.PostAddSSHKeyRes>(server, Method.POST, `/sshKeys`, { }, body)
   }
 
-  async removeSSHKey (server: S9Server, sshKey: string): Promise<void> {
-    const body: Lan.PostRemoveSSHKeyReq = {
+  async deleteSSHKey (server: S9Server, sshKey: string): Promise<void> {
+    const body: Lan.DeleteSSHKeyReq = {
       sshKey,
     }
     // @TODO remove
-    // await mockRemoveSSHKey()
-    await this.httpService.authServerRequest<Lan.PostRemoveSSHKeyRes>(server, Method.DELETE, `/sshKeys`, { body })
+    // await mockDeleteSSHKey()
+    await this.httpService.authServerRequest<Lan.DeleteSSHKeyRes>(server, Method.DELETE, `/sshKeys`, { body })
   }
 }
 
@@ -169,6 +188,18 @@ function mapApiInstalledApp (app: ApiAppInstalled): AppInstalled {
 async function mockGetServer (): Promise<Lan.GetServerRes> {
   await pauseFor(1000)
   return mockApiServer
+}
+
+// @TODO remove
+async function mockGetNotifications (): Promise<Lan.GetNotificationsRes> {
+  await pauseFor(1000)
+  return mockApiNotifications.concat(mockApiNotifications).concat(mockApiNotifications)
+}
+
+// @TODO remove
+async function mockDeleteNotification (): Promise<Lan.DeleteNotificationRes> {
+  await pauseFor(1000)
+  return { }
 }
 
 // @TODO remove
@@ -247,17 +278,17 @@ async function mockWipeAppData (): Promise<Lan.PostWipeAppDataRes> {
 // @TODO remove
 async function mockGetSSHKeys (): Promise<Lan.GetSSHKeysRes> {
   await pauseFor(1000)
-  return mockSSHKeys
+  return mockApiSSHKeys
 }
 
 // @TODO remove
 async function mockAddSSHKey (): Promise<Lan.PostAddSSHKeyRes> {
   await pauseFor(1000)
-  return { }
+  return mockApiSSHKeys[0]
 }
 
 // @TODO remove
-async function mockRemoveSSHKey (): Promise<Lan.PostRemoveSSHKeyRes> {
+async function mockDeleteSSHKey (): Promise<Lan.DeleteSSHKeyRes> {
   await pauseFor(1000)
   return { }
 }
@@ -274,8 +305,51 @@ const mockApiServer: Lan.GetServerRes = {
     'Ethernet': 'Gigabit',
     'Disk': '512 GB Flash (280 GB available)',
   },
-  events: [],
+  notifications: [  {
+    id: '123e4567-e89b-12d3-a456-426655440000',
+    appId: 'bitcoind',
+    created_at: '2019-12-26T14:20:30.872Z',
+    code: '101',
+    title: 'Install Complete',
+    message: 'Installation of bitcoind has successfully completed.',
+  }],
 }
+
+// @TODO remove
+const mockApiNotifications: Lan.GetNotificationsRes = [
+  {
+    id: '123e4567-e89b-12d3-a456-426655440000',
+    appId: 'bitcoind',
+    created_at: '2019-12-26T14:20:30.872Z',
+    code: '101',
+    title: 'Install complete',
+    message: 'Installation of bitcoind has successfully completed.',
+  },
+  {
+    id: '123e4567-e89b-12d3-a456-426655440001',
+    appId: 'start9-agent',
+    created_at: '2019-12-26T14:20:30.872Z',
+    code: '201',
+    title: 'SSH key added',
+    message: 'A new SSH key was added. If you did not do this, shit is bad.',
+  },
+  {
+    id: '123e4567-e89b-12d3-a456-426655440002',
+    appId: 'start9-agent',
+    created_at: '2019-12-26T14:20:30.872Z',
+    code: '002',
+    title: 'SSH key removed',
+    message: 'A SSH key was removed.',
+  },
+  {
+    id: '123e4567-e89b-12d3-a456-426655440003',
+    appId: 'bitcoind',
+    created_at: '2019-12-26T14:20:30.872Z',
+    code: '310',
+    title: 'App crashed',
+    message: 'Bitcoind has crashed',
+  },
+]
 
 // @TODO remove
 const mockApiAppAvailablePreview: ApiAppAvailablePreview = {
@@ -401,7 +475,7 @@ const mockApiAppLogs: string[] = [
   '****** FINISH *****',
 ]
 
-const mockSSHKeys = [
+const mockApiSSHKeys = [
   '12:f8:7e:78:61:b4:bf:e2:de:24:15:96:4e:d4:72:53',
   '00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff',
 ]

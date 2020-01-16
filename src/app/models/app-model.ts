@@ -39,7 +39,7 @@ export class AppModel {
     }
   }
 
-  async removeApp (serverId: string, appId: string) {
+  removeApp (serverId: string, appId: string) {
     const index = this.apps[serverId].findIndex(a => a.id === appId)
     if (index > -1) {
       this.apps[serverId].splice(index, 1)
@@ -75,13 +75,6 @@ export interface AppInstalled extends BaseApp {
 export interface AppVersion {
   version: string
   releaseNotes: string
-}
-
-export interface AppEvent {
-  id: string
-  created_at: string
-  code: number
-  message: string
 }
 
 export type AppConfigSpec = { [key: string]: ValueSpec }

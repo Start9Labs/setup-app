@@ -14,7 +14,7 @@ export class DevSSHKeysPage {
   error = ''
   loading = true
   server: S9Server
-  SSHKeys: string[]
+  SSHKeys: string[] = []
 
   constructor (
     private readonly route: ActivatedRoute,
@@ -88,8 +88,8 @@ export class DevSSHKeysPage {
     await loader.present()
 
     try {
-      await this.serverService.addSSHKey(this.server, key)
-      this.SSHKeys.push(key)
+      const fingerprint = await this.serverService.addSSHKey(this.server, key)
+      this.SSHKeys.push(fingerprint)
     } catch (e) {
       this.error = e.message
     } finally {
@@ -97,16 +97,16 @@ export class DevSSHKeysPage {
     }
   }
 
-  async remove (key: string, index: number) {
+  async delete (key: string, index: number) {
     const loader = await this.loadingCtrl.create({
-      message: 'Removing SSH key...',
+      message: 'Deleting...',
       spinner: 'lines',
       cssClass: 'loader',
     })
     await loader.present()
 
     try {
-      await this.serverService.removeSSHKey(this.server, key)
+      await this.serverService.deleteSSHKey(this.server, key)
       this.SSHKeys.splice(index, 1)
     } catch (e) {
       this.error = e.message

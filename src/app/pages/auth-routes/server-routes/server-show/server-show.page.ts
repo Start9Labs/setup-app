@@ -80,7 +80,7 @@ export class ServerShowPage {
       buttons.push(
         {
           text: 'Server info',
-          icon: 'information-circle',
+          icon: 'information-circle-outline',
           handler: () => {
             this.navCtrl.navigateForward(['specs'], { relativeTo: this.route })
           },

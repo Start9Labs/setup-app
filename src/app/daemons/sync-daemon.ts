@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
-import { Platform } from '@ionic/angular'
-import { ServerModel, S9Server } from '../models/server-model'
+import { Platform, ToastController, NavController } from '@ionic/angular'
+import { ServerModel, S9Server, S9Notification } from '../models/server-model'
 import { pauseFor } from 'src/app/util/misc.util'
 import { ServerService } from '../services/server.service'
 import { AppHealthStatus, AppModel } from '../models/app-model'
@@ -27,6 +27,8 @@ export class SyncDaemon {
     private readonly appModel: AppModel,
     private readonly authService: AuthService,
     private readonly storage: Storage,
+    private readonly toastCtrl: ToastController,
+    private readonly navCtrl: NavController,
   ) { }
 
   async init () {
@@ -103,6 +105,7 @@ export class SyncDaemon {
     try {
       const serverRes = await this.serverService.getServer(server)
       Object.assign(server, serverRes)
+      this.handleNotifications(server)
       await this.serverModel.saveAll()
     } catch (e) {
       server.status = this.initialPass ? AppHealthStatus.UNKNOWN : AppHealthStatus.UNREACHABLE
@@ -137,5 +140,36 @@ export class SyncDaemon {
     this.syncInterval = ms
     await this.storage.set('syncInterval', this.syncInterval)
     if (!this.going) { this.start() }
+  }
+
+  async handleNotifications (server: S9Server): Promise<void> {
+    const count = server.notifications.length
+
+    if (!count) { return }
+
+    const toast = await this.toastCtrl.create({
+      header: server.label,
+      message: `${count} new notification${count === 1 ? '' : 's'}`,
+      position: 'bottom',
+      duration: 4000,
+      cssClass: 'notification-toast',
+      buttons: [
+        {
+          side: 'start',
+          icon: 'close',
+          handler: () => {
+            true
+          },
+        },
+        {
+          side: 'end',
+          text: 'View',
+          handler: () => {
+            this.navCtrl.navigateForward(['/auth', 'servers', server.id, 'notifications'])
+          },
+        },
+      ],
+    })
+    await toast.present()
   }
 }

@@ -1,5 +1,5 @@
-import { AppHealthStatus, AppVersion, AppConfigSpec, AppEvent, Rules } from '../models/app-model'
-import { ServerSpecs } from '../models/server-model'
+import { AppHealthStatus, AppVersion, AppConfigSpec, Rules } from '../models/app-model'
+import { ServerSpecs, S9Notification } from '../models/server-model'
 
 export type TwoHundredOK = { never?: never } // hack for the unit type
 
@@ -26,14 +26,19 @@ export interface ApiAppInstalled extends ApiAppBase {
   progress?: number
 }
 
-export type ApiAppConfig = AppConfigSpec
 
 export interface ApiServer {
   status: AppHealthStatus
   versionInstalled: string
   versionLatest: string
   specs: ServerSpecs
-  events: AppEvent[]
+  notifications: S9Notification[]
+}
+
+export interface ApiAppConfig {
+  spec: AppConfigSpec,
+  config: object | null
+  rules: Rules[]
 }
 
 export module Lan {
@@ -52,11 +57,7 @@ export module Lan {
   export type GetAppInstalledReq = { }
   export type GetAppInstalledRes = ApiAppInstalled
   export type GetAppConfigReq = { }
-  export type GetAppConfigRes = {
-    spec: ApiAppConfig,
-    config: object | null
-    rules: Rules[]
-  }
+  export type GetAppConfigRes = ApiAppConfig
   export type GetAppLogsReq = { after?: string, before?: string, page?: string, perPage?: string }
   export type GetAppLogsRes = string[]
   export type GetAppsInstalledReq = { }
@@ -73,12 +74,16 @@ export module Lan {
   export type PostStopAppRes = TwoHundredOK
   export type PostUpdateAppConfigReq = { }
   export type PostUpdateAppConfigRes = TwoHundredOK
+  export type GetNotificationsReq = { page: string, perPage: string }
+  export type GetNotificationsRes = S9Notification[]
+  export type DeleteNotificationReq = { id: string }
+  export type DeleteNotificationRes = TwoHundredOK
   export type GetSSHKeysReq = { }
   export type GetSSHKeysRes = string[]
   export type PostAddSSHKeyReq = { sshKey: string }
-  export type PostAddSSHKeyRes = TwoHundredOK
-  export type PostRemoveSSHKeyReq = { sshKey: string }
-  export type PostRemoveSSHKeyRes = TwoHundredOK
+  export type PostAddSSHKeyRes = string
+  export type DeleteSSHKeyReq = { sshKey: string }
+  export type DeleteSSHKeyRes = TwoHundredOK
   export type PostWipeAppDataReq = { }
   export type PostWipeAppDataRes = TwoHundredOK
 }

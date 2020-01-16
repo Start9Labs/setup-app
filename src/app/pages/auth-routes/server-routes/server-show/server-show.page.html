@@ -5,6 +5,9 @@
     </ion-buttons>
     <ion-title>{{ server.label }}</ion-title>
     <ion-buttons slot="end" class="ion-padding-end">
+      <ion-button [routerLink]="['/auth', 'servers', server.id, 'notifications']" color="primary">
+        <ion-icon name="notifications-outline"></ion-icon>
+      </ion-button>
       <ion-button (click)="presentAction()" color="primary">
         <ion-icon name="more"></ion-icon>
       </ion-button>
