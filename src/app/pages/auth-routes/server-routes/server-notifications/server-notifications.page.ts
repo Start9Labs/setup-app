@@ -17,7 +17,7 @@ export class ServerNotificationsPage {
   notifications: S9Notification[] = []
   page = 1
   needInfinite = false
-  readonly perPage = 8
+  readonly perPage = 20
 
   constructor (
     private readonly route: ActivatedRoute,
@@ -33,6 +33,7 @@ export class ServerNotificationsPage {
     this.server = server
 
     this.notifications = await this.getNotifications()
+    this.server.badge = 0
     this.loading = false
   }
 
@@ -77,7 +78,7 @@ export class ServerNotificationsPage {
     }
   }
 
-  async remove (notificationId: string, index: number) {
+  async remove (notificationId: string, index: number): Promise<void> {
     const loader = await this.loadingCtrl.create({
       message: 'Deleting...',
       spinner: 'lines',

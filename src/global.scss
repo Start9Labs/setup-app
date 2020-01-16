@@ -90,6 +90,10 @@ ion-note {
   white-space: nowrap;
 }
 
+ion-badge {
+  font-weight: bold;
+}
+
 ion-refresher ion-refresher-content {
   --color: var(--ion-color-warning) !important;
 }

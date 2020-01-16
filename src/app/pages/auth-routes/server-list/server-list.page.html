@@ -30,8 +30,8 @@
     </ion-item>
   </ion-item-group>
 
-  <ion-card *ngFor="let server of serverModel.servers" [routerLink]="[server.id]">
-    <ion-item>
+  <ion-item-group>
+    <ion-item *ngFor="let server of serverModel.servers" [routerLink]="[server.id]">
       <ion-avatar slot="start">
         <img src="assets/img/cube.png" alt="icon" />
       </ion-avatar>
@@ -39,8 +39,9 @@
         <h1>{{ server.label }}</h1>
         <h3><s9-status [status]="server.status"></s9-status></h3>
       </ion-label>
+      <ion-badge slot="end" *ngIf="server.badge" color="danger">{{ server.badge }}</ion-badge>
     </ion-item>
-  </ion-card>
+  </ion-item-group>
 
   <div *ngIf="syncDaemon.syncing" class="servers-spinner">
     <ion-spinner name="dots" color="warning"></ion-spinner>

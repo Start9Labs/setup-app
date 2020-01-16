@@ -19,8 +19,8 @@ export class ServerService {
 
   async getServer (server: S9Server | S9BuilderWith<'zeroconf' | 'privkey' | 'versionInstalled' | 'torAddress'>): Promise<ApiServer> {
     // @TODO remove
-    return mockGetServer()
-    // return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.GET, '')
+    // return mockGetServer()
+    return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.GET, '')
   }
 
   async getNotifications (server: S9Server, page: number, perPage: number): Promise<S9Notification[]> {
@@ -29,8 +29,8 @@ export class ServerService {
       perPage: String(perPage),
     }
     // @TODO remove
-    return mockGetNotifications()
-    // return this.httpService.authServerRequest<Lan.GetNotificationsRes>(server, Method.GET, `/notifications`, { params })
+    // return mockGetNotifications()
+    return this.httpService.authServerRequest<Lan.GetNotificationsRes>(server, Method.GET, `/notifications`, { params })
   }
 
   async deleteNotification (server: S9Server, id: string): Promise<void> {
@@ -38,8 +38,8 @@ export class ServerService {
       id,
     }
     // @TODO remove
-    await mockDeleteNotification()
-    // await this.httpService.authServerRequest<Lan.DeleteNotificationRes>(server, Method.DELETE, `/notifications`, { body })
+    // await mockDeleteNotification()
+    await this.httpService.authServerRequest<Lan.DeleteNotificationRes>(server, Method.DELETE, `/notifications`, { body })
   }
 
   async updateAgent (server: S9Server): Promise<void> {
@@ -72,8 +72,8 @@ export class ServerService {
 
   async getInstalledApps (server: S9Server): Promise<AppInstalled[]> {
     // @TODO remove
-    return mockGetInstalledApps()
-    // return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.GET, `/apps/installed`)
+    // return mockGetInstalledApps()
+    return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.GET, `/apps/installed`)
       .then(res => res.map(mapApiInstalledApp))
   }
 
@@ -322,15 +322,15 @@ const mockApiNotifications: Lan.GetNotificationsRes = [
     appId: 'bitcoind',
     created_at: '2019-12-26T14:20:30.872Z',
     code: '101',
-    title: 'Install complete',
-    message: 'Installation of bitcoind has successfully completed.',
+    title: 'Install Complete',
+    message: 'Installation of bitcoind has completed successfully.',
   },
   {
     id: '123e4567-e89b-12d3-a456-426655440001',
     appId: 'start9-agent',
     created_at: '2019-12-26T14:20:30.872Z',
     code: '201',
-    title: 'SSH key added',
+    title: 'SSH Key Added',
     message: 'A new SSH key was added. If you did not do this, shit is bad.',
   },
   {
@@ -338,7 +338,7 @@ const mockApiNotifications: Lan.GetNotificationsRes = [
     appId: 'start9-agent',
     created_at: '2019-12-26T14:20:30.872Z',
     code: '002',
-    title: 'SSH key removed',
+    title: 'SSH Key Removed',
     message: 'A SSH key was removed.',
   },
   {
@@ -346,14 +346,14 @@ const mockApiNotifications: Lan.GetNotificationsRes = [
     appId: 'bitcoind',
     created_at: '2019-12-26T14:20:30.872Z',
     code: '310',
-    title: 'App crashed',
+    title: 'App Crashed',
     message: 'Bitcoind has crashed',
   },
 ]
 
 // @TODO remove
 const mockApiAppAvailablePreview: ApiAppAvailablePreview = {
-  id: 'bitcoin',
+  id: 'bitcoind',
   versionLatest: '0.18.1',
   versionInstalled: undefined,
   title: 'Bitcoin Core',
@@ -380,7 +380,7 @@ const mockApiAppAvailableFull: ApiAppAvailableFull = {
 
 // @TODO remove
 const mockApiAppInstalled: ApiAppInstalled = {
-  id: 'bitcoin',
+  id: 'bitcoind',
   versionLatest: '0.18.1',
   versionInstalled: '0.18.1',
   title: 'Bitcoin Core',

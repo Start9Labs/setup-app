@@ -2,3 +2,14 @@
   text-align: center;
   margin-top: 40px;
 }
+
+.notification-button {
+  --overflow: visible;
+
+  ion-badge {
+    position: absolute;
+    font-size: 10px;
+    top: 0.1rem;
+    right: 0.2rem;
+  }
+}

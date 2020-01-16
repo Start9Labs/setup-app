@@ -84,6 +84,7 @@ export interface S9Server extends S9ServerStorable {
   specs: ServerSpecs
   versionLatest: string
   privkey: string // derive from mnemonic + torAddress
+  badge: number
   notifications: S9Notification[]
   zeroconf?: ZeroconfService
 }
@@ -124,6 +125,7 @@ export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): 
     status: AppHealthStatus.UNKNOWN,
     statusAt: new Date(),
     privkey: deriveKeys(mnemonic, id).privkey,
+    badge: 0,
     specs: { },
     notifications: [],
   }

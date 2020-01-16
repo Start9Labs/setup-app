@@ -147,6 +147,8 @@ export class SyncDaemon {
 
     if (!count) { return }
 
+    server.badge = server.badge + count
+
     const toast = await this.toastCtrl.create({
       header: server.label,
       message: `${count} new notification${count === 1 ? '' : 's'}`,
