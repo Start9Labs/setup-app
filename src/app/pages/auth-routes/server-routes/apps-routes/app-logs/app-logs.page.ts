@@ -1,4 +1,4 @@
-import { Component, ViewChild, NgZone } from '@angular/core'
+import { Component, ViewChild } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { ServerModel } from 'src/app/models/server-model'
 import { ServerService } from 'src/app/services/server.service'
@@ -24,7 +24,6 @@ export class AppLogsPage {
     private readonly serverModel: ServerModel,
     private readonly appModel: AppModel,
     private readonly serverService: ServerService,
-    private readonly zone: NgZone,
   ) { }
 
   async ngOnInit () {

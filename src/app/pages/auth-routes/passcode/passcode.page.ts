@@ -12,7 +12,7 @@ export class PasscodePage {
   passcodeEnabled: boolean
 
   constructor (
-    private readonly authService: AuthService,
+    readonly authService: AuthService,
     private readonly alertCtrl: AlertController,
   ) { }
 
