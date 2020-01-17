@@ -19,7 +19,6 @@ export class ServerShowPage {
   view: 'apps' | 'about' = 'apps'
   server: S9Server
   apps: AppInstalled[]
-  edited = false
   loading = true
   compareVersions = compareVersions
 
@@ -113,7 +112,21 @@ export class ServerShowPage {
 
     buttons.push(
       {
-        text: 'Forget Server',
+        text: 'Restart',
+        icon: 'refresh-circle',
+        handler: () => {
+          this.presentAlertRestart()
+        },
+      },
+      {
+        text: 'Shutdown',
+        icon: 'power',
+        handler: () => {
+          this.presentAlertShutdown()
+        },
+      },
+      {
+        text: 'Forget',
         cssClass: 'alert-danger',
         icon: 'trash',
         handler: () => {
@@ -205,6 +218,50 @@ export class ServerShowPage {
     }
   }
 
+  async presentAlertRestart () {
+    const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
+      header: 'Confirm',
+      message: `Are you sure you want to restart ${this.server.label}?`,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: 'Restart',
+          cssClass: 'alert-danger',
+          handler: async () => {
+            this.restart()
+          },
+        },
+      ],
+    })
+    await alert.present()
+  }
+
+  async presentAlertShutdown () {
+    const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
+      header: 'Confirm',
+      message: `Are you sure you want to shut down ${this.server.label}?`,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: 'Shutdown',
+          cssClass: 'alert-danger',
+          handler: async () => {
+            this.shutdown()
+          },
+        },
+      ],
+    })
+    await alert.present()
+  }
+
   async presentAlertForget () {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
@@ -227,8 +284,43 @@ export class ServerShowPage {
     await alert.present()
   }
 
+  async restart () {
+    const loader = await this.loadingCtrl.create({
+      spinner: 'lines',
+      message: `restarting ${this.server.label}. This could take a while...`,
+      cssClass: 'loader',
+    })
+    await loader.present()
+
+    try {
+      await this.serverService.restartServer(this.server)
+      await this.navCtrl.pop()
+    } catch (e) {
+      this.error = e.mesasge
+    } finally {
+      await loader.dismiss()
+    }
+  }
+
+  async shutdown () {
+    const loader = await this.loadingCtrl.create({
+      spinner: 'lines',
+      message: `shutting down ${this.server.label}...`,
+      cssClass: 'loader',
+    })
+    await loader.present()
+
+    try {
+      await this.serverService.shutdownServer(this.server)
+      await this.navCtrl.pop()
+    } catch (e) {
+      this.error = e.mesasge
+    } finally {
+      await loader.dismiss()
+    }
+  }
+
   async forget () {
-    this.edited = false
     await this.serverModel.forgetServer(this.server.id)
     await this.navCtrl.navigateRoot(['/auth'])
   }

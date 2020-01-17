@@ -92,8 +92,12 @@ export class ServerDaemon {
 
   async updateSyncInterval (ms: number) {
     this.syncInterval = ms
+    if (this.syncInterval) {
+      this.start()
+    } else {
+      this.going = false
+    }
     await this.storage.set('syncInterval', this.syncInterval)
-    if (!this.going) { this.start() }
   }
 
   async handleNotifications (server: S9Server): Promise<void> {

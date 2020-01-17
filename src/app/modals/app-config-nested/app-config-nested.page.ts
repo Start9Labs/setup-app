@@ -1,7 +1,8 @@
 import { Component, Input } from '@angular/core'
 import { ModalController, AlertController } from '@ionic/angular'
 import { ValueSpec, ValueSpecList, ValueSpecString, ValueSpecObject, ListValueSpecObject } from 'src/app/models/app-model'
-import * as configUtil from '../../../../../util/config.util'
+import * as configUtil from '../../util/config.util'
+import { AppConfigValuePage } from '../app-config-value/app-config-value.page'
 
 @Component({
   selector: 'app-config-nested',
@@ -11,7 +12,7 @@ import * as configUtil from '../../../../../util/config.util'
 export class AppConfigNestedPage {
   @Input() keyval: { key: string, value: ValueSpec }
   @Input() value: any[] | object
-  min: number
+  min: number | undefined
   max: number | undefined
   edited = false
 
@@ -22,12 +23,9 @@ export class AppConfigNestedPage {
 
   ngOnInit () {
     if (this.keyval.value.type === 'list') {
-      const range = this.keyval.value.range
-      const leftInclusive = range.startsWith('[')
-      const rightInclusive = range.endsWith(']')
-      const [minStr, maxStr] = range.split(',').map(a => a.trim())
-      this.min = minStr === '(*' ? 0 : (Number(minStr.slice(1)) + (leftInclusive ? 0 : 1))
-      this.max = maxStr === '*)' ? undefined : (Number(maxStr.slice(0, -1)) - (rightInclusive ? 0 : 1))
+      const range = configUtil.Range.from(this.keyval.value.range)
+      this.min = range.integralMin()
+      this.max = range.integralMax()
     }
   }
 
@@ -36,7 +34,7 @@ export class AppConfigNestedPage {
     const listLength = (this.value as string[]).length
     // if enum list, enforce limits
     if (spec.type === 'list' && spec.spec.type === 'enum') {
-      if (listLength < this.min) {
+      if (this.min && listLength < this.min) {
         return this.presentAlertMinReached()
       } else if (this.max && listLength > this.max) {
         return this.presentAlertMaxReached()
@@ -50,18 +48,23 @@ export class AppConfigNestedPage {
   }
 
   async presentModalConfig (i: number, spec: ListValueSpecObject) {
-    const key = `${this.keyval.key} ${i + 1}`
     const modal = await this.modalCtrl.create({
+      backdropDismiss: false,
       component: AppConfigNestedPage,
       componentProps: {
-        keyval: { key, value: spec },
+        keyval: {
+          key: `${this.keyval.key} ${i + 1}`,
+          value: spec,
+        },
         value: this.value[i],
       },
     })
 
     modal.onWillDismiss().then(res => {
       this.edited = this.edited || res.data.edited
-      this.value[i] = res.data.value
+      if (res.data.edited) {
+        this.value[i] = res.data.value
+      }
     })
 
     await modal.present()
@@ -72,8 +75,8 @@ export class AppConfigNestedPage {
       await this.presentAlertMaxReached()
     } else {
       // if string list show new string alert
-      if ((this.keyval.value as ValueSpecList).spec.type === 'string') {
-        await this.presentAlertStringCreate()
+      if (['string', 'number'].includes((this.keyval.value as ValueSpecList).spec.type)) {
+        await this.presentModalValueEdit()
       // if object list show new object alert
       } else {
         await this.presentAlertObjectCreate()
@@ -95,92 +98,32 @@ export class AppConfigNestedPage {
     // if present, delete
     if (index > -1) {
       (this.value as string[]).splice(index, 1)
-      this.markEdited()
+      this.edited = true
     // if not present, add
     } else {
       (this.value as string[]).push(option)
-      this.markEdited()
+      this.edited = true
     }
   }
 
-  async presentAlertConfigValueEdit (index: number) {
-    const alert = await this.alertCtrl.create({
+  async presentModalValueEdit (index?: number) {
+    const modal = await this.modalCtrl.create({
       backdropDismiss: false,
-      header: this.keyval.key,
-      inputs: [
-        {
-          name: 'inputValue',
-          type: 'text',
-          value: this.value[index],
-          placeholder: 'Enter value',
-        },
-      ],
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-          cssClass: 'secondary',
-        },
-        {
-          text: 'Done',
-          handler: (data: { inputValue: string }) => {
-            const inputValue = data.inputValue
-            // return if no change
-            if (this.value[index] === inputValue) { return }
-            // otherwise add/update value and mark edited
-            try {
-              this.validate(inputValue)
-              this.markEdited();
-              (this.value as any[]).splice(index, 1, inputValue)
-            } catch (e) {
-              alert.message = e.message
-              return false
-            }
-          },
-        },
-      ],
-      cssClass: 'alert-config-value',
+      component: AppConfigValuePage,
+      componentProps: {
+        spec: this.keyval.value,
+        value: index ? this.value[index] : '',
+      },
     })
-    await alert.present()
-  }
 
-  async presentAlertStringCreate () {
-    const alert = await this.alertCtrl.create({
-      backdropDismiss: false,
-      header: this.keyval.key,
-      inputs: [
-        {
-          name: 'inputValue',
-          type: 'text',
-          placeholder: 'Enter value',
-        },
-      ],
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-          cssClass: 'secondary',
-        }, {
-          text: 'Done',
-          handler: (data: { inputValue: string }) => {
-            const inputValue = data.inputValue
-            // return if no value
-            if (!inputValue) { return }
-            // add value and mark edited
-            try {
-              this.validate(inputValue)
-              this.markEdited();
-              (this.value as any[]).push(inputValue)
-            } catch (e) {
-              alert.message = e.message
-              return false
-            }
-          },
-        },
-      ],
-      cssClass: 'alert-config-value',
+    modal.onWillDismiss().then(res => {
+      this.edited = this.edited || res.data.edited
+      if (res.data.edited) {
+        index ? this.value[index] = res.data.value : (this.value as any[]).push(res.data.value)
+      }
     })
-    await alert.present()
+
+    await modal.present()
   }
 
   async presentAlertObjectCreate () {
@@ -238,7 +181,7 @@ export class AppConfigNestedPage {
           text: 'Delete',
           cssClass: 'alert-danger',
           handler: async () => {
-            this.markEdited();
+            this.edited = true;
             (this.value as any[]).splice(index, 1)
           },
         },
@@ -257,9 +200,5 @@ export class AppConfigNestedPage {
     if (pattern && !RegExp(pattern.regex).test(value)) {
       throw new Error(pattern.description)
     }
-  }
-
-  markEdited () {
-    this.edited = true
   }
 }

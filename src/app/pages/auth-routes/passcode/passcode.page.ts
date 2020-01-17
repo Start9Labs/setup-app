@@ -51,7 +51,7 @@ export class PasscodePage {
           handler: (data: { inputValue: string }) => {
             const value = data.inputValue
 
-            if (!new RegExp('^[0-9]{4}$').test(value)) {
+            if (!RegExp('^[0-9]{4}$').test(value)) {
               alert.message = 'Passcode must be a 4-digit number'
               return false
             }

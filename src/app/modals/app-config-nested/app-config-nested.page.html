@@ -25,13 +25,13 @@
         </ion-item-divider>
 
         <div *ngFor="let entry of value; let i = index">
-          <ion-item-sliding *ngIf="keyval.value.spec.type === 'string'">
+          <ion-item-sliding *ngIf="['string', 'number'].includes(keyval.value.spec.type)">
             <ion-item-options side="end">
               <ion-item-option color="danger" (click)="deleteEntry(i)">
                 <ion-icon slot="icon-only" name="trash"></ion-icon>
               </ion-item-option>
             </ion-item-options>
-            <ion-item button detail="false" (click)="presentAlertConfigValueEdit(i)">
+            <ion-item button detail="false" (click)="presentModalValueEdit(i)">
               <ion-label>{{ entry }}</ion-label>
             </ion-item>
           </ion-item-sliding>

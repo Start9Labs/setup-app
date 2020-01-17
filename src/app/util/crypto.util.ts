@@ -3,7 +3,7 @@ import * as bip32 from 'bip32'
 
 export type Hex = string & { __type: 'hex' }
 export function isHex (s: string): s is Hex {
-  return new RegExp('^([0-9a-fA-F]{2})*$').test(s)
+  return RegExp('^([0-9a-fA-F]{2})*$').test(s)
 }
 export function asHex (s: string): Hex {
   if (isHex(s)) {

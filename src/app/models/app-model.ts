@@ -90,9 +90,9 @@ export interface ValueSpecBase {
 }
 
 export interface WithStandalone {
+  name: string
   description: string
   nullable: boolean
-  name: string
 }
 
 export interface ListValueSpecString extends ValueSpecBase {
@@ -138,6 +138,7 @@ export interface ValueSpecBoolean extends ValueSpecBase, Omit<WithStandalone, 'n
 }
 
 export interface ValueSpecList extends ValueSpecBase {
+  name: string
   type: 'list'
   spec: ListValueSpec
   description: string

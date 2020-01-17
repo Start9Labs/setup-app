@@ -7,7 +7,8 @@ import { IonicModule } from '@ionic/angular'
 
 import { AppConfigPage } from './app-config.page'
 import { ObjectConfigComponentModule } from 'src/app/components/object-config/object-config.components.module'
-import { AppConfigNestedPageModule } from '../app-config-nested/app-config-nested.module'
+import { AppConfigNestedPageModule } from '../../../../../modals/app-config-nested/app-config-nested.module'
+import { AppConfigValuePageModule } from 'src/app/modals/app-config-value/app-config-value.module'
 
 const routes: Routes = [
   {
@@ -18,6 +19,7 @@ const routes: Routes = [
 
 @NgModule({
   imports: [
+    AppConfigValuePageModule,
     AppConfigNestedPageModule,
     ObjectConfigComponentModule,
     CommonModule,

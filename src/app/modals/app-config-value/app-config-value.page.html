@@ -1,0 +1,43 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      {{ spec.name }}
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="done()" color="primary">
+        Done
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding-top">
+
+  <ion-item-group>
+    <ion-item>
+      <ion-input [type]="spec.type === 'string' ? 'text' : 'tel'" placeholder="Enter value" [(ngModel)]="value" (ngModelChange)="handleInput($event)"></ion-input>
+    </ion-item>
+  </ion-item-group>
+
+  <ion-item *ngIf="error" style="margin-top: 16px;">
+    <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
+  </ion-item>
+
+  <!-- <ion-item-group>
+    <ion-item-divider></ion-item-divider>
+    <ion-item>
+      <ion-label class="ion-text-wrap">
+        <ion-text color="medium">
+          <p *ngIf="spec.type === 'string' && spec.pattern">{{ spec.pattern.description }}</p>
+          <p *ngIf="spec.type === 'number'">{{ rangeDescription }}</p>
+        </ion-text>
+      </ion-label>
+    </ion-item>
+  </ion-item-group> -->
+
+</ion-content>

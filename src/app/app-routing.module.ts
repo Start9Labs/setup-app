@@ -16,7 +16,7 @@ const routes: Routes = [
   },
   {
     path: 'authenticate',
-    loadChildren: () => import('./pages/authenticate/authenticate.module').then(m => m.AuthenticatePageModule),
+    loadChildren: () => import('./modals/authenticate/authenticate.module').then(m => m.AuthenticatePageModule),
   },
 ]
 

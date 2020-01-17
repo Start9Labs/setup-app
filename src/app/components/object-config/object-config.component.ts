@@ -1,8 +1,9 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core'
 import { AppConfigSpec, ValueSpec, ValueSpecString, ValueSpecObject } from 'src/app/models/app-model'
 import { ModalController, AlertController } from '@ionic/angular'
-import { AppConfigNestedPage } from 'src/app/pages/auth-routes/server-routes/apps-routes/app-config-nested/app-config-nested.page'
+import { AppConfigNestedPage } from 'src/app/modals/app-config-nested/app-config-nested.page'
 import * as configUtil from '../../util/config.util'
+import { AppConfigValuePage } from 'src/app/modals/app-config-value/app-config-value.page'
 
 @Component({
   selector: 'object-config',
@@ -60,47 +61,29 @@ export class ObjectConfigComponent {
     await alert.present()
   }
 
-  async presentAlertConfigValue (keyval: { key: string, value: ValueSpecString }) {
-    const alert = await this.alertCtrl.create({
+  async presentModalValueEdit (keyval: { key: string, value: ValueSpecString }) {
+    const modal = await this.modalCtrl.create({
       backdropDismiss: false,
-      header: keyval.key,
-      inputs: [
-        {
-          name: 'inputValue',
-          type: 'text',
-          value: this.config[keyval.key],
-          placeholder: 'enter value',
-        },
-      ],
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-        }, {
-          text: 'Done',
-          handler: (data: { inputValue: string }) => {
-            const inputValue = data.inputValue
-            // return if no change
-            if (this.config[keyval.key] === inputValue) { return }
-            // set new value and mark edited
-            try {
-              this.validate(keyval.value, inputValue)
-              this.markEdited()
-              this.config[keyval.key] = inputValue
-            } catch (e) {
-              alert.message = e.message
-              return false
-            }
-          },
-        },
-      ],
-      cssClass: 'alert-config-value',
+      component: AppConfigValuePage,
+      componentProps: {
+        spec: keyval.value,
+        value: this.config[keyval.key],
+      },
     })
-    await alert.present()
+
+    modal.onWillDismiss().then(res => {
+      this.editedChange.emit(this.edited || res.data.edited)
+      if (res.data.edited) {
+        this.config[keyval.key] = res.data.value
+      }
+    })
+
+    await modal.present()
   }
 
   async presentModalConfigNested (keyval: { key: string, value: ValueSpec }) {
     const modal = await this.modalCtrl.create({
+      backdropDismiss: false,
       component: AppConfigNestedPage,
       componentProps: {
         keyval,
@@ -114,18 +97,6 @@ export class ObjectConfigComponent {
     })
 
     await modal.present()
-  }
-
-  validate (spec: ValueSpecString, value: string) {
-    // test nullable
-    if (!value && !spec.nullable) {
-      throw new Error('cannot be blank')
-    }
-    // test pattern
-    const pattern = spec.pattern
-    if (pattern && !RegExp(pattern.regex).test(value)) {
-      throw new Error(pattern.description)
-    }
   }
 
   setSelectHeader (key: string) {

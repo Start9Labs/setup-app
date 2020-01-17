@@ -19,8 +19,8 @@ export class ServerService {
 
   async getServer (server: S9Server | S9BuilderWith<'zeroconf' | 'privkey' | 'versionInstalled' | 'torAddress'>): Promise<ApiServer> {
     // @TODO remove
-    // return mockGetServer()
-    return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.GET, '')
+    return mockGetServer()
+    // return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.GET, '')
   }
 
   async getNotifications (server: S9Server, page: number, perPage: number): Promise<S9Notification[]> {
@@ -29,8 +29,8 @@ export class ServerService {
       perPage: String(perPage),
     }
     // @TODO remove
-    // return mockGetNotifications()
-    return this.httpService.authServerRequest<Lan.GetNotificationsRes>(server, Method.GET, `/notifications`, { params })
+    return mockGetNotifications()
+    // return this.httpService.authServerRequest<Lan.GetNotificationsRes>(server, Method.GET, `/notifications`, { params })
   }
 
   async deleteNotification (server: S9Server, id: string): Promise<void> {
@@ -38,8 +38,8 @@ export class ServerService {
       id,
     }
     // @TODO remove
-    // await mockDeleteNotification()
-    await this.httpService.authServerRequest<Lan.DeleteNotificationRes>(server, Method.DELETE, `/notifications`, { body })
+    await mockDeleteNotification()
+    // await this.httpService.authServerRequest<Lan.DeleteNotificationRes>(server, Method.DELETE, `/notifications`, { body })
   }
 
   async updateAgent (server: S9Server): Promise<void> {
@@ -47,20 +47,20 @@ export class ServerService {
       version: server.versionLatest,
     }
     // @TODO remove
-    // await mockPostUpdateAgent()
-    await this.httpService.authServerRequest<Lan.PostUpdateAgentRes>(server, Method.POST, '/update', { }, body)
+    await mockPostUpdateAgent()
+    // await this.httpService.authServerRequest<Lan.PostUpdateAgentRes>(server, Method.POST, '/update', { }, body)
   }
 
   async getAvailableApps (server: S9Server): Promise<AppAvailablePreview[]> {
     // @TODO remove
-    // return mockGetAvailableApps()
-    return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(server, Method.GET, '/apps/store')
+    return mockGetAvailableApps()
+    // return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(server, Method.GET, '/apps/store')
   }
 
   async getAvailableApp (server: S9Server, appId: string): Promise<AppAvailableFull> {
     // @TODO remove
-    // return mockGetAvailableApp()
-    return this.httpService.authServerRequest<Lan.GetAppAvailableRes>(server, Method.GET, `/apps/${appId}/store`)
+    return mockGetAvailableApp()
+    // return this.httpService.authServerRequest<Lan.GetAppAvailableRes>(server, Method.GET, `/apps/${appId}/store`)
       .then(res => {
         return {
           ...res,
@@ -72,15 +72,15 @@ export class ServerService {
 
   async getInstalledApp (server: S9Server, appId: string): Promise<AppInstalled> {
     // @TODO remove
-    // return mockGetInstalledApp()
-    return this.httpService.authServerRequest<Lan.GetAppInstalledRes>(server, Method.GET, `/apps/${appId}/insalled`)
+    return mockGetInstalledApp()
+    // return this.httpService.authServerRequest<Lan.GetAppInstalledRes>(server, Method.GET, `/apps/${appId}/installed`)
       .then(mapApiInstalledApp)
   }
 
   async getInstalledApps (server: S9Server): Promise<AppInstalled[]> {
     // @TODO remove
-    // return mockGetInstalledApps()
-    return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.GET, `/apps/installed`)
+    return mockGetInstalledApps()
+    // return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.GET, `/apps/installed`)
       .then(res => res.map(mapApiInstalledApp))
   }
 
@@ -90,8 +90,8 @@ export class ServerService {
     rules: Rules[]
   }> {
     // @TODO remove
-    // return mockGetAppConfig()
-    return this.httpService.authServerRequest<Lan.GetAppConfigRes>(server, Method.GET, `/apps/${appId}/config`)
+    return mockGetAppConfig()
+    // return this.httpService.authServerRequest<Lan.GetAppConfigRes>(server, Method.GET, `/apps/${appId}/config`)
       .then(({ spec, config, rules }) => {
         return {
           spec,
@@ -103,8 +103,8 @@ export class ServerService {
 
   async getAppLogs (server: S9Server, appId: string, params: Lan.GetAppLogsReq = { }): Promise<string[]> {
     // @TODO remove
-    // return mockGetAppLogs()
-    return this.httpService.authServerRequest<Lan.GetAppLogsRes>(server, Method.GET, `/apps/${appId}/logs`, { params })
+    return mockGetAppLogs()
+    // return this.httpService.authServerRequest<Lan.GetAppLogsRes>(server, Method.GET, `/apps/${appId}/logs`, { params })
   }
 
   async installApp (server: S9Server, appId: string, version: string): Promise<AppInstalled> {
@@ -112,8 +112,8 @@ export class ServerService {
       version,
     }
     // @TODO remove
-    // const installed = await mockInstallApp()
-    const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.POST, `/apps/${appId}/install`, { }, body, 240000)
+    const installed = await mockInstallApp()
+    // const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.POST, `/apps/${appId}/install`, { }, body, 240000)
       .then(mapApiInstalledApp)
     await this.appModel.cacheApp(server.id, installed)
     return installed
@@ -121,23 +121,23 @@ export class ServerService {
 
   async uninstallApp (server: S9Server, appId: string): Promise<void> {
     // @TODO remove
-    // await mockUninstallApp()
-    await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(server, Method.POST, `/apps/${appId}/uninstall`)
+    await mockUninstallApp()
+    // await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(server, Method.POST, `/apps/${appId}/uninstall`)
     await this.appModel.removeApp(server.id, appId)
   }
 
   async startApp (server: S9Server, app: AppInstalled): Promise<void> {
     // @TODO remove
-    // await mockStartApp()
-    await this.httpService.authServerRequest<Lan.PostStartAppRes>(server, Method.POST, `/apps/${app.id}/start`)
+    await mockStartApp()
+    // await this.httpService.authServerRequest<Lan.PostStartAppRes>(server, Method.POST, `/apps/${app.id}/start`)
     app.status = AppHealthStatus.RUNNING
     app.statusAt = new Date()
   }
 
   async stopApp (server: S9Server, app: AppInstalled): Promise<void> {
     // @TODO remove
-    // await mockStopApp()
-    await this.httpService.authServerRequest<Lan.PostStopAppRes>(server, Method.POST, `/apps/${app.id}/stop`)
+    await mockStopApp()
+    // await this.httpService.authServerRequest<Lan.PostStopAppRes>(server, Method.POST, `/apps/${app.id}/stop`)
     app.status = AppHealthStatus.STOPPED
     app.statusAt = new Date()
   }
@@ -147,22 +147,22 @@ export class ServerService {
       config,
     }
     // @TODO remove
-    // await mockUpdateAppConfig()
-    await this.httpService.authServerRequest<Lan.PostUpdateAppConfigRes>(server, Method.PATCH, `/apps/${app.id}/config`, { }, body)
+    await mockUpdateAppConfig()
+    // await this.httpService.authServerRequest<Lan.PostUpdateAppConfigRes>(server, Method.PATCH, `/apps/${app.id}/config`, { }, body)
   }
 
   async wipeAppData (server: S9Server, app: AppInstalled): Promise<void> {
     // @TODO remove
-    // await mockWipeAppData()
-    await this.httpService.authServerRequest<Lan.PostWipeAppDataRes>(server, Method.POST, `/apps/${app.id}/wipe`)
+    await mockWipeAppData()
+    // await this.httpService.authServerRequest<Lan.PostWipeAppDataRes>(server, Method.POST, `/apps/${app.id}/wipe`)
     app.status = AppHealthStatus.NEEDS_CONFIG
     app.statusAt = new Date()
   }
 
   async getSSHKeys (server: S9Server): Promise<string[]> {
     // @TODO remove
-    // return mockGetSSHKeys()
-    return this.httpService.authServerRequest<Lan.GetSSHKeysRes>(server, Method.GET, `/sshKeys`)
+    return mockGetSSHKeys()
+    // return this.httpService.authServerRequest<Lan.GetSSHKeysRes>(server, Method.GET, `/sshKeys`)
   }
 
   async addSSHKey (server: S9Server, sshKey: string): Promise<string> {
@@ -170,8 +170,8 @@ export class ServerService {
       sshKey,
     }
     // @TODO remove
-    // return mockAddSSHKey()
-    return this.httpService.authServerRequest<Lan.PostAddSSHKeyRes>(server, Method.POST, `/sshKeys`, { }, body)
+    return mockAddSSHKey()
+    // return this.httpService.authServerRequest<Lan.PostAddSSHKeyRes>(server, Method.POST, `/sshKeys`, { }, body)
   }
 
   async deleteSSHKey (server: S9Server, sshKey: string): Promise<void> {
@@ -179,8 +179,20 @@ export class ServerService {
       sshKey,
     }
     // @TODO remove
-    // await mockDeleteSSHKey()
-    await this.httpService.authServerRequest<Lan.DeleteSSHKeyRes>(server, Method.DELETE, `/sshKeys`, { body })
+    await mockDeleteSSHKey()
+    // await this.httpService.authServerRequest<Lan.DeleteSSHKeyRes>(server, Method.DELETE, `/sshKeys`, { body })
+  }
+
+  async restartServer (server: S9Server): Promise<void> {
+    // @TODO remove
+    await mockRestartServer()
+    // await this.httpService.authServerRequest<Lan.PostRestartServerRes>(server, Method.POST, '/restart')
+  }
+
+  async shutdownServer (server: S9Server): Promise<void> {
+    // @TODO remove
+    await mockShutdownServer()
+    // await this.httpService.authServerRequest<Lan.PostShutdownServerRes>(server, Method.POST, '/shutdown')
   }
 }
 
@@ -302,6 +314,18 @@ async function mockAddSSHKey (): Promise<Lan.PostAddSSHKeyRes> {
 
 // @TODO remove
 async function mockDeleteSSHKey (): Promise<Lan.DeleteSSHKeyRes> {
+  await pauseFor(1000)
+  return { }
+}
+
+// @TODO remove
+async function mockRestartServer (): Promise<Lan.PostRestartServerRes> {
+  await pauseFor(1000)
+  return { }
+}
+
+// @TODO remove
+async function mockShutdownServer (): Promise<Lan.PostShutdownServerRes> {
   await pauseFor(1000)
   return { }
 }
@@ -518,6 +542,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
       range: '(-100,100]',
     },
     secondaryNumbers: {
+      name: 'Unlucky Numbers',
       type: 'list',
       description: 'Numbers that you like but are not your top favorite.',
       spec: {
@@ -554,6 +579,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
           },
         },
         rulemakers: {
+          name: 'Rule Makers',
           type: 'list',
           description: 'the people who make the rules',
           range: '[0,2]',
@@ -610,6 +636,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
       },
     },
     notifications: {
+      name: 'Notification Preferences',
       type: 'list',
       description: 'how you want to be notified',
       range: '[1,3]',
@@ -633,6 +660,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
       nullable: true,
     },
     rpcallowip: {
+      name: 'RPC Allowed IPs',
       type: 'list',
       description: 'external ip addresses that are authorized to access your Bitcoin node',
       range: '[1,10]',
@@ -646,6 +674,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
       },
     },
     rpcauth: {
+      name: 'RPC Auth',
       type: 'list',
       description: 'api keys that are authorized to access your Bitcoin node.',
       range: '[0,*)',

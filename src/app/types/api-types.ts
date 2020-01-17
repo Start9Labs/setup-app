@@ -86,4 +86,8 @@ export module Lan {
   export type DeleteSSHKeyRes = TwoHundredOK
   export type PostWipeAppDataReq = { }
   export type PostWipeAppDataRes = TwoHundredOK
+  export type PostRestartServerReq = { }
+  export type PostRestartServerRes = TwoHundredOK
+  export type PostShutdownServerReq = { }
+  export type PostShutdownServerRes = TwoHundredOK
 }
