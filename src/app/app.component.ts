@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, NgZone } from '@angular/core'
 import { Platform } from '@ionic/angular'
 import { SplashScreen } from '@ionic-native/splash-screen/ngx'
 import { StatusBar } from '@ionic-native/status-bar/ngx'
@@ -9,6 +9,7 @@ import { AuthService } from './services/auth.service'
 import { Router } from '@angular/router'
 import { AuthStatus } from './types/enums'
 import { AppModel } from './models/app-model'
+import { Subscription } from 'rxjs'
 
 @Component({
   selector: 'app-root',
@@ -17,6 +18,8 @@ import { AppModel } from './models/app-model'
 })
 export class AppComponent {
   private firstAuth = true
+  private pauseSub: Subscription | undefined
+  private resumeSub: Subscription | undefined
 
   constructor (
     private readonly platform: Platform,
@@ -28,6 +31,7 @@ export class AppComponent {
     private readonly serverDaemon: ServerDaemon,
     private readonly authService: AuthService,
     private readonly router: Router,
+    private readonly zone: NgZone,
   ) {
     // set dark theme.
     // @TODO there should be a way to make this the default.
@@ -61,24 +65,36 @@ export class AppComponent {
       if (this.firstAuth) {
         await this.serverModel.load(this.authService.mnemonic!)
         this.initDaemons()
+        this.pauseSub = this.platform.pause.subscribe(() => {
+          this.authService.uninit()
+          this.stopDaemons()
+        })
+        this.resumeSub = this.platform.resume.subscribe(() => {
+          this.authService.init()
+        })
         this.firstAuth = false
         await this.router.navigate(['/auth'])
       } else {
         this.restartDaemons()
       }
-      const pauseSub = this.platform.pause.subscribe(() => {
-        this.authService.uninit()
-        this.stopDaemons()
-        pauseSub.unsubscribe()
-      })
     // missing (no mnemonic)
     } else if (authStatus === AuthStatus.MISSING) {
       this.clearModels()
       this.firstAuth = true
+      if (this.pauseSub) {
+        this.pauseSub.unsubscribe()
+        this.pauseSub = undefined
+      }
+      if (this.resumeSub) {
+        this.resumeSub.unsubscribe()
+        this.resumeSub = undefined
+      }
       await this.router.navigate(['/unauth'])
     // unverified (mnemonic is present but encrypted)
     } else if (authStatus === AuthStatus.UNVERIFIED) {
-      await this.router.navigate(['/authenticate'])
+      this.zone.run(async () => {
+        await this.router.navigate(['/authenticate'])
+      })
     }
   }
 

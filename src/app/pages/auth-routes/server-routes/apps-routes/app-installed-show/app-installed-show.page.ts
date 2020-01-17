@@ -46,7 +46,6 @@ export class AppInstalledShowPage {
       }
 
       this.app = await this.getApp(appId) as AppInstalled
-      this.loading = false
     } catch (e) {
       this.error = e.message
     }
@@ -57,6 +56,8 @@ export class AppInstalledShowPage {
       return this.serverService.getInstalledApp(this.server, appId)
     } catch (e) {
       this.error = e.message
+    } finally {
+      this.loading = false
     }
   }
 

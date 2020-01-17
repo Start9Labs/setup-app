@@ -30,7 +30,7 @@
     </ion-item>
   </ion-item-group>
 
-  <ion-card *ngFor="let server of serverModel.servers" [routerLink]="[server.id]" class="ion-margin-bottom">
+  <ion-card button *ngFor="let server of serverModel.servers" class="ion-margin-bottom" (click)="show(server.id)">
     <ion-item>
       <ion-avatar slot="start">
         <img src="assets/img/cube.png" alt="icon" />

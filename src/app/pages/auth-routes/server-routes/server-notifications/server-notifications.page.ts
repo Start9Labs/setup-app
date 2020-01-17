@@ -34,7 +34,6 @@ export class ServerNotificationsPage {
 
     this.notifications = await this.getNotifications()
     this.server.badge = 0
-    this.loading = false
   }
 
   async doRefresh (e: any) {
@@ -58,6 +57,7 @@ export class ServerNotificationsPage {
     } catch (e) {
       this.error = e.message
     } finally {
+      this.loading = false
       return notifications
     }
   }
