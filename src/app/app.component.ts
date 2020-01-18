@@ -45,6 +45,15 @@ export class AppComponent {
       this.authService.authState.subscribe(authStatus => {
         this.handleAuthChange(authStatus)
       })
+      // subscribe to app pause event
+      this.pauseSub = this.platform.pause.subscribe(() => {
+        this.authService.uninit()
+        this.stopDaemons()
+      })
+      // sunscribe to app resume event
+      this.resumeSub = this.platform.resume.subscribe(() => {
+        this.authService.init()
+      })
       // do Cordova things if Cordova
       if (platform.is('cordova')) {
         // style status bar for iOS and Android
@@ -66,13 +75,6 @@ export class AppComponent {
       if (this.firstAuth) {
         await this.serverModel.load(this.authService.mnemonic!)
         this.initDaemons()
-        this.pauseSub = this.platform.pause.subscribe(() => {
-          this.authService.uninit()
-          this.stopDaemons()
-        })
-        this.resumeSub = this.platform.resume.subscribe(() => {
-          this.authService.init()
-        })
         this.firstAuth = false
         await this.router.navigate(['/auth'])
       } else {
@@ -81,15 +83,8 @@ export class AppComponent {
     // missing (no mnemonic)
     } else if (authStatus === AuthStatus.MISSING) {
       this.clearModels()
+      this.stopDaemons()
       this.firstAuth = true
-      if (this.pauseSub) {
-        this.pauseSub.unsubscribe()
-        this.pauseSub = undefined
-      }
-      if (this.resumeSub) {
-        this.resumeSub.unsubscribe()
-        this.resumeSub = undefined
-      }
       await this.router.navigate(['/unauth'])
     // unverified (mnemonic is present but encrypted)
     } else if (authStatus === AuthStatus.UNVERIFIED) {

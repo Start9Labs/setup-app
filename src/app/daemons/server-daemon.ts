@@ -27,7 +27,7 @@ export class ServerDaemon {
     this.initialized_at = new Date().valueOf()
     this.syncInterval = await this.storage.get('syncInterval')
     if (this.syncInterval === null) {
-      await this.updateSyncInterval(10000)
+      return this.updateSyncInterval(10000)
     }
     this.start()
   }
@@ -74,30 +74,30 @@ export class ServerDaemon {
       }
       await pauseFor(1000)
       server.updating = false
-      return
-    }
+    } else {
+      try {
+        const serverRes = await this.serverService.getServer(server)
+        Object.assign(server, serverRes)
+        this.handleNotifications(server)
+        await this.serverModel.saveAll()
+      } catch (e) {
+        server.status = AppHealthStatus.UNREACHABLE
+        server.statusAt = new Date()
+      }
 
-    try {
-      const serverRes = await this.serverService.getServer(server)
-      Object.assign(server, serverRes)
-      this.handleNotifications(server)
-      await this.serverModel.saveAll()
-    } catch (e) {
-      server.status = AppHealthStatus.UNREACHABLE
-      server.statusAt = new Date()
+      server.updating = false
     }
-
-    server.updating = false
   }
 
   async updateSyncInterval (ms: number) {
     this.syncInterval = ms
     if (this.syncInterval) {
       this.start()
+      await this.storage.set('syncInterval', this.syncInterval)
     } else {
       this.going = false
+      await this.storage.remove('syncInterval')
     }
-    await this.storage.set('syncInterval', this.syncInterval)
   }
 
   async handleNotifications (server: S9Server): Promise<void> {

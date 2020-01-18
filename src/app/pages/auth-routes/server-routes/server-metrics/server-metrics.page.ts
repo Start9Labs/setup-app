@@ -44,4 +44,8 @@ export class ServerMetricsPage {
       this.loading = false
     }
   }
+
+  asIsOrder (a: any, b: any) {
+    return 1
+  }
 }
