@@ -1,5 +1,5 @@
-import { Component, NgZone } from '@angular/core'
-import { Platform } from '@ionic/angular'
+import { Component } from '@angular/core'
+import { Platform, ModalController } from '@ionic/angular'
 import { SplashScreen } from '@ionic-native/splash-screen/ngx'
 import { StatusBar } from '@ionic-native/status-bar/ngx'
 import { ServerModel } from './models/server-model'
@@ -10,6 +10,7 @@ import { Router } from '@angular/router'
 import { AuthStatus } from './types/enums'
 import { AppModel } from './models/app-model'
 import { Subscription } from 'rxjs'
+import { AuthenticatePage } from './modals/authenticate/authenticate.page'
 
 @Component({
   selector: 'app-root',
@@ -31,7 +32,7 @@ export class AppComponent {
     private readonly serverDaemon: ServerDaemon,
     private readonly authService: AuthService,
     private readonly router: Router,
-    private readonly zone: NgZone,
+    private readonly modalCtrl: ModalController,
   ) {
     // set dark theme.
     // @TODO there should be a way to make this the default.
@@ -92,9 +93,7 @@ export class AppComponent {
       await this.router.navigate(['/unauth'])
     // unverified (mnemonic is present but encrypted)
     } else if (authStatus === AuthStatus.UNVERIFIED) {
-      this.zone.run(async () => {
-        await this.router.navigate(['/authenticate'])
-      })
+      await this.presentModalAuthenticate()
     }
   }
 
@@ -116,5 +115,14 @@ export class AppComponent {
   private clearModels () {
     this.serverModel.clearCache()
     this.appModel.clearCache()
+  }
+
+  async presentModalAuthenticate () {
+    const modal = await this.modalCtrl.create({
+      backdropDismiss: false,
+      component: AuthenticatePage,
+    })
+
+    await modal.present()
   }
 }

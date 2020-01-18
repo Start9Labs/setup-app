@@ -15,6 +15,10 @@ const routes: Routes = [
     loadChildren: () => import('./server-specs/server-specs.module').then(m => m.ServerSpecsPageModule),
   },
   {
+    path: 'metrics',
+    loadChildren: () => import('./server-metrics/server-metrics.module').then(m => m.ServerMetricsPageModule),
+  },
+  {
     path: 'apps',
     loadChildren: () => import('./apps-routes/apps-routing.module').then(m => m.AppsRoutingModule),
   },

@@ -1,5 +1,5 @@
 import { AppHealthStatus, AppVersion, AppConfigSpec, Rules } from '../models/app-model'
-import { ServerSpecs, S9Notification } from '../models/server-model'
+import { ServerSpecs, S9Notification, ServerMetrics } from '../models/server-model'
 
 export type TwoHundredOK = { never?: never } // hack for the unit type
 
@@ -31,7 +31,6 @@ export interface ApiServer {
   status: AppHealthStatus
   versionInstalled: string
   versionLatest: string
-  specs: ServerSpecs
   notifications: S9Notification[]
 }
 
@@ -50,6 +49,10 @@ export module Lan {
   export type PostRegisterRes = TwoHundredOK
   export type GetServerReq = { }
   export type GetServerRes = ApiServer
+  export type GetServerSpecsReq = { }
+  export type GetServerSpecsRes = ServerSpecs
+  export type GetServerMetricsReq = { }
+  export type GetServerMetricsRes = ServerMetrics
   export type GetAppAvailableReq = { }
   export type GetAppAvailableRes = ApiAppAvailableFull
   export type GetAppsAvailableReq = { }

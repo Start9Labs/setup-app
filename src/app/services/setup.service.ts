@@ -135,7 +135,6 @@ export class SetupService {
       versionLatest: '0.1.0',
       status: AppHealthStatus.RUNNING,
       statusAt: new Date(),
-      specs: builder.specs,
       privkey: 'testprivkey',
       pubkey: 'testpubkey',
       registered: true,
@@ -166,7 +165,6 @@ export interface S9ServerBuilder {
   statusAt: Date
   versionInstalled?: string
   versionLatest?: string
-  specs: ServerSpecs
 
   privkey?: string
   pubkey?: string
@@ -190,7 +188,6 @@ export function fromUserInput (id: string, label: string): S9ServerBuilder {
     label,
     status: AppHealthStatus.UNKNOWN,
     statusAt: new Date(),
-    specs: { },
     registered: false,
   }
 }
@@ -218,7 +215,6 @@ const defaultBuilder: Required<S9ServerBuilder> = {
   statusAt:         undefined as any,
   versionInstalled: undefined as any,
   versionLatest:    undefined as any,
-  specs:            undefined as any,
   privkey:          undefined as any,
   pubkey:           undefined as any,
   registered:       undefined as any,

@@ -14,10 +14,6 @@ const routes: Routes = [
     canActivate: [UnauthGuard],
     loadChildren: () => import('./pages/unauth-routes/unauth-routing.module').then(m => m.UnauthRoutingModule),
   },
-  {
-    path: 'authenticate',
-    loadChildren: () => import('./modals/authenticate/authenticate.module').then(m => m.AuthenticatePageModule),
-  },
 ]
 
 @NgModule({

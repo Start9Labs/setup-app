@@ -14,8 +14,7 @@
 <ion-content class="ion-padding">
 
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
-    <ion-refresher-content refreshingSpinner="lines">
-    </ion-refresher-content>
+    <ion-refresher-content refreshingSpinner="lines"></ion-refresher-content>
   </ion-refresher>
 
   <ion-item-group *ngIf="!serverModel.servers.length">
@@ -37,7 +36,7 @@
       </ion-avatar>
       <ion-label>
         <h1>{{ server.label }}</h1>
-        <h3><s9-status [status]="server.status"></s9-status></h3>
+        <h3><s9-status [status]="server.status" [target]="server"></s9-status></h3>
       </ion-label>
       <ion-badge slot="end" *ngIf="server.badge" color="danger">{{ server.badge }}</ion-badge>
     </ion-item>

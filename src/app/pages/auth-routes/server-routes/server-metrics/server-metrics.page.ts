@@ -1,19 +1,19 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { ServerModel, ServerSpecs } from 'src/app/models/server-model'
+import { ServerModel, ServerMetrics } from 'src/app/models/server-model'
 import { S9Server } from 'src/app/models/server-model'
 import { ServerService } from 'src/app/services/server.service'
 
 @Component({
-  selector: 'server-specs',
-  templateUrl: './server-specs.page.html',
-  styleUrls: ['./server-specs.page.scss'],
+  selector: 'server-metrics',
+  templateUrl: './server-metrics.page.html',
+  styleUrls: ['./server-metrics.page.scss'],
 })
-export class ServerSpecsPage {
+export class ServerMetricsPage {
   error = ''
   loading = true
   server: S9Server
-  specs: ServerSpecs
+  metrics: ServerMetrics
 
   constructor (
     private readonly route: ActivatedRoute,
@@ -27,8 +27,17 @@ export class ServerSpecsPage {
     if (!server) throw new Error (`No server found with ID: ${serverId}`)
     this.server = server
 
+    await this.getMetrics()
+  }
+
+  async doRefresh (event: any) {
+    await this.getMetrics()
+    event.target.complete()
+  }
+
+  async getMetrics () {
     try {
-      this.specs = await this.serverService.getServerSpecs(this.server)
+      this.metrics = await this.serverService.getServerMetrics(this.server)
     } catch (e) {
       this.error = e.message
     } finally {

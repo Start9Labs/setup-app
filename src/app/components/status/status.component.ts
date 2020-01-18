@@ -8,6 +8,7 @@ import { AppHealthStatus } from 'src/app/models/app-model'
 })
 export class StatusComponent {
   @Input() status: AppHealthStatus
+  @Input() target: 'server' | 'app'
   color: string
   display: string
 
@@ -16,7 +17,7 @@ export class StatusComponent {
   ngOnChanges () {
     switch (this.status) {
       case AppHealthStatus.UNKNOWN:
-        this.display = 'Unknown'
+        this.display = this.target === 'app' ? 'Unknown' : 'Connecting'
         this.color = 'dark'
         break
       case AppHealthStatus.REMOVING:
@@ -33,7 +34,7 @@ export class StatusComponent {
         this.color = 'warning'
         break
       case AppHealthStatus.RUNNING:
-        this.display = 'Running'
+        this.display = this.target === 'app' ? 'Running' : 'Connected'
         this.color = 'success'
         break
       case AppHealthStatus.UNREACHABLE:

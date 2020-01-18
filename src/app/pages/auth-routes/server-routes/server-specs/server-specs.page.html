@@ -9,8 +9,14 @@
 
 <ion-content class="ion-padding-top">
 
+  <ion-item *ngIf="error" style="margin-bottom: 16px;">
+    <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
+  </ion-item>
+
+  <ion-spinner *ngIf="loading" class="center" name="lines" color="warning"></ion-spinner>
+
   <ion-item-group>
-    <ion-item *ngFor="let spec of server.specs | keyvalue">
+    <ion-item *ngFor="let spec of specs | keyvalue">
       <ion-label position="stacked">{{ spec.key }}</ion-label>
       <ion-text color="medium"><h5>{{ spec.value }}</h5></ion-text>
     </ion-item>

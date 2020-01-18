@@ -65,7 +65,6 @@ export interface S9Server extends S9ServerStorable {
   updating: boolean
   status: AppHealthStatus
   statusAt: Date
-  specs: ServerSpecs
   versionLatest: string
   privkey: string // derive from mnemonic + torAddress
   badge: number
@@ -83,6 +82,13 @@ export interface S9Notification {
 }
 
 export type ServerSpecs = { [key: string]: string | number }
+
+export type ServerMetrics = {
+  [key: string]: {
+    value: number
+    unit: string
+  }
+}
 
 export function getLanIP (zcs: ZeroconfService): string {
   const { ipv4Addresses, ipv6Addresses } = zcs
@@ -109,7 +115,6 @@ export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): 
     statusAt: new Date(),
     privkey: deriveKeys(mnemonic, id).privkey,
     badge: 0,
-    specs: { },
     notifications: [],
   }
 }

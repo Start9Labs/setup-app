@@ -36,6 +36,7 @@ export class PasscodePage {
         {
           name: 'inputValue',
           type: 'tel',
+          id: 'maxLength4',
           placeholder: 'enter passcode',
         },
       ],
@@ -61,7 +62,7 @@ export class PasscodePage {
       ],
       cssClass: 'alert-config-value',
     })
-    await alert.present()
+    await alert.present().then(() => { document.getElementById('maxLength4')!.setAttribute('maxlength', '4') })
   }
 
   async save (value: string): Promise<void> {

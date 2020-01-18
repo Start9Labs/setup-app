@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core'
 import { Zeroconf, ZeroconfResult, ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { Subscription } from 'rxjs'
 import { Platform } from '@ionic/angular'
-import { AuthService } from '../services/auth.service'
 import { ServerModel } from '../models/server-model'
 import { ServerDaemon } from './server-daemon'
 
@@ -16,7 +15,6 @@ export class ZeroconfDaemon {
   constructor (
     private readonly platform: Platform,
     private readonly zeroconf: Zeroconf,
-    private readonly authService: AuthService,
     private readonly serverModel: ServerModel,
     private readonly serverDaemon: ServerDaemon,
   ) { }

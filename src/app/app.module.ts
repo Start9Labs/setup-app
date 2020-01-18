@@ -14,11 +14,13 @@ import { SecureStorage } from '@ionic-native/secure-storage/ngx'
 import { SplashScreen } from '@ionic-native/splash-screen/ngx'
 import { StatusBar } from '@ionic-native/status-bar/ngx'
 import { Zeroconf } from '@ionic-native/zeroconf/ngx'
+import { AuthenticatePageModule } from './modals/authenticate/authenticate.module'
 
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
   imports: [
+    AuthenticatePageModule,
     HttpClientModule,
     BrowserModule,
     IonicModule.forRoot(),

@@ -101,6 +101,13 @@ export class ServerShowPage {
           },
         },
         {
+          text: 'Server metrics',
+          icon: 'pulse',
+          handler: () => {
+            this.navCtrl.navigateForward(['metrics'], { relativeTo: this.route })
+          },
+        },
+        {
           text: 'Developer options',
           icon: 'code',
           handler: () => {
@@ -113,7 +120,7 @@ export class ServerShowPage {
     buttons.push(
       {
         text: 'Restart',
-        icon: 'refresh-circle',
+        icon: 'refresh',
         handler: () => {
           this.presentAlertRestart()
         },
@@ -287,7 +294,7 @@ export class ServerShowPage {
   async restart () {
     const loader = await this.loadingCtrl.create({
       spinner: 'lines',
-      message: `restarting ${this.server.label}. This could take a while...`,
+      message: `Restarting ${this.server.label}...`,
       cssClass: 'loader',
     })
     await loader.present()
@@ -305,7 +312,7 @@ export class ServerShowPage {
   async shutdown () {
     const loader = await this.loadingCtrl.create({
       spinner: 'lines',
-      message: `shutting down ${this.server.label}...`,
+      message: `Shutting down ${this.server.label}...`,
       cssClass: 'loader',
     })
     await loader.present()

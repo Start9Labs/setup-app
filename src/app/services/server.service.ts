@@ -23,6 +23,18 @@ export class ServerService {
     return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.GET, '')
   }
 
+  async getServerSpecs (server: S9Server): Promise<Lan.GetServerSpecsRes> {
+    // @TODO remove
+    // return mockGetServerSpecs()
+    return this.httpService.authServerRequest<Lan.GetServerSpecsRes>(server, Method.GET, `/specs`)
+  }
+
+  async getServerMetrics (server: S9Server): Promise<Lan.GetServerMetricsRes> {
+    // @TODO remove
+    // return mockGetServerMetrics()
+    return this.httpService.authServerRequest<Lan.GetServerMetricsRes>(server, Method.GET, `/metrics`)
+  }
+
   async getNotifications (server: S9Server, page: number, perPage: number): Promise<S9Notification[]> {
     const params: Lan.GetNotificationsReq = {
       page: String(page),
@@ -210,6 +222,18 @@ async function mockGetServer (): Promise<Lan.GetServerRes> {
 }
 
 // @TODO remove
+async function mockGetServerSpecs (): Promise<Lan.GetServerSpecsRes> {
+  await pauseFor(1000)
+  return mockApiServerSpecs
+}
+
+// @TODO remove
+async function mockGetServerMetrics (): Promise<Lan.GetServerMetricsRes> {
+  await pauseFor(1000)
+  return mockApiServerMetrics
+}
+
+// @TODO remove
 async function mockGetNotifications (): Promise<Lan.GetNotificationsRes> {
   await pauseFor(1000)
   return mockApiNotifications.concat(mockApiNotifications).concat(mockApiNotifications)
@@ -335,13 +359,6 @@ const mockApiServer: Lan.GetServerRes = {
   versionInstalled: '0.1.0',
   versionLatest: '0.1.0',
   status: AppHealthStatus.RUNNING,
-  specs: {
-    'CPU': 'Broadcom BCM2711, Quad core Cortex-A72 (ARM v8) 64-bit SoC @ 1.5GHz',
-    'RAM': '4GB LPDDR4-2400 SDRAM',
-    'WiFI': '2.4 GHz and 5.0 GHz IEEE 802.11ac wireless, Bluetooth 5.0, BLE',
-    'Ethernet': 'Gigabit',
-    'Disk': '512 GB Flash (280 GB available)',
-  },
   notifications: [  {
     id: '123e4567-e89b-12d3-a456-426655440000',
     appId: 'bitcoind',
@@ -350,6 +367,29 @@ const mockApiServer: Lan.GetServerRes = {
     title: 'Install Complete',
     message: 'Installation of bitcoind has successfully completed.',
   }],
+}
+
+const mockApiServerMetrics: Lan.GetServerMetricsRes = {
+  'Metric1': {
+    value: 22.2,
+    unit: 'mi/b',
+  },
+  'Metric2': {
+    value: 50,
+    unit: '%',
+  },
+  'Metric3': {
+    value: 10.1,
+    unit: '%',
+  },
+}
+
+const mockApiServerSpecs: Lan.GetServerSpecsRes = {
+  'CPU': 'Broadcom BCM2711, Quad core Cortex-A72 (ARM v8) 64-bit SoC @ 1.5GHz',
+  'RAM': '4GB LPDDR4-2400 SDRAM',
+  'WiFI': '2.4 GHz and 5.0 GHz IEEE 802.11ac wireless, Bluetooth 5.0, BLE',
+  'Ethernet': 'Gigabit',
+  'Disk': '512 GB Flash (280 GB available)',
 }
 
 // @TODO remove
