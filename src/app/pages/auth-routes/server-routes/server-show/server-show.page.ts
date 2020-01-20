@@ -4,20 +4,20 @@ import { ServerModel } from 'src/app/models/server-model'
 import { NavController, AlertController, ActionSheetController, LoadingController } from '@ionic/angular'
 import { S9Server } from 'src/app/models/server-model'
 import { ActionSheetButton } from '@ionic/core'
-import { AppHealthStatus, AppInstalled, AppModel } from 'src/app/models/app-model'
+import { AppHealthStatus } from 'src/app/models/app-model'
 import * as compareVersions from 'compare-versions'
 import { ServerService } from 'src/app/services/server.service'
 import { ServerDaemon } from 'src/app/daemons/server-daemon'
-import { AppSyncingPage, serverFromRouteParam } from '../apps-routes/app-syncing-page'
 import { AppDaemon } from 'src/app/daemons/app-daemon'
 import { pauseFor } from 'src/app/util/misc.util'
+import { serverFromRouteParam } from '../server-helpers'
 
 @Component({
   selector: 'server-show',
   templateUrl: 'server-show.page.html',
   styleUrls: ['server-show.page.scss'],
 })
-export class ServerShowPage extends AppSyncingPage {
+export class ServerShowPage {
   error: string
   view: 'apps' | 'about' = 'apps'
   server: S9Server
@@ -32,15 +32,22 @@ export class ServerShowPage extends AppSyncingPage {
     private readonly alertCtrl: AlertController,
     private readonly loadingCtrl: LoadingController,
     private readonly serverDaemon: ServerDaemon,
-    serverService: ServerService,
-    appModel: AppModel,
-  ) { super(serverService, appModel) }
+    private readonly serverService: ServerService,
+    private readonly appDaemon: AppDaemon,
+  ) { }
 
   async ngOnInit () {
-    this.server = serverFromRouteParam(this.route, this.serverModel)
+    this.server = serverFromRouteParam(
+      this.route, this.serverModel,
+    )
 
-    super.ngOnInit(this.server)
+    this.appDaemon.setAndGo(this.server)
+
     this.getServerAndApps()
+  }
+
+  async ngOnDestroy () {
+    this.appDaemon.stop()
   }
 
   async doRefresh (event: any) {
@@ -52,8 +59,8 @@ export class ServerShowPage extends AppSyncingPage {
     this.loading = true
 
     await this.serverDaemon.syncServer(this.server)
-                           .then(() => pauseFor(500))
-                           .then(() => this.conjureAppDaemon(this.server).syncApps())
+              .then(() => pauseFor(500))
+              .then(() => this.appDaemon.syncApps())
 
     this.loading = false
   }

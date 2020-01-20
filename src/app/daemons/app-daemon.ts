@@ -1,26 +1,30 @@
-import { Injectable } from '@angular/core'
-import { ToastController, NavController } from '@ionic/angular'
-import { ServerModel, S9Server } from '../models/server-model'
+import { S9Server } from '../models/server-model'
 import { pauseFor } from 'src/app/util/misc.util'
 import { ServerService } from '../services/server.service'
 import { AppHealthStatus, AppModel } from '../models/app-model'
-import { Storage } from '@ionic/storage'
-import { ZeroconfDaemon } from './zeroconf-daemon'
-import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
+import { Injectable } from '@angular/core'
 
+@Injectable({
+  providedIn: 'root',
+})
 export class AppDaemon {
   private going: boolean
-  syncing: boolean
   private syncInterval: number = 5000
+  syncing: boolean = false
+  server: S9Server
 
   constructor (
     private readonly serverService: ServerService,
     private readonly appModel: AppModel,
-    private readonly server: S9Server,
   ) { }
 
-  getServerId (): string {
-    return this.server.id
+  getServer (): S9Server {
+    return this.server
+  }
+
+  setAndGo (s9: S9Server): void {
+    this.server = s9
+    this.start()
   }
 
   async init () { this.start() }
@@ -36,14 +40,23 @@ export class AppDaemon {
   }
 
   async syncApps (): Promise<void> {
+    if (this.syncing) { return }
+
+    console.log('syncing apps')
+
+    this.syncing = true
+
     try {
       const apps = await this.serverService.getInstalledApps(this.server)
       this.appModel.syncAppCache(this.server.id, apps)
     } catch (e) {
+      console.error('App sync failure: ' + e)
       this.appModel.updateAppsUniformly(this.server.id,
         { status: AppHealthStatus.UNREACHABLE, statusAt: new Date() },
       )
     }
+
+    this.syncing = false
   }
 
   stop () {

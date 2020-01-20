@@ -1,6 +1,4 @@
-import { Omit } from '../util/misc.util'
 import { Injectable } from '@angular/core'
-import { groupBy } from 'rxjs/operators'
 
 @Injectable({
   providedIn: 'root',
@@ -35,7 +33,7 @@ export class AppModel {
 
   syncAppCache (serverId: string, upToDateApps : AppInstalled[]) {
     this.appMap[serverId] = upToDateApps.reduce((acc, newApp) => {
-      acc[newApp.id] = Object.assign(this.appMap[serverId][newApp.id] || { }, newApp)
+      acc[newApp.id] = Object.assign(this.getApp(serverId, newApp.id) || { }, newApp)
       return acc
     }, { } as { [appId: string]: AppInstalled })
   }

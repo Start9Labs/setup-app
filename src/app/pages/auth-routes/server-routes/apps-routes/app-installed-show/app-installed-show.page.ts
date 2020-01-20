@@ -7,14 +7,15 @@ import { AppInstalled, AppHealthStatus, AppModel } from 'src/app/models/app-mode
 import { S9Server } from 'src/app/models/server-model'
 import { ClipboardService } from 'src/app/services/clipboard.service'
 import { ActionSheetButton } from '@ionic/core'
-import { AppSyncingPage, serverFromRouteParam } from '../app-syncing-page'
+import { AppDaemon } from 'src/app/daemons/app-daemon'
+import { serverFromRouteParam } from '../../server-helpers'
 
 @Component({
   selector: 'app-installed-show',
   templateUrl: './app-installed-show.page.html',
   styleUrls: ['./app-installed-show.page.scss'],
 })
-export class AppInstalledShowPage extends AppSyncingPage {
+export class AppInstalledShowPage {
   loading = true
   error: string
   server: S9Server
@@ -28,17 +29,18 @@ export class AppInstalledShowPage extends AppSyncingPage {
     private readonly navCtrl: NavController,
     private readonly clipboardService: ClipboardService,
     private readonly loadingCtrl: LoadingController,
-    serverService: ServerService,
-    appModel: AppModel,
-  ) {
-    super(serverService, appModel)
-  }
+    private readonly serverService: ServerService,
+    private readonly appModel: AppModel,
+    private readonly appDaemon: AppDaemon,
+  ) { }
 
   async ngOnInit () {
     try {
-      this.server = serverFromRouteParam(this.route, this.serverModel)
+      this.server = serverFromRouteParam(
+        this.route, this.serverModel,
+      )
 
-      super.ngOnInit(this.server)
+      this.appDaemon.setAndGo(this.server)
 
       const appId = this.route.snapshot.paramMap.get('appId') as string
       this.app = this.appModel.getApp(this.server.id, appId) || { } as Readonly<AppInstalled>
@@ -47,6 +49,10 @@ export class AppInstalledShowPage extends AppSyncingPage {
     } catch (e) {
       this.error = e.message
     }
+  }
+
+  async ngOnDestroy () {
+    this.appDaemon.stop()
   }
 
   async getApp (appId: string): Promise<void> {
