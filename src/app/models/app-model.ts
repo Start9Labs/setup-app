@@ -179,4 +179,5 @@ export enum AppHealthStatus {
   RESTARTING = 'RESTARTING',
   REMOVING = 'REMOVING',
   DEAD = 'DEAD',
+  CONNECTING = 'CONNECTING',
 }

@@ -58,9 +58,19 @@ export class AppDaemon {
       this.appModel.syncAppCache(this.server.id, apps)
     } catch (e) {
       console.warn('App sync failure: ' + e)
-      this.appModel.updateAppsUniformly(this.server.id,
-        { status: AppHealthStatus.UNREACHABLE, statusAt: new Date() },
-      )
+
+      const now = new Date()
+      if (this.pollingBeganAt.valueOf() + 7000 < now.valueOf()) {
+        this.appModel.updateAppsUniformly(this.server.id,
+          { status: AppHealthStatus.UNREACHABLE, statusAt: now },
+        )
+      } else {
+        this.appModel.updateAppsUniformly(this.server.id,
+          { status: AppHealthStatus.CONNECTING, statusAt: now },
+        )
+      }
+
+
     }
 
     this.syncing = false
