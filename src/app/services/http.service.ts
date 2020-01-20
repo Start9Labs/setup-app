@@ -91,8 +91,8 @@ export class HttpService {
       } else {
         message = e.message || JSON.stringify(e)
       }
-      console.log('error message: ', message)
-      throw new Error('Request error: ' + message)
+      console.log('request error: ', message)
+      throw new Error(message)
     }
   }
 
