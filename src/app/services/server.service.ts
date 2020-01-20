@@ -3,7 +3,7 @@ import { HttpService } from './http.service'
 import { Method } from '../types/enums'
 import { AppInstalled, AppAvailablePreview, AppAvailableFull, AppHealthStatus, AppConfigSpec, AppModel, Rules } from '../models/app-model'
 import { S9Server, S9Notification } from '../models/server-model'
-import { Lan, ApiAppAvailablePreview, ApiAppAvailableFull, ApiAppInstalled, ApiServer } from '../types/api-types'
+import { Lan, ApiAppAvailablePreview, ApiAppAvailableFull, ApiAppInstalled, ApiServer, ApiAppVersionInfo } from '../types/api-types'
 import { S9BuilderWith } from './setup.service'
 import * as configUtil from '../util/config.util'
 import { pauseFor } from '../util/misc.util'
@@ -77,8 +77,19 @@ export class ServerService {
       .then(res => {
         return {
           ...res,
-          // versionLatest expected to have a corresponding version, hence bang
-          releaseNotes: res.versions.find(v => v.version === res.versionLatest)!.releaseNotes,
+          versionViewing: res.versionLatest,
+        }
+      })
+  }
+
+  async getAvailableAppVersionInfo (server: S9Server, appId: string, version: string): Promise<{ releaseNotes: string, versionViewing: string }> {
+    // @TODO remove
+    // return mockGetAvailableAppVersionInfo()
+    return this.httpService.authServerRequest<Lan.GetAppAvailableVersionInfoRes>(server, Method.GET, `/apps/${appId}/store/${version}`)
+      .then(res => {
+        return {
+          ...res,
+          versionViewing: version,
         }
       })
   }
@@ -266,6 +277,12 @@ async function mockGetAvailableApps (): Promise<Lan.GetAppsAvailableRes> {
 }
 
 // @TODO remove
+async function mockGetAvailableAppVersionInfo (): Promise<Lan.GetAppAvailableVersionInfoRes> {
+  await pauseFor(1000)
+  return mockApiAppAvailableVersionInfo
+}
+
+// @TODO remove
 async function mockGetInstalledApp (): Promise<Lan.GetAppInstalledRes> {
   await pauseFor(1000)
   return mockApiAppInstalled
@@ -448,7 +465,7 @@ const mockApiNotifications: Lan.GetNotificationsRes = [
 // @TODO remove
 const mockApiAppAvailablePreview: ApiAppAvailablePreview = {
   id: 'bitcoind',
-  versionLatest: '0.18.1',
+  versionLatest: '0.19.0',
   versionInstalled: undefined,
   title: 'Bitcoin Core',
   descriptionShort: 'Bitcoin is an innovative payment network and new kind of money.',
@@ -459,23 +476,20 @@ const mockApiAppAvailablePreview: ApiAppAvailablePreview = {
 // @TODO remove
 const mockApiAppAvailableFull: ApiAppAvailableFull = {
   ...mockApiAppAvailablePreview,
+  releaseNotes: 'Segit and more cool things!',
   descriptionLong: 'Bitcoin is an innovative payment network and new kind of money. Bitcoin utilizes a robust p2p network to garner decentralized consensus.',
-  versions: [
-    {
-      version: '0.18.1',
-      releaseNotes: '* Faster sync time<br />* MAST support',
-    },
-    {
-      version: '0.17.0',
-      releaseNotes: '* New Bitcoiny stuff!!',
-    },
-  ],
+  versions: ['0.19.0', '0.18.1', '0.17.0'],
+}
+
+// @TODO remove
+const mockApiAppAvailableVersionInfo: ApiAppVersionInfo = {
+  releaseNotes: 'Some older release notes that are not super important anymore.',
 }
 
 // @TODO remove
 const mockApiAppInstalled: ApiAppInstalled = {
   id: 'bitcoind',
-  versionLatest: '0.18.1',
+  versionLatest: '0.19.0',
   versionInstalled: '0.18.1',
   title: 'Bitcoin Core',
   torAddress: 'sample-bitcoin-tor-address',
@@ -595,6 +609,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
     favoriteNumber: {
       name: 'Favorite Number',
       type: 'number',
+      integral: false,
       description: 'Your favorite number of all time',
       changeWarning: 'Once you set this number, it can never be changed without severe consequences.',
       nullable: false,
@@ -607,6 +622,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
       description: 'Numbers that you like but are not your top favorite.',
       spec: {
         type: 'number',
+        integral: false,
         range: '[-100,200)',
       },
       range: '[0,10]',
@@ -712,6 +728,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
     port: {
       name: 'Port',
       type: 'number',
+      integral: true,
       description: 'the default port for your Bitcoin node. default: 8333, testnet: 18333, regtest: 18444',
       nullable: false,
       default: 8333,
