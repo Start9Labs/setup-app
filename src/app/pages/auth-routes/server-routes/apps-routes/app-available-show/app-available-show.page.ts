@@ -89,11 +89,11 @@ export class AppAvailableShowPage {
     }
   }
 
-  async presentAlertInstall (version: string) {
+  async presentAlertInstall () {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Caution',
-      message: `Are you sure you want to install ${this.app.title} ${version}?`,
+      message: `Are you sure you want to install ${this.app.title} ${this.app.versionViewing}?`,
       buttons: [
         {
           text: 'Cancel',
@@ -103,7 +103,7 @@ export class AppAvailableShowPage {
           text: 'Install',
           cssClass: 'alert-success',
           handler: () => {
-            this.install(version)
+            this.install()
           },
         },
       ],
@@ -133,7 +133,7 @@ export class AppAvailableShowPage {
     await alert.present()
   }
 
-  async install (version: string) {
+  async install () {
     const loader = await this.loadingCtrl.create({
       spinner: 'lines',
       cssClass: 'loader',
@@ -141,7 +141,7 @@ export class AppAvailableShowPage {
     await loader.present()
 
     try {
-      await this.serverService.installApp(this.server, this.app.id, version)
+      await this.serverService.installApp(this.server, this.app.id, this.app.versionViewing)
       await this.navCtrl.navigateBack(['/auth', 'servers', this.server.id])
     } catch (e) {
       this.error = e.message

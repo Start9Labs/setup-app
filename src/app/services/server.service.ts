@@ -20,8 +20,8 @@ export class ServerService {
 
   async getServer (server: S9Server | S9BuilderWith<'zeroconf' | 'privkey' | 'versionInstalled' | 'torAddress'>): Promise<ApiServer> {
     // @TODO remove
-    // return mockGetServer()
-    return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.GET, '')
+    return mockGetServer()
+    // return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.GET, '')
   }
 
   async getServerSpecs (server: S9Server): Promise<Lan.GetServerSpecsRes> {
@@ -103,8 +103,8 @@ export class ServerService {
 
   async getInstalledApps (server: S9Server): Promise<AppInstalled[]> {
     // @TODO remove
-    // return mockGetInstalledApps()
-    return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.GET, `/apps/installed`)
+    return mockGetInstalledApps()
+    // return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.GET, `/apps/installed`)
       .then(res => res.map(mapApiInstalledApp))
   }
 
