@@ -1,4 +1,3 @@
-import { Omit } from '../util/misc.util'
 import { Injectable } from '@angular/core'
 
 @Injectable({
@@ -30,6 +29,19 @@ export class AppModel {
   cacheApp (serverId: string, app: AppInstalled, updates: Partial<AppInstalled> = { }): Readonly<AppInstalled> {
     this.appMap[serverId][app.id] = Object.assign(this.getApp(serverId, app.id) || app, updates)
     return this.getApp(serverId, app.id) as Readonly<AppInstalled>
+  }
+
+  syncAppCache (serverId: string, upToDateApps : AppInstalled[]) {
+    this.appMap[serverId] = upToDateApps.reduce((acc, newApp) => {
+      acc[newApp.id] = Object.assign(this.getApp(serverId, newApp.id) || { }, newApp)
+      return acc
+    }, { } as { [appId: string]: AppInstalled })
+  }
+
+  updateAppsUniformly (serverId: string, uniformUpdate: Partial<AppInstalled>) {
+    this.getApps(serverId).forEach(
+      app => this.cacheApp(serverId, app, uniformUpdate),
+    )
   }
 
   removeApp (serverId: string, appId: string) {

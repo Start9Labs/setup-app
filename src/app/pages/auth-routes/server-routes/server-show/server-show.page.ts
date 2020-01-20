@@ -4,10 +4,13 @@ import { ServerModel } from 'src/app/models/server-model'
 import { NavController, AlertController, ActionSheetController, LoadingController } from '@ionic/angular'
 import { S9Server } from 'src/app/models/server-model'
 import { ActionSheetButton } from '@ionic/core'
-import { AppHealthStatus, AppInstalled, AppModel } from 'src/app/models/app-model'
+import { AppHealthStatus } from 'src/app/models/app-model'
 import * as compareVersions from 'compare-versions'
 import { ServerService } from 'src/app/services/server.service'
 import { ServerDaemon } from 'src/app/daemons/server-daemon'
+import { AppDaemon } from 'src/app/daemons/app-daemon'
+import { pauseFor } from 'src/app/util/misc.util'
+import { serverFromRouteParam } from '../server-helpers'
 
 @Component({
   selector: 'server-show',
@@ -28,17 +31,23 @@ export class ServerShowPage {
     private readonly actionCtrl: ActionSheetController,
     private readonly alertCtrl: AlertController,
     private readonly loadingCtrl: LoadingController,
-    private readonly serverService: ServerService,
     private readonly serverDaemon: ServerDaemon,
-    readonly appModel: AppModel,
+    private readonly serverService: ServerService,
+    private readonly appDaemon: AppDaemon,
   ) { }
 
   async ngOnInit () {
-    const serverId = this.route.snapshot.paramMap.get('serverId') as string
-    const server = this.serverModel.getServer(serverId)
-    if (!server) throw new Error (`No server found with ID: ${serverId}`)
-    this.server = server
+    this.server = serverFromRouteParam(
+      this.route, this.serverModel,
+    )
+
+    this.appDaemon.setAndGo(this.server)
+
     this.getServerAndApps()
+  }
+
+  async ngOnDestroy () {
+    this.appDaemon.stop()
   }
 
   async doRefresh (event: any) {
@@ -49,32 +58,11 @@ export class ServerShowPage {
   async getServerAndApps () {
     this.loading = true
 
-    await Promise.all([
-      this.serverDaemon.syncServer(this.server),
-      this.getApps(),
-    ])
+    await this.serverDaemon.syncServer(this.server)
+              .then(() => pauseFor(500))
+              .then(() => this.appDaemon.syncApps())
 
     this.loading = false
-  }
-
-  async getApps (): Promise<void> {
-    try {
-      const apps = await this.serverService.getInstalledApps(this.server)
-      // clear cache of removed apps
-      this.appModel.getApps(this.server.id).forEach(app => {
-        if (!apps.find(a => a.id === app.id)) {
-          this.appModel.removeApp(this.server.id, app.id)
-        }
-      })
-      // update cache with new app data
-      apps.forEach(app => {
-        this.appModel.cacheApp(this.server.id, app, app)
-      })
-    } catch (e) {
-      this.appModel.getApps(this.server.id).forEach(app => {
-        this.appModel.cacheApp(this.server.id, app, { status: AppHealthStatus.UNREACHABLE, statusAt: new Date() })
-      })
-    }
   }
 
   async presentAction () {
