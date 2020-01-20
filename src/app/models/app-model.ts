@@ -105,6 +105,7 @@ export interface ValueSpecString extends ListValueSpecString, WithStandalone {
 export interface ListValueSpecNumber extends ValueSpecBase {
   type: 'number'
   range: string
+  integral: boolean
   units?: string
 }
 

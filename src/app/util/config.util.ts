@@ -293,7 +293,7 @@ export function getDefaultDescription (spec: ValueSpec): string | undefined {
       }
       break
     case 'boolean':
-      toReturn = String(spec.default)
+      toReturn = spec.default === true ? 'On' : 'Off'
       break
     case 'enum':
       toReturn = spec.default

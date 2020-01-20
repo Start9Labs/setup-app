@@ -609,6 +609,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
     favoriteNumber: {
       name: 'Favorite Number',
       type: 'number',
+      integral: false,
       description: 'Your favorite number of all time',
       changeWarning: 'Once you set this number, it can never be changed without severe consequences.',
       nullable: false,
@@ -621,6 +622,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
       description: 'Numbers that you like but are not your top favorite.',
       spec: {
         type: 'number',
+        integral: false,
         range: '[-100,200)',
       },
       range: '[0,10]',
@@ -726,6 +728,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
     port: {
       name: 'Port',
       type: 'number',
+      integral: true,
       description: 'the default port for your Bitcoin node. default: 8333, testnet: 18333, regtest: 18444',
       nullable: false,
       default: 8333,
