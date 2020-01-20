@@ -20,23 +20,23 @@ export class ServerDaemon {
   constructor (
     private readonly serverService: ServerService,
     private readonly serverModel: ServerModel,
-    private readonly storage: Storage,
     private readonly toastCtrl: ToastController,
     private readonly navCtrl: NavController,
     private readonly zeroconfDaemon: ZeroconfDaemon,
   ) { }
 
   async init () {
-    this.initialized_at = new Date().valueOf()
-
     this.zeroconfDaemon.watch().subscribe(zeroconfService => this.handleZeroconfUpdate(zeroconfService) )
-
     this.start()
   }
 
   async start (): Promise<void> {
-    if (this.going) { return }
+    if (!this.going) this.poll()
+  }
+
+  private async poll () {
     this.going = true
+    this.initialized_at = new Date().valueOf()
 
     while (this.going) {
       this.syncServers()
