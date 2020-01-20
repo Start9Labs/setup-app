@@ -37,7 +37,7 @@ export class PinPage {
           name: 'inputValue',
           type: 'tel',
           id: 'maxLength4',
-          placeholder: 'enter pin',
+          placeholder: 'Enter new pin',
         },
       ],
       buttons: [

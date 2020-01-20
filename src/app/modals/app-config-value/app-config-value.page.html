@@ -8,8 +8,8 @@
     <ion-title>
       {{ spec.name }}
     </ion-title>
-    <ion-buttons *ngIf="!this.error && this.edited" slot="end">
-      <ion-button (click)="done()" color="primary">
+    <ion-buttons slot="end">
+      <ion-button [disabled]="this.error" (click)="done()" color="primary">
         Done
       </ion-button>
     </ion-buttons>
