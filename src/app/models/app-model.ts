@@ -50,9 +50,10 @@ export interface AppAvailablePreview extends BaseApp {
 }
 
 export interface AppAvailableFull extends AppAvailablePreview {
+  versionViewing: string
   descriptionLong: string
   releaseNotes: string
-  versions: AppVersion[]
+  versions: string[]
 }
 
 export interface AppInstalled extends BaseApp {
@@ -60,11 +61,6 @@ export interface AppInstalled extends BaseApp {
   statusAt: Date
   torAddress?: string
   progress?: number
-}
-
-export interface AppVersion {
-  version: string
-  releaseNotes: string
 }
 
 export type AppConfigSpec = { [key: string]: ValueSpec }

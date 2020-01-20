@@ -70,17 +70,12 @@ export class ServerService {
     return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(server, Method.GET, '/apps/store')
   }
 
-  async getAvailableApp (server: S9Server, appId: string): Promise<AppAvailableFull> {
+  async getAvailableApp (server: S9Server, appId: string, version?: string): Promise<AppAvailableFull> {
+    const params: Lan.GetAppAvailableReq = { }
+    if (version) { params.version = version }
     // @TODO remove
     // return mockGetAvailableApp()
-    return this.httpService.authServerRequest<Lan.GetAppAvailableRes>(server, Method.GET, `/apps/${appId}/store`)
-      .then(res => {
-        return {
-          ...res,
-          // versionLatest expected to have a corresponding version, hence bang
-          releaseNotes: res.versions.find(v => v.version === res.versionLatest)!.releaseNotes,
-        }
-      })
+    return this.httpService.authServerRequest<Lan.GetAppAvailableRes>(server, Method.GET, `/apps/${appId}/store`, { params })
   }
 
   async getInstalledApp (server: S9Server, appId: string): Promise<AppInstalled> {
@@ -448,7 +443,7 @@ const mockApiNotifications: Lan.GetNotificationsRes = [
 // @TODO remove
 const mockApiAppAvailablePreview: ApiAppAvailablePreview = {
   id: 'bitcoind',
-  versionLatest: '0.18.1',
+  versionLatest: '0.19.0',
   versionInstalled: undefined,
   title: 'Bitcoin Core',
   descriptionShort: 'Bitcoin is an innovative payment network and new kind of money.',
@@ -459,23 +454,16 @@ const mockApiAppAvailablePreview: ApiAppAvailablePreview = {
 // @TODO remove
 const mockApiAppAvailableFull: ApiAppAvailableFull = {
   ...mockApiAppAvailablePreview,
+  versionViewing: '0.19.0',
+  releaseNotes: 'Segit and more cool things!',
   descriptionLong: 'Bitcoin is an innovative payment network and new kind of money. Bitcoin utilizes a robust p2p network to garner decentralized consensus.',
-  versions: [
-    {
-      version: '0.18.1',
-      releaseNotes: '* Faster sync time<br />* MAST support',
-    },
-    {
-      version: '0.17.0',
-      releaseNotes: '* New Bitcoiny stuff!!',
-    },
-  ],
+  versions: ['0.19.0', '0.18.1', '0.17.0'],
 }
 
 // @TODO remove
 const mockApiAppInstalled: ApiAppInstalled = {
   id: 'bitcoind',
-  versionLatest: '0.18.1',
+  versionLatest: '0.19.0',
   versionInstalled: '0.18.1',
   title: 'Bitcoin Core',
   torAddress: 'sample-bitcoin-tor-address',
