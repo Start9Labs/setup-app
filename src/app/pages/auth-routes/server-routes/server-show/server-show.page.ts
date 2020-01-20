@@ -24,13 +24,13 @@ export class ServerShowPage {
   constructor (
     private readonly route: ActivatedRoute,
     private readonly serverModel: ServerModel,
-    private readonly appModel: AppModel,
     private readonly navCtrl: NavController,
     private readonly actionCtrl: ActionSheetController,
     private readonly alertCtrl: AlertController,
     private readonly loadingCtrl: LoadingController,
     private readonly serverService: ServerService,
     private readonly serverDaemon: ServerDaemon,
+    readonly appModel: AppModel,
   ) { }
 
   async ngOnInit () {

@@ -10,26 +10,12 @@ import { AlertOptions } from '@ionic/core'
   styleUrls: ['./settings.page.scss'],
 })
 export class SettingsPage {
-  syncInterval: string
-  syncIntervalInterface: AlertOptions = {
-    header: 'Sync Interval',
-    message: 'Frequency to sync server data',
-  }
 
   constructor (
     private readonly platform: Platform,
     private readonly alertCtrl: AlertController,
     private readonly authService: AuthService,
-    private readonly serverDaemon: ServerDaemon,
   ) { }
-
-  ngOnInit () {
-    this.syncInterval = String(this.serverDaemon.syncInterval)
-  }
-
-  async updateSyncInterval () {
-    await this.serverDaemon.updateSyncInterval(Number(this.syncInterval))
-  }
 
   async presentAlertWarnRecovery () {
     const alert = await this.alertCtrl.create({

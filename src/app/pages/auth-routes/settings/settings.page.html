@@ -10,20 +10,6 @@
 <ion-content>
 
   <ion-item-group>
-    <ion-item-divider>Preferences</ion-item-divider>
-    <ion-item>
-      <ion-label>Sync Interval</ion-label>
-      <ion-select slot="end" [(ngModel)]="syncInterval" [interfaceOptions]="syncIntervalInterface" placeholder="Select One" (ngModelChange)="updateSyncInterval()">
-        <ion-select-option value="5000">5 seconds</ion-select-option>
-        <ion-select-option value="10000">10 seconds</ion-select-option>
-        <ion-select-option value="30000">30 seconds</ion-select-option>
-        <ion-select-option value="60000">60 seconds</ion-select-option>
-        <ion-select-option value="0">Off</ion-select-option>
-      </ion-select>
-    </ion-item>
-  </ion-item-group>
-
-  <ion-item-group>
     <ion-item-divider>Security</ion-item-divider>
     <ion-item button (click)="presentAlertWarnRecovery()">
       <ion-label>View mnemonic</ion-label>

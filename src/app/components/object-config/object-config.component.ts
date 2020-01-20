@@ -33,30 +33,8 @@ export class ObjectConfigComponent {
 
   async presentDescription (keyval: { key: string, value: ValueSpec }, e: Event) {
     e.stopPropagation()
-    // if present, get defaults for subheader
-    let subHeader: string | undefined
-    switch (keyval.value.type) {
-      case 'string':
-        if (typeof keyval.value.default === 'string') {
-          subHeader = keyval.value.default
-        } else if (typeof keyval.value.default === 'object') {
-          subHeader = 'random'
-        } else {
-          'none'
-        }
-        break
-      case 'number':
-        if (typeof keyval.value.default === 'number') {
-          subHeader = String(keyval.value.default)
-        }
-        break
-      case 'boolean':
-        subHeader = String(keyval.value.default)
-        break
-      case 'enum':
-        subHeader = keyval.value.default
-        break
-    }
+    // get default for display in subheader
+    let subHeader = configUtil.getDefaultDescription(keyval.value)
     if (subHeader) { subHeader = `Default: ${subHeader}` }
 
     const alert = await this.alertCtrl.create({
@@ -68,6 +46,7 @@ export class ObjectConfigComponent {
   }
 
   async handleBooleanChange (spec: ValueSpec) {
+    this.markEdited()
     if (spec.changeWarning) {
       const alert = await this.alertCtrl.create({
         backdropDismiss: false,
@@ -77,6 +56,10 @@ export class ObjectConfigComponent {
       })
       await alert.present()
     }
+  }
+
+  async handleEnumChange () {
+    this.markEdited()
   }
 
   async handleObjectClick (keyval: { key: string, value: ValueSpecObject }) {

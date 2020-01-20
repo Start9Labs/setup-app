@@ -9,7 +9,7 @@
       {{ spec.name }}
     </ion-title>
     <ion-buttons slot="end">
-      <ion-button [disabled]="this.error" (click)="done()" color="primary">
+      <ion-button [disabled]="!!error" (click)="done()" color="primary">
         Done
       </ion-button>
     </ion-buttons>
@@ -41,7 +41,7 @@
     </ion-item>
     <p *ngIf="spec.default" class="ion-padding-start">
       <ion-text color="medium">
-        Default: {{ spec.default }}
+        Default: {{ getDefaultDescription(spec) }}
         <span *ngIf="spec.type === 'number' && spec.units"> {{ spec.units }}</span>
       </ion-text>
     </p>

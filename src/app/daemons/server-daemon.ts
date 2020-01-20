@@ -15,7 +15,7 @@ export class ServerDaemon {
   private going: boolean
   private initialized_at: number
   syncing: boolean
-  syncInterval: number
+  syncInterval = 5000
 
   constructor (
     private readonly serverService: ServerService,
@@ -28,8 +28,6 @@ export class ServerDaemon {
 
   async init () {
     this.initialized_at = new Date().valueOf()
-    this.syncInterval = await this.storage.get('syncInterval')
-    if (this.syncInterval === null) { return this.updateSyncInterval(10000) }
 
     this.zeroconfDaemon.watch().subscribe(zeroconfService => this.handleZeroconfUpdate(zeroconfService) )
 
@@ -37,10 +35,10 @@ export class ServerDaemon {
   }
 
   async start (): Promise<void> {
-    if (this.going || !this.syncInterval) { return }
+    if (this.going) { return }
     this.going = true
 
-    while (this.going && this.syncInterval) {
+    while (this.going) {
       this.syncServers()
       await pauseFor(this.syncInterval)
     }
@@ -111,17 +109,6 @@ export class ServerDaemon {
     const updatedServer = this.serverModel.cacheServer(server, updates)
     await this.serverModel.saveAll()
     this.handleNotifications(updatedServer)
-  }
-
-  async updateSyncInterval (ms: number) {
-    this.syncInterval = ms
-    if (this.syncInterval) {
-      this.start()
-      await this.storage.set('syncInterval', this.syncInterval)
-    } else {
-      this.going = false
-      await this.storage.remove('syncInterval')
-    }
   }
 
   async handleNotifications (server: Readonly<S9Server>): Promise<void> {

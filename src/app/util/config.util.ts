@@ -274,3 +274,31 @@ export function getDefaultList (spec: ValueSpecList, list: any[] = []): object[]
 
   return list
 }
+
+export function getDefaultDescription (spec: ValueSpec): string | undefined {
+  let toReturn: string | undefined
+  switch (spec.type) {
+    case 'string':
+      if (typeof spec.default === 'string') {
+        toReturn = spec.default
+      } else if (typeof spec.default === 'object') {
+        toReturn = 'random'
+      } else {
+        'none'
+      }
+      break
+    case 'number':
+      if (typeof spec.default === 'number') {
+        toReturn = String(spec.default)
+      }
+      break
+    case 'boolean':
+      toReturn = String(spec.default)
+      break
+    case 'enum':
+      toReturn = spec.default
+      break
+  }
+
+  return toReturn
+}

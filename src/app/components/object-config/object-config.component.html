@@ -13,7 +13,7 @@
       <ion-icon size="small" slot="icon-only" name="help-circle"></ion-icon>
     </ion-button>
     <ion-label>{{ keyval.value.name }}</ion-label>
-    <ion-note slot="end">{{ config[keyval.key] }}<span *ngIf="keyval.value.units"> {{ keyval.value.units }}</span></ion-note>
+    <ion-note slot="end">{{ config[keyval.key] }}<span *ngIf="config[keyval.key] && keyval.value.units"> {{ keyval.value.units }}</span></ion-note>
   </ion-item>
   <!-- boolean -->
   <ion-item *ngIf="keyval.value.type === 'boolean'">
@@ -29,7 +29,7 @@
       <ion-icon size="small" slot="icon-only" name="help-circle"></ion-icon>
     </ion-button>
     <ion-label>{{ keyval.value.name }}</ion-label>
-    <ion-select slot="end" [interfaceOptions]="setSelectOptions(keyval.value)" placeholder="Select One" [(ngModel)]="config[keyval.key]" [selectedText]="config[keyval.key]" (ngModelChange)="markEdited()">
+    <ion-select slot="end" [interfaceOptions]="setSelectOptions(keyval.value)" placeholder="Select One" [(ngModel)]="config[keyval.key]" [selectedText]="config[keyval.key]" (ngModelChange)="handleEnumChange()">
       <ion-select-option *ngFor="let option of keyval.value.values" [value]="option">
         {{ option }}
         <span *ngIf="option === keyval.value.default"> (default)</span>
