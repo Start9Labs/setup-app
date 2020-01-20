@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
 import * as cryptoUtil from '../util/crypto.util'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, Observable } from 'rxjs'
 import { AuthStatus } from '../types/enums'
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  readonly authState = new BehaviorSubject(AuthStatus.UNINITIALIZED)
+  private readonly authState$ = new BehaviorSubject<AuthStatus>(AuthStatus.UNINITIALIZED)
+  watch (): Observable<AuthStatus> { return this.authState$ }
   mnemonicEncrypted: cryptoUtil.Hex | null = null
   mnemonic: string[] | undefined
   passcodeEnabled = false
@@ -26,22 +27,22 @@ export class AuthService {
         await this.authenticate('')
       } catch (e) {
         this.passcodeEnabled = true
-        this.authState.next(AuthStatus.UNVERIFIED)
+        this.authState$.next(AuthStatus.UNVERIFIED)
       }
     } else {
-      this.authState.next(AuthStatus.MISSING)
+      this.authState$.next(AuthStatus.MISSING)
     }
   }
 
   async authenticate (passcode: string): Promise<void> {
     const decrypted = await cryptoUtil.decrypt(this.mnemonicEncrypted!, passcode)
     this.mnemonic = JSON.parse(decrypted)
-    this.authState.next(AuthStatus.VERIFIED)
+    this.authState$.next(AuthStatus.VERIFIED)
   }
 
   uninit (): void {
     this.clearCache()
-    this.authState.next(AuthStatus.UNINITIALIZED)
+    this.authState$.next(AuthStatus.UNINITIALIZED)
   }
 
   async login (mnemonic: string[]): Promise<void> {
@@ -54,7 +55,7 @@ export class AuthService {
 
     await this.encryptMnemonic('')
 
-    this.authState.next(AuthStatus.VERIFIED)
+    this.authState$.next(AuthStatus.VERIFIED)
   }
 
   async encryptMnemonic (pin: string) {
@@ -67,7 +68,7 @@ export class AuthService {
   async logout (): Promise<void> {
     this.clearCache()
     await this.storage.clear()
-    this.authState.next(AuthStatus.MISSING)
+    this.authState$.next(AuthStatus.MISSING)
   }
 
   async changePasscode (passcode: string): Promise<void> {
@@ -82,14 +83,14 @@ export class AuthService {
   }
 
   isUnverified (): boolean {
-    return this.authState.value === AuthStatus.UNVERIFIED && !!this.mnemonicEncrypted && !this.mnemonic
+    return this.authState$.value === AuthStatus.UNVERIFIED && !!this.mnemonicEncrypted && !this.mnemonic
   }
 
   isVerified (): boolean {
-    return this.authState.value === AuthStatus.VERIFIED && !!this.mnemonicEncrypted && !!this.mnemonic
+    return this.authState$.value === AuthStatus.VERIFIED && !!this.mnemonicEncrypted && !!this.mnemonic
   }
 
   isMissing (): boolean {
-    return this.authState.value === AuthStatus.MISSING && !this.mnemonicEncrypted && !this.mnemonic
+    return this.authState$.value === AuthStatus.MISSING && !this.mnemonicEncrypted && !this.mnemonic
   }
 }

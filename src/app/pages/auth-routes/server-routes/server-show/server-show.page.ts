@@ -39,6 +39,7 @@ export class ServerShowPage {
     const server = this.serverModel.getServer(serverId)
     if (!server) throw new Error (`No server found with ID: ${serverId}`)
     this.server = server
+    // @TODO do we need to create apps array here or just use appModel.appMap in html
     this.apps = this.appModel.getApps(serverId)
     this.getServerAndApps()
   }
@@ -63,19 +64,18 @@ export class ServerShowPage {
     try {
       const apps = await this.serverService.getInstalledApps(this.server)
       // clear cache of removed apps
-      this.appModel.getApps(this.server.id).forEach((app, index) => {
+      this.appModel.getApps(this.server.id).forEach(app => {
         if (!apps.find(a => a.id === app.id)) {
-          this.appModel.getApps(this.server.id).splice(index, 1)
+          this.appModel.removeApp(this.server.id, app.id)
         }
       })
       // update cache with new app data
       apps.forEach(app => {
-        this.appModel.cacheApp(this.server.id, app)
+        this.appModel.cacheApp(this.server.id, app, app)
       })
     } catch (e) {
       this.appModel.getApps(this.server.id).forEach(app => {
-        app.status = AppHealthStatus.UNREACHABLE
-        app.statusAt = new Date()
+        this.appModel.cacheApp(this.server.id, app, { status: AppHealthStatus.UNREACHABLE, statusAt: new Date() })
       })
     }
   }
@@ -176,7 +176,7 @@ export class ServerShowPage {
               alert.message = 'Server must have a name'
               return false
             }
-            this.server.label = inputValue
+            this.serverModel.cacheServer(this.server, { label: inputValue })
             this.serverModel.saveAll()
           },
         },
@@ -216,8 +216,7 @@ export class ServerShowPage {
 
     try {
       await this.serverService.updateAgent(this.server)
-      this.server.status = AppHealthStatus.DOWNLOADING
-      this.server.statusAt = new Date()
+      this.serverModel.cacheServer(this.server, { status: AppHealthStatus.DOWNLOADING, statusAt: new Date() })
     } catch (e) {
       this.error = e.message
     } finally {

@@ -5,37 +5,31 @@ import { Injectable } from '@angular/core'
   providedIn: 'root',
 })
 export class AppModel {
-  apps: { [serverId: string]: AppInstalled[] } = { }
+  appMap: { [serverId: string]:
+    { [appId: string]: AppInstalled }
+  }
 
   constructor () { }
 
   clearCache () {
-    this.apps = { }
+    this.appMap = { }
   }
 
-  getApps (serverId: string): AppInstalled[] {
-    return this.apps[serverId]
+  getApps (serverId: string): Readonly<AppInstalled>[] {
+    return Object.values(this.appMap[serverId]) as Readonly<AppInstalled>[]
   }
 
-  getApp (serverId: string, appId: string): AppInstalled | undefined {
-    return this.apps[serverId].find(a => a.id === appId)
+  getApp (serverId: string, appId: string): Readonly<Readonly<AppInstalled> | undefined> {
+    return this.getApps(serverId)[appId]
   }
 
-  cacheApp (serverId: string, app: AppInstalled) {
-    let existing = this.getApp(serverId, app.id)
-
-    if (existing) {
-      Object.assign(existing, app)
-    } else {
-      this.apps[serverId].push(app)
-    }
+  cacheApp (serverId: string, app: AppInstalled, updates: Partial<AppInstalled> = { }): Readonly<AppInstalled> {
+    this.appMap[serverId][app.id] = Object.assign(this.getApp(serverId, app.id) || app, updates)
+    return this.getApp(serverId, app.id) as Readonly<AppInstalled>
   }
 
   removeApp (serverId: string, appId: string) {
-    const index = this.apps[serverId].findIndex(a => a.id === appId)
-    if (index > -1) {
-      this.apps[serverId].splice(index, 1)
-    }
+    delete this.appMap[serverId][appId]
   }
 }
 
@@ -92,6 +86,7 @@ export interface ValueSpecBase {
 export interface WithStandalone {
   name: string
   description: string
+  changeWarning?: string
   nullable: boolean
 }
 
@@ -142,6 +137,7 @@ export interface ValueSpecList extends ValueSpecBase {
   type: 'list'
   spec: ListValueSpec
   description: string
+  changeWarning?: string
   range: string // '[0,1]' (inclusive) OR '[0,*)' (right unbounded), normal math rules
   default: string[] | number[] | DefaultString[] | object[]
 }

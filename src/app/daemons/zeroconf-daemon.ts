@@ -1,22 +1,20 @@
 import { Injectable } from '@angular/core'
 import { Zeroconf, ZeroconfResult, ZeroconfService } from '@ionic-native/zeroconf/ngx'
-import { Subscription } from 'rxjs'
+import { Subscription, BehaviorSubject, Observable } from 'rxjs'
 import { Platform } from '@ionic/angular'
-import { ServerModel } from '../models/server-model'
-import { ServerDaemon } from './server-daemon'
 
 @Injectable({
   providedIn: 'root',
 })
 export class ZeroconfDaemon {
+  private readonly serviceFound$ : BehaviorSubject<ZeroconfService | null> = new BehaviorSubject(null)
+  watch (): Observable<ZeroconfService | null> { return this.serviceFound$ }
   services: { [hostname: string]: ZeroconfService } = { }
   private zeroconfSub: Subscription | undefined
 
   constructor (
     private readonly platform: Platform,
     private readonly zeroconf: Zeroconf,
-    private readonly serverModel: ServerModel,
-    private readonly serverDaemon: ServerDaemon,
   ) { }
 
   init () {
@@ -54,11 +52,7 @@ export class ZeroconfDaemon {
     ) {
       console.log(`discovered start9 server: ${service.name}`)
       this.services[service.name] = service
-      const server = this.serverModel.getServer(service.name.split('-')[1])
-      if (server) {
-        server.zeroconf = service
-        this.serverDaemon.syncServer(server)
-      }
+      this.serviceFound$.next(service)
     }
   }
 

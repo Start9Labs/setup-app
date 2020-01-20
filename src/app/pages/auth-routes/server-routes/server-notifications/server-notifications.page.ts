@@ -33,7 +33,7 @@ export class ServerNotificationsPage {
     this.server = server
 
     this.notifications = await this.getNotifications()
-    this.server.badge = 0
+    this.serverModel.cacheServer(server, { badge: 0 })
   }
 
   async doRefresh (e: any) {

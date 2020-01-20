@@ -12,6 +12,7 @@ import { pauseFor } from '../util/misc.util'
   providedIn: 'root',
 })
 export class ServerService {
+
   constructor (
     private readonly httpService: HttpService,
     private readonly appModel: AppModel,
@@ -127,7 +128,7 @@ export class ServerService {
     // const installed = await mockInstallApp()
     const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.POST, `/apps/${appId}/install`, { }, body, 240000)
       .then(mapApiInstalledApp)
-    await this.appModel.cacheApp(server.id, installed)
+    await this.appModel.cacheApp(server.id, installed, installed)
     return installed
   }
 

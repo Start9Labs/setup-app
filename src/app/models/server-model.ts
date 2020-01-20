@@ -9,7 +9,10 @@ import * as CryptoJS from 'crypto-js'
   providedIn: 'root',
 })
 export class ServerModel {
-  servers: S9Server[] = []
+  serverMap: { [id: string]: S9Server }
+
+  get servers () { return Object.values(this.serverMap) as Readonly<S9Server>[] }
+  get count () { return this.servers.length }
 
   constructor (
     private readonly storage: Storage,
@@ -17,38 +20,41 @@ export class ServerModel {
   ) { }
 
   clearCache () {
-    this.servers = []
+    this.serverMap = { }
   }
 
   async load (mnemonic: string[]): Promise<void> {
     const fromStorage: S9ServerStore = await this.storage.get('servers') || []
     fromStorage.forEach(s => {
-      this.servers.push(fromStorableServer(s, mnemonic))
-      this.appModel.apps[s.id] = []
+      this.serverMap[s.id] = fromStorableServer(s, mnemonic)
+      this.appModel.appMap[s.id] = { }
     })
   }
 
-  getServer (id: string): S9Server | undefined {
-    return this.servers.find(s => s.id === id)
+  getServer (id: string): Readonly<S9Server> | undefined {
+    return this.serverMap[id]
   }
 
   async createServer (server: S9Server): Promise<void> {
-    this.servers.push(server)
-    this.appModel.apps[server.id] = []
+    this.serverMap[server.id] = server
+    this.appModel.appMap[server.id] = { }
     await this.saveAll()
   }
 
   async forgetServer (id: string): Promise<void> {
-    const index = this.servers.findIndex(s => s.id === id)
-    if (index > -1) {
-      this.servers.splice(index, 1)
-      await this.saveAll()
-    }
-    delete this.appModel.apps[id]
+    delete this.serverMap[id]
+    delete this.appModel.appMap[id]
+    await this.saveAll()
+  }
+
+  // uses the full server object as a default value in case that server was never present
+  cacheServer (server: Readonly<S9Server>, updates: Partial<S9Server>): Readonly<S9Server> {
+    this.serverMap[server.id] = Object.assign(this.getServer(server.id) || server, updates)
+    return this.getServer(server.id) as Readonly<S9Server>
   }
 
   async saveAll (): Promise<void> {
-    await this.storage.set('servers', this.servers.map(toStorableServer))
+    await this.storage.set('servers', Object.values(this.serverMap).map(toStorableServer))
   }
 }
 
@@ -69,7 +75,6 @@ export interface S9Server extends S9ServerStorable {
   privkey: string // derive from mnemonic + torAddress
   badge: number
   notifications: S9Notification[]
-  zeroconf?: ZeroconfService
 }
 
 export interface S9Notification {

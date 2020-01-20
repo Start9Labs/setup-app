@@ -5,6 +5,8 @@ import { pauseFor } from 'src/app/util/misc.util'
 import { ServerService } from '../services/server.service'
 import { AppHealthStatus } from '../models/app-model'
 import { Storage } from '@ionic/storage'
+import { ZeroconfDaemon } from './zeroconf-daemon'
+import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 
 @Injectable({
   providedIn: 'root',
@@ -21,14 +23,16 @@ export class ServerDaemon {
     private readonly storage: Storage,
     private readonly toastCtrl: ToastController,
     private readonly navCtrl: NavController,
+    private readonly zeroconfDaemon: ZeroconfDaemon,
   ) { }
 
   async init () {
     this.initialized_at = new Date().valueOf()
     this.syncInterval = await this.storage.get('syncInterval')
-    if (this.syncInterval === null) {
-      return this.updateSyncInterval(10000)
-    }
+    if (this.syncInterval === null) { return this.updateSyncInterval(10000) }
+
+    this.zeroconfDaemon.watch().subscribe(zeroconfService => this.handleZeroconfUpdate(zeroconfService) )
+
     this.start()
   }
 
@@ -46,47 +50,63 @@ export class ServerDaemon {
     this.going = false
   }
 
+  async handleZeroconfUpdate (zeroconfService: ZeroconfService | null): Promise<void> {
+    if (!zeroconfService) { return }
+    const server = this.serverModel.getServer(zeroconfService.name.split('-')[1])
+    if (server) {
+      this.syncServer(server, 250)
+    }
+  }
+
   async syncServers (): Promise<void> {
     if (this.syncing) { return }
 
-    console.log('syncing servers: ', this.serverModel.servers)
+    console.log('syncing servers: ', this.serverModel.serverMap)
 
     this.syncing = true
 
-    await Promise.all(this.serverModel.servers.map(async server => {
-      await this.syncServer(server)
-    }))
+    await Promise.all(
+      this.serverModel.servers.map(server => this.syncServer(server)).concat(pauseFor(1000)),
+    )
 
     this.syncing = false
   }
 
-  async syncServer (server: S9Server): Promise<void> {
-    if (server.updating) { return }
-    server.updating = true
+  async syncServer (server: Readonly<S9Server>, retryIn?: number): Promise<void> {
+    if (server.updating) {
+      if (retryIn) {
+        await pauseFor(retryIn)
+        return this.syncServer(server, retryIn)
+      } else {
+        return
+      }
+    }
 
-    if (!server.zeroconf) {
+    this.serverModel.cacheServer(server, { updating: true })
+
+    let updates = { } as Partial<S9Server>
+    if (!this.zeroconfDaemon.getService(server.id)) {
       if (server.status === AppHealthStatus.UNKNOWN) {
         const now = new Date()
         if (this.initialized_at + 7000 < now.valueOf()) {
-          server.status = AppHealthStatus.UNREACHABLE
-          server.statusAt = now
+          updates.status = AppHealthStatus.UNREACHABLE
+          updates.statusAt = now
         }
       }
-      await pauseFor(1000)
-      server.updating = false
     } else {
       try {
         const serverRes = await this.serverService.getServer(server)
-        Object.assign(server, serverRes)
-        this.handleNotifications(server)
-        await this.serverModel.saveAll()
+        Object.assign(updates, serverRes)
       } catch (e) {
-        server.status = AppHealthStatus.UNREACHABLE
-        server.statusAt = new Date()
+        updates.status = AppHealthStatus.UNREACHABLE
+        updates.statusAt = new Date()
       }
-
-      server.updating = false
     }
+
+    updates.updating = false
+    const updatedServer = this.serverModel.cacheServer(server, updates)
+    await this.serverModel.saveAll()
+    this.handleNotifications(updatedServer)
   }
 
   async updateSyncInterval (ms: number) {
@@ -100,13 +120,14 @@ export class ServerDaemon {
     }
   }
 
-  async handleNotifications (server: S9Server): Promise<void> {
+  async handleNotifications (server: Readonly<S9Server>): Promise<void> {
     const count = server.notifications.length
 
     if (!count) { return }
+    let updates = { } as Partial<S9Server>
 
-    server.badge = server.badge + count
-    server.notifications = []
+    updates.badge = server.badge + count
+    updates.notifications = []
 
     const toast = await this.toastCtrl.create({
       header: server.label,
@@ -132,5 +153,6 @@ export class ServerDaemon {
       ],
     })
     await toast.present()
+    this.serverModel.cacheServer(server, updates)
   }
 }

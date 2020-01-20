@@ -6,6 +6,7 @@ import { timeout } from 'rxjs/operators'
 import { getLanIP, S9Server } from '../models/server-model'
 import { TokenSigner } from 'jsontokens'
 import { S9BuilderWith } from './setup.service'
+import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 const APP_VERSION = '1.0.0'
 
 @Injectable({
@@ -15,6 +16,7 @@ export class HttpService {
 
   constructor (
     private readonly http: HttpClient,
+    private readonly zerconfDaemon: ZeroconfDaemon,
   ) { }
 
   async authServerRequest<T> (
@@ -95,8 +97,9 @@ export class HttpService {
   }
 
   s9Url (server: S9Server | S9BuilderWith<'versionInstalled'>, path: string): string {
-    if (!server.zeroconf) { throw new Error('S9 Server not found on LAN') }
-    const host = getLanIP(server.zeroconf)
+    const zeroconf = this.zerconfDaemon.getService(server.id)
+    if (!zeroconf) { throw new Error('S9 Server not found on LAN') }
+    const host = getLanIP(zeroconf)
     return `http://${host}/v${server.versionInstalled.charAt(0)}${path}`
   }
 }

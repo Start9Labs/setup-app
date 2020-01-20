@@ -21,6 +21,16 @@ export class ObjectConfigComponent {
     private readonly modalCtrl: ModalController,
   ) { }
 
+  async presentWarning (spec: ValueSpec, e: Event) {
+    if (!spec.changeWarning) { return }
+
+    const alert = await this.alertCtrl.create({
+      header: 'Warning!',
+      message: spec.changeWarning,
+    })
+    await alert.present()
+  }
+
   async presentDescription (keyval: { key: string, value: ValueSpec }, e: Event) {
     e.stopPropagation()
     const alert = await this.alertCtrl.create({

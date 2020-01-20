@@ -9,7 +9,6 @@ import { AuthService } from './services/auth.service'
 import { Router } from '@angular/router'
 import { AuthStatus } from './types/enums'
 import { AppModel } from './models/app-model'
-import { Subscription } from 'rxjs'
 import { AuthenticatePage } from './modals/authenticate/authenticate.page'
 
 @Component({
@@ -19,8 +18,6 @@ import { AuthenticatePage } from './modals/authenticate/authenticate.page'
 })
 export class AppComponent {
   private firstAuth = true
-  private pauseSub: Subscription | undefined
-  private resumeSub: Subscription | undefined
 
   constructor (
     private readonly platform: Platform,
@@ -42,16 +39,16 @@ export class AppComponent {
       // init auth service
       await this.authService.init()
       // subscribe to auth status changes
-      this.authService.authState.subscribe(authStatus => {
+      this.authService.watch().subscribe(authStatus => {
         this.handleAuthChange(authStatus)
       })
       // subscribe to app pause event
-      this.pauseSub = this.platform.pause.subscribe(() => {
+      this.platform.pause.subscribe(() => {
         this.authService.uninit()
         this.stopDaemons()
       })
       // sunscribe to app resume event
-      this.resumeSub = this.platform.resume.subscribe(() => {
+      this.platform.resume.subscribe(() => {
         this.authService.init()
       })
       // do Cordova things if Cordova

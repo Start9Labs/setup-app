@@ -41,19 +41,18 @@ export class AppInstalledShowPage {
       const appId = this.route.snapshot.paramMap.get('appId') as string
       const app = this.appModel.getApp(serverId, appId)
 
-      if (app) {
-        this.app = app
-      }
+      if (app) { this.app = app }
 
-      this.app = await this.getApp(appId) as AppInstalled
+      this.getApp(appId)
     } catch (e) {
       this.error = e.message
     }
   }
 
-  async getApp (appId: string): Promise<AppInstalled | undefined> {
+  async getApp (appId: string): Promise<void> {
     try {
-      return this.serverService.getInstalledApp(this.server, appId)
+      const app = await this.serverService.getInstalledApp(this.server, appId)
+      this.appModel.cacheApp(this.server.id, app)
     } catch (e) {
       this.error = e.message
     } finally {
