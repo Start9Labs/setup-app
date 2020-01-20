@@ -18,7 +18,6 @@ export class ServerShowPage {
   error: string
   view: 'apps' | 'about' = 'apps'
   server: S9Server
-  apps: AppInstalled[]
   loading = true
   compareVersions = compareVersions
 
@@ -39,8 +38,6 @@ export class ServerShowPage {
     const server = this.serverModel.getServer(serverId)
     if (!server) throw new Error (`No server found with ID: ${serverId}`)
     this.server = server
-    // @TODO do we need to create apps array here or just use appModel.appMap in html
-    this.apps = this.appModel.getApps(serverId)
     this.getServerAndApps()
   }
 

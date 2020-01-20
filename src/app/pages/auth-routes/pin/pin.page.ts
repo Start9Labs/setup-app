@@ -3,13 +3,13 @@ import { AuthService } from 'src/app/services/auth.service'
 import { AlertController } from '@ionic/angular'
 
 @Component({
-  selector: 'passcode',
-  templateUrl: 'passcode.page.html',
-  styleUrls: ['passcode.page.scss'],
+  selector: 'pin',
+  templateUrl: 'pin.page.html',
+  styleUrls: ['pin.page.scss'],
 })
-export class PasscodePage {
-  passcode = ''
-  passcodeEnabled: boolean
+export class PinPage {
+  pin = ''
+  pinEnabled: boolean
 
   constructor (
     readonly authService: AuthService,
@@ -17,34 +17,34 @@ export class PasscodePage {
   ) { }
 
   ngOnInit () {
-    this.passcodeEnabled = this.authService.passcodeEnabled
+    this.pinEnabled = this.authService.pinEnabled
   }
 
-  async togglePasscode () {
-    if (this.passcodeEnabled) {
-      await this.presentAlertSetPasscode()
+  async togglePin () {
+    if (this.pinEnabled) {
+      await this.presentAlertSetPin()
     } else {
       await this.save('')
     }
   }
 
-  async presentAlertSetPasscode () {
+  async presentAlertSetPin () {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
-      header: this.authService.passcodeEnabled ? 'Change Passcode' : 'Set Passcode',
+      header: this.authService.pinEnabled ? 'Change Pin' : 'Set Pin',
       inputs: [
         {
           name: 'inputValue',
           type: 'tel',
           id: 'maxLength4',
-          placeholder: 'enter passcode',
+          placeholder: 'enter pin',
         },
       ],
       buttons: [
         {
           text: 'Cancel',
           handler: () => {
-            this.passcodeEnabled = this.authService.passcodeEnabled
+            this.pinEnabled = this.authService.pinEnabled
           },
         },
         {
@@ -53,7 +53,7 @@ export class PasscodePage {
             const value = data.inputValue
 
             if (!RegExp('^[0-9]{4}$').test(value)) {
-              alert.message = 'Passcode must be a 4-digit number'
+              alert.message = 'Pin must be a 4-digit number'
               return false
             }
             this.save(value)
@@ -66,8 +66,8 @@ export class PasscodePage {
   }
 
   async save (value: string): Promise<void> {
-    await this.authService.changePasscode(value)
-    this.passcodeEnabled = this.authService.passcodeEnabled
+    await this.authService.changePin(value)
+    this.pinEnabled = this.authService.pinEnabled
   }
 }
 

@@ -9,7 +9,7 @@ import { ModalController, LoadingController } from '@ionic/angular'
 })
 export class AuthenticatePage {
   error = ''
-  passcode = ''
+  pin = ''
 
   constructor (
     private readonly authService: AuthService,
@@ -17,12 +17,11 @@ export class AuthenticatePage {
     private readonly loadingCtrl: LoadingController,
   ) { }
 
-  async handleInput (value: string) {
-    this.error = ''
-    if (value.length > 4) {
-      this.error = 'Passcode should be 4 digits'
+  async handleInput () {
+    if (this.pin.length > 4) {
+      this.error = 'Pin should be 4 digits'
     }
-    if (value.length === 4) {
+    if (this.pin.length === 4) {
       const loader = await this.loadingCtrl.create({
         spinner: 'lines',
         cssClass: 'loader',
@@ -30,9 +29,10 @@ export class AuthenticatePage {
       await loader.present()
 
       try {
-        await this.authService.authenticate(value)
+        await this.authService.authenticate(this.pin)
         await this.modalCtrl.dismiss()
       } catch (e) {
+        this.pin = ''
         this.error = e.message
       } finally {
         await loader.dismiss()

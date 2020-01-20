@@ -363,7 +363,7 @@ const mockApiServer: Lan.GetServerRes = {
   notifications: [  {
     id: '123e4567-e89b-12d3-a456-426655440000',
     appId: 'bitcoind',
-    created_at: '2019-12-26T14:20:30.872Z',
+    createdAt: '2019-12-26T14:20:30.872Z',
     code: '101',
     title: 'Install Complete',
     message: 'Installation of bitcoind has successfully completed.',
@@ -371,17 +371,33 @@ const mockApiServer: Lan.GetServerRes = {
 }
 
 const mockApiServerMetrics: Lan.GetServerMetricsRes = {
-  'Metric1': {
-    value: 22.2,
-    unit: 'mi/b',
+  'Group1': {
+    'Metric1': {
+      value: 22.2,
+      unit: 'mi/b',
+    },
+    'Metric2': {
+      value: 50,
+      unit: '%',
+    },
+    'Metric3': {
+      value: 10.1,
+      unit: '%',
+    },
   },
-  'Metric2': {
-    value: 50,
-    unit: '%',
-  },
-  'Metric3': {
-    value: 10.1,
-    unit: '%',
+  'Group2': {
+    'Hmmmm1': {
+      value: 22.2,
+      unit: 'mi/b',
+    },
+    'Hmmmm2': {
+      value: 50,
+      unit: '%',
+    },
+    'Hmmmm3': {
+      value: 10.1,
+      unit: '%',
+    },
   },
 }
 
@@ -398,23 +414,23 @@ const mockApiNotifications: Lan.GetNotificationsRes = [
   {
     id: '123e4567-e89b-12d3-a456-426655440000',
     appId: 'bitcoind',
-    created_at: '2019-12-26T14:20:30.872Z',
+    createdAt: '2019-12-26T14:20:30.872Z',
     code: '101',
     title: 'Install Complete',
     message: 'Installation of bitcoind has completed successfully.',
   },
   {
     id: '123e4567-e89b-12d3-a456-426655440001',
-    appId: 'start9-agent',
-    created_at: '2019-12-26T14:20:30.872Z',
+    appId: 'bitcoind',
+    createdAt: '2019-12-26T14:20:30.872Z',
     code: '201',
     title: 'SSH Key Added',
     message: 'A new SSH key was added. If you did not do this, shit is bad.',
   },
   {
     id: '123e4567-e89b-12d3-a456-426655440002',
-    appId: 'start9-agent',
-    created_at: '2019-12-26T14:20:30.872Z',
+    appId: 'bitcoind',
+    createdAt: '2019-12-26T14:20:30.872Z',
     code: '002',
     title: 'SSH Key Removed',
     message: 'A SSH key was removed.',
@@ -422,7 +438,7 @@ const mockApiNotifications: Lan.GetNotificationsRes = [
   {
     id: '123e4567-e89b-12d3-a456-426655440003',
     appId: 'bitcoind',
-    created_at: '2019-12-26T14:20:30.872Z',
+    createdAt: '2019-12-26T14:20:30.872Z',
     code: '310',
     title: 'App Crashed',
     message: 'Bitcoind has crashed',
@@ -564,20 +580,23 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
     randomEnum: {
       name: 'Random Enum',
       type: 'enum',
+      default: 'null',
       description: 'This is not even real.',
-      nullable: true,
-      values: ['option1', 'option2', 'option3'],
+      changeWarning: 'Be careful chnaging this!',
+      values: ['null', 'option1', 'option2', 'option3'],
     },
     testnet: {
       name: 'Testnet',
       type: 'boolean',
       description: 'determines whether your node is running ontestnet or mainnet',
+      changeWarning: 'Chain will have to resync!',
       default: false,
     },
     favoriteNumber: {
       name: 'Favorite Number',
       type: 'number',
       description: 'Your favorite number of all time',
+      changeWarning: 'Once you set this number, it can never be changed without severe consequences.',
       nullable: false,
       default: 7,
       range: '(-100,100]',
@@ -593,17 +612,20 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
       range: '[0,10]',
       default: [2, 3],
     },
-    rpcuserpass: {
-      name: 'RPC users',
+    rpcsettings: {
+      name: 'RPC Settings',
       type: 'object',
       description: 'rpc username and password',
+      changeWarning: 'Adding RPC users gives them special permissions on your node.',
       nullable: false,
+      nullByDefault: false,
       spec: {
         laws: {
           name: 'Laws',
           type: 'object',
           description: 'the law of the realm',
           nullable: true,
+          nullByDefault: true,
           spec: {
             law1: {
               name: 'First Law',
@@ -689,10 +711,11 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
     },
     port: {
       name: 'Port',
-      type: 'string',
+      type: 'number',
       description: 'the default port for your Bitcoin node. default: 8333, testnet: 18333, regtest: 18444',
-      nullable: true,
-      default: '8333',
+      nullable: false,
+      default: 8333,
+      range: '[0, 9999]',
     },
     maxconnections: {
       name: 'Max Connections',
@@ -704,6 +727,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
       name: 'RPC Allowed IPs',
       type: 'list',
       description: 'external ip addresses that are authorized to access your Bitcoin node',
+      changeWarning: 'Any IP you allow here will have RPC access to your Bitcoin node.',
       range: '[1,10]',
       default: ['192.168.1.1'],
       spec: {
@@ -728,10 +752,11 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
   // actual config
   config: {
     randomEnum: 'option1',
+    favoriteNumber: 8,
     testnet: true,
     rpcuserpass: undefined,
     notifications: ['email', 'text'],
-    port: '8333',
+    port: 5959,
     maxconnections: null,
     rpcallowip: [],
     rpcauth: ['matt: 8273gr8qwoidm1uid91jeh8y23gdio1kskmwejkdnm'],

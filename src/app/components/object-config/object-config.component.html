@@ -13,7 +13,7 @@
       <ion-icon size="small" slot="icon-only" name="help-circle"></ion-icon>
     </ion-button>
     <ion-label>{{ keyval.value.name }}</ion-label>
-    <ion-note slot="end">{{ config[keyval.key] }}</ion-note>
+    <ion-note slot="end">{{ config[keyval.key] }}<span *ngIf="keyval.value.units"> {{ keyval.value.units }}</span></ion-note>
   </ion-item>
   <!-- boolean -->
   <ion-item *ngIf="keyval.value.type === 'boolean'">
@@ -21,7 +21,7 @@
       <ion-icon size="small" slot="icon-only" name="help-circle"></ion-icon>
     </ion-button>
     <ion-label>{{ keyval.value.name }}</ion-label>
-    <ion-toggle slot="end" [(ngModel)]="config[keyval.key]" (ngModelChange)="markEdited()"></ion-toggle>
+    <ion-toggle slot="end" [(ngModel)]="config[keyval.key]" (ngModelChange)="handleBooleanChange(keyval.value)"></ion-toggle>
   </ion-item>
   <!-- enum -->
   <ion-item *ngIf="keyval.value.type === 'enum'">
@@ -29,9 +29,11 @@
       <ion-icon size="small" slot="icon-only" name="help-circle"></ion-icon>
     </ion-button>
     <ion-label>{{ keyval.value.name }}</ion-label>
-    <!-- @TODO present warnings everywhere -->
-    <ion-select slot="end" [interfaceOptions]="setSelectHeader(keyval.value.name)" placeholder="Select One" [(ngModel)]="config[keyval.key]" (ngModelChange)="markEdited()" (ionFocus)="presentWarning(keyval.value)">
-      <ion-select-option *ngFor="let option of keyval.value.values" [value]="option">{{ option }}</ion-select-option>
+    <ion-select slot="end" [interfaceOptions]="setSelectOptions(keyval.value)" placeholder="Select One" [(ngModel)]="config[keyval.key]" [selectedText]="config[keyval.key]" (ngModelChange)="markEdited()">
+      <ion-select-option *ngFor="let option of keyval.value.values" [value]="option">
+        {{ option }}
+        <span *ngIf="option === keyval.value.default"> (default)</span>
+      </ion-select-option>
     </ion-select>
   </ion-item>
   <!-- object -->

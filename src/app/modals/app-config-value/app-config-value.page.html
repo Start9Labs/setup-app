@@ -8,7 +8,7 @@
     <ion-title>
       {{ spec.name }}
     </ion-title>
-    <ion-buttons slot="end">
+    <ion-buttons *ngIf="!this.error && this.edited" slot="end">
       <ion-button (click)="done()" color="primary">
         Done
       </ion-button>
@@ -16,28 +16,39 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding-top">
+<ion-content>
+
+  <ion-item-group *ngIf="spec.changeWarning">
+    <ion-item>
+      <ion-label class="ion-text-wrap">
+        <h3><ion-text color="danger">Warning!</ion-text></h3>
+        <br />
+        <h2><ion-text color="medium">{{ spec.changeWarning }}</ion-text></h2>
+      </ion-label>
+    </ion-item>
+  </ion-item-group>
 
   <ion-item-group>
+    <ion-item-divider>
+      Value
+      <span *ngIf="spec.type === 'number' && spec.units"> ({{ spec.units }})</span>
+    </ion-item-divider>
     <ion-item>
-      <ion-input [type]="spec.type === 'string' ? 'text' : 'tel'" placeholder="Enter value" [(ngModel)]="value" (ngModelChange)="handleInput($event)"></ion-input>
+      <ion-input [type]="spec.type === 'string' ? 'text' : 'tel'" placeholder="Enter value" [(ngModel)]="inputValue" (ngModelChange)="handleInput()"></ion-input>
+      <ion-button *ngIf="inputValue && spec.nullable" size="small" slot="end" fill="clear" color="medium" (click)="clear()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
     </ion-item>
+    <p *ngIf="spec.default" class="ion-padding-start">
+      <ion-text color="medium">
+        Default: {{ spec.default }}
+        <span *ngIf="spec.type === 'number' && spec.units"> {{ spec.units }}</span>
+      </ion-text>
+    </p>
   </ion-item-group>
 
   <ion-item *ngIf="error" style="margin-top: 16px;">
     <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
   </ion-item>
-
-  <!-- <ion-item-group>
-    <ion-item-divider></ion-item-divider>
-    <ion-item>
-      <ion-label class="ion-text-wrap">
-        <ion-text color="medium">
-          <p *ngIf="spec.type === 'string' && spec.pattern">{{ spec.pattern.description }}</p>
-          <p *ngIf="spec.type === 'number'">{{ rangeDescription }}</p>
-        </ion-text>
-      </ion-label>
-    </ion-item>
-  </ion-item-group> -->
 
 </ion-content>

@@ -1,19 +1,19 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 import { IonicModule } from '@ionic/angular'
 
-import { PasscodePage } from './passcode.page'
+import { PinPage } from './pin.page'
 
-describe('PasscodePage', () => {
-  let component: PasscodePage
-  let fixture: ComponentFixture<PasscodePage>
+describe('PinPage', () => {
+  let component: PinPage
+  let fixture: ComponentFixture<PinPage>
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [PasscodePage],
+      declarations: [PinPage],
       imports: [IonicModule.forRoot()],
     }).compileComponents()
 
-    fixture = TestBed.createComponent(PasscodePage)
+    fixture = TestBed.createComponent(PinPage)
     component = fixture.componentInstance
     fixture.detectChanges()
   }))

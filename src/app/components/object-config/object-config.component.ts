@@ -33,11 +33,50 @@ export class ObjectConfigComponent {
 
   async presentDescription (keyval: { key: string, value: ValueSpec }, e: Event) {
     e.stopPropagation()
+    // if present, get defaults for subheader
+    let subHeader: string | undefined
+    switch (keyval.value.type) {
+      case 'string':
+        if (typeof keyval.value.default === 'string') {
+          subHeader = keyval.value.default
+        } else if (typeof keyval.value.default === 'object') {
+          subHeader = 'random'
+        } else {
+          'none'
+        }
+        break
+      case 'number':
+        if (typeof keyval.value.default === 'number') {
+          subHeader = String(keyval.value.default)
+        }
+        break
+      case 'boolean':
+        subHeader = String(keyval.value.default)
+        break
+      case 'enum':
+        subHeader = keyval.value.default
+        break
+    }
+    if (subHeader) { subHeader = `Default: ${subHeader}` }
+
     const alert = await this.alertCtrl.create({
-      header: keyval.key,
+      header: keyval.value.name,
+      subHeader,
       message: keyval.value.description,
     })
     await alert.present()
+  }
+
+  async handleBooleanChange (spec: ValueSpec) {
+    if (spec.changeWarning) {
+      const alert = await this.alertCtrl.create({
+        backdropDismiss: false,
+        header: 'Warning',
+        message: spec.changeWarning,
+        buttons: ['Ok'],
+      })
+      await alert.present()
+    }
   }
 
   async handleObjectClick (keyval: { key: string, value: ValueSpecObject }) {
@@ -84,6 +123,7 @@ export class ObjectConfigComponent {
     modal.onWillDismiss().then(res => {
       this.editedChange.emit(this.edited || res.data.edited)
       if (res.data.edited) {
+        console.log(res.data)
         this.config[keyval.key] = res.data.value
       }
     })
@@ -109,8 +149,11 @@ export class ObjectConfigComponent {
     await modal.present()
   }
 
-  setSelectHeader (key: string) {
-    return { header: key }
+  setSelectOptions (spec: ValueSpec) {
+    return {
+      header: spec.name,
+      message: `Warning! ${spec.changeWarning}`,
+    }
   }
 
   markEdited () {

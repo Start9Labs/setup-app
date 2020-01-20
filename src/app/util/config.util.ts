@@ -69,7 +69,7 @@ export class Range {
 export function mapSpecToConfigValue (spec: ValueSpec, value: any): any {
   // if value is null and spec is not nullable, mark invalid and return
   if (value === null) {
-    if (!(spec as WithStandalone).nullable) {
+    if (!(spec as { nullable?: boolean }).nullable) {
       spec.invalid = true
     }
     return value
@@ -137,7 +137,7 @@ export function mapSpecToConfigString (spec: ListValueSpecString, value: string)
 
 export function mapSpecToConfigNumber (spec: ListValueSpecNumber, value: number) {
   if (typeof value !== 'number') {
-    console.log('not an number: ', spec, value)
+    console.log('not a number: ', spec, value)
     spec.invalid = true
     return value
   }
@@ -199,21 +199,18 @@ export function mapSpecToConfigList (spec: ValueSpecList, value: string[] | numb
 }
 
 export function getDefaultConfigValue (spec: ValueSpec): object | string | number | object[] | string[] | boolean | null {
-  if (spec.type !== 'list' && spec.type !== 'boolean' && spec.nullable) {
-    return null
-  }
 
   switch (spec.type) {
     case 'object':
-      return getDefaultObject(spec.spec)
+      return spec.nullByDefault ? null : getDefaultObject(spec.spec)
     case 'string':
-      return getDefaultString(spec.default!)
+      return spec.default ? getDefaultString(spec.default) : null
     case 'number':
-      return getDefaultNumber(spec.default!)
+      return spec.default ? getDefaultNumber(spec.default) : null
     case 'list':
       return getDefaultList(spec)
     case 'enum':
-      return getDefaultEnum(spec.default!)
+      return getDefaultEnum(spec.default)
     case 'boolean':
       return getDefaultBoolean(spec.default)
   }

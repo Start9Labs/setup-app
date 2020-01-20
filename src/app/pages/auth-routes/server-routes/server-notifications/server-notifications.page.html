@@ -42,14 +42,12 @@
         <ion-label class="ion-text-wrap">
           <h2><ion-text [color]="getColor(not)"><b>{{ not.title }}</b></ion-text></h2>
           <h2 class="notification-message">{{ not.message }}</h2>
-          <div class="notification-meta">
-            <p *ngIf="not.appId !== 'start9-agent'">
-              From:
-              <a [routerLink]="['/auth', 'servers', server.id, 'apps', 'installed', not.appId]"> {{ not.appId }}</a>
-            </p>
-            <p>Code: {{ not.code }}</p>
-            <p>{{ not.created_at | date: 'short' }}</p>
-          </div>
+          <p>{{ not.createdAt | date: 'short' }}</p>
+          <p>
+            <a style="text-decoration: none;" [routerLink]="['/auth', 'servers', server.id, 'apps', 'installed', not.appId]">{{ not.appId }}</a>
+            <span> - </span>
+            Code: {{ not.code }}
+          </p>
         </ion-label>
       </ion-item>
     </ion-item-sliding>

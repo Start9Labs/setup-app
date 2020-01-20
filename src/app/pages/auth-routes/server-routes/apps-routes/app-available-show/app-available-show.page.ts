@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { S9Server } from 'src/app/models/server-model'
 import { ActivatedRoute } from '@angular/router'
 import { ServerModel } from 'src/app/models/server-model'
-import { AppAvailableFull, AppHealthStatus } from 'src/app/models/app-model'
+import { AppAvailableFull } from 'src/app/models/app-model'
 import { ServerService } from 'src/app/services/server.service'
 import { NavController, AlertController, LoadingController } from '@ionic/angular'
 import * as compareVersions from 'compare-versions'
@@ -42,6 +42,34 @@ export class AppAvailableShowPage {
     } finally {
       this.loading = false
     }
+  }
+
+  async presentAlertVersions () {
+    const alert = await this.alertCtrl.create({
+      header: 'Versions',
+      backdropDismiss: false,
+      inputs: this.app.versions.map(v => {
+        return {
+          name: v.version, // for CSS
+          type: 'radio',
+          label: v.version, // appearance on screen
+          value: v.version, // literal SEM version value
+        }
+      }),
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        }, {
+          text: 'Ok',
+          handler: (version: string) => {
+            console.log(version)
+          },
+        },
+      ],
+    })
+
+    await alert.present()
   }
 
   async presentAlertInstall (version: string) {

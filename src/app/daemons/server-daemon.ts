@@ -73,9 +73,12 @@ export class ServerDaemon {
   }
 
   async syncServer (server: Readonly<S9Server>, retryIn?: number): Promise<void> {
+    console.log('syncServer called with retryIn: ', !!retryIn)
     if (server.updating) {
+      console.log('server already updating')
       if (retryIn) {
         await pauseFor(retryIn)
+        console.log('done pausing')
         return this.syncServer(server, retryIn)
       } else {
         return
@@ -84,8 +87,9 @@ export class ServerDaemon {
 
     this.serverModel.cacheServer(server, { updating: true })
 
-    let updates = { } as Partial<S9Server>
+    let updates: Partial<S9Server> = { }
     if (!this.zeroconfDaemon.getService(server.id)) {
+      console.log('no zeroconf service')
       if (server.status === AppHealthStatus.UNKNOWN) {
         const now = new Date()
         if (this.initialized_at + 7000 < now.valueOf()) {

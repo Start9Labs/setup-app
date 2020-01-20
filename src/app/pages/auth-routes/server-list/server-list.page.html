@@ -36,7 +36,7 @@
       </ion-avatar>
       <ion-label>
         <h1>{{ server.value.label }}</h1>
-        <h3><s9-status [status]="server.value.status" [target]="server.value"></s9-status></h3>
+        <h3><s9-status [status]="server.value.status" [target]="'server'"></s9-status></h3>
       </ion-label>
       <ion-badge slot="end" *ngIf="server.value.badge" color="danger">{{ server.value.badge }}</ion-badge>
     </ion-item>

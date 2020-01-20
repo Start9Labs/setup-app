@@ -12,7 +12,7 @@ export class AuthService {
   watch (): Observable<AuthStatus> { return this.authState$ }
   mnemonicEncrypted: cryptoUtil.Hex | null = null
   mnemonic: string[] | undefined
-  passcodeEnabled = false
+  pinEnabled = false
 
   constructor (
     private readonly storage: Storage,
@@ -26,7 +26,7 @@ export class AuthService {
       try {
         await this.authenticate('')
       } catch (e) {
-        this.passcodeEnabled = true
+        this.pinEnabled = true
         this.authState$.next(AuthStatus.UNVERIFIED)
       }
     } else {
@@ -34,8 +34,8 @@ export class AuthService {
     }
   }
 
-  async authenticate (passcode: string): Promise<void> {
-    const decrypted = await cryptoUtil.decrypt(this.mnemonicEncrypted!, passcode)
+  async authenticate (pin: string): Promise<void> {
+    const decrypted = await cryptoUtil.decrypt(this.mnemonicEncrypted!, pin)
     this.mnemonic = JSON.parse(decrypted)
     this.authState$.next(AuthStatus.VERIFIED)
   }
@@ -51,7 +51,7 @@ export class AuthService {
     }
 
     this.mnemonic = mnemonic
-    this.passcodeEnabled = false
+    this.pinEnabled = false
 
     await this.encryptMnemonic('')
 
@@ -71,15 +71,15 @@ export class AuthService {
     this.authState$.next(AuthStatus.MISSING)
   }
 
-  async changePasscode (passcode: string): Promise<void> {
-    await this.encryptMnemonic(passcode)
-    this.passcodeEnabled = !!passcode
+  async changePin (pin: string): Promise<void> {
+    await this.encryptMnemonic(pin)
+    this.pinEnabled = !!pin
   }
 
   async clearCache () {
     this.mnemonicEncrypted = null
     this.mnemonic = undefined
-    this.passcodeEnabled = false
+    this.pinEnabled = false
   }
 
   isUnverified (): boolean {

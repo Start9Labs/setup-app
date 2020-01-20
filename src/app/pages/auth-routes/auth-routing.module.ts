@@ -24,8 +24,8 @@ const routes: Routes = [
     loadChildren: () => import('./settings/settings.module').then(m => m.SettingsPageModule),
   },
   {
-    path: 'settings/passcode',
-    loadChildren: () => import('./passcode/passcode.module').then(m => m.PasscodePageModule),
+    path: 'settings/pin',
+    loadChildren: () => import('./pin/pin.module').then(m => m.PinPageModule),
   },
 ]
 

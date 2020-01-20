@@ -4,7 +4,7 @@
       <ion-back-button [defaultHref]="['/auth', 'settings']"></ion-back-button>
     </ion-buttons>
     <ion-title>
-      Passcode
+      Pin
     </ion-title>
   </ion-toolbar>
 </ion-header>
@@ -13,11 +13,11 @@
 
   <ion-item-group>
     <ion-item>
-      <ion-label>Passcode lock</ion-label>
-      <ion-toggle slot="end" [(ngModel)]="passcodeEnabled" (ngModelChange)="togglePasscode()"></ion-toggle>
+      <ion-label>Pin lock</ion-label>
+      <ion-toggle slot="end" [(ngModel)]="pinEnabled" (ngModelChange)="togglePin()"></ion-toggle>
     </ion-item>
-    <ion-item button *ngIf="authService.passcodeEnabled" (click)="presentAlertSetPasscode()">
-      <ion-label>Change passcode</ion-label>
+    <ion-item button *ngIf="authService.pinEnabled" (click)="presentAlertSetPin()">
+      <ion-label>Change pin</ion-label>
     </ion-item>
   </ion-item-group>
 
@@ -27,7 +27,7 @@
       <ion-label class="ion-text-wrap">
         <ion-text color="medium">
           <p>
-            Your passcode is used to encrypt your mnemonic on this device and prevent others from gaining access to your servers.
+            Your pin is used to encrypt your mnemonic on this device and prevent others from gaining access to your servers.
           </p>
         </ion-text>
       </ion-label>

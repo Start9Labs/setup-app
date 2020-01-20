@@ -11,7 +11,7 @@ import { AppConfigValuePage } from '../app-config-value/app-config-value.page'
 })
 export class AppConfigNestedPage {
   @Input() keyval: { key: string, value: ValueSpec }
-  @Input() value: any[] | object
+  @Input() value: any[] | object | null
   min: number | undefined
   max: number | undefined
   edited = false
@@ -29,7 +29,7 @@ export class AppConfigNestedPage {
     }
   }
 
-  async dismiss () {
+  async dismiss (nullify = false) {
     const spec = this.keyval.value
     const listLength = (this.value as string[]).length
     // if enum list, enforce limits
@@ -43,7 +43,7 @@ export class AppConfigNestedPage {
 
     this.modalCtrl.dismiss({
       edited: this.edited,
-      value: this.value,
+      value: nullify ? null : this.value,
     })
   }
 
@@ -56,14 +56,14 @@ export class AppConfigNestedPage {
           key: `${this.keyval.key} ${i + 1}`,
           value: spec,
         },
-        value: this.value[i],
+        value: (this.value as any[])[i],
       },
     })
 
     modal.onWillDismiss().then(res => {
       this.edited = this.edited || res.data.edited
       if (res.data.edited) {
-        this.value[i] = res.data.value
+        (this.value as any[])[i] = res.data.value
       }
     })
 
@@ -112,14 +112,14 @@ export class AppConfigNestedPage {
       component: AppConfigValuePage,
       componentProps: {
         spec: this.keyval.value,
-        value: index ? this.value[index] : '',
+        value: index ? (this.value as any[])[index] : '',
       },
     })
 
     modal.onWillDismiss().then(res => {
       this.edited = this.edited || res.data.edited
       if (res.data.edited) {
-        index ? this.value[index] = res.data.value : (this.value as any[]).push(res.data.value)
+        index ? (this.value as any)[index] = res.data.value : (this.value as any[]).push(res.data.value)
       }
     })
 
@@ -188,6 +188,33 @@ export class AppConfigNestedPage {
       ],
     })
     await alert.present()
+  }
+
+  async presentAlertDestroy () {
+    const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
+      header: 'Caution',
+      message: `Are you sure you want to delete ${this.keyval.value.name}?`,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: 'Delete',
+          cssClass: 'alert-danger',
+          handler: async () => {
+            this.destroy()
+          },
+        },
+      ],
+    })
+    await alert.present()
+  }
+
+  destroy () {
+    this.edited = true
+    this.dismiss(true)
   }
 
   validate (value: string) {

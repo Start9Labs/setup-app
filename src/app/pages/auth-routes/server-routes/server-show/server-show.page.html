@@ -26,7 +26,7 @@
     <ion-item>
       <ion-label>
         <h5>Status</h5>
-        <h1><s9-status [status]="server.status" [target]="server"></s9-status></h1>
+        <h1><s9-status [status]="server.status" [target]="'server'"></s9-status></h1>
       </ion-label>
       <ion-spinner slot="end" *ngIf="server.updating" name="dots" color="warning"></ion-spinner>
     </ion-item>
@@ -48,21 +48,21 @@
       <ion-text color="primary">Sovereign App Store</ion-text>
     </ion-item>
 
-    <ion-item *ngFor="let app of apps" [routerLink]="['apps', 'installed', app.id]">
+    <ion-item *ngFor="let app of appModel.appMap[server.id] | keyvalue" [routerLink]="['apps', 'installed', app.key]">
       <ion-avatar slot="start">
-        <img [src]="app.iconURL" alt="icon" />
+        <img [src]="app.value.iconURL" alt="icon" />
       </ion-avatar>
       <ion-label>
-        <h2>{{ app.title }}</h2>
-        <h3>{{ app.versionInstalled }}</h3>
+        <h2>{{ app.value.title }}</h2>
+        <h3>{{ app.value.versionInstalled }}</h3>
       </ion-label>
       <ion-note slot="end">
-        <s9-status [status]="app.status" [target]="app"></s9-status>
+        <s9-status [status]="app.value.status" [target]="'app'"></s9-status>
       </ion-note>
     </ion-item>
   </ion-item-group>
 
-  <div *ngIf="loading && !apps.length" class="apps-spinner">
+  <div *ngIf="loading && !appModel.count(server.id)" class="apps-spinner">
     <ion-spinner name="lines" color="warning"></ion-spinner>
   </div>
 

@@ -14,7 +14,7 @@
   <div *ngIf="!loading">
 
     <ion-item *ngIf="error" style="margin-bottom: 16px;">
-      <ion-text class="ion-text-wrap" color="danger">{{error}}</ion-text>
+      <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
     </ion-item>
 
     <div *ngIf="app">
@@ -29,7 +29,7 @@
         </ion-label>
       </ion-item>
 
-      <ion-grid class="ion-padding-top ion-padding-bottom">
+      <ion-grid class="ion-padding-top">
         <ion-row *ngIf="!app.versionInstalled">
           <ion-col>
             <ion-button expand="block" fill="outline" (click)="presentAlertInstall(app.versionLatest)">
@@ -52,6 +52,7 @@
       </ion-grid>
 
       <ion-item-group>
+        <ion-item-divider></ion-item-divider>
         <ion-item>
           <ion-label class="ion-text-wrap">
             <h2>Description</h2>
@@ -66,6 +67,11 @@
             <br />
             <ion-text color="medium"><h2 [innerHTML]="app.releaseNotes"></h2></ion-text>
           </ion-label>
+        </ion-item>
+        <ion-item-divider></ion-item-divider>
+        <ion-item button (click)="presentAlertVersions()">
+          <ion-icon slot="start" name="filing"></ion-icon>
+          <ion-label>Other versions</ion-label>
         </ion-item>
       </ion-item-group>
 

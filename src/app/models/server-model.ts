@@ -9,7 +9,7 @@ import * as CryptoJS from 'crypto-js'
   providedIn: 'root',
 })
 export class ServerModel {
-  serverMap: { [id: string]: S9Server }
+  serverMap: { [id: string]: S9Server } = { }
 
   get servers () { return Object.values(this.serverMap) as Readonly<S9Server>[] }
   get count () { return this.servers.length }
@@ -80,7 +80,7 @@ export interface S9Server extends S9ServerStorable {
 export interface S9Notification {
   id: string
   appId: string
-  created_at: string
+  createdAt: string
   code: string
   title: string
   message: string
@@ -90,8 +90,10 @@ export type ServerSpecs = { [key: string]: string | number }
 
 export type ServerMetrics = {
   [key: string]: {
-    value: number
-    unit: string
+    [key: string]: {
+      value: number
+      unit: string
+    }
   }
 }
 

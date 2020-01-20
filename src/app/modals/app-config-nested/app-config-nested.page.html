@@ -5,11 +5,26 @@
         <ion-icon name="arrow-back"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>{{ keyval.key }}</ion-title>
+    <ion-title>{{ keyval.value.name }}</ion-title>
+    <ion-buttons *ngIf="keyval.value.type === 'object' && keyval.value.nullable" slot="end">
+      <ion-button color="danger" (click)="presentAlertDestroy()">
+        Delete
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
+
+  <ion-item-group *ngIf="keyval.value.changeWarning">
+    <ion-item>
+      <ion-label class="ion-text-wrap">
+        <h3><ion-text color="danger">Warning!</ion-text></h3>
+        <br />
+        <h2><ion-text color="medium">{{ keyval.value.changeWarning }}</ion-text></h2>
+      </ion-label>
+    </ion-item>
+  </ion-item-group>
 
   <div *ngIf="keyval.value.type === 'list'">
 
@@ -32,7 +47,7 @@
               </ion-item-option>
             </ion-item-options>
             <ion-item button detail="false" (click)="presentModalValueEdit(i)">
-              <ion-label>{{ entry }}</ion-label>
+              <ion-label>{{ entry }}<span *ngIf="keyval.value.spec.type === 'number'"> {{ keyval.value.spec.units }}</span></ion-label>
             </ion-item>
           </ion-item-sliding>
           <ion-item-sliding *ngIf="keyval.value.spec.type === 'object'">
@@ -68,6 +83,7 @@
   </div>
 
   <ion-item-group *ngIf="keyval.value.type === 'object'">
+    <ion-item-divider></ion-item-divider>
     <object-config [spec]="keyval.value.spec" [(edited)]="edited" [config]="value"></object-config>
   </ion-item-group>
 

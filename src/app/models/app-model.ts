@@ -7,7 +7,7 @@ import { Injectable } from '@angular/core'
 export class AppModel {
   appMap: { [serverId: string]:
     { [appId: string]: AppInstalled }
-  }
+  } = { }
 
   constructor () { }
 
@@ -15,12 +15,16 @@ export class AppModel {
     this.appMap = { }
   }
 
+  count (serverId: string) {
+    return this.getApps(serverId).length
+  }
+
   getApps (serverId: string): Readonly<AppInstalled>[] {
     return Object.values(this.appMap[serverId]) as Readonly<AppInstalled>[]
   }
 
-  getApp (serverId: string, appId: string): Readonly<Readonly<AppInstalled> | undefined> {
-    return this.getApps(serverId)[appId]
+  getApp (serverId: string, appId: string): Readonly<AppInstalled> | undefined {
+    return this.appMap[serverId][appId]
   }
 
   cacheApp (serverId: string, app: AppInstalled, updates: Partial<AppInstalled> = { }): Readonly<AppInstalled> {
@@ -87,7 +91,6 @@ export interface WithStandalone {
   name: string
   description: string
   changeWarning?: string
-  nullable: boolean
 }
 
 export interface ListValueSpecString extends ValueSpecBase {
@@ -100,14 +103,17 @@ export interface ListValueSpecString extends ValueSpecBase {
 
 export interface ValueSpecString extends ListValueSpecString, WithStandalone {
   default?: DefaultString
+  nullable: boolean
 }
 
 export interface ListValueSpecNumber extends ValueSpecBase {
   type: 'number'
   range: string
+  units?: string
 }
 
 export interface ValueSpecNumber extends ListValueSpecNumber, WithStandalone {
+  nullable: boolean
   default?: number
 }
 
@@ -117,7 +123,7 @@ export interface ListValueSpecEnum extends ValueSpecBase {
 }
 
 export interface ValueSpecEnum extends ListValueSpecEnum, WithStandalone {
-  default?: string
+  default: string
 }
 
 export interface ListValueSpecObject extends ValueSpecBase {
@@ -125,9 +131,12 @@ export interface ListValueSpecObject extends ValueSpecBase {
   spec: AppConfigSpec
 }
 
-export interface ValueSpecObject extends ListValueSpecObject, WithStandalone { }
+export interface ValueSpecObject extends ListValueSpecObject, WithStandalone {
+  nullable: boolean
+  nullByDefault: boolean
+}
 
-export interface ValueSpecBoolean extends ValueSpecBase, Omit<WithStandalone, 'nullable'> {
+export interface ValueSpecBoolean extends ValueSpecBase, WithStandalone {
   type: 'boolean'
   default: boolean
 }
