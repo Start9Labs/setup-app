@@ -7,13 +7,14 @@ import { AppInstalled, AppHealthStatus, AppModel } from 'src/app/models/app-mode
 import { S9Server } from 'src/app/models/server-model'
 import { ClipboardService } from 'src/app/services/clipboard.service'
 import { ActionSheetButton } from '@ionic/core'
+import { AppSyncingPage, serverFromRouteParam } from '../app-syncing-page'
 
 @Component({
   selector: 'app-installed-show',
   templateUrl: './app-installed-show.page.html',
   styleUrls: ['./app-installed-show.page.scss'],
 })
-export class AppInstalledShowPage {
+export class AppInstalledShowPage extends AppSyncingPage {
   loading = true
   error: string
   server: S9Server
@@ -22,24 +23,25 @@ export class AppInstalledShowPage {
   constructor (
     private readonly alertCtrl: AlertController,
     private readonly actionCtrl: ActionSheetController,
-    private readonly serverService: ServerService,
     private readonly route: ActivatedRoute,
     private readonly serverModel: ServerModel,
-    private readonly appModel: AppModel,
     private readonly navCtrl: NavController,
     private readonly clipboardService: ClipboardService,
     private readonly loadingCtrl: LoadingController,
-  ) { }
+    serverService: ServerService,
+    appModel: AppModel,
+  ) {
+    super(serverService, appModel)
+  }
 
   async ngOnInit () {
     try {
-      const serverId = this.route.snapshot.paramMap.get('serverId') as string
-      const server = this.serverModel.getServer(serverId)
-      if (!server) throw new Error (`No server found with ID: ${serverId}`)
-      this.server = server
+      this.server = serverFromRouteParam(this.route, this.serverModel)
+
+      super.ngOnInit(this.server)
 
       const appId = this.route.snapshot.paramMap.get('appId') as string
-      this.app = this.appModel.getApp(serverId, appId) || { } as Readonly<AppInstalled>
+      this.app = this.appModel.getApp(this.server.id, appId) || { } as Readonly<AppInstalled>
 
       this.getApp(appId)
     } catch (e) {
