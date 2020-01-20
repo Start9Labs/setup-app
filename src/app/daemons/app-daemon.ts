@@ -8,9 +8,6 @@ import { Storage } from '@ionic/storage'
 import { ZeroconfDaemon } from './zeroconf-daemon'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 
-@Injectable({
-  providedIn: 'root',
-})
 export class AppDaemon {
   private going: boolean
   syncing: boolean

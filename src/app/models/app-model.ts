@@ -35,7 +35,7 @@ export class AppModel {
 
   syncAppCache (serverId: string, upToDateApps : AppInstalled[]) {
     this.appMap[serverId] = upToDateApps.reduce((acc, newApp) => {
-      acc[newApp.id] = this.cacheApp(serverId, newApp, newApp)
+      acc[newApp.id] = Object.assign(this.appMap[serverId][newApp.id] || { }, newApp)
       return acc
     }, { } as { [appId: string]: AppInstalled })
   }
