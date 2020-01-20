@@ -50,10 +50,10 @@ export class AppAvailableShowPage {
       backdropDismiss: false,
       inputs: this.app.versions.map(v => {
         return {
-          name: v.version, // for CSS
+          name: v, // for CSS
           type: 'radio',
-          label: v.version, // appearance on screen
-          value: v.version, // literal SEM version value
+          label: v, // appearance on screen
+          value: v, // literal SEM version value
         }
       }),
       buttons: [
