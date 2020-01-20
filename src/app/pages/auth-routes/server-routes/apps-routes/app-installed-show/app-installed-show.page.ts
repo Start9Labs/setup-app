@@ -20,6 +20,7 @@ export class AppInstalledShowPage {
   error: string
   server: S9Server
   app: AppInstalled
+  appId: string
 
   constructor (
     private readonly alertCtrl: AlertController,
@@ -39,15 +40,20 @@ export class AppInstalledShowPage {
       this.server = serverFromRouteParam(
         this.route, this.serverModel,
       )
+      this.appId = this.route.snapshot.paramMap.get('appId') as string
+
+      // if app is not in cache, it will not exist
+      this.app = this.appModel.getApp(this.server.id, this.appId) as AppInstalled
+      if (!this.app) { return }
+
+      this.app = await this.getApp(this.appId) as AppInstalled
+      if (!this.app) { return }
 
       this.appDaemon.setAndGo(this.server)
-
-      const appId = this.route.snapshot.paramMap.get('appId') as string
-      this.app = this.appModel.getApp(this.server.id, appId) || { } as Readonly<AppInstalled>
-
-      this.getApp(appId)
     } catch (e) {
       this.error = e.message
+    } finally {
+      this.loading = false
     }
   }
 
@@ -55,14 +61,15 @@ export class AppInstalledShowPage {
     this.appDaemon.stop()
   }
 
-  async getApp (appId: string): Promise<void> {
+  async getApp (appId: string): Promise<AppInstalled | undefined> {
+    let installedApp: AppInstalled | undefined = undefined
     try {
-      this.app = await this.serverService.getInstalledApp(this.server, appId)
-      this.appModel.cacheApp(this.server.id, this.app)
+      const appRes = await this.serverService.getInstalledApp(this.server, appId)
+      installedApp = this.appModel.cacheApp(this.server.id, appRes, appRes)
     } catch (e) {
       this.error = e.message
     } finally {
-      this.loading = false
+      return installedApp
     }
   }
 
@@ -116,6 +123,10 @@ export class AppInstalledShowPage {
     })
 
     await action.present()
+  }
+
+  async handleReinstall () {
+    this.navCtrl.navigateForward(['/auth', 'server', this.server.id, 'apps', 'available', this.appId])
   }
 
   async stop (): Promise<void> {

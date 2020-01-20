@@ -20,28 +20,34 @@
 
   <ion-spinner *ngIf="loading" class="center" name="lines" color="warning"></ion-spinner>
 
-  <div *ngIf="!loading">
+  <div *ngIf="!loading && app">
 
     <ion-item-group>
       <ion-item>
         <ion-label position="stacked">Status</ion-label>
-        <h5><s9-status [status]="app.status" [target]="'app'"></s9-status></h5>
+        <h5>
+          <s9-status [status]="app.status" [target]="'app'"></s9-status>
+        </h5>
       </ion-item>
     </ion-item-group>
 
-    <ion-button *ngIf="['NEEDS_CONFIG', 'RECOVERABLE'].includes(app.status)" style="margin: 16px 0;" expand="block" fill="outline" color="warning" [routerLink]="['config']">
+    <ion-button *ngIf="['NEEDS_CONFIG', 'RECOVERABLE'].includes(app.status)" style="margin: 16px 0;" expand="block"
+      fill="outline" color="warning" [routerLink]="['config']">
       Config
     </ion-button>
 
-    <ion-button *ngIf="app.status === 'STOPPED'" style="margin: 16px 0;" expand="block" fill="outline" color="success" (click)="start()">
+    <ion-button *ngIf="app.status === 'STOPPED'" style="margin: 16px 0;" expand="block" fill="outline" color="success"
+      (click)="start()">
       Start
     </ion-button>
 
-    <ion-button *ngIf="['RUNNING', 'RESTARTING'].includes(app.status)" style="margin: 16px 0;" expand="block" fill="outline" color="danger" (click)="stop()">
+    <ion-button *ngIf="['RUNNING', 'RESTARTING'].includes(app.status)" style="margin: 16px 0;" expand="block"
+      fill="outline" color="danger" (click)="stop()">
       Stop
     </ion-button>
 
-    <ion-button *ngIf="app.status === 'DEAD'" style="margin: 16px 0;" expand="block" fill="outline" color="primary" (click)="presentAlertUninstall()">
+    <ion-button *ngIf="app.status === 'DEAD'" style="margin: 16px 0;" expand="block" fill="outline" color="primary"
+      (click)="presentAlertUninstall()">
       Uninstall
     </ion-button>
 
@@ -49,11 +55,15 @@
       <ion-item-divider></ion-item-divider>
       <ion-item>
         <ion-label position="stacked">Installed Version</ion-label>
-        <ion-text color="medium"><h5>{{ app.versionInstalled }}</h5></ion-text>
+        <ion-text color="medium">
+          <h5>{{ app.versionInstalled }}</h5>
+        </ion-text>
       </ion-item>
       <ion-item>
         <ion-label position="stacked">Tor Address</ion-label>
-        <ion-text style="word-break: break-all;" color="medium"><h5>{{ app.torAddress }}</h5></ion-text>
+        <ion-text style="word-break: break-all;" color="medium">
+          <h5>{{ app.torAddress }}</h5>
+        </ion-text>
         <ion-note slot="end">
           <ion-button (click)="copyTor()" fill="outline" size="small">
             Copy
@@ -63,5 +73,10 @@
     </ion-item-group>
 
   </div>
+  <div *ngIf="!loading && !app">
+    <ion-button style="margin: 16px 0;" expand="block" fill="outline" color="primary" (click)="handleReinstall()">
+      Reinstall?
+    </ion-button>
+  </div>
 
-</ion-content>
+</ion-content>!
