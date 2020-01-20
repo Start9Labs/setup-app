@@ -17,11 +17,11 @@ export class SettingsPage {
     private readonly authService: AuthService,
   ) { }
 
-  async presentAlertWarnRecovery () {
+  async presentAlertWarnMnemonic () {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Caution',
-      message: 'Please make sure no one is snooping. And remember to keep your recovery phrase private and secure.',
+      message: 'Please make sure no one is snooping. And remember to keep your mnemonic phrase private and secure.',
       buttons: [
         {
           text: 'Cancel',
@@ -31,7 +31,7 @@ export class SettingsPage {
           text: 'Show',
           cssClass: 'alert-danger',
           handler: async () => {
-            await this.presentAlertViewRecovery()
+            await this.presentAlertViewMnemonic()
           },
         },
       ],
@@ -39,10 +39,10 @@ export class SettingsPage {
     await alert.present()
   }
 
-  async presentAlertViewRecovery () {
+  async presentAlertViewMnemonic () {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
-      header: 'Recovery Phrase',
+      header: 'Mnemonic Phrase',
       message: `${this.authService.mnemonic!.join(' ')}`,
       buttons: ['Close'],
     })
@@ -53,7 +53,7 @@ export class SettingsPage {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Wait!',
-      message: 'Are you sure you want to wipe the keychain on this device? All servers will be forgotten. You will need your recovery phrase to regain access to your servers.',
+      message: 'Are you sure you want to wipe the keychain on this device? All servers will be forgotten. You will need your mnemonic phrase to regain access to your servers.',
       buttons: [
         {
           text: 'Cancel',
