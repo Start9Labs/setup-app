@@ -13,6 +13,10 @@
     "postinstall": "cp -r node_modules/crypto-browserify node_modules/crypto && cp -r node_modules/stream-browserify node_modules/stream"
   },
   "private": true,
+  "resolutions": {
+    "tree-kill": "1.2.2",
+    "serialize-javascript": "^2.1.1"
+  },
   "dependencies": {
     "@angular/common": "~8.2.13",
     "@angular/core": "~8.2.13",
