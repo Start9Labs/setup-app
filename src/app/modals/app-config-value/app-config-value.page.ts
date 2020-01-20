@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core'
 import { ValueSpecString, ValueSpecNumber, ValueSpec } from 'src/app/models/app-model'
 import { Range } from 'src/app/util/config.util'
 import { AlertController, ModalController } from '@ionic/angular'
-import { getDefaultDescription } from '../../util/config.util'
+import { getDefaultDescription, getDefaultConfigValue } from '../../util/config.util'
 
 @Component({
   selector: 'app-config-value',
@@ -48,6 +48,11 @@ export class AppConfigValuePage {
 
   getDefaultDescription (spec: ValueSpec): string | undefined {
     return getDefaultDescription(spec)
+  }
+
+  refreshDefault () {
+    this.inputValue = String(getDefaultConfigValue(this.spec))
+    this.handleInput()
   }
 
   handleInput () {

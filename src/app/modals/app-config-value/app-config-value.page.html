@@ -44,6 +44,7 @@
         Default: {{ getDefaultDescription(spec) }}
         <span *ngIf="spec.type === 'number' && spec.units"> {{ spec.units }}</span>
       </ion-text>
+      <ion-icon *ngIf="getDefaultDescription(spec) === 'random'" style="vertical-align: bottom;" name="refresh" color="primary" (click)="refreshDefault()"></ion-icon>
     </p>
   </ion-item-group>
 

@@ -54,7 +54,7 @@
             <ion-button *ngIf="compareVersions(app.versionInstalled, app.versionViewing) === -1" expand="block" fill="outline" color="success" (click)="presentAlertInstall()">
               Update
             </ion-button>
-            <ion-button [disabled]="compareVersions(app.versionInstalled, app.versionViewing) === 1" expand="block" fill="outline" color="warning" (click)="presentAlertInstall()">
+            <ion-button *ngIf="compareVersions(app.versionInstalled, app.versionViewing) === 1" expand="block" fill="outline" color="warning" (click)="presentAlertInstall()">
               Downgrade
             </ion-button>
           </ion-col>
