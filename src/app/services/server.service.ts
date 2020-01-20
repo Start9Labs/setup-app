@@ -3,7 +3,7 @@ import { HttpService } from './http.service'
 import { Method } from '../types/enums'
 import { AppInstalled, AppAvailablePreview, AppAvailableFull, AppHealthStatus, AppConfigSpec, AppModel, Rules } from '../models/app-model'
 import { S9Server, S9Notification } from '../models/server-model'
-import { Lan, ApiAppAvailablePreview, ApiAppAvailableFull, ApiAppInstalled, ApiServer } from '../types/api-types'
+import { Lan, ApiAppAvailablePreview, ApiAppAvailableFull, ApiAppInstalled, ApiServer, ApiAppVersionInfo } from '../types/api-types'
 import { S9BuilderWith } from './setup.service'
 import * as configUtil from '../util/config.util'
 import { pauseFor } from '../util/misc.util'
@@ -70,12 +70,28 @@ export class ServerService {
     return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(server, Method.GET, '/apps/store')
   }
 
-  async getAvailableApp (server: S9Server, appId: string, version?: string): Promise<AppAvailableFull> {
-    const params: Lan.GetAppAvailableReq = { }
-    if (version) { params.version = version }
+  async getAvailableApp (server: S9Server, appId: string): Promise<AppAvailableFull> {
     // @TODO remove
     // return mockGetAvailableApp()
-    return this.httpService.authServerRequest<Lan.GetAppAvailableRes>(server, Method.GET, `/apps/${appId}/store`, { params })
+    return this.httpService.authServerRequest<Lan.GetAppAvailableRes>(server, Method.GET, `/apps/${appId}/store`)
+      .then(res => {
+        return {
+          ...res,
+          versionViewing: res.versionLatest,
+        }
+      })
+  }
+
+  async getAvailableAppVersionInfo (server: S9Server, appId: string, version: string): Promise<{ releaseNotes: string, versionViewing: string }> {
+    // @TODO remove
+    // return mockGetAvailableAppVersionInfo()
+    return this.httpService.authServerRequest<Lan.GetAppAvailableVersionInfoRes>(server, Method.GET, `/apps/${appId}/store/${version}`)
+      .then(res => {
+        return {
+          ...res,
+          versionViewing: version,
+        }
+      })
   }
 
   async getInstalledApp (server: S9Server, appId: string): Promise<AppInstalled> {
@@ -258,6 +274,12 @@ async function mockGetAvailableApp (): Promise<Lan.GetAppAvailableRes> {
 async function mockGetAvailableApps (): Promise<Lan.GetAppsAvailableRes> {
   await pauseFor(1000)
   return [mockApiAppAvailablePreview, mockApiAppAvailablePreview, mockApiAppAvailablePreview]
+}
+
+// @TODO remove
+async function mockGetAvailableAppVersionInfo (): Promise<Lan.GetAppAvailableVersionInfoRes> {
+  await pauseFor(1000)
+  return mockApiAppAvailableVersionInfo
 }
 
 // @TODO remove
@@ -454,10 +476,14 @@ const mockApiAppAvailablePreview: ApiAppAvailablePreview = {
 // @TODO remove
 const mockApiAppAvailableFull: ApiAppAvailableFull = {
   ...mockApiAppAvailablePreview,
-  versionViewing: '0.19.0',
   releaseNotes: 'Segit and more cool things!',
   descriptionLong: 'Bitcoin is an innovative payment network and new kind of money. Bitcoin utilizes a robust p2p network to garner decentralized consensus.',
   versions: ['0.19.0', '0.18.1', '0.17.0'],
+}
+
+// @TODO remove
+const mockApiAppAvailableVersionInfo: ApiAppVersionInfo = {
+  releaseNotes: 'Some older release notes that are not super important anymore.',
 }
 
 // @TODO remove

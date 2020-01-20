@@ -63,13 +63,30 @@ export class AppAvailableShowPage {
         }, {
           text: 'Ok',
           handler: (version: string) => {
-            console.log(version)
+            this.getVersionInfo(version)
           },
         },
       ],
     })
 
     await alert.present()
+  }
+
+  async getVersionInfo (version: string) {
+    const loader = await this.loadingCtrl.create({
+      spinner: 'lines',
+      cssClass: 'loader',
+    })
+    await loader.present()
+
+    try {
+      const info = await this.serverService.getAvailableAppVersionInfo(this.server, this.app.id, version)
+      Object.assign(this.app, info)
+    } catch (e) {
+      this.error = e.message
+    } finally {
+      await loader.dismiss()
+    }
   }
 
   async presentAlertInstall (version: string) {

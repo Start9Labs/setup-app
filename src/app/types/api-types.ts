@@ -16,7 +16,6 @@ export interface ApiAppAvailablePreview extends ApiAppBase {
 }
 
 export interface ApiAppAvailableFull extends ApiAppAvailablePreview {
-  versionViewing: string
   releaseNotes: string
   descriptionLong: string
   versions: string[]
@@ -37,9 +36,13 @@ export interface ApiServer {
 }
 
 export interface ApiAppConfig {
-  spec: AppConfigSpec,
+  spec: AppConfigSpec
   config: object | null
   rules: Rules[]
+}
+
+export interface ApiAppVersionInfo {
+  releaseNotes: string
 }
 
 export module Lan {
@@ -55,10 +58,12 @@ export module Lan {
   export type GetServerSpecsRes = ServerSpecs
   export type GetServerMetricsReq = { [k: string]: never }
   export type GetServerMetricsRes = ServerMetrics
-  export type GetAppAvailableReq = { version?: string }
+  export type GetAppAvailableReq = { [k: string]: never }
   export type GetAppAvailableRes = ApiAppAvailableFull
   export type GetAppsAvailableReq = { [k: string]: never }
   export type GetAppsAvailableRes = ApiAppAvailablePreview[]
+  export type GetAppAvailableVersionInfoReq = { [k: string]: never }
+  export type GetAppAvailableVersionInfoRes = ApiAppVersionInfo
   export type GetAppInstalledReq = { [k: string]: never }
   export type GetAppInstalledRes = ApiAppInstalled
   export type GetAppConfigReq = { [k: string]: never }
