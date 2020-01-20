@@ -22,7 +22,7 @@ export class ZeroconfDaemon {
   }
 
   async start (reInit = false) {
-    return this.mock()
+    // return this.mock()
 
     if (!this.platform.is('cordova')) { return }
 
