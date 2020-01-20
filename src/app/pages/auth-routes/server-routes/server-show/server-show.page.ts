@@ -4,7 +4,7 @@ import { ServerModel } from 'src/app/models/server-model'
 import { NavController, AlertController, ActionSheetController, LoadingController } from '@ionic/angular'
 import { S9Server } from 'src/app/models/server-model'
 import { ActionSheetButton } from '@ionic/core'
-import { AppHealthStatus } from 'src/app/models/app-model'
+import { AppHealthStatus, AppModel } from 'src/app/models/app-model'
 import * as compareVersions from 'compare-versions'
 import { ServerService } from 'src/app/services/server.service'
 import { ServerDaemon } from 'src/app/daemons/server-daemon'
@@ -34,6 +34,7 @@ export class ServerShowPage {
     private readonly serverDaemon: ServerDaemon,
     private readonly serverService: ServerService,
     private readonly appDaemon: AppDaemon,
+    readonly appModel: AppModel,
   ) { }
 
   async ngOnInit () {
