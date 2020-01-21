@@ -7,7 +7,6 @@ import { AppInstalled, AppHealthStatus, AppModel } from 'src/app/models/app-mode
 import { S9Server } from 'src/app/models/server-model'
 import { ClipboardService } from 'src/app/services/clipboard.service'
 import { ActionSheetButton } from '@ionic/core'
-import { AppDaemon } from 'src/app/daemons/app-daemon'
 import { serverFromRouteParam } from '../../server-helpers'
 
 @Component({
@@ -32,7 +31,6 @@ export class AppInstalledShowPage {
     private readonly loadingCtrl: LoadingController,
     private readonly serverService: ServerService,
     private readonly appModel: AppModel,
-    private readonly appDaemon: AppDaemon,
   ) { }
 
   async ngOnInit () {
@@ -44,12 +42,6 @@ export class AppInstalledShowPage {
 
     this.app = this.appModel.getApp(this.server.id, this.appId) as AppInstalled
     await this.getApp(this.appId)
-
-    this.appDaemon.setAndGo(this.server)
-  }
-
-  async ngOnDestroy () {
-    this.appDaemon.stop()
   }
 
   async getApp (appId: string): Promise<void> {

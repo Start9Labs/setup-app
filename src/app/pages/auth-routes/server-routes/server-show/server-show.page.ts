@@ -8,9 +8,9 @@ import { AppHealthStatus, AppModel } from 'src/app/models/app-model'
 import * as compareVersions from 'compare-versions'
 import { ServerService } from 'src/app/services/server.service'
 import { ServerDaemon } from 'src/app/daemons/server-daemon'
-import { AppDaemon } from 'src/app/daemons/app-daemon'
 import { pauseFor } from 'src/app/util/misc.util'
 import { serverFromRouteParam } from '../server-helpers'
+import { ServerSyncService } from 'src/app/services/server.sync.service'
 
 @Component({
   selector: 'server-show',
@@ -31,9 +31,8 @@ export class ServerShowPage {
     private readonly actionCtrl: ActionSheetController,
     private readonly alertCtrl: AlertController,
     private readonly loadingCtrl: LoadingController,
-    private readonly serverDaemon: ServerDaemon,
     private readonly serverService: ServerService,
-    private readonly appDaemon: AppDaemon,
+    private readonly sss: ServerSyncService,
     readonly appModel: AppModel,
   ) { }
 
@@ -42,13 +41,7 @@ export class ServerShowPage {
       this.route, this.serverModel,
     )
 
-    this.appDaemon.setAndGo(this.server)
-
     this.getServerAndApps()
-  }
-
-  async ngOnDestroy () {
-    this.appDaemon.stop()
   }
 
   async doRefresh (event: any) {
@@ -58,11 +51,7 @@ export class ServerShowPage {
 
   async getServerAndApps () {
     this.loading = true
-
-    await this.serverDaemon.syncServer(this.server)
-              .then(() => pauseFor(500))
-              .then(() => this.appDaemon.syncApps())
-
+    await this.sss.fromCache().syncServer(this.server)
     this.loading = false
   }
 

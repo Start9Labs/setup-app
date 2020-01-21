@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { ServerModel } from 'src/app/models/server-model'
-import { ServerDaemon } from 'src/app/daemons/server-daemon'
 import { NavController } from '@ionic/angular'
+import { ServerSyncService } from 'src/app/services/server.sync.service'
 
 @Component({
   selector: 'page-server-list',
@@ -12,12 +12,12 @@ export class ServerListPage {
 
   constructor (
     public serverModel: ServerModel,
-    public serverDaemon: ServerDaemon,
+    public sss: ServerSyncService,
     private readonly navCtrl: NavController,
   ) { }
 
   async doRefresh (event: any) {
-    await this.serverDaemon.syncServers()
+    await this.sss.fromCache().syncServers()
     event.target.complete()
   }
 
