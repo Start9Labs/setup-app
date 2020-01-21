@@ -1,8 +1,12 @@
 export enum Method {
-  GET = 'GET',
-  POST = 'POST',
-  PATCH = 'PATCH',
-  DELETE = 'DELETE',
+  get = 'get',
+  post = 'post',
+  put = 'put',
+  patch = 'patch',
+  head = 'head',
+  delete = 'delete',
+  upload = 'upload',
+  download = 'download',
 }
 
 export enum AuthStatus {
