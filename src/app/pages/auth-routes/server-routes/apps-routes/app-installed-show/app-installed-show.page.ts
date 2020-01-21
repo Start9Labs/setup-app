@@ -20,6 +20,7 @@ export class AppInstalledShowPage {
   error: string
   server: S9Server
   app: AppInstalled
+  appId: string
 
   constructor (
     private readonly alertCtrl: AlertController,
@@ -35,20 +36,16 @@ export class AppInstalledShowPage {
   ) { }
 
   async ngOnInit () {
-    try {
-      this.server = serverFromRouteParam(
-        this.route, this.serverModel,
-      )
+    this.server = serverFromRouteParam(
+      this.route, this.serverModel,
+    )
+    this.appId = this.route.snapshot.paramMap.get('appId') as string
+      // throw some shit somewhere
 
-      this.appDaemon.setAndGo(this.server)
+    this.app = this.appModel.getApp(this.server.id, this.appId) as AppInstalled
+    await this.getApp(this.appId)
 
-      const appId = this.route.snapshot.paramMap.get('appId') as string
-      this.app = this.appModel.getApp(this.server.id, appId) || { } as Readonly<AppInstalled>
-
-      this.getApp(appId)
-    } catch (e) {
-      this.error = e.message
-    }
+    this.appDaemon.setAndGo(this.server)
   }
 
   async ngOnDestroy () {
@@ -57,8 +54,8 @@ export class AppInstalledShowPage {
 
   async getApp (appId: string): Promise<void> {
     try {
-      const app = await this.serverService.getInstalledApp(this.server, appId)
-      this.appModel.cacheApp(this.server.id, this.app, app)
+      const appRes = await this.serverService.getInstalledApp(this.server, appId)
+      this.appModel.cacheApp(this.server.id, appRes, appRes)
     } catch (e) {
       this.error = e.message
     } finally {
@@ -116,6 +113,10 @@ export class AppInstalledShowPage {
     })
 
     await action.present()
+  }
+
+  async handleReinstall () {
+    this.navCtrl.navigateForward(['/auth', 'server', this.server.id, 'apps', 'available', this.appId])
   }
 
   async stop (): Promise<void> {

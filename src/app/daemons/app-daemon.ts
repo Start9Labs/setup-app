@@ -69,8 +69,6 @@ export class AppDaemon {
           { status: AppHealthStatus.UNKNOWN, statusAt: now.toISOString() },
         )
       }
-
-
     }
 
     this.syncing = false
