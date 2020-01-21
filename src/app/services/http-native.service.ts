@@ -5,7 +5,7 @@ import { S9BuilderWith } from './setup.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { TokenSigner } from 'jsontokens'
 import { Method } from '../types/enums'
-import { AppSettings } from '../app.module'
+const version = require('../../../package.json')
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +17,7 @@ export class HttpNativeService {
     private readonly zerconfDaemon: ZeroconfDaemon,
   ) {
     this.http.setDataSerializer('json')
-    this.http.setHeader('*', 'app-version', AppSettings.APP_VERSION)
+    this.http.setHeader('*', 'app-version', version)
     this.http.setRequestTimeout(5)
   }
 

@@ -7,7 +7,7 @@ import { TokenSigner } from 'jsontokens'
 import { S9BuilderWith } from './setup.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { Method } from '../types/enums'
-import { AppSettings } from '../app.module'
+const version = require('../../../package.json')
 
 @Injectable({
   providedIn: 'root',
@@ -118,7 +118,7 @@ function appendAuthOptions (server: S9Server | S9BuilderWith<'privkey'>, options
 
 function appendDefaultOptions (options: HttpBrowserOptions): HttpBrowserOptions {
   let headers: HttpHeaders = options.headers || new HttpHeaders()
-  headers = headers.set('app-version', AppSettings.APP_VERSION)
+  headers = headers.set('app-version', version)
   options.headers = headers
   options.observe = 'response'
 

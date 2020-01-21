@@ -17,10 +17,6 @@ import { Zeroconf } from '@ionic-native/zeroconf/ngx'
 import { AuthenticatePageModule } from './modals/authenticate/authenticate.module'
 import { HTTP } from '@ionic-native/http/ngx'
 
-export class AppSettings {
-  public static get APP_VERSION (): string { return '1.0.0' }
-}
-
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
