@@ -8,39 +8,46 @@ import { Injectable } from '@angular/core'
   providedIn: 'root',
 })
 export class AppDaemon {
-  private going: boolean
+  // daemon is currently polling
+  private polling: boolean = false
+  // daemon was currently suspended from polling and is ready to repoll
   private syncInterval: number = 5000
+
+  // daemon is presently syncinc apps
   syncing: boolean = false
-  server: S9Server
+
+  server: S9Server | undefined
+  pollingBeganAt: Date
 
   constructor (
     private readonly serverService: ServerService,
     private readonly appModel: AppModel,
   ) { }
 
-  getServer (): S9Server {
+  getServer (): S9Server | undefined {
     return this.server
   }
 
-  setAndGo (s9: S9Server): void {
+  async setAndGo (s9: S9Server): Promise<void> {
     this.server = s9
     this.start()
   }
 
-  async init () { this.start() }
+  async start () {
+    if (this.server && !this.polling) this.poll()
+  }
 
-  async start (): Promise<void> {
-    if (this.going) { return }
-    this.going = true
-
-    while (this.going) {
+  private async poll () : Promise<void> {
+    this.polling = true
+    this.pollingBeganAt = new Date()
+    while (this.polling) {
       this.syncApps()
       await pauseFor(this.syncInterval)
     }
   }
 
   async syncApps (): Promise<void> {
-    if (this.syncing) { return }
+    if (this.syncing || !this.server) { return }
 
     console.log('syncing apps')
 
@@ -50,16 +57,31 @@ export class AppDaemon {
       const apps = await this.serverService.getInstalledApps(this.server)
       this.appModel.syncAppCache(this.server.id, apps)
     } catch (e) {
-      console.error('App sync failure: ' + e)
-      this.appModel.updateAppsUniformly(this.server.id,
-        { status: AppHealthStatus.UNREACHABLE, statusAt: new Date().toISOString() },
-      )
+      console.warn('App sync failure: ' + e)
+
+      const now = new Date()
+      if (this.pollingBeganAt.valueOf() + 7000 < now.valueOf()) {
+        this.appModel.updateAppsUniformly(this.server.id,
+          { status: AppHealthStatus.UNREACHABLE, statusAt: now.toISOString() },
+        )
+      } else {
+        this.appModel.updateAppsUniformly(this.server.id,
+          { status: AppHealthStatus.UNKNOWN, statusAt: now.toISOString() },
+        )
+      }
+
+
     }
 
     this.syncing = false
   }
 
+  suspend () {
+    this.polling = false
+  }
+
   stop () {
-    this.going = false
+    this.polling = false
+    this.server = undefined
   }
 }

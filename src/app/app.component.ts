@@ -10,6 +10,7 @@ import { Router } from '@angular/router'
 import { AuthStatus } from './types/enums'
 import { AppModel } from './models/app-model'
 import { AuthenticatePage } from './modals/authenticate/authenticate.page'
+import { AppDaemon } from './daemons/app-daemon'
 
 @Component({
   selector: 'app-root',
@@ -30,6 +31,7 @@ export class AppComponent {
     private readonly authService: AuthService,
     private readonly router: Router,
     private readonly modalCtrl: ModalController,
+    private readonly appDaemon: AppDaemon,
   ) {
     // set dark theme.
     // @TODO there should be a way to make this the default.
@@ -45,11 +47,12 @@ export class AppComponent {
       // subscribe to app pause event
       this.platform.pause.subscribe(() => {
         this.authService.uninit()
-        this.stopDaemons()
+        this.suspendDaemons()
       })
       // sunscribe to app resume event
       this.platform.resume.subscribe(() => {
         this.authService.init()
+        this.appDaemon.start()
       })
       // do Cordova things if Cordova
       if (platform.is('cordova')) {
@@ -97,11 +100,19 @@ export class AppComponent {
   private restartDaemons () {
     this.zeroconfDaemon.start(true)
     this.serverDaemon.start()
+    this.appDaemon.start()
+  }
+
+  private suspendDaemons () {
+    this.serverDaemon.stop()
+    this.zeroconfDaemon.stop()
+    this.appDaemon.suspend()
   }
 
   private stopDaemons () {
     this.serverDaemon.stop()
     this.zeroconfDaemon.stop()
+    this.appDaemon.stop()
   }
 
   private clearModels () {
