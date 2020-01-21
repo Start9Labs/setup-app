@@ -49,7 +49,7 @@ export class HttpNativeService {
       if (res.data) {
         return JSON.parse(res.data)
       } else {
-        return { } as any
+        return { } as T
       }
     } catch (e) {
       console.error(e)
