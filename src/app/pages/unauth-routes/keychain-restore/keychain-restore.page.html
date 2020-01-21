@@ -12,11 +12,11 @@
 <ion-content>
 
   <div class="ion-padding">
-    <ion-text>Type your 12 word recovery phrase, separted with spaces.</ion-text>
+    <ion-text>Enter a Bip39-compliant mnemonic passphrase, separated with spaces.</ion-text>
   </div>
 
   <div class="ion-padding-start ion-padding-end">
-    <ion-textarea class="recovery-input" [(ngModel)]="mnemonic"></ion-textarea>
+    <ion-textarea class="mnemonic-input" [(ngModel)]="mnemonic"></ion-textarea>
   </div>
 
   <ion-item *ngIf="error" style="margin-top: 16px;">

@@ -45,10 +45,6 @@ export class StatusComponent {
         this.display = 'Stopped'
         this.color = 'danger'
         break
-      case AppHealthStatus.DOWNLOADING:
-        this.display = 'Downloading'
-        this.color = 'warning'
-        break
       case AppHealthStatus.INSTALLING:
         this.display = 'Installing'
         this.color = 'warning'

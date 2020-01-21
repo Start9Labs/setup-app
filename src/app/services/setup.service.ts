@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { S9Server, ServerSpecs, getLanIP } from '../models/server-model'
+import { S9Server, getLanIP } from '../models/server-model'
 import { HttpService } from './http.service'
 import { Method } from 'src/app/types/enums'
 import { pauseFor } from 'src/app/util/misc.util'
@@ -45,13 +45,13 @@ export class SetupService {
 
     // enable lan
     if (!hasValues(['zeroconf'], builder)) {
-      this.message = `getting zeroconf service`
+      this.message = `discovering server on local network`
       builder.zeroconf = this.zeroconfDaemon.getService(builder.id)
     }
 
     // agent version
     if (hasValues(['zeroconf'], builder) && !hasValues(['versionInstalled'], builder)) {
-      this.message = `getting agent version`
+      this.message = `communicating with server`
       builder.versionInstalled = await this.getVersion(builder)
     }
 
@@ -134,7 +134,7 @@ export class SetupService {
       versionInstalled: '0.1.0',
       versionLatest: '0.1.0',
       status: AppHealthStatus.RUNNING,
-      statusAt: new Date(),
+      statusAt: new Date().toISOString(),
       privkey: 'testprivkey',
       pubkey: 'testpubkey',
       registered: true,
@@ -162,7 +162,7 @@ export interface S9ServerBuilder {
   label: string
 
   status: AppHealthStatus
-  statusAt: Date
+  statusAt: string
   versionInstalled?: string
   versionLatest?: string
 
@@ -187,7 +187,7 @@ export function fromUserInput (id: string, label: string): S9ServerBuilder {
     id,
     label,
     status: AppHealthStatus.UNKNOWN,
-    statusAt: new Date(),
+    statusAt: new Date().toISOString(),
     registered: false,
   }
 }

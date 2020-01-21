@@ -32,9 +32,12 @@
       <ion-grid class="ion-padding-top">
         <ion-row *ngIf="!app.versionInstalled">
           <ion-col>
-            <ion-button expand="block" fill="outline" color="success" (click)="presentAlertInstall()">
+            <ion-button *ngIf="app.status !== 'INSTALLING'" expand="block" fill="outline" color="success" (click)="presentAlertInstall()">
               Install
             </ion-button>
+            <ion-item *ngIf="app.status === 'INSTALLING'">
+              <ion-label><ion-text color="warning">Installing...</ion-text></ion-label>
+            </ion-item>
           </ion-col>
         </ion-row>
         <ion-row *ngIf="app.versionInstalled && compareVersions(app.versionInstalled, app.versionViewing) === 0">

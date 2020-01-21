@@ -70,7 +70,7 @@ export interface S9ServerStorable {
 export interface S9Server extends S9ServerStorable {
   updating: boolean
   status: AppHealthStatus
-  statusAt: Date
+  statusAt: string
   versionLatest: string
   privkey: string // derive from mnemonic + torAddress
   badge: number
@@ -119,7 +119,7 @@ export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): 
     versionLatest: '0.0.0',
     updating: false,
     status: AppHealthStatus.UNKNOWN,
-    statusAt: new Date(),
+    statusAt: new Date().toISOString(),
     privkey: deriveKeys(mnemonic, id).privkey,
     badge: 0,
     notifications: [],

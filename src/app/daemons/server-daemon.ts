@@ -92,7 +92,7 @@ export class ServerDaemon {
         const now = new Date()
         if (this.initialized_at + 7000 < now.valueOf()) {
           updates.status = AppHealthStatus.UNREACHABLE
-          updates.statusAt = now
+          updates.statusAt = now.toISOString()
         }
       }
     } else {
@@ -101,7 +101,7 @@ export class ServerDaemon {
         Object.assign(updates, serverRes)
       } catch (e) {
         updates.status = AppHealthStatus.UNREACHABLE
-        updates.statusAt = new Date()
+        updates.statusAt = new Date().toISOString()
       }
     }
 

@@ -6,8 +6,10 @@ export type TwoHundredOK = { never?: never } // hack for the unit type
 interface ApiAppBase {
   id: string
   title: string
+  status: AppHealthStatus | null
+  statusAt: string
   versionLatest: string
-  versionInstalled?: string
+  versionInstalled: string | null
   iconURL: string
 }
 
@@ -22,9 +24,7 @@ export interface ApiAppAvailableFull extends ApiAppAvailablePreview {
 }
 
 export interface ApiAppInstalled extends ApiAppBase {
-  status: AppHealthStatus
   torAddress?: string
-  progress?: number
 }
 
 
