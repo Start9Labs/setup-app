@@ -40,6 +40,10 @@ export class HttpNativeService {
   }
 
   async request<T> (url: string, options: HttpNativeOptions): Promise<T> {
+    if (options.method === Method.post && !options.data) {
+      options.data = { }
+    }
+
     console.log('Request URL: ', url)
     console.log('Request Options: ', options)
 
