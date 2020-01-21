@@ -52,8 +52,10 @@ export class AppModel {
 export interface BaseApp {
   id: string
   title: string
+  status: AppHealthStatus | null
+  statusAt: string
   versionLatest: string
-  versionInstalled?: string
+  versionInstalled: string | null
   iconURL: string
 }
 
@@ -69,10 +71,7 @@ export interface AppAvailableFull extends AppAvailablePreview {
 }
 
 export interface AppInstalled extends BaseApp {
-  status: AppHealthStatus
-  statusAt: Date
   torAddress?: string
-  progress?: number
 }
 
 export type AppConfigSpec = { [key: string]: ValueSpec }
@@ -170,7 +169,6 @@ export interface Rules {
 export enum AppHealthStatus {
   UNKNOWN = 'UNKNOWN',
   UNREACHABLE = 'UNREACHABLE',
-  DOWNLOADING = 'DOWNLOADING',
   INSTALLING = 'INSTALLING',
   NEEDS_CONFIG = 'NEEDS_CONFIG',
   RECOVERABLE = 'RECOVERABLE',

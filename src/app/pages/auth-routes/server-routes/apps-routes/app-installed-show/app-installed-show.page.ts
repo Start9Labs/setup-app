@@ -57,8 +57,8 @@ export class AppInstalledShowPage {
 
   async getApp (appId: string): Promise<void> {
     try {
-      this.app = await this.serverService.getInstalledApp(this.server, appId)
-      this.appModel.cacheApp(this.server.id, this.app)
+      const app = await this.serverService.getInstalledApp(this.server, appId)
+      this.appModel.cacheApp(this.server.id, this.app, app)
     } catch (e) {
       this.error = e.message
     } finally {

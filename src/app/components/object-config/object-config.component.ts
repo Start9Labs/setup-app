@@ -135,7 +135,7 @@ export class ObjectConfigComponent {
   setSelectOptions (spec: ValueSpec) {
     return {
       header: spec.name,
-      message: `Warning! ${spec.changeWarning}`,
+      message: spec.changeWarning ? `Warning! ${spec.changeWarning}` : undefined,
     }
   }
 
