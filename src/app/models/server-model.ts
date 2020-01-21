@@ -97,6 +97,12 @@ export type ServerMetrics = {
   }
 }
 
+export interface SSHFingerprint {
+  alg: string
+  hash: string
+  hostname: string
+}
+
 export function getLanIP (zcs: ZeroconfService): string {
   const { ipv4Addresses, ipv6Addresses } = zcs
 

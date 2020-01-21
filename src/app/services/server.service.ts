@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Method } from '../types/enums'
 import { AppInstalled, AppAvailablePreview, AppAvailableFull, AppHealthStatus, AppConfigSpec, AppModel, Rules } from '../models/app-model'
-import { S9Server, S9Notification } from '../models/server-model'
+import { S9Server, S9Notification, SSHFingerprint } from '../models/server-model'
 import { Lan, ApiAppAvailablePreview, ApiAppAvailableFull, ApiAppInstalled, ApiServer, ApiAppVersionInfo } from '../types/api-types'
 import { S9BuilderWith } from './setup.service'
 import * as configUtil from '../util/config.util'
@@ -39,10 +39,7 @@ export class ServerService {
   }
 
   async deleteNotification (server: S9Server, id: string): Promise<void> {
-    const params: Lan.DeleteNotificationReq = {
-      id,
-    }
-    await this.httpService.authServerRequest<Lan.DeleteNotificationRes>(server, `/notifications`, { method: Method.delete, params })
+    await this.httpService.authServerRequest<Lan.DeleteNotificationRes>(server, `/notifications/${id}`, { method: Method.delete })
   }
 
   async updateAgent (server: S9Server): Promise<void> {
@@ -142,11 +139,11 @@ export class ServerService {
     app.statusAt = new Date().toISOString()
   }
 
-  async getSSHKeys (server: S9Server): Promise<string[]> {
+  async getSSHKeys (server: S9Server): Promise<SSHFingerprint[]> {
     return this.httpService.authServerRequest<Lan.GetSSHKeysRes>(server, `/sshKeys`, { method: Method.get })
   }
 
-  async addSSHKey (server: S9Server, sshKey: string): Promise<string> {
+  async addSSHKey (server: S9Server, sshKey: string): Promise<SSHFingerprint> {
     const data: Lan.PostAddSSHKeyReq = {
       sshKey,
     }
@@ -154,10 +151,7 @@ export class ServerService {
   }
 
   async deleteSSHKey (server: S9Server, sshKey: string): Promise<void> {
-    const params: Lan.DeleteSSHKeyReq = {
-      sshKey,
-    }
-    await this.httpService.authServerRequest<Lan.DeleteSSHKeyRes>(server, `/sshKeys`, { method: Method.delete, params })
+    await this.httpService.authServerRequest<Lan.DeleteSSHKeyRes>(server, `/sshKeys/${sshKey}`, { method: Method.delete })
   }
 
   async restartServer (server: S9Server): Promise<void> {
@@ -285,11 +279,11 @@ export class XServerService {
     await mockWipeAppData()
   }
 
-  async getSSHKeys (server: S9Server): Promise<string[]> {
+  async getSSHKeys (server: S9Server): Promise<SSHFingerprint[]> {
     return mockGetSSHKeys()
   }
 
-  async addSSHKey (server: S9Server, sshKey: string): Promise<string> {
+  async addSSHKey (server: S9Server, sshKey: string): Promise<SSHFingerprint> {
     return mockAddSSHKey()
   }
 
@@ -422,15 +416,15 @@ async function mockWipeAppData (): Promise<Lan.PostWipeAppDataRes> {
 }
 
 // @TODO move-to-test-folders
-async function mockGetSSHKeys (): Promise<Lan.GetSSHKeysRes> {
+async function mockGetSSHKeys (): Promise<SSHFingerprint[]> {
   await pauseFor(1000)
-  return mockApiSSHKeys
+  return mockApiSSHFingerprints
 }
 
 // @TODO move-to-test-folders
-async function mockAddSSHKey (): Promise<Lan.PostAddSSHKeyRes> {
+async function mockAddSSHKey (): Promise<SSHFingerprint> {
   await pauseFor(1000)
-  return mockApiSSHKeys[0]
+  return mockApiSSHFingerprints[0]
 }
 
 // @TODO move-to-test-folders
@@ -665,9 +659,17 @@ const mockApiAppLogs: string[] = [
   '****** FINISH *****',
 ]
 
-const mockApiSSHKeys = [
-  '12:f8:7e:78:61:b4:bf:e2:de:24:15:96:4e:d4:72:53',
-  '00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff',
+const mockApiSSHFingerprints: SSHFingerprint[] = [
+  {
+    alg: 'ed25519',
+    hash: '12:f8:7e:78:61:b4:bf:e2:de:24:15:96:4e:d4:72:53',
+    hostname: 'matt macbook pro',
+  },
+  {
+    alg: 'ed25519',
+    hash: '12:f8:7e:78:61:b4:bf:e2:de:24:15:96:4e:d4:72:53',
+    hostname: 'matt macbook pro',
+  },
 ]
 
 const mockApiAppConfig: Lan.GetAppConfigRes = {

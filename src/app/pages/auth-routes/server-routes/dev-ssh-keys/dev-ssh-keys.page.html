@@ -21,7 +21,7 @@
 
   <ion-spinner *ngIf="loading" class="center" name="lines" color="warning"></ion-spinner>
 
-  <ion-item-group *ngIf="!SSHKeys.length && !loading">
+  <ion-item-group *ngIf="!fingerprints.length && !loading">
     <ion-item>
       <ion-label class="ion-text-wrap">
         <h3><ion-text color="danger">Warning</ion-text></h3>
@@ -34,14 +34,14 @@
   </ion-item-group>
 
   <ion-item-group>
-    <ion-item-sliding *ngFor="let key of SSHKeys; let i = index">
+    <ion-item-sliding *ngFor="let fingerprint of fingerprints; let i = index">
       <ion-item-options side="end">
-        <ion-item-option color="danger" (click)="delete(key, i)">
+        <ion-item-option color="danger" (click)="delete(fingerprint, i)">
           <ion-icon slot="icon-only" name="trash"></ion-icon>
         </ion-item-option>
       </ion-item-options>
       <ion-item>
-        <ion-label class="ion-text-wrap">{{ key }}</ion-label>
+        <ion-label class="ion-text-wrap">{{ fingerprint.alg }} {{ fingerprint.hash }} {{ fingerprint.hostname }}</ion-label>
       </ion-item>
     </ion-item-sliding>
   </ion-item-group>

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { ServerModel } from 'src/app/models/server-model'
+import { ServerModel, SSHFingerprint } from 'src/app/models/server-model'
 import { S9Server } from 'src/app/models/server-model'
 import { ActivatedRoute } from '@angular/router'
 import { AlertController, LoadingController } from '@ionic/angular'
@@ -14,7 +14,7 @@ export class DevSSHKeysPage {
   error = ''
   loading = true
   server: S9Server
-  SSHKeys: string[] = []
+  fingerprints: SSHFingerprint[] = []
 
   constructor (
     private readonly route: ActivatedRoute,
@@ -40,7 +40,7 @@ export class DevSSHKeysPage {
 
   async getSSHKeys () {
     try {
-      this.SSHKeys = await this.serverService.getSSHKeys(this.server)
+      this.fingerprints = await this.serverService.getSSHKeys(this.server)
     } catch (e) {
       this.error = e.message
     } finally {
@@ -89,7 +89,7 @@ export class DevSSHKeysPage {
 
     try {
       const fingerprint = await this.serverService.addSSHKey(this.server, key)
-      this.SSHKeys.push(fingerprint)
+      this.fingerprints.unshift(fingerprint)
     } catch (e) {
       this.error = e.message
     } finally {
@@ -97,7 +97,7 @@ export class DevSSHKeysPage {
     }
   }
 
-  async delete (key: string, index: number) {
+  async delete (fingerprint: SSHFingerprint, index: number) {
     const loader = await this.loadingCtrl.create({
       message: 'Deleting...',
       spinner: 'lines',
@@ -106,8 +106,8 @@ export class DevSSHKeysPage {
     await loader.present()
 
     try {
-      await this.serverService.deleteSSHKey(this.server, key)
-      this.SSHKeys.splice(index, 1)
+      await this.serverService.deleteSSHKey(this.server, fingerprint.hash)
+      this.fingerprints.splice(index, 1)
     } catch (e) {
       this.error = e.message
     } finally {

@@ -1,5 +1,5 @@
 import { AppHealthStatus, AppConfigSpec, Rules } from '../models/app-model'
-import { ServerSpecs, S9Notification, ServerMetrics } from '../models/server-model'
+import { ServerSpecs, S9Notification, ServerMetrics, SSHFingerprint } from '../models/server-model'
 
 export type TwoHundredOK = { never?: never } // hack for the unit type
 
@@ -89,9 +89,9 @@ export module Lan {
   export type DeleteNotificationReq = { id: string }
   export type DeleteNotificationRes = TwoHundredOK
   export type GetSSHKeysReq = { [k: string]: never }
-  export type GetSSHKeysRes = string[]
+  export type GetSSHKeysRes = SSHFingerprint[]
   export type PostAddSSHKeyReq = { sshKey: string }
-  export type PostAddSSHKeyRes = string
+  export type PostAddSSHKeyRes = SSHFingerprint
   export type DeleteSSHKeyReq = { sshKey: string }
   export type DeleteSSHKeyRes = TwoHundredOK
   export type PostWipeAppDataReq = { [k: string]: never }
