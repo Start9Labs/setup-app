@@ -26,8 +26,8 @@
           <h1>{{ app.title }}</h1>
           <ion-text *ngIf="app.versionInstalled" color="success"><h2>Installed</h2></ion-text>
           <div *ngIf="!app.versionInstalled">
-            <ion-text *ngIf="app.status !== INSTALLING" color="warning"><h2>Not installed</h2></ion-text>
-            <ion-text *ngIf="app.status === INSTALLING" color="warning"><h2>Installing...</h2></ion-text>
+            <ion-text *ngIf="app.status !== 'INSTALLING'" color="warning"><h2>Not installed</h2></ion-text>
+            <ion-text *ngIf="app.status === 'INSTALLING'" color="warning"><h2>Installing...</h2></ion-text>
           </div>
         </ion-label>
       </ion-item>
