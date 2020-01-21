@@ -92,7 +92,7 @@ export class AppConfigPage {
         await this.serverService.startApp(this.server, this.app)
       // if not RUNNING beforehand, set status to STOPPED
       } else {
-        this.appModel.cacheApp(this.server.id, this.app, { status: AppHealthStatus.STOPPED, statusAt: new Date() })
+        this.appModel.cacheApp(this.server.id, this.app, { status: AppHealthStatus.STOPPED, statusAt: new Date().toISOString() })
       }
 
       await this.navigateBack()

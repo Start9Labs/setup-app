@@ -202,7 +202,7 @@ export class ServerShowPage {
 
     try {
       await this.serverService.updateAgent(this.server)
-      this.serverModel.cacheServer(this.server, { status: AppHealthStatus.DOWNLOADING, statusAt: new Date() })
+      this.serverModel.cacheServer(this.server, { status: AppHealthStatus.INSTALLING, statusAt: new Date().toISOString() })
     } catch (e) {
       this.error = e.message
     } finally {

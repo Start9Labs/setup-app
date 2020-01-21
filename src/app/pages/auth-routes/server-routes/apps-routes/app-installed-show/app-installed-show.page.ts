@@ -36,40 +36,30 @@ export class AppInstalledShowPage {
   ) { }
 
   async ngOnInit () {
-    try {
-      this.server = serverFromRouteParam(
-        this.route, this.serverModel,
-      )
-      this.appId = this.route.snapshot.paramMap.get('appId') as string
+    this.server = serverFromRouteParam(
+      this.route, this.serverModel,
+    )
+    this.appId = this.route.snapshot.paramMap.get('appId') as string
+      // throw some shit somewhere
 
-      // if app is not in cache, it will not exist
-      this.app = this.appModel.getApp(this.server.id, this.appId) as AppInstalled
-      if (!this.app) { return }
+    this.app = this.appModel.getApp(this.server.id, this.appId) as AppInstalled
+    await this.getApp(this.appId)
 
-      this.app = await this.getApp(this.appId) as AppInstalled
-      if (!this.app) { return }
-
-      this.appDaemon.setAndGo(this.server)
-    } catch (e) {
-      this.error = e.message
-    } finally {
-      this.loading = false
-    }
+    this.appDaemon.setAndGo(this.server)
   }
 
   async ngOnDestroy () {
     this.appDaemon.stop()
   }
 
-  async getApp (appId: string): Promise<AppInstalled | undefined> {
-    let installedApp: AppInstalled | undefined = undefined
+  async getApp (appId: string): Promise<void> {
     try {
       const appRes = await this.serverService.getInstalledApp(this.server, appId)
-      installedApp = this.appModel.cacheApp(this.server.id, appRes, appRes)
+      this.appModel.cacheApp(this.server.id, appRes, appRes)
     } catch (e) {
       this.error = e.message
     } finally {
-      return installedApp
+      this.loading = false
     }
   }
 
@@ -80,7 +70,7 @@ export class AppInstalledShowPage {
   async presentAction () {
     const buttons : ActionSheetButton[] = []
 
-    if ([AppHealthStatus.NEEDS_CONFIG, AppHealthStatus.RECOVERABLE, AppHealthStatus.RUNNING, AppHealthStatus.STOPPED, AppHealthStatus.RESTARTING].includes(this.app.status)) {
+    if (([AppHealthStatus.NEEDS_CONFIG, AppHealthStatus.RECOVERABLE, AppHealthStatus.RUNNING, AppHealthStatus.STOPPED, AppHealthStatus.RESTARTING]).includes(this.app.status!)) {
       buttons.push(
         {
           text: 'App Config',

@@ -98,14 +98,12 @@ export class ServerService {
     // @TODO remove
     // return mockGetInstalledApp()
     return this.httpService.authServerRequest<Lan.GetAppInstalledRes>(server, Method.GET, `/apps/${appId}/installed`)
-      .then(mapApiInstalledApp)
   }
 
   async getInstalledApps (server: S9Server): Promise<AppInstalled[]> {
     // @TODO remove
     // return mockGetInstalledApps()
     return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.GET, `/apps/installed`)
-      .then(res => res.map(mapApiInstalledApp))
   }
 
   async getAppConfig (server: S9Server, appId: string): Promise<{
@@ -138,8 +136,7 @@ export class ServerService {
     // @TODO remove
     // const installed = await mockInstallApp()
     const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.POST, `/apps/${appId}/install`, { }, body, 240000)
-      .then(mapApiInstalledApp)
-    await this.appModel.cacheApp(server.id, installed, installed)
+    await this.appModel.cacheApp(server.id, installed)
     return installed
   }
 
@@ -155,7 +152,7 @@ export class ServerService {
     // await mockStartApp()
     await this.httpService.authServerRequest<Lan.PostStartAppRes>(server, Method.POST, `/apps/${app.id}/start`)
     app.status = AppHealthStatus.RUNNING
-    app.statusAt = new Date()
+    app.statusAt = new Date().toISOString()
   }
 
   async stopApp (server: S9Server, app: AppInstalled): Promise<void> {
@@ -163,7 +160,7 @@ export class ServerService {
     // await mockStopApp()
     await this.httpService.authServerRequest<Lan.PostStopAppRes>(server, Method.POST, `/apps/${app.id}/stop`)
     app.status = AppHealthStatus.STOPPED
-    app.statusAt = new Date()
+    app.statusAt = new Date().toISOString()
   }
 
   async updateAppConfig (server: S9Server, app: AppInstalled, config: object): Promise<void> {
@@ -180,7 +177,7 @@ export class ServerService {
     // await mockWipeAppData()
     await this.httpService.authServerRequest<Lan.PostWipeAppDataRes>(server, Method.POST, `/apps/${app.id}/wipe`)
     app.status = AppHealthStatus.NEEDS_CONFIG
-    app.statusAt = new Date()
+    app.statusAt = new Date().toISOString()
   }
 
   async getSSHKeys (server: S9Server): Promise<string[]> {
@@ -217,13 +214,6 @@ export class ServerService {
     // @TODO remove
     // await mockShutdownServer()
     await this.httpService.authServerRequest<Lan.PostShutdownServerRes>(server, Method.POST, '/shutdown')
-  }
-}
-
-function mapApiInstalledApp (app: ApiAppInstalled): AppInstalled {
-  return {
-    ...app,
-    statusAt: new Date(),
   }
 }
 
@@ -466,7 +456,9 @@ const mockApiNotifications: Lan.GetNotificationsRes = [
 const mockApiAppAvailablePreview: ApiAppAvailablePreview = {
   id: 'bitcoind',
   versionLatest: '0.19.0',
-  versionInstalled: undefined,
+  versionInstalled: null,
+  status: AppHealthStatus.INSTALLING,
+  statusAt: new Date().toISOString(),
   title: 'Bitcoin Core',
   descriptionShort: 'Bitcoin is an innovative payment network and new kind of money.',
   // server specific
@@ -494,6 +486,7 @@ const mockApiAppInstalled: ApiAppInstalled = {
   title: 'Bitcoin Core',
   torAddress: 'sample-bitcoin-tor-address',
   status: AppHealthStatus.RECOVERABLE,
+  statusAt: new Date().toISOString(),
   iconURL: 'assets/img/bitcoin_core.png',
 }
 
