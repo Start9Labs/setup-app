@@ -11,7 +11,7 @@ import { pauseFor } from '../util/misc.util'
 @Injectable({
   providedIn: 'root',
 })
-export class ServerService {
+export class XServerService {
 
   constructor (
     private readonly httpService: HttpService,
@@ -19,20 +19,14 @@ export class ServerService {
   ) { }
 
   async getServer (server: S9Server | S9BuilderWith<'zeroconf' | 'privkey' | 'versionInstalled' | 'torAddress'>): Promise<ApiServer> {
-    // @TODO remove
-    // return mockGetServer()
     return this.httpService.authServerRequest<Lan.GetServerRes>(server, Method.GET, '')
   }
 
   async getServerSpecs (server: S9Server): Promise<Lan.GetServerSpecsRes> {
-    // @TODO remove
-    // return mockGetServerSpecs()
     return this.httpService.authServerRequest<Lan.GetServerSpecsRes>(server, Method.GET, `/specs`)
   }
 
   async getServerMetrics (server: S9Server): Promise<Lan.GetServerMetricsRes> {
-    // @TODO remove
-    // return mockGetServerMetrics()
     return this.httpService.authServerRequest<Lan.GetServerMetricsRes>(server, Method.GET, `/metrics`)
   }
 
@@ -41,8 +35,6 @@ export class ServerService {
       page: String(page),
       perPage: String(perPage),
     }
-    // @TODO remove
-    // return mockGetNotifications()
     return this.httpService.authServerRequest<Lan.GetNotificationsRes>(server, Method.GET, `/notifications`, { params })
   }
 
@@ -50,8 +42,6 @@ export class ServerService {
     const body: Lan.DeleteNotificationReq = {
       id,
     }
-    // @TODO remove
-    // await mockDeleteNotification()
     await this.httpService.authServerRequest<Lan.DeleteNotificationRes>(server, Method.DELETE, `/notifications`, { body })
   }
 
@@ -59,20 +49,14 @@ export class ServerService {
     const body: Lan.PostUpdateAgentReq = {
       version: server.versionLatest,
     }
-    // @TODO remove
-    // await mockPostUpdateAgent()
     await this.httpService.authServerRequest<Lan.PostUpdateAgentRes>(server, Method.POST, '/update', { }, body)
   }
 
   async getAvailableApps (server: S9Server): Promise<AppAvailablePreview[]> {
-    // @TODO remove
-    // return mockGetAvailableApps()
     return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(server, Method.GET, '/apps/store')
   }
 
   async getAvailableApp (server: S9Server, appId: string): Promise<AppAvailableFull> {
-    // @TODO remove
-    // return mockGetAvailableApp()
     return this.httpService.authServerRequest<Lan.GetAppAvailableRes>(server, Method.GET, `/apps/${appId}/store`)
       .then(res => {
         return {
@@ -83,8 +67,6 @@ export class ServerService {
   }
 
   async getAvailableAppVersionInfo (server: S9Server, appId: string, version: string): Promise<{ releaseNotes: string, versionViewing: string }> {
-    // @TODO remove
-    // return mockGetAvailableAppVersionInfo()
     return this.httpService.authServerRequest<Lan.GetAppAvailableVersionInfoRes>(server, Method.GET, `/apps/${appId}/store/${version}`)
       .then(res => {
         return {
@@ -95,14 +77,10 @@ export class ServerService {
   }
 
   async getInstalledApp (server: S9Server, appId: string): Promise<AppInstalled> {
-    // @TODO remove
-    // return mockGetInstalledApp()
     return this.httpService.authServerRequest<Lan.GetAppInstalledRes>(server, Method.GET, `/apps/${appId}/installed`)
   }
 
   async getInstalledApps (server: S9Server): Promise<AppInstalled[]> {
-    // @TODO remove
-    // return mockGetInstalledApps()
     return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, Method.GET, `/apps/installed`)
   }
 
@@ -111,8 +89,6 @@ export class ServerService {
     config: object
     rules: Rules[]
   }> {
-    // @TODO remove
-    // return mockGetAppConfig()
     return this.httpService.authServerRequest<Lan.GetAppConfigRes>(server, Method.GET, `/apps/${appId}/config`)
       .then(({ spec, config, rules }) => {
         return {
@@ -124,8 +100,6 @@ export class ServerService {
   }
 
   async getAppLogs (server: S9Server, appId: string, params: Lan.GetAppLogsReq = { }): Promise<string[]> {
-    // @TODO remove
-    // return mockGetAppLogs()
     return this.httpService.authServerRequest<Lan.GetAppLogsRes>(server, Method.GET, `/apps/${appId}/logs`, { params })
   }
 
@@ -133,31 +107,23 @@ export class ServerService {
     const body: Lan.PostInstallAppReq = {
       version,
     }
-    // @TODO remove
-    // const installed = await mockInstallApp()
     const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, Method.POST, `/apps/${appId}/install`, { }, body, 240000)
     await this.appModel.cacheApp(server.id, installed)
     return installed
   }
 
   async uninstallApp (server: S9Server, appId: string): Promise<void> {
-    // @TODO remove
-    // await mockUninstallApp()
     await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(server, Method.POST, `/apps/${appId}/uninstall`)
     await this.appModel.removeApp(server.id, appId)
   }
 
   async startApp (server: S9Server, app: AppInstalled): Promise<void> {
-    // @TODO remove
-    // await mockStartApp()
     await this.httpService.authServerRequest<Lan.PostStartAppRes>(server, Method.POST, `/apps/${app.id}/start`)
     app.status = AppHealthStatus.RUNNING
     app.statusAt = new Date().toISOString()
   }
 
   async stopApp (server: S9Server, app: AppInstalled): Promise<void> {
-    // @TODO remove
-    // await mockStopApp()
     await this.httpService.authServerRequest<Lan.PostStopAppRes>(server, Method.POST, `/apps/${app.id}/stop`)
     app.status = AppHealthStatus.STOPPED
     app.statusAt = new Date().toISOString()
@@ -167,22 +133,16 @@ export class ServerService {
     const body: Lan.PostUpdateAppConfigReq = {
       config,
     }
-    // @TODO remove
-    // await mockUpdateAppConfig()
     await this.httpService.authServerRequest<Lan.PostUpdateAppConfigRes>(server, Method.PATCH, `/apps/${app.id}/config`, { }, body)
   }
 
   async wipeAppData (server: S9Server, app: AppInstalled): Promise<void> {
-    // @TODO remove
-    // await mockWipeAppData()
     await this.httpService.authServerRequest<Lan.PostWipeAppDataRes>(server, Method.POST, `/apps/${app.id}/wipe`)
     app.status = AppHealthStatus.NEEDS_CONFIG
     app.statusAt = new Date().toISOString()
   }
 
   async getSSHKeys (server: S9Server): Promise<string[]> {
-    // @TODO remove
-    // return mockGetSSHKeys()
     return this.httpService.authServerRequest<Lan.GetSSHKeysRes>(server, Method.GET, `/sshKeys`)
   }
 
@@ -190,8 +150,6 @@ export class ServerService {
     const body: Lan.PostAddSSHKeyReq = {
       sshKey,
     }
-    // @TODO remove
-    // return mockAddSSHKey()
     return this.httpService.authServerRequest<Lan.PostAddSSHKeyRes>(server, Method.POST, `/sshKeys`, { }, body)
   }
 
@@ -199,170 +157,301 @@ export class ServerService {
     const body: Lan.DeleteSSHKeyReq = {
       sshKey,
     }
-    // @TODO remove
-    // await mockDeleteSSHKey()
     await this.httpService.authServerRequest<Lan.DeleteSSHKeyRes>(server, Method.DELETE, `/sshKeys`, { body })
   }
 
   async restartServer (server: S9Server): Promise<void> {
-    // @TODO remove
-    // await mockRestartServer()
     await this.httpService.authServerRequest<Lan.PostRestartServerRes>(server, Method.POST, '/restart')
   }
 
   async shutdownServer (server: S9Server): Promise<void> {
-    // @TODO remove
-    // await mockShutdownServer()
     await this.httpService.authServerRequest<Lan.PostShutdownServerRes>(server, Method.POST, '/shutdown')
   }
 }
 
-// @TODO remove
+// Mocks
+
+@Injectable({
+  providedIn: 'root',
+})
+export class ServerService {
+
+  constructor (
+    private readonly httpService: HttpService,
+    private readonly appModel: AppModel,
+  ) { }
+
+  async getServer (server: S9Server | S9BuilderWith<'zeroconf' | 'privkey' | 'versionInstalled' | 'torAddress'>): Promise<ApiServer> {
+    return mockGetServer()
+  }
+
+  async getServerSpecs (server: S9Server): Promise<Lan.GetServerSpecsRes> {
+    return mockGetServerSpecs()
+  }
+
+  async getServerMetrics (server: S9Server): Promise<Lan.GetServerMetricsRes> {
+    return mockGetServerMetrics()
+  }
+
+  async getNotifications (server: S9Server, page: number, perPage: number): Promise<S9Notification[]> {
+    return mockGetNotifications()
+  }
+
+  async deleteNotification (server: S9Server, id: string): Promise<void> {
+    await mockDeleteNotification()
+  }
+
+  async updateAgent (server: S9Server): Promise<void> {
+    await mockPostUpdateAgent()
+  }
+
+  async getAvailableApps (server: S9Server): Promise<AppAvailablePreview[]> {
+    return mockGetAvailableApps()
+  }
+
+  async getAvailableApp (server: S9Server, appId: string): Promise<AppAvailableFull> {
+    return mockGetAvailableApp()
+      .then(res => {
+        return {
+          ...res,
+          versionViewing: res.versionLatest,
+        }
+      })
+  }
+
+  async getAvailableAppVersionInfo (server: S9Server, appId: string, version: string): Promise<{ releaseNotes: string, versionViewing: string }> {
+    return mockGetAvailableAppVersionInfo()
+      .then(res => {
+        return {
+          ...res,
+          versionViewing: version,
+        }
+      })
+  }
+
+  async getInstalledApp (server: S9Server, appId: string): Promise<AppInstalled> {
+    return mockGetInstalledApp()
+  }
+
+  async getInstalledApps (server: S9Server): Promise<AppInstalled[]> {
+    return mockGetInstalledApps()
+  }
+
+  async getAppConfig (server: S9Server, appId: string): Promise<{
+    spec: AppConfigSpec,
+    config: object
+    rules: Rules[]
+  }> {
+    return mockGetAppConfig()
+      .then(({ spec, config, rules }) => {
+        return {
+          spec,
+          config: configUtil.mapSpecToConfigObject({ type: 'object', spec }, config || { }),
+          rules,
+        }
+      })
+  }
+
+  async getAppLogs (server: S9Server, appId: string, params: Lan.GetAppLogsReq = { }): Promise<string[]> {
+    return mockGetAppLogs()
+  }
+
+  async installApp (server: S9Server, appId: string, version: string): Promise<AppInstalled> {
+    const installed = await mockInstallApp()
+    await this.appModel.cacheApp(server.id, installed)
+    return installed
+  }
+
+  async uninstallApp (server: S9Server, appId: string): Promise<void> {
+    await mockUninstallApp()
+    await this.appModel.removeApp(server.id, appId)
+  }
+
+  async startApp (server: S9Server, app: AppInstalled): Promise<void> {
+    await mockStartApp()
+    app.status = AppHealthStatus.RUNNING
+    app.statusAt = new Date().toISOString()
+  }
+
+  async stopApp (server: S9Server, app: AppInstalled): Promise<void> {
+    await mockStopApp()
+  }
+
+  async updateAppConfig (server: S9Server, app: AppInstalled, config: object): Promise<void> {
+    await mockUpdateAppConfig()
+  }
+
+  async wipeAppData (server: S9Server, app: AppInstalled): Promise<void> {
+    await mockWipeAppData()
+  }
+
+  async getSSHKeys (server: S9Server): Promise<string[]> {
+    return mockGetSSHKeys()
+  }
+
+  async addSSHKey (server: S9Server, sshKey: string): Promise<string> {
+    return mockAddSSHKey()
+  }
+
+  async deleteSSHKey (server: S9Server, sshKey: string): Promise<void> {
+    await mockDeleteSSHKey()
+  }
+
+  async restartServer (server: S9Server): Promise<void> {
+    await mockRestartServer()
+  }
+
+  async shutdownServer (server: S9Server): Promise<void> {
+    await mockShutdownServer()
+  }
+}
+
+// @TODO move-to-test-folders
 async function mockGetServer (): Promise<Lan.GetServerRes> {
   await pauseFor(1000)
   return mockApiServer
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 async function mockGetServerSpecs (): Promise<Lan.GetServerSpecsRes> {
   await pauseFor(1000)
   return mockApiServerSpecs
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 async function mockGetServerMetrics (): Promise<Lan.GetServerMetricsRes> {
   await pauseFor(1000)
   return mockApiServerMetrics
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 async function mockGetNotifications (): Promise<Lan.GetNotificationsRes> {
   await pauseFor(1000)
   return mockApiNotifications.concat(mockApiNotifications).concat(mockApiNotifications)
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 async function mockDeleteNotification (): Promise<Lan.DeleteNotificationRes> {
   await pauseFor(1000)
   return { }
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 async function mockPostUpdateAgent (): Promise<Lan.PostUpdateAgentRes> {
   await pauseFor(1000)
   return { }
 }
 
 
-// @TODO remove
+// @TODO move-to-test-folders
 async function mockGetAvailableApp (): Promise<Lan.GetAppAvailableRes> {
   await pauseFor(1000)
   return mockApiAppAvailableFull
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 async function mockGetAvailableApps (): Promise<Lan.GetAppsAvailableRes> {
   await pauseFor(1000)
   return [mockApiAppAvailablePreview, mockApiAppAvailablePreview, mockApiAppAvailablePreview]
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 async function mockGetAvailableAppVersionInfo (): Promise<Lan.GetAppAvailableVersionInfoRes> {
   await pauseFor(1000)
   return mockApiAppAvailableVersionInfo
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 async function mockGetInstalledApp (): Promise<Lan.GetAppInstalledRes> {
   await pauseFor(1000)
   return mockApiAppInstalled
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 async function mockGetInstalledApps (): Promise<Lan.GetAppsInstalledRes> {
   await pauseFor(1000)
   return [mockApiAppInstalled]
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 async function mockGetAppLogs (): Promise<Lan.GetAppLogsRes> {
   await pauseFor(1000)
   return mockApiAppLogs
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 async function mockGetAppConfig (): Promise<Lan.GetAppConfigRes> {
   await pauseFor(1000)
   return mockApiAppConfig
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 async function mockInstallApp (): Promise<Lan.PostInstallAppRes> {
   await pauseFor(1000)
   return mockApiAppInstalled
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 async function mockUninstallApp (): Promise<Lan.PostUninstallAppRes> {
   await pauseFor(1000)
   return { }
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 async function mockStartApp (): Promise<Lan.PostStartAppRes> {
   await pauseFor(1000)
   return { }
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 async function mockStopApp (): Promise<Lan.PostStopAppRes> {
   await pauseFor(1000)
   return { }
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 async function mockUpdateAppConfig (): Promise<Lan.PostUpdateAppConfigRes> {
   await pauseFor(1000)
   return { }
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 async function mockWipeAppData (): Promise<Lan.PostWipeAppDataRes> {
   await pauseFor(1000)
   return { }
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 async function mockGetSSHKeys (): Promise<Lan.GetSSHKeysRes> {
   await pauseFor(1000)
   return mockApiSSHKeys
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 async function mockAddSSHKey (): Promise<Lan.PostAddSSHKeyRes> {
   await pauseFor(1000)
   return mockApiSSHKeys[0]
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 async function mockDeleteSSHKey (): Promise<Lan.DeleteSSHKeyRes> {
   await pauseFor(1000)
   return { }
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 async function mockRestartServer (): Promise<Lan.PostRestartServerRes> {
   await pauseFor(1000)
   return { }
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 async function mockShutdownServer (): Promise<Lan.PostShutdownServerRes> {
   await pauseFor(1000)
   return { }
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 const mockApiServer: Lan.GetServerRes = {
   versionInstalled: '0.1.0',
   versionLatest: '0.1.0',
@@ -416,7 +505,7 @@ const mockApiServerSpecs: Lan.GetServerSpecsRes = {
   'Disk': '512 GB Flash (280 GB available)',
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 const mockApiNotifications: Lan.GetNotificationsRes = [
   {
     id: '123e4567-e89b-12d3-a456-426655440000',
@@ -452,7 +541,7 @@ const mockApiNotifications: Lan.GetNotificationsRes = [
   },
 ]
 
-// @TODO remove
+// @TODO move-to-test-folders
 const mockApiAppAvailablePreview: ApiAppAvailablePreview = {
   id: 'bitcoind',
   versionLatest: '0.19.0',
@@ -465,7 +554,7 @@ const mockApiAppAvailablePreview: ApiAppAvailablePreview = {
   iconURL: 'assets/img/bitcoin_core.png',
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 const mockApiAppAvailableFull: ApiAppAvailableFull = {
   ...mockApiAppAvailablePreview,
   releaseNotes: 'Segit and more cool things!',
@@ -473,12 +562,12 @@ const mockApiAppAvailableFull: ApiAppAvailableFull = {
   versions: ['0.19.0', '0.18.1', '0.17.0'],
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 const mockApiAppAvailableVersionInfo: ApiAppVersionInfo = {
   releaseNotes: 'Some older release notes that are not super important anymore.',
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 const mockApiAppInstalled: ApiAppInstalled = {
   id: 'bitcoind',
   versionLatest: '0.19.0',
@@ -490,7 +579,7 @@ const mockApiAppInstalled: ApiAppInstalled = {
   iconURL: 'assets/img/bitcoin_core.png',
 }
 
-// @TODO remove
+// @TODO move-to-test-folders
 const mockApiAppLogs: string[] = [
   '****** START *****',
   '[ng] ℹ ｢wdm｣: Compiled successfully.',
