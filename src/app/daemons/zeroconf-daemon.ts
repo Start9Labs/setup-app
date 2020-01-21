@@ -22,15 +22,15 @@ export class ZeroconfDaemon {
   }
 
   async start (reInit = false) {
-    // return this.mock()
+    return this.mock()
 
-    if (!this.platform.is('cordova')) { return }
+    // if (!this.platform.is('cordova')) { return }
 
-    if (reInit) { await this.zeroconf.reInit() }
+    // if (reInit) { await this.zeroconf.reInit() }
 
-    this.zeroconfSub = this.zeroconf.watch('_http._tcp.', 'local.').subscribe(result => {
-      this.handleServiceUpdate(result)
-    })
+    // this.zeroconfSub = this.zeroconf.watch('_http._tcp.', 'local.').subscribe(result => {
+    //   this.handleServiceUpdate(result)
+    // })
   }
 
   stop () {

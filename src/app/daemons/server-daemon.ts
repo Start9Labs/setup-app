@@ -1,28 +1,23 @@
 import { Injectable } from '@angular/core'
-import { ToastController, NavController } from '@ionic/angular'
-import { ServerModel, S9Server } from '../models/server-model'
+import { ServerModel } from '../models/server-model'
 import { pauseFor } from 'src/app/util/misc.util'
-import { ServerService } from '../services/server.service'
-import { AppHealthStatus } from '../models/app-model'
-import { Storage } from '@ionic/storage'
 import { ZeroconfDaemon } from './zeroconf-daemon'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
+import { ServerSyncService } from '../services/server.sync.service'
 
 @Injectable({
   providedIn: 'root',
 })
 export class ServerDaemon {
   private going: boolean
-  private initialized_at: number
   syncing: boolean
   syncInterval = 5000
+  secondsDisconnectedBeforeUnreachable = 7
 
   constructor (
-    private readonly serverService: ServerService,
     private readonly serverModel: ServerModel,
-    private readonly toastCtrl: ToastController,
-    private readonly navCtrl: NavController,
     private readonly zeroconfDaemon: ZeroconfDaemon,
+    private readonly sss: ServerSyncService,
   ) { }
 
   async init () {
@@ -36,10 +31,10 @@ export class ServerDaemon {
 
   private async poll () {
     this.going = true
-    this.initialized_at = new Date().valueOf()
+
 
     while (this.going) {
-      this.syncServers()
+      await this.sss.refreshCache().syncServers()
       await pauseFor(this.syncInterval)
     }
   }
@@ -52,98 +47,8 @@ export class ServerDaemon {
     if (!zeroconfService) { return }
     const server = this.serverModel.getServer(zeroconfService.name.split('-')[1])
     if (server) {
-      this.syncServer(server, 250)
+      this.sss.fromCache().syncServer(server, 250)
     }
-  }
-
-  async syncServers (): Promise<void> {
-    if (this.syncing) { return }
-
-    console.log('syncing servers: ', this.serverModel.serverMap)
-
-    this.syncing = true
-
-    await Promise.all(
-      this.serverModel.servers.map(server => this.syncServer(server)).concat(pauseFor(1000)),
-    )
-
-    this.syncing = false
-  }
-
-  async syncServer (server: Readonly<S9Server>, retryIn?: number): Promise<void> {
-    console.log('syncServer called with retryIn: ', !!retryIn)
-    if (server.updating) {
-      console.log('server already updating')
-      if (retryIn) {
-        await pauseFor(retryIn)
-        console.log('done pausing')
-        return this.syncServer(server, retryIn)
-      } else {
-        return
-      }
-    }
-
-    this.serverModel.cacheServer(server, { updating: true })
-
-    let updates: Partial<S9Server> = { }
-    if (!this.zeroconfDaemon.getService(server.id)) {
-      console.log('no zeroconf service')
-      if (server.status === AppHealthStatus.UNKNOWN) {
-        const now = new Date()
-        if (this.initialized_at + 7000 < now.valueOf()) {
-          updates.status = AppHealthStatus.UNREACHABLE
-          updates.statusAt = now.toISOString()
-        }
-      }
-    } else {
-      try {
-        const serverRes = await this.serverService.getServer(server)
-        Object.assign(updates, serverRes)
-      } catch (e) {
-        updates.status = AppHealthStatus.UNREACHABLE
-        updates.statusAt = new Date().toISOString()
-      }
-    }
-
-    updates.updating = false
-    const updatedServer = this.serverModel.cacheServer(server, updates)
-    await this.serverModel.saveAll()
-    this.handleNotifications(updatedServer)
-  }
-
-  async handleNotifications (server: Readonly<S9Server>): Promise<void> {
-    const count = server.notifications.length
-
-    if (!count) { return }
-    let updates = { } as Partial<S9Server>
-
-    updates.badge = server.badge + count
-    updates.notifications = []
-
-    const toast = await this.toastCtrl.create({
-      header: server.label,
-      message: `${count} new notification${count === 1 ? '' : 's'}`,
-      position: 'bottom',
-      duration: 4000,
-      cssClass: 'notification-toast',
-      buttons: [
-        {
-          side: 'start',
-          icon: 'close',
-          handler: () => {
-            true
-          },
-        },
-        {
-          side: 'end',
-          text: 'View',
-          handler: () => {
-            this.navCtrl.navigateForward(['/auth', 'servers', server.id, 'notifications'])
-          },
-        },
-      ],
-    })
-    await toast.present()
-    this.serverModel.cacheServer(server, updates)
   }
 }
+
