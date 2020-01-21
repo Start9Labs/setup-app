@@ -1,5 +1,3 @@
-import { promises } from 'dns'
-
 export type Omit<ObjectType, KeysType extends keyof ObjectType> = Pick<ObjectType, Exclude<keyof ObjectType, KeysType>>
 
 export type PromiseRes<T> = { result: 'resolve', value: T } | { result: 'reject', value: Error }
@@ -11,8 +9,8 @@ export async function tryAll ( promises: Promise<any>[] ): Promise<PromiseRes<an
   ))
 }
 
-export async function doAllForAtleast (minTime: number, promises: Promise<any>[]): Promise<any[]> {
-  const returned = await Promise.all(promises.concat(pauseFor(minTime || 0)))
+export async function doForAtLeast (minTime: number, promises: Promise<any>[]): Promise<any[]> {
+  const returned = await Promise.all(promises.concat(pauseFor(minTime)))
   returned.pop()
   return returned
 }

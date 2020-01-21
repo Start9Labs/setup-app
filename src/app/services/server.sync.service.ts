@@ -4,7 +4,7 @@ import { ServerModel, S9Server } from '../models/server-model'
 import { ServerService } from './server.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { AppModel, AppHealthStatus } from '../models/app-model'
-import { doAllForAtleast, tryAll, pauseFor } from '../util/misc.util'
+import { doForAtLeast, tryAll, pauseFor } from '../util/misc.util'
 
 @Injectable({
   providedIn: 'root',
@@ -106,13 +106,13 @@ export class ServerSync {
 
     this.syncing = true
     console.log('syncing servers: ', this.serverModel.serverMap)
-    await doAllForAtleast(1000, this.serverModel.servers.map(server => this.syncServer(server)))
+    await doForAtLeast(1000, this.serverModel.servers.map(server => this.syncServer(server)))
     this.syncing = false
   }
 
   async syncServer (server: Readonly<S9Server>, retryIn?: number): Promise<void> {
     if (server.updating && retryIn) { return this.retry(server, retryIn) }
-    if (server.updating) { console.log('Server ' + server.id + ' already updating.'); return }
+    if (server.updating) { console.log(`Server ${server.id} already updating.`); return }
 
     this.serverModel.cacheServer(server, { updating: true })
 
@@ -130,17 +130,6 @@ export class ServerSync {
 
     await this.serverModel.saveAll()
     this.syncNotifier.handleNotifications(updatedServer)
-  }
-
-  hasBeenRunningSufficientlyLong (server: S9Server): boolean {
-    return (server.status === AppHealthStatus.UNKNOWN) &&
-           (this.initialized_at.valueOf() + this.secondsDisconnectedBeforeUnreachable * 1000 < new Date().valueOf())
-
-  }
-
-  markServerUnreachable (server: S9Server): void {
-    this.serverModel.cacheServer(server, isUnreachable())
-    this.appModel.updateAppsUniformly(server.id, isUnreachable())
   }
 
   async syncServerAttributes (server: S9Server): Promise<void> {
@@ -169,8 +158,19 @@ export class ServerSync {
     }
   }
 
-  async retry (server: S9Server, retryIn: number) {
-    console.log('syncServer called with retryIn: ', retryIn)
+  private hasBeenRunningSufficientlyLong (server: S9Server): boolean {
+    return (server.status === AppHealthStatus.UNKNOWN) &&
+           (this.initialized_at.valueOf() + this.secondsDisconnectedBeforeUnreachable * 1000 < new Date().valueOf())
+
+  }
+
+  private markServerUnreachable (server: S9Server): void {
+    this.serverModel.cacheServer(server, isUnreachable())
+    this.appModel.updateAppsUniformly(server.id, isUnreachable())
+  }
+
+  private async retry (server: S9Server, retryIn: number): Promise<void> {
+    console.log(`syncServer called while server updating. Will retry in ${retryIn / 1000} seconds`)
     await pauseFor(retryIn)
     console.log('ready to retry.')
     return this.syncServer(server, retryIn)
