@@ -118,6 +118,8 @@ export class ServerSync {
 
     if (!this.zeroconfDaemon.getService(server.id) && this.hasBeenRunningSufficientlyLong(server)) {
       this.markServerUnreachable(server)
+    } else if (!this.zeroconfDaemon.getService(server.id)) {
+      return
     } else {
       await this.syncServerAttributes(server)
     }
@@ -146,7 +148,7 @@ export class ServerSync {
     switch (appsRes.result) {
       case 'resolve' : this.appModel.syncAppCache(server.id, appsRes.value); break
       case 'reject'  : {
-        console.error(`get apps request for ${server.id} rejected with ${JSON.stringify(serverRes.value)}`)
+        console.error(`get apps request for ${server.id} rejected with ${JSON.stringify(appsRes.value)}`)
         this.appModel.updateAppsUniformly(server.id, isUnreachable())
         break
       }

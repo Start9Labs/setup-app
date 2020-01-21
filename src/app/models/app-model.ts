@@ -19,11 +19,11 @@ export class AppModel {
   }
 
   getApps (serverId: string): Readonly<AppInstalled>[] {
-    return Object.values(this.appMap[serverId]) as Readonly<AppInstalled>[]
+    return Object.values(this.appMap[serverId] || { }) as Readonly<AppInstalled>[]
   }
 
   getApp (serverId: string, appId: string): Readonly<AppInstalled> | undefined {
-    return this.appMap[serverId][appId]
+    return (this.appMap[serverId] && this.appMap[serverId][appId])
   }
 
   cacheApp (serverId: string, app: AppInstalled, updates: Partial<AppInstalled> = { }): Readonly<AppInstalled> {
@@ -32,6 +32,8 @@ export class AppModel {
   }
 
   syncAppCache (serverId: string, upToDateApps : AppInstalled[]) {
+    if(!this.appMap[serverId]) return
+
     this.appMap[serverId] = upToDateApps.reduce((acc, newApp) => {
       acc[newApp.id] = Object.assign(this.getApp(serverId, newApp.id) || { }, newApp)
       return acc
