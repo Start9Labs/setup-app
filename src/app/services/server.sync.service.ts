@@ -119,12 +119,7 @@ export class ServerSync {
     if (!this.zeroconfDaemon.getService(server.id) && this.hasBeenRunningSufficientlyLong(server)) {
       this.markServerUnreachable(server)
     } else {
-      try {
-        await this.syncServerAttributes(server)
-      } catch (e) {
-        console.error(e)
-        this.markServerUnreachable(server)
-      }
+      await this.syncServerAttributes(server)
     }
     const updatedServer = this.serverModel.cacheServer(server, { updating: false })
 
