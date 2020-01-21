@@ -118,6 +118,8 @@ export class ServerSync {
 
     if (!this.zeroconfDaemon.getService(server.id) && this.hasBeenRunningSufficientlyLong(server)) {
       this.markServerUnreachable(server)
+    } else if (!this.zeroconfDaemon.getService(server.id)) {
+      return
     } else {
       await this.syncServerAttributes(server)
     }
