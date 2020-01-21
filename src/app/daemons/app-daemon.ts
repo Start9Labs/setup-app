@@ -62,11 +62,11 @@ export class AppDaemon {
       const now = new Date()
       if (this.pollingBeganAt.valueOf() + 7000 < now.valueOf()) {
         this.appModel.updateAppsUniformly(this.server.id,
-          { status: AppHealthStatus.UNREACHABLE, statusAt: now },
+          { status: AppHealthStatus.UNREACHABLE, statusAt: now.toISOString() },
         )
       } else {
         this.appModel.updateAppsUniformly(this.server.id,
-          { status: AppHealthStatus.CONNECTING, statusAt: now },
+          { status: AppHealthStatus.UNKNOWN, statusAt: now.toISOString() },
         )
       }
 
