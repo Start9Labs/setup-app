@@ -7,7 +7,7 @@ import { TokenSigner } from 'jsontokens'
 import { S9BuilderWith } from './setup.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { Method } from '../types/enums'
-const version = require('../../../package.json')
+const version = require('../../../package.json').version
 
 @Injectable({
   providedIn: 'root',

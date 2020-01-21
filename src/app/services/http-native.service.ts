@@ -5,7 +5,7 @@ import { S9BuilderWith } from './setup.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { TokenSigner } from 'jsontokens'
 import { Method } from '../types/enums'
-const version = require('../../../package.json')
+const version = require('../../../package.json').version
 
 @Injectable({
   providedIn: 'root',
@@ -45,7 +45,12 @@ export class HttpNativeService {
 
     try {
       const res = await this.http.sendRequest(url, options)
-      return JSON.parse(res.data)
+      console.log('RESPONSE', res)
+      if (res.data) {
+        return JSON.parse(res.data)
+      } else {
+        return { } as any
+      }
     } catch (e) {
       console.error(e)
       throw new Error(e.error)
