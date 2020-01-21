@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core'
 import { S9Server, getLanIP } from '../models/server-model'
-import { HttpService } from './http.service'
 import { Method } from 'src/app/types/enums'
 import { pauseFor } from 'src/app/util/misc.util'
 import * as cryptoUtil from '../util/crypto.util'
@@ -10,6 +9,7 @@ import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { AppHealthStatus } from '../models/app-model'
 import { ServerService } from './server.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
+import { HttpNativeService } from './http-native.service'
 
 @Injectable({
   providedIn: 'root',
@@ -21,7 +21,7 @@ export class SetupService {
   public message = ''
 
   constructor (
-    private readonly httpService: HttpService,
+    private readonly httpService: HttpNativeService,
     private readonly authService: AuthService,
     private readonly serverService: ServerService,
     private readonly zeroconfDaemon: ZeroconfDaemon,
@@ -98,7 +98,7 @@ export class SetupService {
   async getVersion (builder: S9BuilderWith<'zeroconf'>): Promise<string | undefined> {
     try {
       const host = getLanIP(builder.zeroconf)
-      const { version } = await this.httpService.request<Lan.GetVersionRes>(Method.GET, `http://${host}/version`, { }, { }, SetupService.timeout)
+      const { version } = await this.httpService.request<Lan.GetVersionRes>(`http://${host}/version`, { method: Method.get, timeout: SetupService.timeout })
       return version
     } catch (e) {
       return undefined
@@ -107,7 +107,7 @@ export class SetupService {
 
   async getTor (builder: S9BuilderWith<'zeroconf' | 'versionInstalled'>): Promise<string | undefined> {
     try {
-      const { torAddress } = await this.httpService.serverRequest<Lan.GetTorRes>(builder, Method.GET, '/tor', { }, { }, SetupService.timeout)
+      const { torAddress } = await this.httpService.serverRequest<Lan.GetTorRes>(builder, '/tor', { method: Method.get, timeout: SetupService.timeout })
       return torAddress
     } catch (e) {
       return undefined
@@ -117,8 +117,8 @@ export class SetupService {
   async registerPubkey (builder: S9BuilderWith<'zeroconf' | 'versionInstalled' | 'pubkey'>, productKey: string): Promise<boolean> {
     const { pubkey } = builder
     try {
-      const body: Lan.PostRegisterReq = { pubKey: pubkey, productKey }
-      await this.httpService.serverRequest<Lan.PostRegisterRes>(builder, Method.POST, '/register', { }, body, SetupService.timeout)
+      const data: Lan.PostRegisterReq = { pubKey: pubkey, productKey }
+      await this.httpService.serverRequest<Lan.PostRegisterRes>(builder, '/register', { method: Method.post, data, timeout: SetupService.timeout })
       return true
     } catch (e) {
       return false
