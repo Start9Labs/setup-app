@@ -73,7 +73,7 @@ export class AppInstalledShowPage {
   async presentAction () {
     const buttons : ActionSheetButton[] = []
 
-    if ([AppHealthStatus.NEEDS_CONFIG, AppHealthStatus.RECOVERABLE, AppHealthStatus.RUNNING, AppHealthStatus.STOPPED, AppHealthStatus.RESTARTING].includes(this.app.status)) {
+    if (([AppHealthStatus.NEEDS_CONFIG, AppHealthStatus.RECOVERABLE, AppHealthStatus.RUNNING, AppHealthStatus.STOPPED, AppHealthStatus.RESTARTING]).includes(this.app.status!)) {
       buttons.push(
         {
           text: 'App Config',

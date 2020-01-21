@@ -52,7 +52,7 @@ export class AppDaemon {
     } catch (e) {
       console.error('App sync failure: ' + e)
       this.appModel.updateAppsUniformly(this.server.id,
-        { status: AppHealthStatus.UNREACHABLE, statusAt: new Date() },
+        { status: AppHealthStatus.UNREACHABLE, statusAt: new Date().toISOString() },
       )
     }
 
