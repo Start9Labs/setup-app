@@ -17,9 +17,6 @@ export class HttpNativeService {
     private readonly zerconfDaemon: ZeroconfDaemon,
     private readonly serverModel: ServerModel,
   ) {
-    this.http.setDataSerializer('json')
-    this.http.setHeader('*', 'app-version', version)
-    this.http.setRequestTimeout(5)
   }
 
   async authServerRequest<T> (
@@ -42,6 +39,9 @@ export class HttpNativeService {
   }
 
   async request<T> (url: string, options: HttpNativeOptions): Promise<T> {
+    this.http.setDataSerializer('json')
+    this.http.setHeader('*', 'app-version', version)
+    this.http.setRequestTimeout(5)
     if (options.method === Method.post && !options.data) {
       options.data = { }
     }
@@ -80,7 +80,7 @@ export class HttpNativeService {
   }
 }
 
-export function getAuthHeader (server: S9Server | S9BuilderWith<'privkey'>): { 'Authorization': string }  {
+export function getAuthHeader (server: S9Server | S9BuilderWith<'privkey'>): { 'Authorization': string } {
   const past = Math.floor((new Date().getTime() - 30000) / 1000)
   const tokenPayload = { 'iss': 'start9-companion', 'iat': past, 'exp': past + 60 }
   const token = new TokenSigner('ES256K', server.privkey).sign(tokenPayload)
