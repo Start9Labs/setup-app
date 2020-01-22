@@ -38,6 +38,7 @@ export class DevSSHKeysPage {
   async getSSHKeys () {
     try {
       this.fingerprints = await this.serverService.getSSHKeys(this.serverId)
+      this.error = ''
     } catch (e) {
       this.error = e.message
     } finally {
@@ -87,6 +88,7 @@ export class DevSSHKeysPage {
     try {
       const fingerprint = await this.serverService.addSSHKey(this.serverId, key)
       this.fingerprints.unshift(fingerprint)
+      this.error = ''
     } catch (e) {
       this.error = e.message
     } finally {
@@ -105,6 +107,7 @@ export class DevSSHKeysPage {
     try {
       await this.serverService.deleteSSHKey(this.serverId, fingerprint.hash)
       this.fingerprints.splice(index, 1)
+      this.error = ''
     } catch (e) {
       this.error = e.message
     } finally {

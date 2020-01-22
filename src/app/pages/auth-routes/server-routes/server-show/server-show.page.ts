@@ -52,8 +52,14 @@ export class ServerShowPage {
   async getServerAndApps () {
     const server = this.server$.value
     this.loading = true
-    await this.sss.fromCache().syncServer(server)
-    this.loading = false
+    try {
+      await this.sss.fromCache().syncServer(server)
+      this.error = ''
+    } catch (e) {
+      this.error = e.message
+    } finally {
+      this.loading = false
+    }
   }
 
   async presentAction () {

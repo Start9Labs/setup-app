@@ -37,6 +37,7 @@ export class AppLogsPage {
       this.logs = ''
       const logs = await this.serverService.getAppLogs(this.serverId, app.id)
       this.logs = logs.join('\n\n')
+      this.error = ''
       this.loading = false
       setTimeout(async () => await this.content.scrollToBottom(100), 200)
     } catch (e) {

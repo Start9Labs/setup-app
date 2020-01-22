@@ -31,7 +31,7 @@
     </ion-item>
   </ion-item-group>
 
-  <ion-item-group class="ion-margin-bottom">
+  <ion-item-group style="margin-bottom: 16px;">
     <ion-item-sliding *ngFor="let not of notifications; let i = index">
       <ion-item-options side="end">
         <ion-item-option color="danger" (click)="remove(not.id, i, $event)">

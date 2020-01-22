@@ -55,7 +55,13 @@
       *ngIf="(app$ | async)?.versionInstalled && (app$ | async)?.status !== 'INSTALLING'">
       <ion-item-divider></ion-item-divider>
       <ion-item>
-        <ion-label position="stacked">Installed Version</ion-label>
+        <ion-label position="stacked">App ID</ion-label>
+        <ion-text color="medium">
+          <h5>{{ (app$ | async)?.id }}</h5>
+        </ion-text>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Version</ion-label>
         <ion-text color="medium">
           <h5>{{ (app$ | async)?.versionInstalled }}</h5>
         </ion-text>

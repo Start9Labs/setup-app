@@ -35,6 +35,7 @@ export class ServerMetricsPage {
   async getMetrics () {
     try {
       this.metrics = await this.serverService.getServerMetrics(this.serverId)
+      this.error = ''
     } catch (e) {
       this.error = e.message
     } finally {

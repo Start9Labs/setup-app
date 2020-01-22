@@ -42,6 +42,7 @@ export class AppInstalledShowPage {
     try {
       const appRes = await this.serverService.getInstalledApp(this.serverId, this.appId)
       this.appModel.update(this.serverId, this.appId, appRes)
+      this.error = ''
     } catch (e) {
       this.error = e.message
     } finally {

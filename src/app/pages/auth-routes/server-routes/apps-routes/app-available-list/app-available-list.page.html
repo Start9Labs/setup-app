@@ -17,7 +17,7 @@
       <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
     </ion-item>
 
-    <ion-card *ngFor="let app of apps" class="ion-margin-bottom" [routerLink]="[app.id]">
+    <ion-card *ngFor="let app of apps" style="margin-bottom: 16px;" [routerLink]="[app.id]">
       <ion-item>
         <ion-avatar slot="start">
           <img [src]="app.iconURL" alt="icon" />

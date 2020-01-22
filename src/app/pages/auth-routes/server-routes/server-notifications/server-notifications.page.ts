@@ -57,6 +57,7 @@ export class ServerNotificationsPage {
       notifications = await this.serverService.getNotifications(this.serverId, this.page, this.perPage)
       this.needInfinite = notifications.length >= this.perPage
       this.page++
+      this.error = ''
     } catch (e) {
       this.error = e.message
     } finally {
@@ -92,6 +93,7 @@ export class ServerNotificationsPage {
     try {
       await this.serverService.deleteNotification(this.serverId, notificationId)
       this.notifications.splice(index, 1)
+      this.error = ''
     } catch (e) {
       this.error = e.message
     } finally {
