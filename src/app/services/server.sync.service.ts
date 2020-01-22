@@ -90,7 +90,7 @@ export class ServerSyncService {
 
 export class ServerSync {
   syncing: boolean
-  secondsDisconnectedBeforeUnreachable = 7
+  timeBeforeUnreachable = 7000
 
   constructor (
     private readonly serverService: ServerService,
@@ -111,7 +111,10 @@ export class ServerSync {
   }
 
   async syncServer (server: Readonly<S9Server>, retryIn?: number): Promise<void> {
-    if (server.updating && retryIn) { return this.retry(server, retryIn) }
+    if (server.updating && retryIn) {
+      console.log('syncServer retrying in: ', retryIn)
+      return this.retry(server, retryIn)
+    }
     if (server.updating) { console.log(`Server ${server.id} already updating.`); return }
 
     this.serverModel.update(server.id, { updating: true })
@@ -162,7 +165,7 @@ export class ServerSync {
 
   private hasBeenRunningSufficientlyLong (server: S9Server): boolean {
     return (server.status === ServerStatus.UNKNOWN) &&
-           (this.initialized_at.valueOf() + this.secondsDisconnectedBeforeUnreachable * 1000 < new Date().valueOf())
+           (this.initialized_at.valueOf() + this.timeBeforeUnreachable < new Date().valueOf())
 
   }
 

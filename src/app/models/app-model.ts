@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { diff, both } from '../util/misc.util'
 
-
 @Injectable({
   providedIn: 'root',
 })

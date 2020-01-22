@@ -4,7 +4,7 @@ import { AppModel } from './app-model'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { deriveKeys } from '../util/crypto.util'
 import * as CryptoJS from 'crypto-js'
-import { BehaviorSubject, Observable, from, Subject } from 'rxjs'
+import { BehaviorSubject, Subject } from 'rxjs'
 
 @Injectable({
   providedIn: 'root',
@@ -16,7 +16,9 @@ export class ServerModel {
   constructor (
     private readonly storage: Storage,
     private readonly appModel: AppModel,
-  ) { }
+  ) {
+    console.log('super initial cache: ', this.cache)
+  }
 
   watch (serverId: string) : BehaviorSubject<S9Server> {
     if (!this.cache[serverId]) throw new Error (`Expected cached server for ${serverId} but none found`)
@@ -39,6 +41,7 @@ export class ServerModel {
 
   // no op if missing
   update (serverId: string, update: Partial<S9Server>): void {
+    console.log('server model update called with: ', update)
     if (this.cache[serverId]) {
       const updatedServer = { ...this.cache[serverId].value, ...update }
       this.cache[serverId].next(updatedServer)
@@ -48,8 +51,13 @@ export class ServerModel {
 
   // no op if already exists
   create (server: S9Server): void {
+    console.log('server model create called with: ', server)
     if (!this.cache[server.id]) {
+      this.appModel.createServerCache(server.id)
+      console.log('** 1 **', server)
+      console.log('cache1', this.cache)
       this.cache[server.id] = new BehaviorSubject(server)
+      console.log('cache2', this.cache)
       this.serverDelta$.next(true)
     }
   }
@@ -66,7 +74,6 @@ export class ServerModel {
     const fromStorage: S9ServerStore = await this.storage.get('servers') || []
     fromStorage.forEach(s => {
       this.create(fromStorableServer(s, mnemonic))
-      this.appModel.createServerCache(s.id)
     })
   }
 
