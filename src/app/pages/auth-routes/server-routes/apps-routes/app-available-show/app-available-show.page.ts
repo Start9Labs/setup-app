@@ -6,6 +6,8 @@ import { AppAvailableFull } from 'src/app/models/app-model'
 import { ServerService } from 'src/app/services/server.service'
 import { NavController, AlertController, LoadingController } from '@ionic/angular'
 import * as compareVersions from 'compare-versions'
+import { Observable } from 'rxjs'
+import { first } from 'rxjs/operators'
 
 @Component({
   selector: 'app-available-show',
@@ -15,14 +17,13 @@ import * as compareVersions from 'compare-versions'
 export class AppAvailableShowPage {
   loading = true
   error: string
-  server: S9Server
+  serverId: string
   app: AppAvailableFull = { } as AppAvailableFull
   compareVersions = compareVersions
 
   constructor (
     private readonly navCtrl: NavController,
     private readonly route: ActivatedRoute,
-    private readonly serverModel: ServerModel,
     private readonly serverService: ServerService,
     private readonly alertCtrl: AlertController,
     private readonly loadingCtrl: LoadingController,
@@ -30,13 +31,10 @@ export class AppAvailableShowPage {
 
   async ngOnInit () {
     try {
-      const serverId = this.route.snapshot.paramMap.get('serverId') as string
-      const server = this.serverModel.getServer(serverId)
-      if (!server) throw new Error (`No server found with ID: ${serverId}`)
-      this.server = server
+      this.serverId = this.route.snapshot.paramMap.get('serverId') as string
 
       const appId = this.route.snapshot.paramMap.get('appId') as string
-      this.app = await this.serverService.getAvailableApp(this.server, appId)
+      this.app = await this.serverService.getAvailableApp(this.serverId, appId)
     } catch (e) {
       this.error = e.message
     } finally {
@@ -80,7 +78,7 @@ export class AppAvailableShowPage {
     await loader.present()
 
     try {
-      const info = await this.serverService.getAvailableAppVersionInfo(this.server, this.app.id, version)
+      const info = await this.serverService.getAvailableAppVersionInfo(this.serverId, this.app.id, version)
       Object.assign(this.app, info)
     } catch (e) {
       this.error = e.message
@@ -141,8 +139,8 @@ export class AppAvailableShowPage {
     await loader.present()
 
     try {
-      await this.serverService.installApp(this.server, this.app.id, this.app.versionViewing)
-      await this.navCtrl.navigateBack(['/auth', 'servers', this.server.id])
+      await this.serverService.installApp(this.serverId, this.app.id, this.app.versionViewing)
+      await this.navCtrl.navigateBack(['/auth', 'servers', this.serverId])
     } catch (e) {
       this.error = e.message
     } finally {
@@ -159,8 +157,8 @@ export class AppAvailableShowPage {
     await loader.present()
 
     try {
-      await this.serverService.uninstallApp(this.server, this.app.id)
-      await this.navCtrl.navigateBack(['/auth', 'servers', this.server.id])
+      await this.serverService.uninstallApp(this.serverId, this.app.id)
+      await this.navCtrl.navigateBack(['/auth', 'servers', this.serverId])
     } catch (e) {
       this.error = e.message
     } finally {

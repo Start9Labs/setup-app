@@ -4,57 +4,74 @@ import { AppHealthStatus, AppModel } from './app-model'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { deriveKeys } from '../util/crypto.util'
 import * as CryptoJS from 'crypto-js'
+import { BehaviorSubject, Observable, from, Subject } from 'rxjs'
 
 @Injectable({
   providedIn: 'root',
 })
 export class ServerModel {
-  serverMap: { [id: string]: S9Server } = { }
-
-  get servers () { return Object.values(this.serverMap) as Readonly<S9Server>[] }
-  get count () { return this.servers.length }
+  cache: { [id: string]: BehaviorSubject<S9Server> } = {  }
+  serverDelta$ : Subject<boolean> = new Subject()
 
   constructor (
     private readonly storage: Storage,
     private readonly appModel: AppModel,
   ) { }
 
+  watch (serverId: string) : Observable<S9Server> {
+    if (!this.cache[serverId]) throw new Error (`Expected cached server for ${serverId} but none found`)
+    return this.cache[serverId]
+  }
+
+  peek (serverId: string): S9Server {
+    if (!this.cache[serverId] || !this.cache[serverId].value) throw new Error (`Excpected cached server for ${serverId} but none found`)
+    return this.cache[serverId].value
+  }
+
+  // no op if missing
+  remove (serverId: string): void {
+    if (this.cache[serverId]) {
+      this.cache[serverId].complete()
+      delete this.cache[serverId]
+      this.serverDelta$.next(true)
+    }
+  }
+
+  // no op if missing
+  update (serverId: string, update: Partial<S9Server>): void {
+    if (this.cache[serverId]) {
+      const updatedServer = { ...this.cache[serverId].value, ...update }
+      this.cache[serverId].next(updatedServer)
+      this.serverDelta$.next(true)
+    }
+  }
+
+  // no op if already exists
+  create (server: S9Server): void {
+    if (!this.cache[server.id]) {
+      this.cache[server.id] = new BehaviorSubject(server)
+      this.serverDelta$.next(true)
+    }
+  }
+
+  count (): number { return this.peekAll().length }
+  peekAll (): Readonly<S9Server>[] { return Object.values(this.cache).map(s => s.value) }
+
   clearCache () {
-    this.serverMap = { }
+    this.peekAll().forEach( s => this.remove(s.id) )
+    this.cache = { }
   }
 
   async load (mnemonic: string[]): Promise<void> {
     const fromStorage: S9ServerStore = await this.storage.get('servers') || []
     fromStorage.forEach(s => {
-      this.serverMap[s.id] = fromStorableServer(s, mnemonic)
-      this.appModel.appMap[s.id] = { }
+      this.create(fromStorableServer(s, mnemonic))
+      this.appModel.createServerCache(s.id)
     })
   }
 
-  getServer (id: string): Readonly<S9Server> | undefined {
-    return this.serverMap[id]
-  }
-
-  async createServer (server: S9Server): Promise<void> {
-    this.serverMap[server.id] = server
-    this.appModel.appMap[server.id] = { }
-    await this.saveAll()
-  }
-
-  async forgetServer (id: string): Promise<void> {
-    delete this.serverMap[id]
-    delete this.appModel.appMap[id]
-    await this.saveAll()
-  }
-
-  // uses the full server object as a default value in case that server was never present
-  cacheServer (server: Readonly<S9Server>, updates: Partial<S9Server>): Readonly<S9Server> {
-    this.serverMap[server.id] = Object.assign(this.getServer(server.id) || server, updates)
-    return this.getServer(server.id) as Readonly<S9Server>
-  }
-
   async saveAll (): Promise<void> {
-    await this.storage.set('servers', Object.values(this.serverMap).map(toStorableServer))
+    await this.storage.set('servers', this.peekAll().map(toStorableServer))
   }
 }
 

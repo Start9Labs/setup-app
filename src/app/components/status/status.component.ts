@@ -54,7 +54,7 @@ export class StatusComponent {
         this.color = 'danger'
         break
       default:
-        this.color = 'dark'
+        this.color = 'secondary'
     }
   }
 }

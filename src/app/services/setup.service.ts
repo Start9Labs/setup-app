@@ -7,9 +7,8 @@ import { AuthService } from './auth.service'
 import { Lan } from '../types/api-types'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { AppHealthStatus } from '../models/app-model'
-import { ServerService } from './server.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
-import { HttpNativeService } from './http-native.service'
+import { HttpNativeService, getAuthHeader } from './http-native.service'
 
 @Injectable({
   providedIn: 'root',
@@ -23,7 +22,6 @@ export class SetupService {
   constructor (
     private readonly httpService: HttpNativeService,
     private readonly authService: AuthService,
-    private readonly serverService: ServerService,
     private readonly zeroconfDaemon: ZeroconfDaemon,
   ) { }
 
@@ -85,7 +83,7 @@ export class SetupService {
       builder.status !== AppHealthStatus.RUNNING
     ) {
       this.message = `getting server`
-      await this.serverService.getServer(builder)
+      await this.getServer(builder)
         .then(serverRes => {
           builder = { ...builder, ...serverRes }
         })
@@ -123,6 +121,10 @@ export class SetupService {
     } catch (e) {
       return false
     }
+  }
+
+  async getServer (builder: S9BuilderWith<'zeroconf' | 'versionInstalled' | 'pubkey' | 'privkey' | 'torAddress'>): Promise<Lan.GetServerRes> {
+    return this.httpService.serverRequest<Lan.GetServerRes>(builder, '', { method: Method.get, timeout: SetupService.timeout, headers: getAuthHeader(builder) })
   }
 
   // @TODO remove

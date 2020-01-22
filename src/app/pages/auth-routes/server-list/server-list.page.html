@@ -29,25 +29,20 @@
     </ion-item>
   </ion-item-group>
 
-  <ion-card button *ngFor="let server of serverModel.serverMap | keyvalue" class="ion-margin-bottom"
-    (click)="show(server.key)">
+  <ion-card button *ngFor="let server of servers" class="ion-margin-bottom" (click)="show(server.id)">
     <ion-item>
       <ion-avatar slot="start">
         <img src="assets/img/cube.png" alt="icon" />
       </ion-avatar>
       <ion-label>
-        <h1>{{ server.value.label }}</h1>
+        <h1>{{ server.label }}</h1>
         <h3>
-          <s9-status [status]="server.value.status" [target]="'server'"></s9-status>
+          <s9-status [status]="server.status" [target]="'server'"></s9-status>
         </h3>
       </ion-label>
-      <ion-badge slot="end" *ngIf="server.value.badge" color="danger">{{ server.value.badge }}</ion-badge>
+      <ion-badge slot="end" *ngIf="server.badge" color="danger">{{ server.badge }}</ion-badge>
     </ion-item>
   </ion-card>
-
-  <div *ngIf="sss.fromCache().syncing" class="servers-spinner">
-    <ion-spinner name="dots" color="warning"></ion-spinner>
-  </div>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button [routerLink]="['/auth', 'setup']" class="fab-button">

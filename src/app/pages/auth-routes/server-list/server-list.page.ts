@@ -1,7 +1,8 @@
 import { Component } from '@angular/core'
-import { ServerModel } from 'src/app/models/server-model'
+import { ServerModel, S9Server } from 'src/app/models/server-model'
 import { NavController } from '@ionic/angular'
 import { ServerSyncService } from 'src/app/services/server.sync.service'
+import { Subscription } from 'rxjs'
 
 @Component({
   selector: 'page-server-list',
@@ -9,12 +10,24 @@ import { ServerSyncService } from 'src/app/services/server.sync.service'
   styleUrls: ['./server-list.page.scss'],
 })
 export class ServerListPage {
+  servers: S9Server[]
+  private deltaSubscription: Subscription
 
   constructor (
     public serverModel: ServerModel,
     public sss: ServerSyncService,
     private readonly navCtrl: NavController,
   ) { }
+
+  ngOnInit () {
+    this.deltaSubscription = this.serverModel.serverDelta$.subscribe(a => {
+      if (a) { this.servers = this.serverModel.peekAll() }
+    })
+  }
+
+  ngOnDestroy () {
+    this.deltaSubscription.unsubscribe()
+  }
 
   async doRefresh (event: any) {
     await this.sss.fromCache().syncServers()

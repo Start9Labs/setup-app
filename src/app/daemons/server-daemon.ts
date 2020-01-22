@@ -45,7 +45,7 @@ export class ServerDaemon {
 
   async handleZeroconfUpdate (zeroconfService: ZeroconfService | null): Promise<void> {
     if (!zeroconfService) { return }
-    const server = this.serverModel.getServer(zeroconfService.name.split('-')[1])
+    const server = this.serverModel.peek(zeroconfService.name.split('-')[1])
     if (server) {
       this.sss.fromCache().syncServer(server, 250)
     }

@@ -2,8 +2,6 @@ import { Component } from '@angular/core'
 import { ServerService } from 'src/app/services/server.service'
 import { AppAvailablePreview } from 'src/app/models/app-model'
 import { ActivatedRoute } from '@angular/router'
-import { ServerModel } from 'src/app/models/server-model'
-import { S9Server } from 'src/app/models/server-model'
 
 @Component({
   selector: 'app-available-list',
@@ -13,23 +11,18 @@ import { S9Server } from 'src/app/models/server-model'
 export class AppAvailableListPage {
   loading = true
   error: string
-  server: S9Server
   apps: AppAvailablePreview[] = []
+  serverId: string
 
   constructor (
     private readonly route: ActivatedRoute,
-    private readonly serverModel: ServerModel,
     private readonly serverService: ServerService,
   ) { }
 
   async ngOnInit () {
     try {
-      const serverId = this.route.snapshot.paramMap.get('serverId') as string
-      const server = this.serverModel.getServer(serverId)
-      if (!server) throw new Error (`No server found with ID: ${serverId}`)
-      this.server = server
-
-      this.apps = await this.serverService.getAvailableApps(this.server)
+      this.serverId = this.route.snapshot.paramMap.get('serverId') as string
+      this.apps = await this.serverService.getAvailableApps(this.serverId)
     } catch (e) {
       this.error = e.message
     } finally {

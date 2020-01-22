@@ -3,7 +3,9 @@ import { ServerModel, S9Notification } from 'src/app/models/server-model'
 import { S9Server } from 'src/app/models/server-model'
 import { ActivatedRoute } from '@angular/router'
 import { ServerService } from 'src/app/services/server.service'
-import { LoadingController, IonInfiniteScroll, IonRefresher } from '@ionic/angular'
+import { LoadingController } from '@ionic/angular'
+import { Observable } from 'rxjs'
+import { first } from 'rxjs/operators'
 
 @Component({
   selector: 'server-notifications',
@@ -13,11 +15,12 @@ import { LoadingController, IonInfiniteScroll, IonRefresher } from '@ionic/angul
 export class ServerNotificationsPage {
   error = ''
   loading = true
-  server: S9Server
   notifications: S9Notification[] = []
   page = 1
   needInfinite = false
   readonly perPage = 20
+  server$: Observable<S9Server>
+  serverId: string
 
   constructor (
     private readonly route: ActivatedRoute,
@@ -27,13 +30,13 @@ export class ServerNotificationsPage {
   ) { }
 
   async ngOnInit () {
-    const serverId = this.route.snapshot.paramMap.get('serverId') as string
-    const server = this.serverModel.getServer(serverId)
-    if (!server) throw new Error (`No server found with ID: ${serverId}`)
-    this.server = server
+    this.serverId = this.route.snapshot.paramMap.get('serverId') as string
+    this.server$ = this.serverModel.watch(this.serverId)
 
-    this.notifications = await this.getNotifications()
-    this.serverModel.cacheServer(server, { badge: 0 })
+    this.server$.pipe(first()).subscribe(async s => {
+      this.notifications = await this.getNotifications()
+      this.serverModel.update(s.id, { badge: 0 })
+    })
   }
 
   async doRefresh (e: any) {
@@ -51,7 +54,7 @@ export class ServerNotificationsPage {
   async getNotifications (): Promise<S9Notification[]> {
     let notifications: S9Notification[] = []
     try {
-      notifications = await this.serverService.getNotifications(this.server, this.page, this.perPage)
+      notifications = await this.serverService.getNotifications(this.serverId, this.page, this.perPage)
       this.needInfinite = notifications.length >= this.perPage
       this.page++
     } catch (e) {
@@ -87,7 +90,7 @@ export class ServerNotificationsPage {
     await loader.present()
 
     try {
-      await this.serverService.deleteNotification(this.server, notificationId)
+      await this.serverService.deleteNotification(this.serverId, notificationId)
       this.notifications.splice(index, 1)
     } catch (e) {
       this.error = e.message

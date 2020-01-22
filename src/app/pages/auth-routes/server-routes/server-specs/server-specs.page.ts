@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router'
 import { ServerModel, ServerSpecs } from 'src/app/models/server-model'
 import { S9Server } from 'src/app/models/server-model'
 import { ServerService } from 'src/app/services/server.service'
+import { Observable } from 'rxjs'
 
 @Component({
   selector: 'server-specs',
@@ -12,23 +13,19 @@ import { ServerService } from 'src/app/services/server.service'
 export class ServerSpecsPage {
   error = ''
   loading = true
-  server: S9Server
   specs: ServerSpecs
+  serverId: string
 
   constructor (
     private readonly route: ActivatedRoute,
-    private readonly serverModel: ServerModel,
     private readonly serverService: ServerService,
   ) { }
 
   async ngOnInit () {
-    const serverId = this.route.snapshot.paramMap.get('serverId') as string
-    const server = this.serverModel.getServer(serverId)
-    if (!server) throw new Error (`No server found with ID: ${serverId}`)
-    this.server = server
+    this.serverId = this.route.snapshot.paramMap.get('serverId') as string
 
     try {
-      this.specs = await this.serverService.getServerSpecs(this.server)
+      this.specs = await this.serverService.getServerSpecs(this.serverId)
     } catch (e) {
       this.error = e.message
     } finally {
@@ -36,7 +33,7 @@ export class ServerSpecsPage {
     }
   }
 
-  asIsOrder (a: any, b: any) {
+  asIsOrder () {
     return 1
   }
 }

@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button [defaultHref]="['/auth', 'servers', server.id]"></ion-back-button>
+      <ion-back-button [defaultHref]="['/auth', 'servers', serverId]"></ion-back-button>
     </ion-buttons>
     <ion-title>Sovereign App Store</ion-title>
   </ion-toolbar>
@@ -17,25 +17,33 @@
       <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
     </ion-item>
 
-    <ion-card *ngFor="let app of apps" [routerLink]="[app.id]">
+    <ion-card *ngFor="let app of apps" class="ion-margin-bottom" [routerLink]="[app.id]">
       <ion-item>
         <ion-avatar slot="start">
           <img [src]="app.iconURL" alt="icon" />
         </ion-avatar>
         <ion-label>
           <h1>{{ app.title }}</h1>
-          <ion-text *ngIf="app.versionInstalled" color="success"><h2>Installed</h2></ion-text>
+          <ion-text *ngIf="app.versionInstalled" color="success">
+            <h2 *ngIf="app.status !== 'INSTALLING'">Installed</h2>
+            <h2 *ngIf="app.status === 'INSTALLING'">
+              <ion-text color="primary">Installing...</ion-text>
+            </h2>
+          </ion-text>
           <div *ngIf="!app.versionInstalled">
-            <ion-text *ngIf="app.status !== 'INSTALLING'" color="warning"><h2>Not installed</h2></ion-text>
-            <ion-text *ngIf="app.status === 'INSTALLING'" color="warning"><h2>Installing...</h2></ion-text>
+            <ion-text *ngIf="app.status !== 'INSTALLING'" color="warning">
+              <h2>Not installed</h2>
+            </ion-text>
           </div>
         </ion-label>
       </ion-item>
       <ion-card-content>
-        <ion-text color="medium"><h2>{{ app.descriptionShort }}</h2></ion-text>
+        <ion-text color="medium">
+          <h2>{{ app.descriptionShort }}</h2>
+        </ion-text>
       </ion-card-content>
     </ion-card>
-    
+
   </div>
 
 </ion-content>

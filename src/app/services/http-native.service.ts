@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { HTTP } from '@ionic-native/http/ngx'
-import { S9Server, getLanIP } from '../models/server-model'
+import { S9Server, getLanIP, ServerModel } from '../models/server-model'
 import { S9BuilderWith } from './setup.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { TokenSigner } from 'jsontokens'
@@ -15,6 +15,7 @@ export class HttpNativeService {
   constructor (
     private readonly http: HTTP,
     private readonly zerconfDaemon: ZeroconfDaemon,
+    private readonly serverModel: ServerModel,
   ) {
     this.http.setDataSerializer('json')
     this.http.setHeader('*', 'app-version', version)
@@ -22,10 +23,11 @@ export class HttpNativeService {
   }
 
   async authServerRequest<T> (
-    server: S9Server | S9BuilderWith<'versionInstalled' | 'privkey'>,
+    serverId: string,
     path: string,
     options: HttpNativeOptions,
   ): Promise<T> {
+    const server = this.serverModel.peek(serverId)
     options.headers = Object.assign(options.headers || { }, getAuthHeader(server))
     return this.serverRequest(server, path, options)
   }
@@ -36,7 +38,7 @@ export class HttpNativeService {
     options: HttpNativeOptions,
   ): Promise<T> {
     const url = this.s9Url(server, path)
-    return this.request(url, options)
+    return this.request<T>(url, options)
   }
 
   async request<T> (url: string, options: HttpNativeOptions): Promise<T> {
@@ -45,7 +47,7 @@ export class HttpNativeService {
     }
 
     console.log('Request URL: ', url)
-    console.log('Request Options: ', options)
+    console.log('Request Options: ', options, '. Request * Full Headers: ', this.http.getHeaders('*'))
 
     try {
       const res = await this.http.sendRequest(url, options)
@@ -69,7 +71,7 @@ export class HttpNativeService {
   }
 }
 
-function getAuthHeader (server: S9Server | S9BuilderWith<'privkey'>): { 'Authorization': string }  {
+export function getAuthHeader (server: S9Server | S9BuilderWith<'privkey'>): { 'Authorization': string }  {
   const past = Math.floor((new Date().getTime() - 30000) / 1000)
   const tokenPayload = { 'iss': 'start9-companion', 'iat': past, 'exp': past + 60 }
   const token = new TokenSigner('ES256K', server.privkey).sign(tokenPayload)

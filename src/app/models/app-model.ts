@@ -1,53 +1,135 @@
 import { Injectable } from '@angular/core'
+import { BehaviorSubject, Observable } from 'rxjs'
+import { diff, both } from '../util/misc.util'
+
 
 @Injectable({
   providedIn: 'root',
 })
 export class AppModel {
-  appMap: { [serverId: string]:
-    { [appId: string]: AppInstalled }
-  } = { }
+  cache: { [serverId: string]: BehaviorSubject <{ [appId: string]: BehaviorSubject<AppInstalled> }> } = { }
 
   constructor () { }
 
+  watch (serverId: string, appId: string): Observable<AppInstalled> {
+    if (!this.cache[serverId])              throw new Error(`Expected cached apps for server ${serverId}.`)
+    if (!this.cache[serverId].value[appId]) throw new Error(`Expected cached app ${appId} for server ${serverId}.`)
+    return this.cache[serverId].value[appId]
+  }
+
+  watchServerCache (serverId:  string): Observable<{ [appId: string]: BehaviorSubject<AppInstalled> }> {
+    if (!this.cache[serverId]) throw new Error(`Expected cached apps for server ${serverId}.`)
+    return this.cache[serverId]
+  }
+
+  peek (serverId: string, appId: string): AppInstalled {
+    if (!this.cache[serverId])              throw new Error(`Expected cached apps for server ${serverId}.`)
+    if (!this.cache[serverId].value[appId]) throw new Error(`Expected cached app ${appId} for server ${serverId}.`)
+    return this.cache[serverId].value[appId].value
+  }
+
+  peekServerCache (serverId: string): { [appId: string]: BehaviorSubject<AppInstalled> } {
+    if (!this.cache[serverId]) throw new Error(`Expected cached apps for server ${serverId}.`)
+    return this.cache[serverId].value
+  }
+
+   // no op if already exists
+   // will notify subscribers to the server's app array
+  create (serverId: string, app: AppInstalled): void {
+    if (!this.cache[serverId]) throw new Error(`Expected cached apps for server ${serverId}.`)
+    if (!this.peek(serverId, app.id)) {
+      const previousCache = this.peekServerCache(serverId)
+      previousCache[app.id] = new BehaviorSubject(app)
+      this.cache[serverId].next(previousCache)
+    }
+  }
+
+  createServerCache (serverId: string): void {
+    if (this.cache[serverId]) return
+    this.cache[serverId] = new BehaviorSubject({ })
+  }
+
+  update (serverId: string, appId: string, update: Partial<AppInstalled>): void {
+    if (!this.cache[serverId]) { throw new Error(`Expected cached apps for server ${serverId}.`) }
+    if (this.peek(serverId, appId)) {
+      const updatedApp = { ...this.peek(serverId, appId), ...update }
+      this.cache[serverId].value[appId].next(updatedApp)
+      this.cache[serverId].next(this.peekServerCache(serverId))
+    }
+  }
+
+   // no op if missing
+  remove (serverId: string, appId: string): void {
+    if (!this.cache[serverId]) { throw new Error(`Expected cached apps for server ${serverId}.`) }
+    if (this.peek(serverId, appId)) {
+      const previousCache = this.peekServerCache(serverId)
+      this.cache[serverId].value[appId].complete()
+      delete previousCache[appId]
+      this.cache[serverId].next(previousCache)
+    }
+  }
+
+  count (serverId: string): number {
+    return this.peekAll(serverId).length
+  }
+
+  peekAll (serverId: string): Readonly<AppInstalled>[] {
+    return Object.values(this.peekServerCache(serverId)).map(s => s.value)
+  }
+
   clearCache () {
-    this.appMap = { }
+    Object.keys(this.cache).forEach( serverId => {
+      Object.keys(this.cache[serverId].value).forEach( appId => {
+        this.cache[serverId].value[appId].complete()
+      })
+      this.cache[serverId].complete()
+    })
+
+    this.cache = { }
   }
 
-  count (serverId: string) {
-    return this.getApps(serverId).length
-  }
+  syncAppCache (serverId: string, allUpToDateApps : AppInstalled[]) {
+    console.log(`Syncing app cache for ${serverId} with ${JSON.stringify(allUpToDateApps)}`)
+    if (!this.cache[serverId]) return
 
-  getApps (serverId: string): Readonly<AppInstalled>[] {
-    return Object.values(this.appMap[serverId] || { }) as Readonly<AppInstalled>[]
-  }
+    const previousAppIds = Object.keys(this.cache[serverId].value)
+    const currentAppIds = allUpToDateApps.map(a => a.id)
 
-  getApp (serverId: string, appId: string): Readonly<AppInstalled> | undefined {
-    return (this.appMap[serverId] && this.appMap[serverId][appId])
-  }
+    const appsLost = diff(previousAppIds, currentAppIds)
+    const appsGained = diff(currentAppIds, previousAppIds)
+    const appsToUpdate = both(previousAppIds, currentAppIds)
 
-  cacheApp (serverId: string, app: AppInstalled, updates: Partial<AppInstalled> = { }): Readonly<AppInstalled> {
-    this.appMap[serverId][app.id] = Object.assign(this.getApp(serverId, app.id) || app, updates)
-    return this.getApp(serverId, app.id) as Readonly<AppInstalled>
-  }
 
-  syncAppCache (serverId: string, upToDateApps : AppInstalled[]) {
-    if(!this.appMap[serverId]) return
+    appsLost.forEach( appId => {
+      this.cache[serverId].value[appId].complete()
+    })
 
-    this.appMap[serverId] = upToDateApps.reduce((acc, newApp) => {
-      acc[newApp.id] = Object.assign(this.getApp(serverId, newApp.id) || { }, newApp)
-      return acc
-    }, { } as { [appId: string]: AppInstalled })
+    const tmp = { }
+
+    appsToUpdate.forEach( appId => {
+      const updatedApp = { ...this.peek(serverId, appId), ...allUpToDateApps.find(a => a.id == appId) as AppInstalled}
+      this.cache[serverId].value[appId].next(updatedApp)
+      tmp[appId] = this.cache[serverId].value[appId]
+    })
+
+    appsGained.forEach ( appId => {
+      this.cache[serverId].value[appId] = new BehaviorSubject(allUpToDateApps.find(a => a.id == appId) as AppInstalled)
+      tmp[appId] = this.cache[serverId].value[appId]
+    })
+
+    this.cache[serverId].next(tmp)
+    console.log(`After caching apps for ${serverId}, cache is...`, JSON.stringify(allUpToDateApps))
   }
 
   updateAppsUniformly (serverId: string, uniformUpdate: Partial<AppInstalled>) {
-    this.getApps(serverId).forEach(
-      app => this.cacheApp(serverId, app, uniformUpdate),
-    )
-  }
+    const tmp = {  }
+    Object.entries(this.peekServerCache(serverId)).forEach( ([appId, appSubject]) => {
+      const updatedApp = { ...appSubject.value, ...uniformUpdate }
+      this.cache[serverId].value[appId].next(updatedApp)
+      tmp[appId] = this.cache[serverId].value[appId]
+    })
 
-  removeApp (serverId: string, appId: string) {
-    delete this.appMap[serverId][appId]
+    this.cache[serverId].next(tmp)
   }
 }
 
