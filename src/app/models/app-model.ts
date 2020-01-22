@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core'
 
+
 @Injectable({
   providedIn: 'root',
 })
@@ -32,12 +33,15 @@ export class AppModel {
   }
 
   syncAppCache (serverId: string, upToDateApps : AppInstalled[]) {
-    if(!this.appMap[serverId]) return
+    console.log(`Syncing app cache for ${serverId}`, JSON.stringify(upToDateApps))
+    if (!this.appMap[serverId]) return
 
     this.appMap[serverId] = upToDateApps.reduce((acc, newApp) => {
       acc[newApp.id] = Object.assign(this.getApp(serverId, newApp.id) || { }, newApp)
       return acc
     }, { } as { [appId: string]: AppInstalled })
+
+    console.log(`After caching apps for ${serverId}, cache is...`, JSON.stringify(upToDateApps))
   }
 
   updateAppsUniformly (serverId: string, uniformUpdate: Partial<AppInstalled>) {

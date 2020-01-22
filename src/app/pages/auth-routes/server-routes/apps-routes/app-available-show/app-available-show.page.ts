@@ -31,7 +31,7 @@ export class AppAvailableShowPage {
   async ngOnInit () {
     try {
       const serverId = this.route.snapshot.paramMap.get('serverId') as string
-      const server = this.serverModel.getServer(serverId)
+      const server = this.serverModel.peekServer(serverId)
       if (!server) throw new Error (`No server found with ID: ${serverId}`)
       this.server = server
 

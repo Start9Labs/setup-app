@@ -45,7 +45,7 @@ export class HttpNativeService {
     }
 
     console.log('Request URL: ', url)
-    console.log('Request Options: ', options)
+    console.log('Request Options: ', options, '. Request * Full Headers: ', this.http.getHeaders('*'))
 
     try {
       const res = await this.http.sendRequest(url, options)

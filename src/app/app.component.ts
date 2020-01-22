@@ -105,7 +105,7 @@ export class AppComponent {
   }
 
   private clearModels () {
-    this.serverModel.clearCache()
+    this.serverModel.forceClearCache()
     this.appModel.clearCache()
   }
 

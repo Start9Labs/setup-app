@@ -4,57 +4,84 @@ import { AppHealthStatus, AppModel } from './app-model'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { deriveKeys } from '../util/crypto.util'
 import * as CryptoJS from 'crypto-js'
+import { BehaviorSubject, Observable, from } from 'rxjs'
+
+type ServerCache = { [id: string]: BehaviorSubject<S9Server> }
 
 @Injectable({
   providedIn: 'root',
 })
 export class ServerModel {
-  serverMap: { [id: string]: S9Server } = { }
-
-  get servers () { return Object.values(this.serverMap) as Readonly<S9Server>[] }
-  get count () { return this.servers.length }
+  serverMap$ = new BehaviorSubject<ServerCache>({ })
 
   constructor (
     private readonly storage: Storage,
     private readonly appModel: AppModel,
   ) { }
 
-  clearCache () {
-    this.serverMap = { }
+  watchAllServers (): Observable<ServerCache> { return this.serverMap$ }
+  watchServer (serverId: string) : Observable<S9Server> | undefined {
+    return this.serverMap$.value[serverId]
+  }
+
+  peekServer (serverId: string): S9Server | undefined {
+    return (this.serverMap$.value[serverId] && this.serverMap$.value[serverId].value)
+  }
+  peekServerMap (): ServerCache { return this.serverMap$.value }
+
+  private pokeServerMap (serverMapReplacement: ServerCache): void {
+    this.serverMap$.next(serverMapReplacement)
+  }
+
+  forceAddServer (s9: S9Server): void {
+    let serverMap = this.peekServerMap()
+    serverMap[s9.id] = new BehaviorSubject<S9Server>(s9)
+    this.pokeServerMap(serverMap)
+  }
+
+  removeServer (s9Id: string): void {
+    let serverMap = this.peekServerMap()
+    serverMap[s9Id].next(undefined)
+    this.pokeServerMap(serverMap)
+  }
+
+  updateServer (serverId: string, update: Partial<S9Server>): void {
+    let serverMap = this.peekServerMap()
+    if (serverMap[serverId]) {
+      serverMap[serverId] = { ...serverMap[serverId], ...update }
+    }
+    this.pokeServerMap(serverMap)
+  }
+
+  upsertServer (server: S9Server, update: Partial<S9Server>): void {
+    let serverMap = this.peekServerMap()
+    if (serverMap[server.id]) {
+      serverMap[server.id] = { ...serverMap[server.id], ...update }
+    } else {
+      serverMap[server.id] = server
+    }
+    this.pokeServerMap(serverMap)
+  }
+
+  peekServerCount (): number { return this.peekServers().length }
+  peekServers (): Readonly<S9Server>[] { return Object.values(this.peekServerMap()) }
+
+  forceClearCache () {
+    this.serverMap$.next({ })
   }
 
   async load (mnemonic: string[]): Promise<void> {
     const fromStorage: S9ServerStore = await this.storage.get('servers') || []
     fromStorage.forEach(s => {
-      this.serverMap[s.id] = fromStorableServer(s, mnemonic)
+      const serverMap = { }
+      serverMap[s.id] = fromStorableServer(s, mnemonic)
+      this.pokeServerMap(serverMap)
       this.appModel.appMap[s.id] = { }
     })
   }
 
-  getServer (id: string): Readonly<S9Server> | undefined {
-    return this.serverMap[id]
-  }
-
-  async createServer (server: S9Server): Promise<void> {
-    this.serverMap[server.id] = server
-    this.appModel.appMap[server.id] = { }
-    await this.saveAll()
-  }
-
-  async forgetServer (id: string): Promise<void> {
-    delete this.serverMap[id]
-    delete this.appModel.appMap[id]
-    await this.saveAll()
-  }
-
-  // uses the full server object as a default value in case that server was never present
-  cacheServer (server: Readonly<S9Server>, updates: Partial<S9Server>): Readonly<S9Server> {
-    this.serverMap[server.id] = Object.assign(this.getServer(server.id) || server, updates)
-    return this.getServer(server.id) as Readonly<S9Server>
-  }
-
   async saveAll (): Promise<void> {
-    await this.storage.set('servers', Object.values(this.serverMap).map(toStorableServer))
+    await this.storage.set('servers', this.peekServers().map(toStorableServer))
   }
 }
 
