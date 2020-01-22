@@ -1,10 +1,10 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button [defaultHref]="['/auth', 'servers', server.id]"></ion-back-button>
+      <ion-back-button [defaultHref]="['/auth', 'servers', serverId]"></ion-back-button>
     </ion-buttons>
     <ion-title>
-      {{ server.label }}
+      {{ (server$ | async)?.label }}
     </ion-title>
   </ion-toolbar>
 </ion-header>
@@ -40,11 +40,14 @@
       </ion-item-options>
       <ion-item>
         <ion-label class="ion-text-wrap">
-          <h2><ion-text [color]="getColor(not)"><b>{{ not.title }}</b></ion-text></h2>
+          <h2>
+            <ion-text [color]="getColor(not)"><b>{{ not.title }}</b></ion-text>
+          </h2>
           <h2 class="notification-message">{{ not.message }}</h2>
           <p>{{ not.createdAt | date: 'short' }}</p>
           <p>
-            <a style="text-decoration: none;" [routerLink]="['/auth', 'servers', server.id, 'apps', 'installed', not.appId]">{{ not.appId }}</a>
+            <a style="text-decoration: none;"
+              [routerLink]="['/auth', 'servers', serverId, 'apps', 'installed', not.appId]">{{ not.appId }}</a>
             <span> - </span>
             Code: {{ not.code }}
           </p>

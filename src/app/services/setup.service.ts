@@ -30,8 +30,8 @@ export class SetupService {
   async setup (builder: S9ServerBuilder, productKey: string): Promise<S9Server> {
     for (let i = 0; i < SetupService.setupAttempts; i ++) {
       // @TODO delete
-      // builder = this.mockServer(builder)
-      builder = await this.setupAttempt(builder, productKey)
+      builder = this.mockServer(builder)
+      // builder = await this.setupAttempt(builder, productKey)
       if (isFullySetup(builder)) {
         return toS9Server(builder)
       }
@@ -85,7 +85,7 @@ export class SetupService {
       builder.status !== AppHealthStatus.RUNNING
     ) {
       this.message = `getting server`
-      await this.serverService.getServer(builder)
+      await this.serverService.getServer(builder.id)
         .then(serverRes => {
           builder = { ...builder, ...serverRes }
         })

@@ -17,7 +17,7 @@ export class SetupPage {
   constructor (
     private readonly navController: NavController,
     private readonly setupService: SetupService,
-    private readonly s9Model: ServerModel,
+    private readonly serverModel: ServerModel,
     private readonly loadingCtrl: LoadingController,
   ) { }
 
@@ -35,7 +35,7 @@ export class SetupPage {
     // attempt to acquire all connection info for new server + check status asynchronously
     try {
       const server = await this.setupService.setup(serverData, this.productKey)
-      await this.s9Model.createServer(server)
+      await this.serverModel.create(server)
       await this.navController.navigateRoot(['/auth'])
     } catch (e) {
       this.error = `Error: ${e.message}`

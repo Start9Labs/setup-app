@@ -2,6 +2,7 @@ import { Component } from '@angular/core'
 import { S9Server } from 'src/app/models/server-model'
 import { ActivatedRoute } from '@angular/router'
 import { ServerModel } from 'src/app/models/server-model'
+import { Observable } from 'rxjs'
 
 @Component({
   selector: 'dev-options',
@@ -9,18 +10,14 @@ import { ServerModel } from 'src/app/models/server-model'
   styleUrls: ['dev-options.page.scss'],
 })
 export class DevOptionsPage {
-  server: S9Server
+  serverId: string
 
   constructor (
     private readonly route: ActivatedRoute,
-    private readonly serverModel: ServerModel,
   ) { }
 
   ngOnInit () {
-    const serverId = this.route.snapshot.paramMap.get('serverId') as string
-    const server = this.serverModel.getServer(serverId)
-    if (!server) throw new Error (`No server found with ID: ${serverId}`)
-    this.server = server
+    this.serverId = this.route.snapshot.paramMap.get('serverId') as string
   }
 }
 

@@ -7,7 +7,7 @@ import { AppInstalled, AppHealthStatus, AppModel } from 'src/app/models/app-mode
 import { S9Server } from 'src/app/models/server-model'
 import { ClipboardService } from 'src/app/services/clipboard.service'
 import { ActionSheetButton } from '@ionic/core'
-import { serverFromRouteParam } from '../../server-helpers'
+import { Observable } from 'rxjs'
 
 @Component({
   selector: 'app-installed-show',
@@ -17,15 +17,14 @@ import { serverFromRouteParam } from '../../server-helpers'
 export class AppInstalledShowPage {
   loading = true
   error: string
-  server: S9Server
   app: AppInstalled
   appId: string
+  serverId: string
 
   constructor (
     private readonly alertCtrl: AlertController,
     private readonly actionCtrl: ActionSheetController,
     private readonly route: ActivatedRoute,
-    private readonly serverModel: ServerModel,
     private readonly navCtrl: NavController,
     private readonly clipboardService: ClipboardService,
     private readonly loadingCtrl: LoadingController,
@@ -34,20 +33,17 @@ export class AppInstalledShowPage {
   ) { }
 
   async ngOnInit () {
-    this.server = serverFromRouteParam(
-      this.route, this.serverModel,
-    )
+    this.serverId = this.route.snapshot.paramMap.get('serverId') as string
     this.appId = this.route.snapshot.paramMap.get('appId') as string
-      // throw some shit somewhere
 
-    this.app = this.appModel.getApp(this.server.id, this.appId) as AppInstalled
+    this.app = this.appModel.getApp(this.serverId, this.appId) as AppInstalled
     await this.getApp(this.appId)
   }
 
   async getApp (appId: string): Promise<void> {
     try {
-      const appRes = await this.serverService.getInstalledApp(this.server, appId)
-      this.appModel.cacheApp(this.server.id, appRes, appRes)
+      const appRes = await this.serverService.getInstalledApp(this.serverId, appId)
+      this.appModel.cacheApp(this.serverId, appRes, appRes)
     } catch (e) {
       this.error = e.message
     } finally {
@@ -86,7 +82,7 @@ export class AppInstalledShowPage {
         text: 'Store Listing',
         icon: 'appstore',
         handler: () => {
-          this.navCtrl.navigateForward(['/auth', 'servers', this.server.id, 'apps', 'available', this.app.id])
+          this.navCtrl.navigateForward(['/auth', 'servers', this.serverId, 'apps', 'available', this.app.id])
         },
       },
     )
@@ -108,7 +104,7 @@ export class AppInstalledShowPage {
   }
 
   async handleReinstall () {
-    this.navCtrl.navigateForward(['/auth', 'server', this.server.id, 'apps', 'available', this.appId])
+    this.navCtrl.navigateForward(['/auth', 'server', this.serverId, 'apps', 'available', this.appId])
   }
 
   async stop (): Promise<void> {
@@ -120,7 +116,7 @@ export class AppInstalledShowPage {
     await loader.present()
 
     try {
-      await this.serverService.stopApp(this.server, this.app)
+      await this.serverService.stopApp(this.serverId, this.app)
     } catch (e) {
       this.error = e.message
     } finally {
@@ -137,7 +133,7 @@ export class AppInstalledShowPage {
     await loader.present()
 
     try {
-      await this.serverService.startApp(this.server, this.app)
+      await this.serverService.startApp(this.serverId, this.app)
     } catch (e) {
       this.error = e.message
     } finally {
@@ -176,7 +172,7 @@ export class AppInstalledShowPage {
     await loader.present()
 
     try {
-      await this.serverService.uninstallApp(this.server, this.app.id)
+      await this.serverService.uninstallApp(this.serverId, this.app.id)
       await this.navCtrl.pop()
     } catch (e) {
       this.error = e.message

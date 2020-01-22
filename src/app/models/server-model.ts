@@ -4,84 +4,74 @@ import { AppHealthStatus, AppModel } from './app-model'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { deriveKeys } from '../util/crypto.util'
 import * as CryptoJS from 'crypto-js'
-import { BehaviorSubject, Observable, from } from 'rxjs'
-
-type ServerCache = { [id: string]: BehaviorSubject<S9Server> }
+import { BehaviorSubject, Observable, from, Subject } from 'rxjs'
 
 @Injectable({
   providedIn: 'root',
 })
 export class ServerModel {
-  serverMap$ = new BehaviorSubject<ServerCache>({ })
+  cache: { [id: string]: BehaviorSubject<S9Server> } = {  }
+  serverDelta$ : Subject<boolean> = new Subject()
 
   constructor (
     private readonly storage: Storage,
     private readonly appModel: AppModel,
   ) { }
 
-  watchAllServers (): Observable<ServerCache> { return this.serverMap$ }
-  watchServer (serverId: string) : Observable<S9Server> | undefined {
-    return this.serverMap$.value[serverId]
+  watch (serverId: string) : Observable<S9Server> {
+    if (!this.cache[serverId]) throw new Error (`Excpected cached server for ${serverId} but none found`)
+    return this.cache[serverId]
   }
 
-  peekServer (serverId: string): S9Server | undefined {
-    return (this.serverMap$.value[serverId] && this.serverMap$.value[serverId].value)
-  }
-  peekServerMap (): ServerCache { return this.serverMap$.value }
-
-  private pokeServerMap (serverMapReplacement: ServerCache): void {
-    this.serverMap$.next(serverMapReplacement)
+  peek (serverId: string): S9Server {
+    if (!this.cache[serverId] || !this.cache[serverId].value) throw new Error (`Excpected cached server for ${serverId} but none found`)
+    return this.cache[serverId].value
   }
 
-  forceAddServer (s9: S9Server): void {
-    let serverMap = this.peekServerMap()
-    serverMap[s9.id] = new BehaviorSubject<S9Server>(s9)
-    this.pokeServerMap(serverMap)
-  }
-
-  removeServer (s9Id: string): void {
-    let serverMap = this.peekServerMap()
-    serverMap[s9Id].next(undefined)
-    this.pokeServerMap(serverMap)
-  }
-
-  updateServer (serverId: string, update: Partial<S9Server>): void {
-    let serverMap = this.peekServerMap()
-    if (serverMap[serverId]) {
-      serverMap[serverId] = { ...serverMap[serverId], ...update }
+  // no op if missing
+  remove (serverId: string): void {
+    if (this.cache[serverId]) {
+      this.cache[serverId].complete()
+      delete this.cache[serverId]
+      this.serverDelta$.next(true)
     }
-    this.pokeServerMap(serverMap)
   }
 
-  upsertServer (server: S9Server, update: Partial<S9Server>): void {
-    let serverMap = this.peekServerMap()
-    if (serverMap[server.id]) {
-      serverMap[server.id] = { ...serverMap[server.id], ...update }
-    } else {
-      serverMap[server.id] = server
+  // no op if missing
+  update (serverId: string, update: Partial<S9Server>): void {
+    if (this.cache[serverId]) {
+      const updatedServer = { ...this.cache[serverId].value, ...update }
+      this.cache[serverId].next(updatedServer)
+      this.serverDelta$.next(true)
     }
-    this.pokeServerMap(serverMap)
   }
 
-  peekServerCount (): number { return this.peekServers().length }
-  peekServers (): Readonly<S9Server>[] { return Object.values(this.peekServerMap()) }
+  // no op if already exists
+  create (server: S9Server): void {
+    if (!this.cache[server.id]) {
+      this.cache[server.id] = new BehaviorSubject(server)
+      this.serverDelta$.next(true)
+    }
+  }
 
-  forceClearCache () {
-    this.serverMap$.next({ })
+  count (): number { return this.peekAll().length }
+  peekAll (): Readonly<S9Server>[] { return Object.values(this.cache).map(s => s.value) }
+
+  clearCache () {
+    this.peekAll().forEach( s => this.remove(s.id) )
+    this.cache = { }
   }
 
   async load (mnemonic: string[]): Promise<void> {
     const fromStorage: S9ServerStore = await this.storage.get('servers') || []
     fromStorage.forEach(s => {
-      const serverMap = { }
-      serverMap[s.id] = fromStorableServer(s, mnemonic)
-      this.pokeServerMap(serverMap)
+      this.create(fromStorableServer(s, mnemonic))
       this.appModel.appMap[s.id] = { }
     })
   }
 
   async saveAll (): Promise<void> {
-    await this.storage.set('servers', this.peekServers().map(toStorableServer))
+    await this.storage.set('servers', this.peekAll().map(toStorableServer))
   }
 }
 

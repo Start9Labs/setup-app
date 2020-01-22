@@ -1,8 +1,6 @@
 import { Component } from '@angular/core'
 import { AlertController, Platform } from '@ionic/angular'
 import { AuthService } from 'src/app/services/auth.service'
-import { ServerDaemon } from 'src/app/daemons/server-daemon'
-import { AlertOptions } from '@ionic/core'
 
 @Component({
   selector: 'app-settings',

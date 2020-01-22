@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button [defaultHref]="['/auth', 'servers', server.id]"></ion-back-button>
+      <ion-back-button [defaultHref]="['/auth', 'servers', serverId]"></ion-back-button>
     </ion-buttons>
     <ion-title>Sovereign App Store</ion-title>
   </ion-toolbar>
@@ -24,18 +24,26 @@
         </ion-avatar>
         <ion-label>
           <h1>{{ app.title }}</h1>
-          <ion-text *ngIf="app.versionInstalled" color="success"><h2>Installed</h2></ion-text>
+          <ion-text *ngIf="app.versionInstalled" color="success">
+            <h2>Installed</h2>
+          </ion-text>
           <div *ngIf="!app.versionInstalled">
-            <ion-text *ngIf="app.status !== 'INSTALLING'" color="warning"><h2>Not installed</h2></ion-text>
-            <ion-text *ngIf="app.status === 'INSTALLING'" color="warning"><h2>Installing...</h2></ion-text>
+            <ion-text *ngIf="app.status !== 'INSTALLING'" color="warning">
+              <h2>Not installed</h2>
+            </ion-text>
+            <ion-text *ngIf="app.status === 'INSTALLING'" color="warning">
+              <h2>Installing...</h2>
+            </ion-text>
           </div>
         </ion-label>
       </ion-item>
       <ion-card-content>
-        <ion-text color="medium"><h2>{{ app.descriptionShort }}</h2></ion-text>
+        <ion-text color="medium">
+          <h2>{{ app.descriptionShort }}</h2>
+        </ion-text>
       </ion-card-content>
     </ion-card>
-    
+
   </div>
 
 </ion-content>

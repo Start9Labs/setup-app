@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button [defaultHref]="['/auth', 'servers', server.id]"></ion-back-button>
+      <ion-back-button [defaultHref]="['/auth', 'servers', serverId]"></ion-back-button>
     </ion-buttons>
     <ion-title>{{ app?.title }}</ion-title>
     <ion-buttons slot="end" class="ion-padding-end">
@@ -25,23 +25,29 @@
     <ion-item-group>
       <ion-item>
         <ion-label position="stacked">Status</ion-label>
-        <h5><s9-status [status]="app.status" [target]="'app'"></s9-status></h5>
+        <h5>
+          <s9-status [status]="app.status" [target]="'app'"></s9-status>
+        </h5>
       </ion-item>
     </ion-item-group>
 
-    <ion-button *ngIf="['NEEDS_CONFIG', 'RECOVERABLE'].includes(app.status)" style="margin: 16px 0;" expand="block" fill="outline" color="warning" [routerLink]="['config']">
+    <ion-button *ngIf="['NEEDS_CONFIG', 'RECOVERABLE'].includes(app.status)" style="margin: 16px 0;" expand="block"
+      fill="outline" color="warning" [routerLink]="['config']">
       Config
     </ion-button>
 
-    <ion-button *ngIf="app.status === 'STOPPED'" style="margin: 16px 0;" expand="block" fill="outline" color="success" (click)="start()">
+    <ion-button *ngIf="app.status === 'STOPPED'" style="margin: 16px 0;" expand="block" fill="outline" color="success"
+      (click)="start()">
       Start
     </ion-button>
 
-    <ion-button *ngIf="['RUNNING', 'RESTARTING'].includes(app.status)" style="margin: 16px 0;" expand="block" fill="outline" color="danger" (click)="stop()">
+    <ion-button *ngIf="['RUNNING', 'RESTARTING'].includes(app.status)" style="margin: 16px 0;" expand="block"
+      fill="outline" color="danger" (click)="stop()">
       Stop
     </ion-button>
 
-    <ion-button *ngIf="app.status === 'DEAD'" style="margin: 16px 0;" expand="block" fill="outline" color="primary" (click)="presentAlertUninstall()">
+    <ion-button *ngIf="app.status === 'DEAD'" style="margin: 16px 0;" expand="block" fill="outline" color="primary"
+      (click)="presentAlertUninstall()">
       Uninstall
     </ion-button>
 

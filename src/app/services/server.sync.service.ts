@@ -49,7 +49,7 @@ export class SyncNotifier {
       ],
     })
     await toast.present()
-    this.serverModel.cacheServer(server, updates)
+    this.serverModel.update(server.id, updates)
   }
 }
 
@@ -105,8 +105,8 @@ export class ServerSync {
     if (this.syncing) { return }
 
     this.syncing = true
-    console.log('syncing servers: ', this.serverModel.serverMap)
-    await doForAtLeast(1000, this.serverModel.servers.map(server => this.syncServer(server)))
+    console.log('syncing servers: ', this.serverModel.cache)
+    await doForAtLeast(1000, this.serverModel.peekAll().map(server => this.syncServer(server)))
     this.syncing = false
   }
 
@@ -114,7 +114,7 @@ export class ServerSync {
     if (server.updating && retryIn) { return this.retry(server, retryIn) }
     if (server.updating) { console.log(`Server ${server.id} already updating.`); return }
 
-    this.serverModel.cacheServer(server, { updating: true })
+    this.serverModel.update(server.id, { updating: true })
 
     if (!this.zeroconfDaemon.getService(server.id)) {
       if (this.hasBeenRunningSufficientlyLong(server)) {
@@ -123,7 +123,8 @@ export class ServerSync {
     } else {
       await this.syncServerAttributes(server)
     }
-    const updatedServer = this.serverModel.cacheServer(server, { updating: false })
+    this.serverModel.update(server.id, { updating: false })
+    const updatedServer = this.serverModel.peek(server.id)
 
     await this.serverModel.saveAll()
     this.syncNotifier.handleNotifications(updatedServer)
@@ -131,13 +132,13 @@ export class ServerSync {
 
   async syncServerAttributes (server: S9Server): Promise<void> {
     const [serverRes, appsRes] = await tryAll ( [
-          this.serverService.getServer(server),
-          pauseFor(250).then(() => this.serverService.getInstalledApps(server)),
+          this.serverService.getServer(server.id),
+          pauseFor(250).then(() => this.serverService.getInstalledApps(server.id)),
         ],
     )
 
     switch (serverRes.result) {
-      case 'resolve' : this.serverModel.cacheServer(server, serverRes.value); break
+      case 'resolve' : this.serverModel.update(server.id, serverRes.value); break
       case 'reject'  : {
         console.error(`get server request for ${server.id} rejected with ${JSON.stringify(serverRes.value)}`)
         this.markServerUnreachable(server)
@@ -162,7 +163,7 @@ export class ServerSync {
   }
 
   private markServerUnreachable (server: S9Server): void {
-    this.serverModel.cacheServer(server, isUnreachable())
+    this.serverModel.update(server.id, isUnreachable())
     this.appModel.updateAppsUniformly(server.id, isUnreachable())
   }
 

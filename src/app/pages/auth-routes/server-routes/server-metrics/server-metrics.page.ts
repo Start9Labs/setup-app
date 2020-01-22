@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router'
 import { ServerModel, ServerMetrics } from 'src/app/models/server-model'
 import { S9Server } from 'src/app/models/server-model'
 import { ServerService } from 'src/app/services/server.service'
+import { Observable } from 'rxjs'
 
 @Component({
   selector: 'server-metrics',
@@ -12,21 +13,17 @@ import { ServerService } from 'src/app/services/server.service'
 export class ServerMetricsPage {
   error = ''
   loading = true
-  server: S9Server
+  serverId: string
+
   metrics: ServerMetrics
 
   constructor (
     private readonly route: ActivatedRoute,
-    private readonly serverModel: ServerModel,
     private readonly serverService: ServerService,
   ) { }
 
   async ngOnInit () {
-    const serverId = this.route.snapshot.paramMap.get('serverId') as string
-    const server = this.serverModel.getServer(serverId)
-    if (!server) throw new Error (`No server found with ID: ${serverId}`)
-    this.server = server
-
+    this.serverId = this.route.snapshot.paramMap.get('serverId') as string
     await this.getMetrics()
   }
 
@@ -37,7 +34,7 @@ export class ServerMetricsPage {
 
   async getMetrics () {
     try {
-      this.metrics = await this.serverService.getServerMetrics(this.server)
+      this.metrics = await this.serverService.getServerMetrics(this.serverId)
     } catch (e) {
       this.error = e.message
     } finally {

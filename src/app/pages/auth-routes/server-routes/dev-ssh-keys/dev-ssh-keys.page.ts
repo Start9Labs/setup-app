@@ -4,6 +4,7 @@ import { S9Server } from 'src/app/models/server-model'
 import { ActivatedRoute } from '@angular/router'
 import { AlertController, LoadingController } from '@ionic/angular'
 import { ServerService } from 'src/app/services/server.service'
+import { Observable } from 'rxjs'
 
 @Component({
   selector: 'dev-ssh-keys',
@@ -15,21 +16,17 @@ export class DevSSHKeysPage {
   loading = true
   server: S9Server
   fingerprints: SSHFingerprint[] = []
+  serverId: string
 
   constructor (
     private readonly route: ActivatedRoute,
-    private readonly serverModel: ServerModel,
     private readonly loadingCtrl: LoadingController,
     private readonly alertCtrl: AlertController,
     private readonly serverService: ServerService,
   ) { }
 
   async ngOnInit () {
-    const serverId = this.route.snapshot.paramMap.get('serverId') as string
-    const server = this.serverModel.getServer(serverId)
-    if (!server) throw new Error (`No server found with ID: ${serverId}`)
-    this.server = server
-
+    this.serverId = this.route.snapshot.paramMap.get('serverId') as string
     await this.getSSHKeys()
   }
 
@@ -40,7 +37,7 @@ export class DevSSHKeysPage {
 
   async getSSHKeys () {
     try {
-      this.fingerprints = await this.serverService.getSSHKeys(this.server)
+      this.fingerprints = await this.serverService.getSSHKeys(this.serverId)
     } catch (e) {
       this.error = e.message
     } finally {
@@ -88,7 +85,7 @@ export class DevSSHKeysPage {
     await loader.present()
 
     try {
-      const fingerprint = await this.serverService.addSSHKey(this.server, key)
+      const fingerprint = await this.serverService.addSSHKey(this.serverId, key)
       this.fingerprints.unshift(fingerprint)
     } catch (e) {
       this.error = e.message
@@ -106,7 +103,7 @@ export class DevSSHKeysPage {
     await loader.present()
 
     try {
-      await this.serverService.deleteSSHKey(this.server, fingerprint.hash)
+      await this.serverService.deleteSSHKey(this.serverId, fingerprint.hash)
       this.fingerprints.splice(index, 1)
     } catch (e) {
       this.error = e.message

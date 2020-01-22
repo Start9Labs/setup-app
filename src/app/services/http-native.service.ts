@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { HTTP } from '@ionic-native/http/ngx'
-import { S9Server, getLanIP } from '../models/server-model'
+import { S9Server, getLanIP, ServerModel } from '../models/server-model'
 import { S9BuilderWith } from './setup.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { TokenSigner } from 'jsontokens'
@@ -15,6 +15,7 @@ export class HttpNativeService {
   constructor (
     private readonly http: HTTP,
     private readonly zerconfDaemon: ZeroconfDaemon,
+    private readonly serverModel: ServerModel,
   ) {
     this.http.setDataSerializer('json')
     this.http.setHeader('*', 'app-version', version)
@@ -22,10 +23,11 @@ export class HttpNativeService {
   }
 
   async authServerRequest<T> (
-    server: S9Server | S9BuilderWith<'versionInstalled' | 'privkey'>,
+    serverId: string,
     path: string,
     options: HttpNativeOptions,
   ): Promise<T> {
+    const server = this.serverModel.peek(serverId)
     options.headers = Object.assign(options.headers || { }, getAuthHeader(server))
     return this.serverRequest(server, path, options)
   }

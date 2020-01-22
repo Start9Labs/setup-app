@@ -5,6 +5,7 @@ import { ServerService } from 'src/app/services/server.service'
 import { S9Server } from 'src/app/models/server-model'
 import { AppInstalled, AppModel } from 'src/app/models/app-model'
 import { IonContent } from '@ionic/angular'
+import { Observable } from 'rxjs'
 
 @Component({
   selector: 'app-logs',
@@ -15,26 +16,22 @@ export class AppLogsPage {
   @ViewChild(IonContent, { static: false }) private content: IonContent
   loading = true
   error = ''
-  server: S9Server
+  serverId: string
   app: AppInstalled
   logs: string
 
   constructor (
     private readonly route: ActivatedRoute,
-    private readonly serverModel: ServerModel,
     private readonly appModel: AppModel,
     private readonly serverService: ServerService,
   ) { }
 
   async ngOnInit () {
-    const serverId = this.route.snapshot.paramMap.get('serverId') as string
-    const server = this.serverModel.getServer(serverId)
-    if (!server) throw new Error (`No server found with ID: ${serverId}`)
-    this.server = server
+    this.serverId = this.route.snapshot.paramMap.get('serverId') as string
 
     const appId = this.route.snapshot.paramMap.get('appId') as string
-    const app = this.appModel.getApp(serverId, appId)
-    if (!app) throw new Error (`No app found on ${serverId} with ID: ${appId}`)
+    const app = this.appModel.getApp(this.serverId, appId)
+    if (!app) throw new Error (`No app found on ${this.serverId} with ID: ${appId}`)
     this.app = app
 
     await this.getLogs()
@@ -45,7 +42,7 @@ export class AppLogsPage {
     this.logs = ''
 
     try {
-      const logs = await this.serverService.getAppLogs(this.server, this.app.id)
+      const logs = await this.serverService.getAppLogs(this.serverId, this.app.id)
       this.logs = logs.join('\n\n')
       this.loading = false
       setTimeout(async () => await this.content.scrollToBottom(100), 200)

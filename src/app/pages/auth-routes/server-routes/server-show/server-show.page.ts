@@ -7,10 +7,8 @@ import { ActionSheetButton } from '@ionic/core'
 import { AppHealthStatus, AppModel } from 'src/app/models/app-model'
 import * as compareVersions from 'compare-versions'
 import { ServerService } from 'src/app/services/server.service'
-import { ServerDaemon } from 'src/app/daemons/server-daemon'
-import { pauseFor } from 'src/app/util/misc.util'
-import { serverFromRouteParam } from '../server-helpers'
 import { ServerSyncService } from 'src/app/services/server.sync.service'
+import { Observable } from 'rxjs'
 
 @Component({
   selector: 'server-show',
@@ -20,9 +18,10 @@ import { ServerSyncService } from 'src/app/services/server.sync.service'
 export class ServerShowPage {
   error: string
   view: 'apps' | 'about' = 'apps'
-  server: S9Server
   loading = true
   compareVersions = compareVersions
+  server$: Observable<S9Server>
+  serverId: string
 
   constructor (
     private readonly route: ActivatedRoute,
@@ -37,9 +36,8 @@ export class ServerShowPage {
   ) { }
 
   async ngOnInit () {
-    this.server = serverFromRouteParam(
-      this.route, this.serverModel,
-    )
+    this.serverId = this.route.snapshot.paramMap.get('serverId') as string
+    this.server$ = this.serverModel.watch(this.serverId)
 
     this.getServerAndApps()
   }
@@ -50,12 +48,14 @@ export class ServerShowPage {
   }
 
   async getServerAndApps () {
+    const server = this.serverModel.peek(this.serverId)
     this.loading = true
-    await this.sss.fromCache().syncServer(this.server)
+    await this.sss.fromCache().syncServer(server)
     this.loading = false
   }
 
   async presentAction () {
+    const server = this.serverModel.peek(this.serverId)
     const buttons: ActionSheetButton[] = [
       {
         text: 'Edit friendly name',
@@ -66,7 +66,7 @@ export class ServerShowPage {
       },
     ]
 
-    if (this.server.status === AppHealthStatus.RUNNING) {
+    if (server.status === AppHealthStatus.RUNNING) {
       buttons.push(
         {
           text: 'Server info',
@@ -125,6 +125,7 @@ export class ServerShowPage {
   }
 
   async presentAlertEditName () {
+    const server = this.serverModel.peek(this.serverId)
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Friendly Name',
@@ -132,7 +133,7 @@ export class ServerShowPage {
         {
           name: 'inputValue',
           type: 'text',
-          value: this.server.label,
+          value: server.label,
           placeholder: '(ex. My Server)',
         },
       ],
@@ -145,13 +146,13 @@ export class ServerShowPage {
           handler: (data: { inputValue: string }) => {
             const inputValue = data.inputValue
             // return if no change
-            if (this.server.label === inputValue) { return }
+            if (server.label === inputValue) { return }
             // throw error if no server name
             if (!inputValue) {
               alert.message = 'Server must have a name'
               return false
             }
-            this.serverModel.cacheServer(this.server, { label: inputValue })
+            this.serverModel.update(this.serverId, { label: inputValue })
             this.serverModel.saveAll()
           },
         },
@@ -162,10 +163,11 @@ export class ServerShowPage {
   }
 
   async presentAlertUpdate () {
+    const server = this.serverModel.peek(this.serverId)
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Confirm',
-      message: `Update Agent OS to ${this.server.versionLatest}?`,
+      message: `Update Agent OS to ${server.versionLatest}?`,
       buttons: [
         {
           text: 'Cancel',
@@ -183,6 +185,7 @@ export class ServerShowPage {
   }
 
   async update () {
+    const server = this.serverModel.peek(this.serverId)
     const loader = await this.loadingCtrl.create({
       spinner: 'lines',
       cssClass: 'loader',
@@ -190,8 +193,8 @@ export class ServerShowPage {
     await loader.present()
 
     try {
-      await this.serverService.updateAgent(this.server)
-      this.serverModel.cacheServer(this.server, { status: AppHealthStatus.INSTALLING, statusAt: new Date().toISOString() })
+      await this.serverService.updateAgent(this.serverId, server.versionLatest)
+      this.serverModel.update(this.serverId, { status: AppHealthStatus.INSTALLING, statusAt: new Date().toISOString() })
     } catch (e) {
       this.error = e.message
     } finally {
@@ -200,10 +203,11 @@ export class ServerShowPage {
   }
 
   async presentAlertRestart () {
+    const server = this.serverModel.peek(this.serverId)
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Confirm',
-      message: `Are you sure you want to restart ${this.server.label}?`,
+      message: `Are you sure you want to restart ${server.label}?`,
       buttons: [
         {
           text: 'Cancel',
@@ -222,10 +226,11 @@ export class ServerShowPage {
   }
 
   async presentAlertShutdown () {
+    const server = this.serverModel.peek(this.serverId)
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Confirm',
-      message: `Are you sure you want to shut down ${this.server.label}?`,
+      message: `Are you sure you want to shut down ${server.label}?`,
       buttons: [
         {
           text: 'Cancel',
@@ -244,10 +249,11 @@ export class ServerShowPage {
   }
 
   async presentAlertForget () {
+    const server = this.serverModel.peek(this.serverId)
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Caution',
-      message: `Are you sure you want to forget ${this.server.label} on this device?`,
+      message: `Are you sure you want to forget ${server.label} on this device?`,
       buttons: [
         {
           text: 'Cancel',
@@ -266,15 +272,16 @@ export class ServerShowPage {
   }
 
   async restart () {
+    const server = this.serverModel.peek(this.serverId)
     const loader = await this.loadingCtrl.create({
       spinner: 'lines',
-      message: `Restarting ${this.server.label}...`,
+      message: `Restarting ${server.label}...`,
       cssClass: 'loader',
     })
     await loader.present()
 
     try {
-      await this.serverService.restartServer(this.server)
+      await this.serverService.restartServer(this.serverId)
       await this.navCtrl.pop()
     } catch (e) {
       this.error = e.mesasge
@@ -284,15 +291,16 @@ export class ServerShowPage {
   }
 
   async shutdown () {
+    const server = this.serverModel.peek(this.serverId)
     const loader = await this.loadingCtrl.create({
       spinner: 'lines',
-      message: `Shutting down ${this.server.label}...`,
+      message: `Shutting down ${server.label}...`,
       cssClass: 'loader',
     })
     await loader.present()
 
     try {
-      await this.serverService.shutdownServer(this.server)
+      await this.serverService.shutdownServer(this.serverId)
       await this.navCtrl.pop()
     } catch (e) {
       this.error = e.mesasge
@@ -302,7 +310,7 @@ export class ServerShowPage {
   }
 
   async forget () {
-    await this.serverModel.forgetServer(this.server.id)
+    await this.serverModel.remove(this.serverId)
     await this.navCtrl.navigateRoot(['/auth'])
   }
 }

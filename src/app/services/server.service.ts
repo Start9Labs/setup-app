@@ -11,50 +11,50 @@ import { HttpNativeService } from './http-native.service'
 @Injectable({
   providedIn: 'root',
 })
-export class ServerService {
+export class XServerService {
 
   constructor (
     private readonly httpService: HttpNativeService,
     private readonly appModel: AppModel,
   ) { }
 
-  async getServer (server: S9Server | S9BuilderWith<'zeroconf' | 'privkey' | 'versionInstalled' | 'torAddress'>): Promise<ApiServer> {
-    return this.httpService.authServerRequest<Lan.GetServerRes>(server, '', { method: Method.get })
+  async getServer (serverId: string): Promise<ApiServer> {
+    return this.httpService.authServerRequest<Lan.GetServerRes>(serverId, '', { method: Method.get })
   }
 
-  async getServerSpecs (server: S9Server): Promise<Lan.GetServerSpecsRes> {
-    return this.httpService.authServerRequest<Lan.GetServerSpecsRes>(server, `/specs`, { method: Method.get })
+  async getServerSpecs (serverId: string): Promise<Lan.GetServerSpecsRes> {
+    return this.httpService.authServerRequest<Lan.GetServerSpecsRes>(serverId, `/specs`, { method: Method.get })
   }
 
-  async getServerMetrics (server: S9Server): Promise<Lan.GetServerMetricsRes> {
-    return this.httpService.authServerRequest<Lan.GetServerMetricsRes>(server, `/metrics`, { method: Method.get })
+  async getServerMetrics (serverId: string): Promise<Lan.GetServerMetricsRes> {
+    return this.httpService.authServerRequest<Lan.GetServerMetricsRes>(serverId, `/metrics`, { method: Method.get })
   }
 
-  async getNotifications (server: S9Server, page: number, perPage: number): Promise<S9Notification[]> {
+  async getNotifications (serverId: string, page: number, perPage: number): Promise<S9Notification[]> {
     const params: Lan.GetNotificationsReq = {
       page: String(page),
       perPage: String(perPage),
     }
-    return this.httpService.authServerRequest<Lan.GetNotificationsRes>(server, `/notifications`, { method: Method.get, params })
+    return this.httpService.authServerRequest<Lan.GetNotificationsRes>(serverId, `/notifications`, { method: Method.get, params })
   }
 
-  async deleteNotification (server: S9Server, id: string): Promise<void> {
-    await this.httpService.authServerRequest<Lan.DeleteNotificationRes>(server, `/notifications/${id}`, { method: Method.delete })
+  async deleteNotification (serverId: string, id: string): Promise<void> {
+    await this.httpService.authServerRequest<Lan.DeleteNotificationRes>(serverId, `/notifications/${id}`, { method: Method.delete })
   }
 
-  async updateAgent (server: S9Server): Promise<void> {
+  async updateAgent (serverId: string, version: string): Promise<void> {
     const data: Lan.PostUpdateAgentReq = {
-      version: server.versionLatest,
+      version,
     }
-    await this.httpService.authServerRequest<Lan.PostUpdateAgentRes>(server, '/update', { method: Method.post, data })
+    await this.httpService.authServerRequest<Lan.PostUpdateAgentRes>(serverId, '/update', { method: Method.post, data })
   }
 
-  async getAvailableApps (server: S9Server): Promise<AppAvailablePreview[]> {
-    return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(server, '/apps/store', { method: Method.get })
+  async getAvailableApps (serverId: string): Promise<AppAvailablePreview[]> {
+    return this.httpService.authServerRequest<Lan.GetAppsAvailableRes>(serverId, '/apps/store', { method: Method.get })
   }
 
-  async getAvailableApp (server: S9Server, appId: string): Promise<AppAvailableFull> {
-    return this.httpService.authServerRequest<Lan.GetAppAvailableRes>(server, `/apps/${appId}/store`, { method: Method.get })
+  async getAvailableApp (serverId: string, appId: string): Promise<AppAvailableFull> {
+    return this.httpService.authServerRequest<Lan.GetAppAvailableRes>(serverId, `/apps/${appId}/store`, { method: Method.get })
       .then(res => {
         return {
           ...res,
@@ -63,8 +63,8 @@ export class ServerService {
       })
   }
 
-  async getAvailableAppVersionInfo (server: S9Server, appId: string, version: string): Promise<{ releaseNotes: string, versionViewing: string }> {
-    return this.httpService.authServerRequest<Lan.GetAppAvailableVersionInfoRes>(server, `/apps/${appId}/store/${version}`, { method: Method.get })
+  async getAvailableAppVersionInfo (serverId: string, appId: string, version: string): Promise<{ releaseNotes: string, versionViewing: string }> {
+    return this.httpService.authServerRequest<Lan.GetAppAvailableVersionInfoRes>(serverId, `/apps/${appId}/store/${version}`, { method: Method.get })
       .then(res => {
         return {
           ...res,
@@ -73,20 +73,20 @@ export class ServerService {
       })
   }
 
-  async getInstalledApp (server: S9Server, appId: string): Promise<AppInstalled> {
-    return this.httpService.authServerRequest<Lan.GetAppInstalledRes>(server, `/apps/${appId}/installed`, { method: Method.get })
+  async getInstalledApp (serverId: string, appId: string): Promise<AppInstalled> {
+    return this.httpService.authServerRequest<Lan.GetAppInstalledRes>(serverId, `/apps/${appId}/installed`, { method: Method.get })
   }
 
-  async getInstalledApps (server: S9Server): Promise<AppInstalled[]> {
-    return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(server, `/apps/installed`, { method: Method.get })
+  async getInstalledApps (serverId: string): Promise<AppInstalled[]> {
+    return this.httpService.authServerRequest<Lan.GetAppsInstalledRes>(serverId, `/apps/installed`, { method: Method.get })
   }
 
-  async getAppConfig (server: S9Server, appId: string): Promise<{
+  async getAppConfig (serverId: string, appId: string): Promise<{
     spec: AppConfigSpec,
     config: object
     rules: Rules[]
   }> {
-    return this.httpService.authServerRequest<Lan.GetAppConfigRes>(server, `/apps/${appId}/config`, { method: Method.get })
+    return this.httpService.authServerRequest<Lan.GetAppConfigRes>(serverId, `/apps/${appId}/config`, { method: Method.get })
       .then(({ spec, config, rules }) => {
         return {
           spec,
@@ -96,70 +96,70 @@ export class ServerService {
       })
   }
 
-  async getAppLogs (server: S9Server, appId: string, params: Lan.GetAppLogsReq = { }): Promise<string[]> {
-    return this.httpService.authServerRequest<Lan.GetAppLogsRes>(server, `/apps/${appId}/logs`, { method: Method.get, params: params as any })
+  async getAppLogs (serverId: string, appId: string, params: Lan.GetAppLogsReq = { }): Promise<string[]> {
+    return this.httpService.authServerRequest<Lan.GetAppLogsRes>(serverId, `/apps/${appId}/logs`, { method: Method.get, params: params as any })
   }
 
-  async installApp (server: S9Server, appId: string, version: string): Promise<AppInstalled> {
+  async installApp (serverId: string, appId: string, version: string): Promise<AppInstalled> {
     const data: Lan.PostInstallAppReq = {
       version,
     }
-    const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(server, `/apps/${appId}/install`, { method: Method.post, data, timeout: 240000 })
-    await this.appModel.cacheApp(server.id, installed)
+    const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(serverId, `/apps/${appId}/install`, { method: Method.post, data, timeout: 240000 })
+    await this.appModel.cacheApp(serverId, installed)
     return installed
   }
 
-  async uninstallApp (server: S9Server, appId: string): Promise<void> {
-    await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(server, `/apps/${appId}/uninstall`, { method: Method.post })
-    await this.appModel.removeApp(server.id, appId)
+  async uninstallApp (serverId: string, appId: string): Promise<void> {
+    await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(serverId, `/apps/${appId}/uninstall`, { method: Method.post })
+    await this.appModel.removeApp(serverId, appId)
   }
 
-  async startApp (server: S9Server, app: AppInstalled): Promise<void> {
-    await this.httpService.authServerRequest<Lan.PostStartAppRes>(server, `/apps/${app.id}/start`, { method: Method.post })
+  async startApp (serverId: string, app: AppInstalled): Promise<void> {
+    await this.httpService.authServerRequest<Lan.PostStartAppRes>(serverId, `/apps/${app.id}/start`, { method: Method.post })
     app.status = AppHealthStatus.RUNNING
     app.statusAt = new Date().toISOString()
   }
 
-  async stopApp (server: S9Server, app: AppInstalled): Promise<void> {
-    await this.httpService.authServerRequest<Lan.PostStopAppRes>(server, `/apps/${app.id}/stop`, { method: Method.post })
+  async stopApp (serverId: string, app: AppInstalled): Promise<void> {
+    await this.httpService.authServerRequest<Lan.PostStopAppRes>(serverId, `/apps/${app.id}/stop`, { method: Method.post })
     app.status = AppHealthStatus.STOPPED
     app.statusAt = new Date().toISOString()
   }
 
-  async updateAppConfig (server: S9Server, app: AppInstalled, config: object): Promise<void> {
+  async updateAppConfig (serverId: string, app: AppInstalled, config: object): Promise<void> {
     const data: Lan.PostUpdateAppConfigReq = {
       config,
     }
-    await this.httpService.authServerRequest<Lan.PostUpdateAppConfigRes>(server, `/apps/${app.id}/config`, { method: Method.patch, data })
+    await this.httpService.authServerRequest<Lan.PostUpdateAppConfigRes>(serverId, `/apps/${app.id}/config`, { method: Method.patch, data })
   }
 
-  async wipeAppData (server: S9Server, app: AppInstalled): Promise<void> {
-    await this.httpService.authServerRequest<Lan.PostWipeAppDataRes>(server, `/apps/${app.id}/wipe`, { method: Method.post })
+  async wipeAppData (serverId: string, app: AppInstalled): Promise<void> {
+    await this.httpService.authServerRequest<Lan.PostWipeAppDataRes>(serverId, `/apps/${app.id}/wipe`, { method: Method.post })
     app.status = AppHealthStatus.NEEDS_CONFIG
     app.statusAt = new Date().toISOString()
   }
 
-  async getSSHKeys (server: S9Server): Promise<SSHFingerprint[]> {
-    return this.httpService.authServerRequest<Lan.GetSSHKeysRes>(server, `/sshKeys`, { method: Method.get })
+  async getSSHKeys (serverId: string): Promise<SSHFingerprint[]> {
+    return this.httpService.authServerRequest<Lan.GetSSHKeysRes>(serverId, `/sshKeys`, { method: Method.get })
   }
 
-  async addSSHKey (server: S9Server, sshKey: string): Promise<SSHFingerprint> {
+  async addSSHKey (serverId: string, sshKey: string): Promise<SSHFingerprint> {
     const data: Lan.PostAddSSHKeyReq = {
       sshKey,
     }
-    return this.httpService.authServerRequest<Lan.PostAddSSHKeyRes>(server, `/sshKeys`, { method: Method.post, data })
+    return this.httpService.authServerRequest<Lan.PostAddSSHKeyRes>(serverId, `/sshKeys`, { method: Method.post, data })
   }
 
-  async deleteSSHKey (server: S9Server, sshKey: string): Promise<void> {
-    await this.httpService.authServerRequest<Lan.DeleteSSHKeyRes>(server, `/sshKeys/${sshKey}`, { method: Method.delete })
+  async deleteSSHKey (serverId: string, sshKey: string): Promise<void> {
+    await this.httpService.authServerRequest<Lan.DeleteSSHKeyRes>(serverId, `/sshKeys/${sshKey}`, { method: Method.delete })
   }
 
-  async restartServer (server: S9Server): Promise<void> {
-    await this.httpService.authServerRequest<Lan.PostRestartServerRes>(server, '/restart', { method: Method.post })
+  async restartServer (serverId: string): Promise<void> {
+    await this.httpService.authServerRequest<Lan.PostRestartServerRes>(serverId, '/restart', { method: Method.post })
   }
 
-  async shutdownServer (server: S9Server): Promise<void> {
-    await this.httpService.authServerRequest<Lan.PostShutdownServerRes>(server, '/shutdown', { method: Method.post })
+  async shutdownServer (serverId: string): Promise<void> {
+    await this.httpService.authServerRequest<Lan.PostShutdownServerRes>(serverId, '/shutdown', { method: Method.post })
   }
 }
 
@@ -169,41 +169,41 @@ export class ServerService {
 @Injectable({
   providedIn: 'root',
 })
-export class XServerService {
+export class ServerService {
 
   constructor (
     private readonly appModel: AppModel,
   ) { }
 
-  async getServer (server: S9Server | S9BuilderWith<'zeroconf' | 'privkey' | 'versionInstalled' | 'torAddress'>): Promise<ApiServer> {
+  async getServer (serverId: string | S9BuilderWith<'zeroconf' | 'privkey' | 'versionInstalled' | 'torAddress'>): Promise<ApiServer> {
     return mockGetServer()
   }
 
-  async getServerSpecs (server: S9Server): Promise<Lan.GetServerSpecsRes> {
+  async getServerSpecs (serverId: string): Promise<Lan.GetServerSpecsRes> {
     return mockGetServerSpecs()
   }
 
-  async getServerMetrics (server: S9Server): Promise<Lan.GetServerMetricsRes> {
+  async getServerMetrics (serverId: string): Promise<Lan.GetServerMetricsRes> {
     return mockGetServerMetrics()
   }
 
-  async getNotifications (server: S9Server, page: number, perPage: number): Promise<S9Notification[]> {
+  async getNotifications (serverId: string, page: number, perPage: number): Promise<S9Notification[]> {
     return mockGetNotifications()
   }
 
-  async deleteNotification (server: S9Server, id: string): Promise<void> {
+  async deleteNotification (serverId: string, id: string): Promise<void> {
     await mockDeleteNotification()
   }
 
-  async updateAgent (server: S9Server): Promise<void> {
+  async updateAgent (serverId: string, thing: any): Promise<void> {
     await mockPostUpdateAgent()
   }
 
-  async getAvailableApps (server: S9Server): Promise<AppAvailablePreview[]> {
+  async getAvailableApps (serverId: string): Promise<AppAvailablePreview[]> {
     return mockGetAvailableApps()
   }
 
-  async getAvailableApp (server: S9Server, appId: string): Promise<AppAvailableFull> {
+  async getAvailableApp (serverId: string, appId: string): Promise<AppAvailableFull> {
     return mockGetAvailableApp()
       .then(res => {
         return {
@@ -213,7 +213,7 @@ export class XServerService {
       })
   }
 
-  async getAvailableAppVersionInfo (server: S9Server, appId: string, version: string): Promise<{ releaseNotes: string, versionViewing: string }> {
+  async getAvailableAppVersionInfo (serverId: string, appId: string, version: string): Promise<{ releaseNotes: string, versionViewing: string }> {
     return mockGetAvailableAppVersionInfo()
       .then(res => {
         return {
@@ -223,15 +223,15 @@ export class XServerService {
       })
   }
 
-  async getInstalledApp (server: S9Server, appId: string): Promise<AppInstalled> {
+  async getInstalledApp (serverId: string, appId: string): Promise<AppInstalled> {
     return mockGetInstalledApp()
   }
 
-  async getInstalledApps (server: S9Server): Promise<AppInstalled[]> {
+  async getInstalledApps (serverId: string): Promise<AppInstalled[]> {
     return mockGetInstalledApps()
   }
 
-  async getAppConfig (server: S9Server, appId: string): Promise<{
+  async getAppConfig (serverId: string, appId: string): Promise<{
     spec: AppConfigSpec,
     config: object
     rules: Rules[]
@@ -246,56 +246,56 @@ export class XServerService {
       })
   }
 
-  async getAppLogs (server: S9Server, appId: string, params: Lan.GetAppLogsReq = { }): Promise<string[]> {
+  async getAppLogs (serverId: string, appId: string, params: Lan.GetAppLogsReq = { }): Promise<string[]> {
     return mockGetAppLogs()
   }
 
-  async installApp (server: S9Server, appId: string, version: string): Promise<AppInstalled> {
+  async installApp (serverId: string, appId: string, version: string): Promise<AppInstalled> {
     const installed = await mockInstallApp()
-    await this.appModel.cacheApp(server.id, installed)
+    await this.appModel.cacheApp(serverId, installed)
     return installed
   }
 
-  async uninstallApp (server: S9Server, appId: string): Promise<void> {
+  async uninstallApp (serverId: string, appId: string): Promise<void> {
     await mockUninstallApp()
-    await this.appModel.removeApp(server.id, appId)
+    await this.appModel.removeApp(serverId, appId)
   }
 
-  async startApp (server: S9Server, app: AppInstalled): Promise<void> {
+  async startApp (serverId: string, app: AppInstalled): Promise<void> {
     await mockStartApp()
     app.status = AppHealthStatus.RUNNING
     app.statusAt = new Date().toISOString()
   }
 
-  async stopApp (server: S9Server, app: AppInstalled): Promise<void> {
+  async stopApp (serverId: string, app: AppInstalled): Promise<void> {
     await mockStopApp()
   }
 
-  async updateAppConfig (server: S9Server, app: AppInstalled, config: object): Promise<void> {
+  async updateAppConfig (serverId: string, app: AppInstalled, config: object): Promise<void> {
     await mockUpdateAppConfig()
   }
 
-  async wipeAppData (server: S9Server, app: AppInstalled): Promise<void> {
+  async wipeAppData (serverId: string, app: AppInstalled): Promise<void> {
     await mockWipeAppData()
   }
 
-  async getSSHKeys (server: S9Server): Promise<SSHFingerprint[]> {
+  async getSSHKeys (serverId: string): Promise<SSHFingerprint[]> {
     return mockGetSSHKeys()
   }
 
-  async addSSHKey (server: S9Server, sshKey: string): Promise<SSHFingerprint> {
+  async addSSHKey (serverId: string, sshKey: string): Promise<SSHFingerprint> {
     return mockAddSSHKey()
   }
 
-  async deleteSSHKey (server: S9Server, sshKey: string): Promise<void> {
+  async deleteSSHKey (serverId: string, sshKey: string): Promise<void> {
     await mockDeleteSSHKey()
   }
 
-  async restartServer (server: S9Server): Promise<void> {
+  async restartServer (serverId: string): Promise<void> {
     await mockRestartServer()
   }
 
-  async shutdownServer (server: S9Server): Promise<void> {
+  async shutdownServer (serverId: string): Promise<void> {
     await mockShutdownServer()
   }
 }
