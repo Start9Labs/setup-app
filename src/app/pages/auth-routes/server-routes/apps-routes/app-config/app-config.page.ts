@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { NavController, LoadingController, AlertController } from '@ionic/angular'
 import { ActivatedRoute } from '@angular/router'
-import { AppInstalled, AppConfigSpec, AppHealthStatus, AppModel } from 'src/app/models/app-model'
+import { AppInstalled, AppConfigSpec, AppStatus, AppModel } from 'src/app/models/app-model'
 import { ServerService } from 'src/app/services/server.service'
 import { BehaviorSubject } from 'rxjs'
 
@@ -36,7 +36,7 @@ export class AppConfigPage {
     this.app$ = this.appModel.watch(this.serverId, this.appId)
 
     const app = this.app$.value
-    if (app.status === AppHealthStatus.RECOVERABLE) {
+    if (app.status === AppStatus.RECOVERABLE) {
       await this.presentAlertRecoverable()
       this.edited = true
     } else {
@@ -79,7 +79,7 @@ export class AppConfigPage {
       await this.serverService.updateAppConfig(this.serverId, app, this.config)
 
       // if status was RUNNING beforehand, restart the app
-      if (app.status === AppHealthStatus.RUNNING) {
+      if (app.status === AppStatus.RUNNING) {
         loader.message = `Restarting ${app.title}. This could take a while...`
         // stop app
         await this.serverService.stopApp(this.serverId, app)
@@ -87,7 +87,7 @@ export class AppConfigPage {
         await this.serverService.startApp(this.serverId, app)
       // if not RUNNING beforehand, set status to STOPPED
       } else {
-        this.appModel.update(this.serverId, this.appId, { status: AppHealthStatus.STOPPED, statusAt: new Date().toISOString() })
+        this.appModel.update(this.serverId, this.appId, { status: AppStatus.STOPPED, statusAt: new Date().toISOString() })
       }
 
       await this.navigateBack()

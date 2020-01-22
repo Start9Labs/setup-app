@@ -52,6 +52,7 @@ export class AppAvailableShowPage {
           type: 'radio',
           label: v, // appearance on screen
           value: v, // literal SEM version value
+          checked: this.app.versionViewing === v,
         }
       }),
       buttons: [

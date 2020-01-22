@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
-import { AppHealthStatus, AppModel } from './app-model'
+import { AppModel } from './app-model'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { deriveKeys } from '../util/crypto.util'
 import * as CryptoJS from 'crypto-js'
@@ -86,7 +86,7 @@ export interface S9ServerStorable {
 
 export interface S9Server extends S9ServerStorable {
   updating: boolean
-  status: AppHealthStatus
+  status: ServerStatus
   statusAt: string
   versionLatest: string
   privkey: string // derive from mnemonic + torAddress
@@ -141,7 +141,7 @@ export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): 
     versionInstalled,
     versionLatest: '0.0.0',
     updating: false,
-    status: AppHealthStatus.UNKNOWN,
+    status: ServerStatus.UNKNOWN,
     statusAt: new Date().toISOString(),
     privkey: deriveKeys(mnemonic, id).privkey,
     badge: 0,
@@ -163,4 +163,12 @@ export function toStorableServer (ss: S9Server): S9ServerStorable {
 export function idFromSerial (serialNo: string): string {
   // sha256 hash is big endian
   return CryptoJS.SHA256(serialNo).toString(CryptoJS.enc.Hex).substr(0, 8)
+}
+
+export enum ServerStatus {
+  UNKNOWN = 'UNKNOWN',
+  UNREACHABLE = 'UNREACHABLE',
+  UPDATING = 'UPDATING',
+  NEEDS_CONFIG = 'NEEDS_CONFIG',
+  RUNNING = 'RUNNING',
 }

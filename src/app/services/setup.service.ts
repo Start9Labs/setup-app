@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core'
-import { S9Server, getLanIP } from '../models/server-model'
+import { S9Server, getLanIP, ServerStatus } from '../models/server-model'
 import { Method } from 'src/app/types/enums'
 import { pauseFor } from 'src/app/util/misc.util'
 import * as cryptoUtil from '../util/crypto.util'
 import { AuthService } from './auth.service'
 import { Lan } from '../types/api-types'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
-import { AppHealthStatus } from '../models/app-model'
+import { AppStatus } from '../models/app-model'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { HttpNativeService, getAuthHeader } from './http-native.service'
 
@@ -80,7 +80,7 @@ export class SetupService {
     if (
       hasValues(['zeroconf', 'versionInstalled', 'torAddress', 'pubkey', 'privkey'], builder) &&
       builder.registered &&
-      builder.status !== AppHealthStatus.RUNNING
+      builder.status !== ServerStatus.RUNNING
     ) {
       this.message = `getting server`
       await this.getServer(builder)
@@ -135,7 +135,7 @@ export class SetupService {
       torAddress: 'agent-tor-address-isaverylongaddresssothaticantestwrapping.onion',
       versionInstalled: '0.1.0',
       versionLatest: '0.1.0',
-      status: AppHealthStatus.RUNNING,
+      status: ServerStatus.RUNNING,
       statusAt: new Date().toISOString(),
       privkey: 'testprivkey',
       pubkey: 'testpubkey',
@@ -163,7 +163,7 @@ export interface S9ServerBuilder {
   id: string
   label: string
 
-  status: AppHealthStatus
+  status: ServerStatus
   statusAt: string
   versionInstalled?: string
   versionLatest?: string
@@ -181,14 +181,14 @@ export function hasValues<T extends keyof S9ServerBuilder> (t: T[], s: S9ServerB
 }
 
 export function isFullySetup (ss: S9ServerBuilder): ss is Required<S9ServerBuilder> {
-  return hasValues(builderKeys(), ss) && ss.registered && ss.status === AppHealthStatus.RUNNING
+  return hasValues(builderKeys(), ss) && ss.registered && ss.status === ServerStatus.RUNNING
 }
 
 export function fromUserInput (id: string, label: string): S9ServerBuilder {
   return {
     id,
     label,
-    status: AppHealthStatus.UNKNOWN,
+    status: ServerStatus.UNKNOWN,
     statusAt: new Date().toISOString(),
     registered: false,
   }

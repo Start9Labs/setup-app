@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core'
 import { ToastController, NavController } from '@ionic/angular'
-import { ServerModel, S9Server } from '../models/server-model'
+import { ServerModel, S9Server, ServerStatus } from '../models/server-model'
 import { ServerService } from './server.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
-import { AppModel, AppHealthStatus } from '../models/app-model'
+import { AppModel, AppStatus } from '../models/app-model'
 import { doForAtLeast, tryAll, pauseFor } from '../util/misc.util'
 
 @Injectable({
@@ -154,21 +154,21 @@ export class ServerSync {
       }
       case 'reject'  : {
         console.error(`get apps request for ${server.id} rejected with ${JSON.stringify(appsRes.value)}`)
-        this.appModel.updateAppsUniformly(server.id, isUnreachable())
+        this.appModel.updateAppsUniformly(server.id, appUnreachable())
         break
       }
     }
   }
 
   private hasBeenRunningSufficientlyLong (server: S9Server): boolean {
-    return (server.status === AppHealthStatus.UNKNOWN) &&
+    return (server.status === ServerStatus.UNKNOWN) &&
            (this.initialized_at.valueOf() + this.secondsDisconnectedBeforeUnreachable * 1000 < new Date().valueOf())
 
   }
 
   private markServerUnreachable (server: S9Server): void {
-    this.serverModel.update(server.id, isUnreachable())
-    this.appModel.updateAppsUniformly(server.id, isUnreachable())
+    this.serverModel.update(server.id, serverUnreachable())
+    this.appModel.updateAppsUniformly(server.id, appUnreachable())
   }
 
   private async retry (server: S9Server, retryIn: number): Promise<void> {
@@ -180,4 +180,5 @@ export class ServerSync {
 
 }
 
-const isUnreachable = () =>  ({ status: AppHealthStatus.UNREACHABLE, statusAt: new Date().toISOString() })
+const serverUnreachable = () =>  ({ status: ServerStatus.UNREACHABLE, statusAt: new Date().toISOString() })
+const appUnreachable = () =>  ({ status: AppStatus.UNREACHABLE, statusAt: new Date().toISOString() })

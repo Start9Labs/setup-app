@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core'
-import { AppHealthStatus } from 'src/app/models/app-model'
+import { AppStatus } from 'src/app/models/app-model'
+import { ServerStatus } from 'src/app/models/server-model'
 
 @Component({
   selector: 's9-status',
@@ -7,49 +8,84 @@ import { AppHealthStatus } from 'src/app/models/app-model'
   styleUrls: ['./status.component.scss'],
 })
 export class StatusComponent {
-  @Input() status: AppHealthStatus
-  @Input() target: 'server' | 'app'
+  @Input() appStatus?: AppStatus
+  @Input() serverStatus?: ServerStatus
   color: string
   display: string
 
   constructor () { }
 
   ngOnChanges () {
-    switch (this.status) {
-      case AppHealthStatus.UNKNOWN:
-        this.display = this.target === 'app' ? 'Unknown' : 'Connecting'
+    if (this.serverStatus) {
+      this.handleServerStatus()
+    } else if (this.appStatus) {
+      this.handleAppStatus()
+    }
+  }
+
+  handleServerStatus () {
+    switch (this.serverStatus) {
+      case ServerStatus.UNKNOWN:
+        this.display = 'Connecting'
         this.color = 'dark'
         break
-      case AppHealthStatus.REMOVING:
-        this.display = 'Removing'
-        this.color = 'danger'
-        break
-      case AppHealthStatus.RESTARTING:
-        this.display = 'Restarting'
-        this.color = 'warning'
-        break
-      case AppHealthStatus.NEEDS_CONFIG:
-      case AppHealthStatus.RECOVERABLE:
-        this.display = 'Needs Config'
-        this.color = 'warning'
-        break
-      case AppHealthStatus.RUNNING:
-        this.display = this.target === 'app' ? 'Running' : 'Connected'
-        this.color = 'success'
-        break
-      case AppHealthStatus.UNREACHABLE:
+      case ServerStatus.UNREACHABLE:
         this.display = 'Unreachable'
         this.color = 'danger'
         break
-      case AppHealthStatus.STOPPED:
+      case ServerStatus.NEEDS_CONFIG:
+        this.display = 'Needs Config'
+        this.color = 'warning'
+        break
+      case ServerStatus.RUNNING:
+        this.display = 'Connected'
+        this.color = 'success'
+        break
+      case ServerStatus.UPDATING:
+        this.display = 'Updating'
+        this.color = 'primary'
+        break
+      default:
+        this.color = 'secondary'
+    }
+  }
+
+  handleAppStatus () {
+    switch (this.appStatus) {
+      case AppStatus.UNKNOWN:
+        this.display = 'Unknown'
+        this.color = 'dark'
+        break
+      case AppStatus.REMOVING:
+        this.display = 'Removing'
+        this.color = 'danger'
+        break
+      case AppStatus.RESTARTING:
+        this.display = 'Restarting'
+        this.color = 'warning'
+        break
+      case AppStatus.NEEDS_CONFIG:
+      case AppStatus.RECOVERABLE:
+        this.display = 'Needs Config'
+        this.color = 'warning'
+        break
+      case AppStatus.RUNNING:
+        this.display = 'Running'
+        this.color = 'success'
+        break
+      case AppStatus.UNREACHABLE:
+        this.display = 'Unreachable'
+        this.color = 'danger'
+        break
+      case AppStatus.STOPPED:
         this.display = 'Stopped'
         this.color = 'danger'
         break
-      case AppHealthStatus.INSTALLING:
+      case AppStatus.INSTALLING:
         this.display = 'Installing'
         this.color = 'warning'
         break
-      case AppHealthStatus.DEAD:
+      case AppStatus.DEAD:
         this.display = 'Corrupted'
         this.color = 'danger'
         break

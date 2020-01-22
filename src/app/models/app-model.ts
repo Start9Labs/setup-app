@@ -144,7 +144,7 @@ export class AppModel {
 export interface BaseApp {
   id: string
   title: string
-  status: AppHealthStatus | null
+  status: AppStatus | null
   statusAt: string
   versionLatest: string
   versionInstalled: string | null
@@ -258,7 +258,8 @@ export interface Rules {
   description: string
 }
 
-export enum AppHealthStatus {
+export enum AppStatus {
+  // shared
   UNKNOWN = 'UNKNOWN',
   UNREACHABLE = 'UNREACHABLE',
   INSTALLING = 'INSTALLING',

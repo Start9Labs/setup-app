@@ -1,10 +1,10 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { ServerModel } from 'src/app/models/server-model'
+import { ServerModel, ServerStatus } from 'src/app/models/server-model'
 import { NavController, AlertController, ActionSheetController, LoadingController } from '@ionic/angular'
 import { S9Server } from 'src/app/models/server-model'
 import { ActionSheetButton } from '@ionic/core'
-import { AppHealthStatus, AppModel, AppInstalled } from 'src/app/models/app-model'
+import { AppStatus, AppModel, AppInstalled } from 'src/app/models/app-model'
 import * as compareVersions from 'compare-versions'
 import { ServerService } from 'src/app/services/server.service'
 import { ServerSyncService } from 'src/app/services/server.sync.service'
@@ -74,7 +74,7 @@ export class ServerShowPage {
       },
     ]
 
-    if (server.status === AppHealthStatus.RUNNING) {
+    if (server.status === ServerStatus.RUNNING) {
       buttons.push(
         {
           text: 'Server info',
@@ -202,7 +202,7 @@ export class ServerShowPage {
 
     try {
       await this.serverService.updateAgent(this.serverId, server.versionLatest)
-      this.serverModel.update(this.serverId, { status: AppHealthStatus.INSTALLING, statusAt: new Date().toISOString() })
+      this.serverModel.update(this.serverId, { status: ServerStatus.UPDATING, statusAt: new Date().toISOString() })
     } catch (e) {
       this.error = e.message
     } finally {

@@ -28,7 +28,7 @@
       <ion-label>
         <h5>Status</h5>
         <h1>
-          <s9-status [status]="(server$ | async)?.status" [target]="'server'"></s9-status>
+          <s9-status [serverStatus]="(server$ | async)?.status"></s9-status>
         </h1>
       </ion-label>
     </ion-item>
@@ -61,7 +61,7 @@
         <h3>{{ (app$.value | async)?.versionInstalled }}</h3>
       </ion-label>
       <ion-note slot="end">
-        <s9-status [status]="(app$.value | async)?.status" [target]="'app'"></s9-status>
+        <s9-status [appStatus]="(app$.value | async)?.status"></s9-status>
       </ion-note>
     </ion-item>
   </ion-item-group>

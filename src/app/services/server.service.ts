@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Method } from '../types/enums'
-import { AppInstalled, AppAvailablePreview, AppAvailableFull, AppHealthStatus, AppConfigSpec, AppModel, Rules } from '../models/app-model'
-import { S9Notification, SSHFingerprint } from '../models/server-model'
+import { AppInstalled, AppAvailablePreview, AppAvailableFull, AppStatus, AppConfigSpec, AppModel, Rules } from '../models/app-model'
+import { S9Notification, SSHFingerprint, ServerStatus } from '../models/server-model'
 import { Lan, ApiAppAvailablePreview, ApiAppAvailableFull, ApiAppInstalled, ApiServer, ApiAppVersionInfo } from '../types/api-types'
 import { S9BuilderWith } from './setup.service'
 import * as configUtil from '../util/config.util'
@@ -115,12 +115,12 @@ export class ServerService {
 
   async startApp (serverId: string, app: AppInstalled): Promise<void> {
     await this.httpService.authServerRequest<Lan.PostStartAppRes>(serverId, `/apps/${app.id}/start`, { method: Method.post })
-    this.appModel.update(serverId, app.id, { status: AppHealthStatus.RUNNING, statusAt: new Date().toISOString() })
+    this.appModel.update(serverId, app.id, { status: AppStatus.RUNNING, statusAt: new Date().toISOString() })
   }
 
   async stopApp (serverId: string, app: AppInstalled): Promise<void> {
     await this.httpService.authServerRequest<Lan.PostStopAppRes>(serverId, `/apps/${app.id}/stop`, { method: Method.post })
-    this.appModel.update(serverId, app.id, { status: AppHealthStatus.STOPPED, statusAt: new Date().toISOString() })
+    this.appModel.update(serverId, app.id, { status: AppStatus.STOPPED, statusAt: new Date().toISOString() })
   }
 
   async updateAppConfig (serverId: string, app: AppInstalled, config: object): Promise<void> {
@@ -132,7 +132,7 @@ export class ServerService {
 
   async wipeAppData (serverId: string, app: AppInstalled): Promise<void> {
     await this.httpService.authServerRequest<Lan.PostWipeAppDataRes>(serverId, `/apps/${app.id}/wipe`, { method: Method.post })
-    this.appModel.update(serverId, app.id, { status: AppHealthStatus.NEEDS_CONFIG, statusAt: new Date().toISOString() })
+    this.appModel.update(serverId, app.id, { status: AppStatus.NEEDS_CONFIG, statusAt: new Date().toISOString() })
   }
 
   async getSSHKeys (serverId: string): Promise<SSHFingerprint[]> {
@@ -259,7 +259,7 @@ export class XServerService {
 
   async startApp (serverId: string, app: AppInstalled): Promise<void> {
     await mockStartApp()
-    app.status = AppHealthStatus.RUNNING
+    app.status = AppStatus.RUNNING
     app.statusAt = new Date().toISOString()
   }
 
@@ -445,7 +445,7 @@ async function mockShutdownServer (): Promise<Lan.PostShutdownServerRes> {
 const mockApiServer: Lan.GetServerRes = {
   versionInstalled: '0.1.0',
   versionLatest: '0.1.0',
-  status: AppHealthStatus.RUNNING,
+  status: ServerStatus.RUNNING,
   notifications: [  {
     id: '123e4567-e89b-12d3-a456-426655440000',
     appId: 'bitcoind',
@@ -536,7 +536,7 @@ const mockApiAppAvailablePreview: ApiAppAvailablePreview = {
   id: 'bitcoind',
   versionLatest: '0.19.0',
   versionInstalled: null,
-  status: AppHealthStatus.INSTALLING,
+  status: AppStatus.INSTALLING,
   statusAt: new Date().toISOString(),
   title: 'Bitcoin Core',
   descriptionShort: 'Bitcoin is an innovative payment network and new kind of money.',
@@ -564,7 +564,7 @@ const mockApiAppInstalled: ApiAppInstalled = {
   versionInstalled: '0.18.1',
   title: 'Bitcoin Core',
   torAddress: 'sample-bitcoin-tor-address',
-  status: AppHealthStatus.RECOVERABLE,
+  status: AppStatus.RECOVERABLE,
   statusAt: new Date().toISOString(),
   iconURL: 'assets/img/bitcoin_core.png',
 }

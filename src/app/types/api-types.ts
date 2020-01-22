@@ -1,12 +1,12 @@
-import { AppHealthStatus, AppConfigSpec, Rules } from '../models/app-model'
-import { ServerSpecs, S9Notification, ServerMetrics, SSHFingerprint } from '../models/server-model'
+import { AppStatus, AppConfigSpec, Rules } from '../models/app-model'
+import { ServerSpecs, S9Notification, ServerMetrics, SSHFingerprint, ServerStatus } from '../models/server-model'
 
 export type TwoHundredOK = { never?: never } // hack for the unit type
 
 interface ApiAppBase {
   id: string
   title: string
-  status: AppHealthStatus | null
+  status: AppStatus | null
   statusAt: string
   versionLatest: string
   versionInstalled: string | null
@@ -29,7 +29,7 @@ export interface ApiAppInstalled extends ApiAppBase {
 
 
 export interface ApiServer {
-  status: AppHealthStatus
+  status: ServerStatus
   versionInstalled: string
   versionLatest: string
   notifications: S9Notification[]

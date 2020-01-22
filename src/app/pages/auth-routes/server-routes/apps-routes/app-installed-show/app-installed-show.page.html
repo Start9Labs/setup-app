@@ -26,7 +26,7 @@
       <ion-item>
         <ion-label position="stacked">Status</ion-label>
         <h5>
-          <s9-status [status]="(app$ | async)?.status" [target]="'app'"></s9-status>
+          <s9-status [appStatus]="(app$ | async)?.status"></s9-status>
         </h5>
       </ion-item>
     </ion-item-group>
@@ -48,11 +48,10 @@
 
     <ion-button *ngIf="(app$ | async)?.status === 'DEAD'" style="margin: 16px 0;" expand="block" fill="outline"
       color="primary" (click)="presentAlertUninstall()">
-      Uninstall
+      Force Uninstall
     </ion-button>
 
-    <ion-item-group class="ion-text-wrap"
-      *ngIf="(app$ | async)?.versionInstalled && (app$ | async)?.status !== 'INSTALLING'">
+    <ion-item-group class="ion-text-wrap" *ngIf="(app$ | async)?.versionInstalled && (app$ | async)?.status !== 'INSTALLING'">
       <ion-item-divider></ion-item-divider>
       <ion-item>
         <ion-label position="stacked">App ID</ion-label>

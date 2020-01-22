@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { AlertController, NavController, LoadingController, ActionSheetController } from '@ionic/angular'
 import { ServerService } from 'src/app/services/server.service'
 import { ActivatedRoute } from '@angular/router'
-import { AppInstalled, AppHealthStatus, AppModel } from 'src/app/models/app-model'
+import { AppInstalled, AppStatus, AppModel } from 'src/app/models/app-model'
 import { ClipboardService } from 'src/app/services/clipboard.service'
 import { ActionSheetButton } from '@ionic/core'
 import { Observable, BehaviorSubject } from 'rxjs'
@@ -33,7 +33,11 @@ export class AppInstalledShowPage {
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
     this.appId = this.route.snapshot.paramMap.get('appId') as string
-    this.app$ = this.appModel.watch(this.serverId, this.appId)
+    try {
+      this.app$ = this.appModel.watch(this.serverId, this.appId)
+    } catch (e) {
+      console.error
+    }
 
     await this.getApp()
   }
@@ -41,6 +45,7 @@ export class AppInstalledShowPage {
   async getApp (): Promise<void> {
     try {
       const appRes = await this.serverService.getInstalledApp(this.serverId, this.appId)
+      this.app$ = this.app$ || this.appModel.watch(this.serverId, this.appId)
       this.appModel.update(this.serverId, this.appId, appRes)
       this.error = ''
     } catch (e) {
@@ -60,11 +65,11 @@ export class AppInstalledShowPage {
     const buttons : ActionSheetButton[] = []
 
     if (([
-      AppHealthStatus.NEEDS_CONFIG,
-      AppHealthStatus.RECOVERABLE,
-      AppHealthStatus.RUNNING,
-      AppHealthStatus.STOPPED,
-      AppHealthStatus.RESTARTING,
+      AppStatus.NEEDS_CONFIG,
+      AppStatus.RECOVERABLE,
+      AppStatus.RUNNING,
+      AppStatus.STOPPED,
+      AppStatus.RESTARTING,
     ]).includes(app.status!)) {
       buttons.push(
         {
@@ -94,7 +99,7 @@ export class AppInstalledShowPage {
       },
     )
 
-    if (app.versionInstalled && app.status !== AppHealthStatus.INSTALLING) {
+    if (app.versionInstalled && app.status !== AppStatus.INSTALLING) {
       buttons.push({
         text: 'Uninstall',
         cssClass: 'alert-danger',
