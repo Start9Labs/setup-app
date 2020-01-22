@@ -124,7 +124,7 @@ export class SetupService {
   }
 
   async getServer (builder: S9BuilderWith<'zeroconf' | 'versionInstalled' | 'pubkey' | 'privkey' | 'torAddress'>): Promise<Lan.GetServerRes> {
-    return this.httpService.serverRequest<Lan.GetServerRes>(builder, '', { method: Method.post, timeout: SetupService.timeout, headers: getAuthHeader(builder) })
+    return this.httpService.serverRequest<Lan.GetServerRes>(builder, '', { method: Method.get, timeout: SetupService.timeout, headers: getAuthHeader(builder) })
   }
 
   // @TODO remove

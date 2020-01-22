@@ -88,12 +88,12 @@ export class AppModel {
     this.cache = { }
   }
 
-  syncAppCache (serverId: string, allUpToDateApps : { [appId: string]: AppInstalled}) {
+  syncAppCache (serverId: string, allUpToDateApps : AppInstalled[]) {
     console.log(`Syncing app cache for ${serverId} with ${JSON.stringify(allUpToDateApps)}`)
     if (!this.cache[serverId]) return
 
     const previousAppIds = Object.keys(this.cache[serverId].value)
-    const currentAppIds = Object.keys(allUpToDateApps)
+    const currentAppIds = allUpToDateApps.map(a => a.id)
 
     const appsLost = diff(previousAppIds, currentAppIds)
     const appsGained = diff(currentAppIds, previousAppIds)
@@ -107,13 +107,13 @@ export class AppModel {
     const tmp = { }
 
     appsToUpdate.forEach( appId => {
-      const updatedApp = { ...this.peek(serverId, appId), ...allUpToDateApps[appId]}
+      const updatedApp = { ...this.peek(serverId, appId), ...allUpToDateApps.find(a => a.id == appId) as AppInstalled}
       this.cache[serverId].value[appId].next(updatedApp)
       tmp[appId] = this.cache[serverId].value[appId]
     })
 
     appsGained.forEach ( appId => {
-      this.cache[serverId].value[appId] = new BehaviorSubject(allUpToDateApps[appId])
+      this.cache[serverId].value[appId] = new BehaviorSubject(allUpToDateApps.find(a => a.id == appId) as AppInstalled)
       tmp[appId] = this.cache[serverId].value[appId]
     })
 

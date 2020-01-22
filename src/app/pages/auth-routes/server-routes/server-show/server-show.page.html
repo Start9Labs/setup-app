@@ -31,7 +31,6 @@
           <s9-status [status]="(server$ | async)?.status" [target]="'server'"></s9-status>
         </h1>
       </ion-label>
-      <ion-spinner slot="end" *ngIf="(server$ | async)?.updating" name="dots" color="warning"></ion-spinner>
     </ion-item>
   </ion-item-group>
 
@@ -53,17 +52,16 @@
       <ion-text color="primary">Sovereign App Store</ion-text>
     </ion-item>
 
-    <ion-item *ngFor="let app of Object.values((serverApps$ | async)).map(appObserve => a.value) | keyvalue"
-      [routerLink]="['apps', 'installed', app.key]">
+    <ion-item *ngFor="let app$ of (serverApps$ | async) | keyvalue" [routerLink]="['apps', 'installed', app$.key]">
       <ion-avatar slot="start">
-        <img [src]="app.value.iconURL" alt="icon" />
+        <img [src]="(app$.value | async)?.iconURL" alt="icon" />
       </ion-avatar>
       <ion-label>
-        <h2>{{ app.value.title }}</h2>
-        <h3>{{ app.value.versionInstalled }}</h3>
+        <h2>{{ (app$.value | async)?.title }}</h2>
+        <h3>{{ (app$.value | async)?.versionInstalled }}</h3>
       </ion-label>
       <ion-note slot="end">
-        <s9-status [status]="app.value.status" [target]="'app'"></s9-status>
+        <s9-status [status]="(app$.value | async)?.status" [target]="'app'"></s9-status>
       </ion-note>
     </ion-item>
   </ion-item-group>

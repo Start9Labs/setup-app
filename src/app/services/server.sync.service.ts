@@ -131,7 +131,7 @@ export class ServerSync {
   }
 
   async syncServerAttributes (server: S9Server): Promise<void> {
-    const [serverRes, appsRes] = await tryAll ( [
+    const [serverRes, appsRes] = await tryAll( [
           this.serverService.getServer(server.id),
           pauseFor(250).then(() => this.serverService.getInstalledApps(server.id)),
         ],
@@ -147,7 +147,11 @@ export class ServerSync {
     }
 
     switch (appsRes.result) {
-      case 'resolve' : this.appModel.syncAppCache(server.id, appsRes.value); break
+      case 'resolve' : {
+
+        this.appModel.syncAppCache(server.id, appsRes.value)
+        break
+      }
       case 'reject'  : {
         console.error(`get apps request for ${server.id} rejected with ${JSON.stringify(appsRes.value)}`)
         this.appModel.updateAppsUniformly(server.id, isUnreachable())

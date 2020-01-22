@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="['/auth', 'servers', serverId]"></ion-back-button>
     </ion-buttons>
-    <ion-title>{{ app?.title }}</ion-title>
+    <ion-title>{{ (app$ | async)?.title }}</ion-title>
     <ion-buttons slot="end" class="ion-padding-end">
       <ion-button (click)="presentAction()" color="primary">
         <ion-icon name="more"></ion-icon>

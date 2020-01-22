@@ -38,7 +38,7 @@ export class HttpNativeService {
     options: HttpNativeOptions,
   ): Promise<T> {
     const url = this.s9Url(server, path)
-    return this.request(url, options)
+    return this.request<T>(url, options)
   }
 
   async request<T> (url: string, options: HttpNativeOptions): Promise<T> {

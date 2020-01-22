@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { ServerModel, S9Server } from 'src/app/models/server-model'
 import { NavController } from '@ionic/angular'
 import { ServerSyncService } from 'src/app/services/server.sync.service'
-import { Observable, Observer, Subscription } from 'rxjs'
+import { Subscription } from 'rxjs'
 
 @Component({
   selector: 'page-server-list',

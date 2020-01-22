@@ -44,10 +44,6 @@
     </ion-item>
   </ion-card>
 
-  <div *ngIf="sss.fromCache().syncing" class="servers-spinner">
-    <ion-spinner name="dots" color="warning"></ion-spinner>
-  </div>
-
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button [routerLink]="['/auth', 'setup']" class="fab-button">
       <ion-icon name="add"></ion-icon>
