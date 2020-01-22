@@ -51,7 +51,7 @@
       Uninstall
     </ion-button>
 
-    <ion-item-group class="ion-text-wrap">
+    <ion-item-group class="ion-text-wrap" *ngIf="app.versionInstalled && app.status !== 'INSTALLING'">
       <ion-item-divider></ion-item-divider>
       <ion-item>
         <ion-label position="stacked">Installed Version</ion-label>

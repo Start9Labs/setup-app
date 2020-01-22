@@ -87,14 +87,16 @@ export class AppInstalledShowPage {
       },
     )
 
-    buttons.push({
-      text: 'Uninstall',
-      cssClass: 'alert-danger',
-      icon: 'trash',
-      handler: () => {
-        this.presentAlertUninstall()
-      },
-    })
+    if (this.app.versionInstalled) {
+      buttons.push({
+        text: 'Uninstall',
+        cssClass: 'alert-danger',
+        icon: 'trash',
+        handler: () => {
+          this.presentAlertUninstall()
+        },
+      })
+    }
 
     const action = await this.actionCtrl.create({
       buttons,
