@@ -105,7 +105,7 @@ export class ServerSync {
     if (this.syncing) { return }
 
     this.syncing = true
-    console.log('syncing servers: ', this.serverModel.cache)
+    console.log('syncing servers: ', this.serverModel.darkCache)
     await doForAtLeast(1000, this.serverModel.peekAll().map(server => this.syncServer(server)))
     this.syncing = false
   }
