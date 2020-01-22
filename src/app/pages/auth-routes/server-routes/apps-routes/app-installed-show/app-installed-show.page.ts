@@ -2,9 +2,7 @@ import { Component } from '@angular/core'
 import { AlertController, NavController, LoadingController, ActionSheetController } from '@ionic/angular'
 import { ServerService } from 'src/app/services/server.service'
 import { ActivatedRoute } from '@angular/router'
-import { ServerModel } from 'src/app/models/server-model'
 import { AppInstalled, AppHealthStatus, AppModel } from 'src/app/models/app-model'
-import { S9Server } from 'src/app/models/server-model'
 import { ClipboardService } from 'src/app/services/clipboard.service'
 import { ActionSheetButton } from '@ionic/core'
 import { Observable } from 'rxjs'
@@ -17,7 +15,7 @@ import { Observable } from 'rxjs'
 export class AppInstalledShowPage {
   loading = true
   error: string
-  app: AppInstalled
+  app$: Observable<AppInstalled>
   appId: string
   serverId: string
 
@@ -35,15 +33,15 @@ export class AppInstalledShowPage {
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
     this.appId = this.route.snapshot.paramMap.get('appId') as string
+    this.app$ = this.appModel.watch(this.serverId, this.appId)
 
-    this.app = this.appModel.getApp(this.serverId, this.appId) as AppInstalled
-    await this.getApp(this.appId)
+    await this.getApp()
   }
 
-  async getApp (appId: string): Promise<void> {
+  async getApp (): Promise<void> {
     try {
-      const appRes = await this.serverService.getInstalledApp(this.serverId, appId)
-      this.appModel.cacheApp(this.serverId, appRes, appRes)
+      const appRes = await this.serverService.getInstalledApp(this.serverId, this.appId)
+      this.appModel.update(this.serverId, this.appId, appRes)
     } catch (e) {
       this.error = e.message
     } finally {
@@ -52,13 +50,21 @@ export class AppInstalledShowPage {
   }
 
   async copyTor () {
-    await this.clipboardService.copy(this.app.torAddress || '')
+    const app = this.appModel.peek(this.serverId, this.appId)
+    await this.clipboardService.copy(app.torAddress || '')
   }
 
   async presentAction () {
+    const app = this.appModel.peek(this.serverId, this.appId)
     const buttons : ActionSheetButton[] = []
 
-    if (([AppHealthStatus.NEEDS_CONFIG, AppHealthStatus.RECOVERABLE, AppHealthStatus.RUNNING, AppHealthStatus.STOPPED, AppHealthStatus.RESTARTING]).includes(this.app.status!)) {
+    if (([
+      AppHealthStatus.NEEDS_CONFIG,
+      AppHealthStatus.RECOVERABLE,
+      AppHealthStatus.RUNNING,
+      AppHealthStatus.STOPPED,
+      AppHealthStatus.RESTARTING,
+    ]).includes(app.status!)) {
       buttons.push(
         {
           text: 'App Config',
@@ -82,12 +88,12 @@ export class AppInstalledShowPage {
         text: 'Store Listing',
         icon: 'appstore',
         handler: () => {
-          this.navCtrl.navigateForward(['/auth', 'servers', this.serverId, 'apps', 'available', this.app.id])
+          this.navCtrl.navigateForward(['/auth', 'servers', this.serverId, 'apps', 'available', app.id])
         },
       },
     )
 
-    if (this.app.versionInstalled) {
+    if (app.versionInstalled && app.status !== AppHealthStatus.INSTALLING) {
       buttons.push({
         text: 'Uninstall',
         cssClass: 'alert-danger',
@@ -110,15 +116,17 @@ export class AppInstalledShowPage {
   }
 
   async stop (): Promise<void> {
+    const app = this.appModel.peek(this.serverId, this.appId)
     const loader = await this.loadingCtrl.create({
-      message: `Stopping ${this.app.title}. This could take a while...`,
+      message: `Stopping ${app.title}. This could take a while...`,
       spinner: 'lines',
       cssClass: 'loader',
     })
     await loader.present()
 
     try {
-      await this.serverService.stopApp(this.serverId, this.app)
+      await this.serverService.stopApp(this.serverId, app)
+
     } catch (e) {
       this.error = e.message
     } finally {
@@ -127,15 +135,16 @@ export class AppInstalledShowPage {
   }
 
   async start (): Promise<void> {
+    const app = this.appModel.peek(this.serverId, this.appId)
     const loader = await this.loadingCtrl.create({
-      message: `Starting ${this.app.title}...`,
+      message: `Starting ${app.title}...`,
       spinner: 'lines',
       cssClass: 'loader',
     })
     await loader.present()
 
     try {
-      await this.serverService.startApp(this.serverId, this.app)
+      await this.serverService.startApp(this.serverId, app)
     } catch (e) {
       this.error = e.message
     } finally {
@@ -144,10 +153,11 @@ export class AppInstalledShowPage {
   }
 
   async presentAlertUninstall () {
+    const app = this.appModel.peek(this.serverId, this.appId)
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Caution',
-      message: `Are you sure you want to uninstall ${this.app.title}?`,
+      message: `Are you sure you want to uninstall ${app.title}?`,
       buttons: [
         {
           text: 'Cancel',
@@ -166,15 +176,16 @@ export class AppInstalledShowPage {
   }
 
   async uninstall (): Promise<void> {
+    const app = this.appModel.peek(this.serverId, this.appId)
     const loader = await this.loadingCtrl.create({
-      message: `Uninstalling ${this.app.title}`,
+      message: `Uninstalling ${app.title}`,
       spinner: 'lines',
       cssClass: 'loader',
     })
     await loader.present()
 
     try {
-      await this.serverService.uninstallApp(this.serverId, this.app.id)
+      await this.serverService.uninstallApp(this.serverId, this.appId)
       await this.navCtrl.pop()
     } catch (e) {
       this.error = e.message

@@ -53,7 +53,7 @@
       <ion-text color="primary">Sovereign App Store</ion-text>
     </ion-item>
 
-    <ion-item *ngFor="let app of appModel.appMap[(server$ | async)?.id] | keyvalue"
+    <ion-item *ngFor="let app of Object.values((serverApps$ | async)).map(appObserve => a.value) | keyvalue"
       [routerLink]="['apps', 'installed', app.key]">
       <ion-avatar slot="start">
         <img [src]="app.value.iconURL" alt="icon" />

@@ -19,7 +19,7 @@ export class ServerModel {
   ) { }
 
   watch (serverId: string) : Observable<S9Server> {
-    if (!this.cache[serverId]) throw new Error (`Excpected cached server for ${serverId} but none found`)
+    if (!this.cache[serverId]) throw new Error (`Expected cached server for ${serverId} but none found`)
     return this.cache[serverId]
   }
 
@@ -66,7 +66,7 @@ export class ServerModel {
     const fromStorage: S9ServerStore = await this.storage.get('servers') || []
     fromStorage.forEach(s => {
       this.create(fromStorableServer(s, mnemonic))
-      this.appModel.appMap[s.id] = { }
+      this.appModel.createServerCache(s.id)
     })
   }
 

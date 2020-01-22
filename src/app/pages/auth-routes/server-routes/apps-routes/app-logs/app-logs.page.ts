@@ -1,8 +1,6 @@
 import { Component, ViewChild } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { ServerModel } from 'src/app/models/server-model'
 import { ServerService } from 'src/app/services/server.service'
-import { S9Server } from 'src/app/models/server-model'
 import { AppInstalled, AppModel } from 'src/app/models/app-model'
 import { IonContent } from '@ionic/angular'
 import { Observable } from 'rxjs'
@@ -17,7 +15,7 @@ export class AppLogsPage {
   loading = true
   error = ''
   serverId: string
-  app: AppInstalled
+  appId: string
   logs: string
 
   constructor (
@@ -28,21 +26,18 @@ export class AppLogsPage {
 
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
-
-    const appId = this.route.snapshot.paramMap.get('appId') as string
-    const app = this.appModel.getApp(this.serverId, appId)
-    if (!app) throw new Error (`No app found on ${this.serverId} with ID: ${appId}`)
-    this.app = app
+    this.appId = this.route.snapshot.paramMap.get('appId') as string
 
     await this.getLogs()
   }
 
   async getLogs () {
+    const app = this.appModel.peek(this.serverId, this.appId)
     this.loading = true
     this.logs = ''
 
     try {
-      const logs = await this.serverService.getAppLogs(this.serverId, this.app.id)
+      const logs = await this.serverService.getAppLogs(this.serverId, app.id)
       this.logs = logs.join('\n\n')
       this.loading = false
       setTimeout(async () => await this.content.scrollToBottom(100), 200)

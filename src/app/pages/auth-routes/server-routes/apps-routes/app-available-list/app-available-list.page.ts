@@ -2,8 +2,6 @@ import { Component } from '@angular/core'
 import { ServerService } from 'src/app/services/server.service'
 import { AppAvailablePreview } from 'src/app/models/app-model'
 import { ActivatedRoute } from '@angular/router'
-import { ServerModel } from 'src/app/models/server-model'
-import { Observable } from 'rxjs'
 
 @Component({
   selector: 'app-available-list',

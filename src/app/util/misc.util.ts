@@ -9,6 +9,16 @@ export async function tryAll ( promises: Promise<any>[] ): Promise<PromiseRes<an
   ))
 }
 
+// arr1 - arr2
+export function diff<T> (arr1: T[], arr2: T[]): T[] {
+  return arr1.filter(x => !arr2.includes(x))
+}
+
+// arr1 & arr2
+export function both<T> (arr1: T[], arr2: T[]): T[] {
+  return arr1.filter(x => arr2.includes(x))
+}
+
 export async function doForAtLeast (minTime: number, promises: Promise<any>[]): Promise<any[]> {
   const returned = await Promise.all(promises.concat(pauseFor(minTime)))
   returned.pop()

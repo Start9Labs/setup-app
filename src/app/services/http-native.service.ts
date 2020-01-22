@@ -71,7 +71,7 @@ export class HttpNativeService {
   }
 }
 
-function getAuthHeader (server: S9Server | S9BuilderWith<'privkey'>): { 'Authorization': string }  {
+export function getAuthHeader (server: S9Server | S9BuilderWith<'privkey'>): { 'Authorization': string }  {
   const past = Math.floor((new Date().getTime() - 30000) / 1000)
   const tokenPayload = { 'iss': 'start9-companion', 'iat': past, 'exp': past + 60 }
   const token = new TokenSigner('ES256K', server.privkey).sign(tokenPayload)

@@ -4,11 +4,11 @@ import { ServerModel } from 'src/app/models/server-model'
 import { NavController, AlertController, ActionSheetController, LoadingController } from '@ionic/angular'
 import { S9Server } from 'src/app/models/server-model'
 import { ActionSheetButton } from '@ionic/core'
-import { AppHealthStatus, AppModel } from 'src/app/models/app-model'
+import { AppHealthStatus, AppModel, AppInstalled } from 'src/app/models/app-model'
 import * as compareVersions from 'compare-versions'
 import { ServerService } from 'src/app/services/server.service'
 import { ServerSyncService } from 'src/app/services/server.sync.service'
-import { Observable } from 'rxjs'
+import { Observable, BehaviorSubject } from 'rxjs'
 
 @Component({
   selector: 'server-show',
@@ -22,6 +22,7 @@ export class ServerShowPage {
   compareVersions = compareVersions
   server$: Observable<S9Server>
   serverId: string
+  serverApps$: Observable<{ [appId: string]: BehaviorSubject<AppInstalled> }>
 
   constructor (
     private readonly route: ActivatedRoute,
@@ -38,6 +39,7 @@ export class ServerShowPage {
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
     this.server$ = this.serverModel.watch(this.serverId)
+    this.serverApps$ = this.appModel.watchServerCache(this.serverId)
 
     this.getServerAndApps()
   }
