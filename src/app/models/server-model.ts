@@ -4,76 +4,72 @@ import { AppModel } from './app-model'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { deriveKeys } from '../util/crypto.util'
 import * as CryptoJS from 'crypto-js'
-import { BehaviorSubject, Subject } from 'rxjs'
+import { BehaviorSubject, Observable, from, Subject } from 'rxjs'
+import { pauseFor } from '../util/misc.util'
 
 @Injectable({
   providedIn: 'root',
 })
 export class ServerModel {
-  cache: { [id: string]: BehaviorSubject<S9Server> } = {  }
+  darkCache: { [id: string]: BehaviorSubject<S9Server> } = { }
   serverDelta$ : Subject<boolean> = new Subject()
 
   constructor (
     private readonly storage: Storage,
     private readonly appModel: AppModel,
   ) {
-    console.log('super initial cache: ', this.cache)
+    console.log('ServerModel initial cache: ', JSON.stringify(this.darkCache))
   }
 
   watch (serverId: string) : BehaviorSubject<S9Server> {
-    if (!this.cache[serverId]) throw new Error (`Expected cached server for ${serverId} but none found`)
-    return this.cache[serverId]
+    if (!this.darkCache[serverId]) throw new Error (`Expected cached server for ${serverId} but none found`)
+    return this.darkCache[serverId]
   }
 
   peek (serverId: string): S9Server {
-    if (!this.cache[serverId] || !this.cache[serverId].value) throw new Error (`Expected cached server for ${serverId} but none found`)
-    return this.cache[serverId].value
+    if (!this.darkCache[serverId] || !this.darkCache[serverId].value) throw new Error (`Expected cached server for ${serverId} but none found`)
+    return this.darkCache[serverId].value
   }
 
   // no op if missing
   remove (serverId: string): void {
-    if (this.cache[serverId]) {
-      this.cache[serverId].complete()
-      delete this.cache[serverId]
+    if (this.darkCache[serverId]) {
+      this.darkCache[serverId].complete()
+      delete this.darkCache[serverId]
       this.serverDelta$.next(true)
     }
   }
 
   // no op if missing
   update (serverId: string, update: Partial<S9Server>): void {
-    console.log('server model update called with: ', update)
-    if (this.cache[serverId]) {
-      const updatedServer = { ...this.cache[serverId].value, ...update }
-      this.cache[serverId].next(updatedServer)
+    if (this.darkCache[serverId]) {
+      const updatedServer = { ...this.darkCache[serverId].value, ...update }
+      this.darkCache[serverId].next(updatedServer)
       this.serverDelta$.next(true)
     }
   }
 
   // no op if already exists
   create (server: S9Server): void {
-    console.log('server model create called with: ', server)
-    if (!this.cache[server.id]) {
-      this.appModel.createServerCache(server.id)
-      console.log('** 1 **', server)
-      console.log('cache1', this.cache)
-      this.cache[server.id] = new BehaviorSubject(server)
-      console.log('cache2', this.cache)
+    if (!this.darkCache[server.id]) {
+      this.darkCache[server.id] = new BehaviorSubject(server)
       this.serverDelta$.next(true)
     }
   }
 
   count (): number { return this.peekAll().length }
-  peekAll (): Readonly<S9Server>[] { return Object.values(this.cache).map(s => s.value) }
+  peekAll (): Readonly<S9Server>[] { return Object.values(this.darkCache).map(s => s.value) }
 
   clearCache () {
     this.peekAll().forEach( s => this.remove(s.id) )
-    this.cache = { }
+    this.darkCache = { }
   }
 
   async load (mnemonic: string[]): Promise<void> {
     const fromStorage: S9ServerStore = await this.storage.get('servers') || []
     fromStorage.forEach(s => {
       this.create(fromStorableServer(s, mnemonic))
+      this.appModel.createServerCache(s.id)
     })
   }
 
