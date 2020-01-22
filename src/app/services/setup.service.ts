@@ -6,7 +6,6 @@ import * as cryptoUtil from '../util/crypto.util'
 import { AuthService } from './auth.service'
 import { Lan } from '../types/api-types'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
-import { AppStatus } from '../models/app-model'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { HttpNativeService, getAuthHeader } from './http-native.service'
 
