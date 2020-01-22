@@ -18,8 +18,6 @@ export class HttpNativeService {
     private readonly zerconfDaemon: ZeroconfDaemon,
     private readonly serverModel: ServerModel,
   ) {
-    console.log('HttpNative constructor')
-
     this.http.setDataSerializer('json')
     this.http.setHeader('*', 'app-version', version)
     this.http.setRequestTimeout(5)
@@ -49,12 +47,11 @@ export class HttpNativeService {
       options.data = { }
     }
 
-    console.log('Request URL: ', url)
+    // console.log('Request URL: ', url)
     console.log('Request Options: ', options, '. Request * Full Headers: ', this.http.getHeaders('*'))
 
     try {
       const res = await this.http.sendRequest(url, options)
-      console.log('RESPONSE', res)
       if (res.data) {
         return JSON.parse(res.data)
       } else {

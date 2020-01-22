@@ -4,8 +4,7 @@ import { AppModel } from './app-model'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { deriveKeys } from '../util/crypto.util'
 import * as CryptoJS from 'crypto-js'
-import { BehaviorSubject, Observable, from, Subject } from 'rxjs'
-import { pauseFor } from '../util/misc.util'
+import { BehaviorSubject, Subject } from 'rxjs'
 
 @Injectable({
   providedIn: 'root',
@@ -53,6 +52,7 @@ export class ServerModel {
   create (server: S9Server): void {
     if (!this.darkCache[server.id]) {
       this.darkCache[server.id] = new BehaviorSubject(server)
+      this.appModel.createServerCache(server.id)
       this.serverDelta$.next(true)
     }
   }
@@ -69,7 +69,6 @@ export class ServerModel {
     const fromStorage: S9ServerStore = await this.storage.get('servers') || []
     fromStorage.forEach(s => {
       this.create(fromStorableServer(s, mnemonic))
-      this.appModel.createServerCache(s.id)
     })
   }
 

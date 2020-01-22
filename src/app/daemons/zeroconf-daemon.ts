@@ -39,7 +39,6 @@ export class ZeroconfDaemon {
 
   handleServiceUpdate (result: ZeroconfResult) {
     const { action, service } = result
-    console.log(`zeroconf service ${action}`, service)
 
     if (
       service.name.startsWith('start9-')

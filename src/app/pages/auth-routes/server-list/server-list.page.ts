@@ -20,10 +20,8 @@ export class ServerListPage {
   ) { }
 
   ngOnInit () {
-    console.log('server list init')
     this.servers = this.serverModel.peekAll()
     this.deltaSubscription = this.serverModel.serverDelta$.subscribe(a => {
-      console.log('server list updated: ', a)
       if (a) { this.servers = this.serverModel.peekAll() }
     })
   }
