@@ -18,13 +18,13 @@ export class ServerModel {
     private readonly appModel: AppModel,
   ) { }
 
-  watch (serverId: string) : Observable<S9Server> {
+  watch (serverId: string) : BehaviorSubject<S9Server> {
     if (!this.cache[serverId]) throw new Error (`Expected cached server for ${serverId} but none found`)
     return this.cache[serverId]
   }
 
   peek (serverId: string): S9Server {
-    if (!this.cache[serverId] || !this.cache[serverId].value) throw new Error (`Excpected cached server for ${serverId} but none found`)
+    if (!this.cache[serverId] || !this.cache[serverId].value) throw new Error (`Expected cached server for ${serverId} but none found`)
     return this.cache[serverId].value
   }
 

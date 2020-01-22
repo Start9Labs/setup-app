@@ -3,7 +3,7 @@ import { NavController, LoadingController, AlertController } from '@ionic/angula
 import { ActivatedRoute } from '@angular/router'
 import { AppInstalled, AppConfigSpec, AppHealthStatus, AppModel } from 'src/app/models/app-model'
 import { ServerService } from 'src/app/services/server.service'
-import { Observable } from 'rxjs'
+import { BehaviorSubject } from 'rxjs'
 
 @Component({
   selector: 'app-config',
@@ -13,7 +13,7 @@ import { Observable } from 'rxjs'
 export class AppConfigPage {
   loading = false
   error: string
-  app$: Observable<AppInstalled>
+  app$: BehaviorSubject<AppInstalled>
   appId: string
   spec: AppConfigSpec
   config: object
@@ -35,7 +35,7 @@ export class AppConfigPage {
     this.appId = this.route.snapshot.paramMap.get('appId') as string
     this.app$ = this.appModel.watch(this.serverId, this.appId)
 
-    const app = this.appModel.peek(this.serverId, this.appId)
+    const app = this.app$.value
     if (app.status === AppHealthStatus.RECOVERABLE) {
       await this.presentAlertRecoverable()
       this.edited = true
@@ -66,7 +66,7 @@ export class AppConfigPage {
   }
 
   async save () {
-    const app = this.appModel.peek(this.serverId, this.appId)
+    const app = this.app$.value
     const loader = await this.loadingCtrl.create({
       message: 'Saving config...',
       spinner: 'lines',
@@ -99,7 +99,7 @@ export class AppConfigPage {
   }
 
   async presentAlertRecoverable () {
-    const app = this.appModel.peek(this.serverId, this.appId)
+    const app = this.app$.value
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Keep existing data?',
@@ -124,7 +124,7 @@ export class AppConfigPage {
   }
 
   async presentAlertConfirmWipeData () {
-    const app = this.appModel.peek(this.serverId, this.appId)
+    const app = this.app$.value
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Confirm',
@@ -171,7 +171,7 @@ export class AppConfigPage {
   }
 
   async wipeAppData () {
-    const app = this.appModel.peek(this.serverId, this.appId)
+    const app = this.app$.value
     const loader = await this.loadingCtrl.create({
       message: 'Wiping Data. This could take a while...',
       spinner: 'lines',

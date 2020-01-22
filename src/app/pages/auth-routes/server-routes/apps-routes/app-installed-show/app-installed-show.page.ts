@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router'
 import { AppInstalled, AppHealthStatus, AppModel } from 'src/app/models/app-model'
 import { ClipboardService } from 'src/app/services/clipboard.service'
 import { ActionSheetButton } from '@ionic/core'
-import { Observable } from 'rxjs'
+import { Observable, BehaviorSubject } from 'rxjs'
 
 @Component({
   selector: 'app-installed-show',
@@ -15,7 +15,7 @@ import { Observable } from 'rxjs'
 export class AppInstalledShowPage {
   loading = true
   error: string
-  app$: Observable<AppInstalled>
+  app$: BehaviorSubject<AppInstalled>
   appId: string
   serverId: string
 
@@ -50,12 +50,12 @@ export class AppInstalledShowPage {
   }
 
   async copyTor () {
-    const app = this.appModel.peek(this.serverId, this.appId)
+    const app = this.app$.value
     await this.clipboardService.copy(app.torAddress || '')
   }
 
   async presentAction () {
-    const app = this.appModel.peek(this.serverId, this.appId)
+    const app = this.app$.value
     const buttons : ActionSheetButton[] = []
 
     if (([
@@ -116,7 +116,7 @@ export class AppInstalledShowPage {
   }
 
   async stop (): Promise<void> {
-    const app = this.appModel.peek(this.serverId, this.appId)
+    const app = this.app$.value
     const loader = await this.loadingCtrl.create({
       message: `Stopping ${app.title}. This could take a while...`,
       spinner: 'lines',
@@ -135,7 +135,7 @@ export class AppInstalledShowPage {
   }
 
   async start (): Promise<void> {
-    const app = this.appModel.peek(this.serverId, this.appId)
+    const app = this.app$.value
     const loader = await this.loadingCtrl.create({
       message: `Starting ${app.title}...`,
       spinner: 'lines',
@@ -153,7 +153,7 @@ export class AppInstalledShowPage {
   }
 
   async presentAlertUninstall () {
-    const app = this.appModel.peek(this.serverId, this.appId)
+    const app = this.app$.value
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Caution',
@@ -176,7 +176,7 @@ export class AppInstalledShowPage {
   }
 
   async uninstall (): Promise<void> {
-    const app = this.appModel.peek(this.serverId, this.appId)
+    const app = this.app$.value
     const loader = await this.loadingCtrl.create({
       message: `Uninstalling ${app.title}`,
       spinner: 'lines',

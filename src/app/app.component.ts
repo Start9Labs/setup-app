@@ -90,12 +90,12 @@ export class AppComponent {
   }
 
   private initDaemons () {
-    this.zeroconfDaemon.init()
-    this.serverDaemon.init()
+    this.zeroconfDaemon.start()
+    this.serverDaemon.start()
   }
 
   private restartDaemons () {
-    this.zeroconfDaemon.start(true)
+    this.zeroconfDaemon.start()
     this.serverDaemon.start()
   }
 

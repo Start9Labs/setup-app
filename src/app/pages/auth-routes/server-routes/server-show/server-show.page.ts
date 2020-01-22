@@ -20,7 +20,7 @@ export class ServerShowPage {
   view: 'apps' | 'about' = 'apps'
   loading = true
   compareVersions = compareVersions
-  server$: Observable<S9Server>
+  server$: BehaviorSubject<S9Server>
   serverId: string
   serverApps$: Observable<{ [appId: string]: BehaviorSubject<AppInstalled> }>
 
@@ -50,14 +50,14 @@ export class ServerShowPage {
   }
 
   async getServerAndApps () {
-    const server = this.serverModel.peek(this.serverId)
+    const server = this.server$.value
     this.loading = true
     await this.sss.fromCache().syncServer(server)
     this.loading = false
   }
 
   async presentAction () {
-    const server = this.serverModel.peek(this.serverId)
+    const server = this.server$.value
     const buttons: ActionSheetButton[] = [
       {
         text: 'Edit friendly name',
@@ -127,7 +127,7 @@ export class ServerShowPage {
   }
 
   async presentAlertEditName () {
-    const server = this.serverModel.peek(this.serverId)
+    const server = this.server$.value
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Friendly Name',
@@ -165,7 +165,7 @@ export class ServerShowPage {
   }
 
   async presentAlertUpdate () {
-    const server = this.serverModel.peek(this.serverId)
+    const server = this.server$.value
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Confirm',
@@ -187,7 +187,7 @@ export class ServerShowPage {
   }
 
   async update () {
-    const server = this.serverModel.peek(this.serverId)
+    const server = this.server$.value
     const loader = await this.loadingCtrl.create({
       spinner: 'lines',
       cssClass: 'loader',
@@ -205,7 +205,7 @@ export class ServerShowPage {
   }
 
   async presentAlertRestart () {
-    const server = this.serverModel.peek(this.serverId)
+    const server = this.server$.value
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Confirm',
@@ -228,7 +228,7 @@ export class ServerShowPage {
   }
 
   async presentAlertShutdown () {
-    const server = this.serverModel.peek(this.serverId)
+    const server = this.server$.value
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Confirm',
@@ -251,7 +251,7 @@ export class ServerShowPage {
   }
 
   async presentAlertForget () {
-    const server = this.serverModel.peek(this.serverId)
+    const server = this.server$.value
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Caution',
@@ -274,7 +274,7 @@ export class ServerShowPage {
   }
 
   async restart () {
-    const server = this.serverModel.peek(this.serverId)
+    const server = this.server$.value
     const loader = await this.loadingCtrl.create({
       spinner: 'lines',
       message: `Restarting ${server.label}...`,
@@ -293,7 +293,7 @@ export class ServerShowPage {
   }
 
   async shutdown () {
-    const server = this.serverModel.peek(this.serverId)
+    const server = this.server$.value
     const loader = await this.loadingCtrl.create({
       spinner: 'lines',
       message: `Shutting down ${server.label}...`,

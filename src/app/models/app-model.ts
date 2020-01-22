@@ -11,7 +11,7 @@ export class AppModel {
 
   constructor () { }
 
-  watch (serverId: string, appId: string): Observable<AppInstalled> {
+  watch (serverId: string, appId: string): BehaviorSubject<AppInstalled> {
     if (!this.cache[serverId])              throw new Error(`Expected cached apps for server ${serverId}.`)
     if (!this.cache[serverId].value[appId]) throw new Error(`Expected cached app ${appId} for server ${serverId}.`)
     return this.cache[serverId].value[appId]
@@ -28,6 +28,14 @@ export class AppModel {
     return this.cache[serverId].value[appId].value
   }
 
+  peekS (serverId: string, appId: string): AppInstalled | undefined {
+    try {
+      return this.peek(serverId, appId)
+    } catch (e) {
+      return undefined
+    }
+  }
+
   peekServerCache (serverId: string): { [appId: string]: BehaviorSubject<AppInstalled> } {
     if (!this.cache[serverId]) throw new Error(`Expected cached apps for server ${serverId}.`)
     return this.cache[serverId].value
@@ -37,7 +45,7 @@ export class AppModel {
    // will notify subscribers to the server's app array
   create (serverId: string, app: AppInstalled): void {
     if (!this.cache[serverId]) throw new Error(`Expected cached apps for server ${serverId}.`)
-    if (!this.peek(serverId, app.id)) {
+    if (!this.peekS(serverId, app.id)) {
       const previousCache = this.peekServerCache(serverId)
       previousCache[app.id] = new BehaviorSubject(app)
       this.cache[serverId].next(previousCache)
@@ -51,7 +59,7 @@ export class AppModel {
 
   update (serverId: string, appId: string, update: Partial<AppInstalled>): void {
     if (!this.cache[serverId]) { throw new Error(`Expected cached apps for server ${serverId}.`) }
-    if (this.peek(serverId, appId)) {
+    if (this.peekS(serverId, appId)) {
       const updatedApp = { ...this.peek(serverId, appId), ...update }
       this.cache[serverId].value[appId].next(updatedApp)
       this.cache[serverId].next(this.peekServerCache(serverId))
@@ -61,7 +69,7 @@ export class AppModel {
    // no op if missing
   remove (serverId: string, appId: string): void {
     if (!this.cache[serverId]) { throw new Error(`Expected cached apps for server ${serverId}.`) }
-    if (this.peek(serverId, appId)) {
+    if (this.peekS(serverId, appId)) {
       const previousCache = this.peekServerCache(serverId)
       this.cache[serverId].value[appId].complete()
       delete previousCache[appId]

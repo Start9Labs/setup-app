@@ -17,16 +17,12 @@ export class ZeroconfDaemon {
     private readonly zeroconf: Zeroconf,
   ) { }
 
-  init () {
-    this.start()
-  }
-
-  async start (reInit = false) {
+  async start () {
     // return this.mock()
 
     if (!this.platform.is('cordova')) { return }
 
-    if (reInit) { await this.zeroconf.reInit() }
+    await this.zeroconf.reInit()
 
     this.zeroconfSub = this.zeroconf.watch('_http._tcp.', 'local.').subscribe(result => {
       this.handleServiceUpdate(result)

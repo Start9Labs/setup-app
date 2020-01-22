@@ -8,14 +8,29 @@
 
 <ion-content class="ion-padding-top">
 
+  <ion-item *ngIf="error" style="margin-bottom: 16px;">
+    <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
+  </ion-item>
+
   <ion-item-group>
     <ion-item>
       <ion-input maxLength="4" type="tel" placeholder="Enter pin" [(ngModel)]="pin" (ngModelChange)="handleInput()"></ion-input>
     </ion-item>
   </ion-item-group>
 
-  <ion-item *ngIf="error" style="margin-top: 16px;">
-    <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
-  </ion-item>
+  <ion-item-group>
+    <ion-item-divider></ion-item-divider>
+    <ion-item>
+      <ion-label class="ion-text-wrap">
+        <h2>Pin</h2>
+        <br />
+        <ion-text color="medium">
+          <p>
+            Enter your pin to unlock this device. If you do not remember your pin, you can <a (click)="presentAlertWipeKeychain()" style="text-decoration: none;;">wipe the keychain</a> to return to the homescreen and re-enter your mnemonic phrase.
+          </p>
+        </ion-text>
+      </ion-label>
+    </ion-item>
+  </ion-item-group>
 
 </ion-content>

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { AuthService } from 'src/app/services/auth.service'
-import { ModalController, LoadingController } from '@ionic/angular'
+import { ModalController, LoadingController, AlertController } from '@ionic/angular'
 
 @Component({
   selector: 'authenticate',
@@ -15,6 +15,7 @@ export class AuthenticatePage {
     private readonly authService: AuthService,
     private readonly modalCtrl: ModalController,
     private readonly loadingCtrl: LoadingController,
+    private readonly alertCtrl: AlertController,
   ) { }
 
   async handleInput () {
@@ -40,5 +41,31 @@ export class AuthenticatePage {
     }
   }
 
+  async presentAlertWipeKeychain () {
+    const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
+      header: 'Wait!',
+      message: 'Are you sure you want to wipe the keychain on this device? All servers will be forgotten. You will need your mnemonic phrase to regain access to your servers.',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: 'Wipe Keychain',
+          cssClass: 'alert-danger',
+          handler: () => {
+            this.logout()
+          },
+        },
+      ],
+    })
+    await alert.present()
+  }
+
+  async logout () {
+    await this.authService.logout()
+    await this.modalCtrl.dismiss()
+  }
 }
 

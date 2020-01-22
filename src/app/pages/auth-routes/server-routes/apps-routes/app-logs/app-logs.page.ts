@@ -1,9 +1,8 @@
 import { Component, ViewChild } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { ServerService } from 'src/app/services/server.service'
-import { AppInstalled, AppModel } from 'src/app/models/app-model'
+import { AppModel } from 'src/app/models/app-model'
 import { IonContent } from '@ionic/angular'
-import { Observable } from 'rxjs'
 
 @Component({
   selector: 'app-logs',
@@ -32,11 +31,10 @@ export class AppLogsPage {
   }
 
   async getLogs () {
-    const app = this.appModel.peek(this.serverId, this.appId)
-    this.loading = true
-    this.logs = ''
-
     try {
+      const app = this.appModel.peek(this.serverId, this.appId)
+      this.loading = true
+      this.logs = ''
       const logs = await this.serverService.getAppLogs(this.serverId, app.id)
       this.logs = logs.join('\n\n')
       this.loading = false
