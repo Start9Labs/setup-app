@@ -6,25 +6,27 @@ import { diff, both } from '../util/misc.util'
   providedIn: 'root',
 })
 export class AppModel {
-  cache: { [serverId: string]: BehaviorSubject <{ [appId: string]: BehaviorSubject<AppInstalled> }> } = { }
+  lightCache: { [serverId: string]: BehaviorSubject <{ [appId: string]: BehaviorSubject<AppInstalled> }> } = { }
 
-  constructor () { }
+  constructor () {
+    console.log('AppModel: ', JSON.stringify(this.lightCache))
+   }
 
   watch (serverId: string, appId: string): BehaviorSubject<AppInstalled> {
-    if (!this.cache[serverId])              throw new Error(`Expected cached apps for server ${serverId}.`)
-    if (!this.cache[serverId].value[appId]) throw new Error(`Expected cached app ${appId} for server ${serverId}.`)
-    return this.cache[serverId].value[appId]
+    if (!this.lightCache[serverId])              throw new Error(`Expected cached apps for server ${serverId}.`)
+    if (!this.lightCache[serverId].value[appId]) throw new Error(`Expected cached app ${appId} for server ${serverId}.`)
+    return this.lightCache[serverId].value[appId]
   }
 
   watchServerCache (serverId:  string): Observable<{ [appId: string]: BehaviorSubject<AppInstalled> }> {
-    if (!this.cache[serverId]) throw new Error(`Expected cached apps for server ${serverId}.`)
-    return this.cache[serverId]
+    if (!this.lightCache[serverId]) throw new Error(`Expected cached apps for server ${serverId}.`)
+    return this.lightCache[serverId]
   }
 
   peek (serverId: string, appId: string): AppInstalled {
-    if (!this.cache[serverId])              throw new Error(`Expected cached apps for server ${serverId}.`)
-    if (!this.cache[serverId].value[appId]) throw new Error(`Expected cached app ${appId} for server ${serverId}.`)
-    return this.cache[serverId].value[appId].value
+    if (!this.lightCache[serverId])              throw new Error(`Expected cached apps for server ${serverId}.`)
+    if (!this.lightCache[serverId].value[appId]) throw new Error(`Expected cached app ${appId} for server ${serverId}.`)
+    return this.lightCache[serverId].value[appId].value
   }
 
   peekS (serverId: string, appId: string): AppInstalled | undefined {
@@ -36,43 +38,43 @@ export class AppModel {
   }
 
   peekServerCache (serverId: string): { [appId: string]: BehaviorSubject<AppInstalled> } {
-    if (!this.cache[serverId]) throw new Error(`Expected cached apps for server ${serverId}.`)
-    return this.cache[serverId].value
+    if (!this.lightCache[serverId]) throw new Error(`Expected cached apps for server ${serverId}.`)
+    return this.lightCache[serverId].value
   }
 
    // no op if already exists
    // will notify subscribers to the server's app array
   create (serverId: string, app: AppInstalled): void {
-    if (!this.cache[serverId]) throw new Error(`Expected cached apps for server ${serverId}.`)
+    if (!this.lightCache[serverId]) throw new Error(`Expected cached apps for server ${serverId}.`)
     if (!this.peekS(serverId, app.id)) {
       const previousCache = this.peekServerCache(serverId)
       previousCache[app.id] = new BehaviorSubject(app)
-      this.cache[serverId].next(previousCache)
+      this.lightCache[serverId].next(previousCache)
     }
   }
 
   createServerCache (serverId: string): void {
-    if (this.cache[serverId]) return
-    this.cache[serverId] = new BehaviorSubject({ })
+    if (this.lightCache[serverId]) return
+    this.lightCache[serverId] = new BehaviorSubject({ })
   }
 
   update (serverId: string, appId: string, update: Partial<AppInstalled>): void {
-    if (!this.cache[serverId]) { throw new Error(`Expected cached apps for server ${serverId}.`) }
+    if (!this.lightCache[serverId]) { throw new Error(`Expected cached apps for server ${serverId}.`) }
     if (this.peekS(serverId, appId)) {
       const updatedApp = { ...this.peek(serverId, appId), ...update }
-      this.cache[serverId].value[appId].next(updatedApp)
-      this.cache[serverId].next(this.peekServerCache(serverId))
+      this.lightCache[serverId].value[appId].next(updatedApp)
+      this.lightCache[serverId].next(this.peekServerCache(serverId))
     }
   }
 
    // no op if missing
   remove (serverId: string, appId: string): void {
-    if (!this.cache[serverId]) { throw new Error(`Expected cached apps for server ${serverId}.`) }
+    if (!this.lightCache[serverId]) { throw new Error(`Expected cached apps for server ${serverId}.`) }
     if (this.peekS(serverId, appId)) {
       const previousCache = this.peekServerCache(serverId)
-      this.cache[serverId].value[appId].complete()
+      this.lightCache[serverId].value[appId].complete()
       delete previousCache[appId]
-      this.cache[serverId].next(previousCache)
+      this.lightCache[serverId].next(previousCache)
     }
   }
 
@@ -85,21 +87,20 @@ export class AppModel {
   }
 
   clearCache () {
-    Object.keys(this.cache).forEach( serverId => {
-      Object.keys(this.cache[serverId].value).forEach( appId => {
-        this.cache[serverId].value[appId].complete()
+    Object.keys(this.lightCache).forEach( serverId => {
+      Object.keys(this.lightCache[serverId].value).forEach( appId => {
+        this.lightCache[serverId].value[appId].complete()
       })
-      this.cache[serverId].complete()
+      this.lightCache[serverId].complete()
     })
 
-    this.cache = { }
+    this.lightCache = { }
   }
 
   syncAppCache (serverId: string, allUpToDateApps : AppInstalled[]) {
-    console.log(`Syncing app cache for ${serverId} with ${JSON.stringify(allUpToDateApps)}`)
-    if (!this.cache[serverId]) return
+    if (!this.lightCache[serverId]) return
 
-    const previousAppIds = Object.keys(this.cache[serverId].value)
+    const previousAppIds = Object.keys(this.lightCache[serverId].value)
     const currentAppIds = allUpToDateApps.map(a => a.id)
 
     const appsLost = diff(previousAppIds, currentAppIds)
@@ -108,35 +109,34 @@ export class AppModel {
 
 
     appsLost.forEach( appId => {
-      this.cache[serverId].value[appId].complete()
+      this.lightCache[serverId].value[appId].complete()
     })
 
     const tmp = { }
 
     appsToUpdate.forEach( appId => {
       const updatedApp = { ...this.peek(serverId, appId), ...allUpToDateApps.find(a => a.id == appId) as AppInstalled}
-      this.cache[serverId].value[appId].next(updatedApp)
-      tmp[appId] = this.cache[serverId].value[appId]
+      this.lightCache[serverId].value[appId].next(updatedApp)
+      tmp[appId] = this.lightCache[serverId].value[appId]
     })
 
     appsGained.forEach ( appId => {
-      this.cache[serverId].value[appId] = new BehaviorSubject(allUpToDateApps.find(a => a.id == appId) as AppInstalled)
-      tmp[appId] = this.cache[serverId].value[appId]
+      this.lightCache[serverId].value[appId] = new BehaviorSubject(allUpToDateApps.find(a => a.id == appId) as AppInstalled)
+      tmp[appId] = this.lightCache[serverId].value[appId]
     })
 
-    this.cache[serverId].next(tmp)
-    console.log(`After caching apps for ${serverId}, cache is...`, JSON.stringify(allUpToDateApps))
+    this.lightCache[serverId].next(tmp)
   }
 
   updateAppsUniformly (serverId: string, uniformUpdate: Partial<AppInstalled>) {
     const tmp = {  }
     Object.entries(this.peekServerCache(serverId)).forEach( ([appId, appSubject]) => {
       const updatedApp = { ...appSubject.value, ...uniformUpdate }
-      this.cache[serverId].value[appId].next(updatedApp)
-      tmp[appId] = this.cache[serverId].value[appId]
+      this.lightCache[serverId].value[appId].next(updatedApp)
+      tmp[appId] = this.lightCache[serverId].value[appId]
     })
 
-    this.cache[serverId].next(tmp)
+    this.lightCache[serverId].next(tmp)
   }
 }
 

@@ -5,6 +5,7 @@ import { S9BuilderWith } from './setup.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { TokenSigner } from 'jsontokens'
 import { Method } from '../types/enums'
+import { pauseFor } from '../util/misc.util'
 const version = require('../../../package.json').version
 
 @Injectable({

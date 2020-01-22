@@ -31,11 +31,15 @@ export class AppComponent {
     private readonly router: Router,
     private readonly modalCtrl: ModalController,
   ) {
+    console.log('app serverModel, ', JSON.stringify(this.serverModel.darkCache))
+    console.log('app appModel, ', JSON.stringify(this.appModel.lightCache))
     // set dark theme.
     // @TODO there should be a way to make this the default.
     document.body.classList.toggle('dark', true)
     // wait for platform reday
+    console.log('not ready')
     this.platform.ready().then(async () => {
+      console.log('platform ready')
       // init auth service
       await this.authService.init()
       // subscribe to auth status changes

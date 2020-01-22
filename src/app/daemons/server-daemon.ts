@@ -18,7 +18,7 @@ export class ServerDaemon {
     private readonly zeroconfDaemon: ZeroconfDaemon,
     private readonly sss: ServerSyncService,
   ) {
-    console.log('initial cache', this.serverModel.cache)
+    console.log('initial cache', JSON.stringify(this.serverModel.darkCache))
     this.zeroconfDaemon.watch().subscribe(zeroconfService => this.handleZeroconfUpdate(zeroconfService) )
   }
 
@@ -41,9 +41,7 @@ export class ServerDaemon {
   }
 
   async handleZeroconfUpdate (zeroconfService: ZeroconfService | null): Promise<void> {
-    console.log('handle update called')
     if (!zeroconfService) { return }
-    console.log('zeroconf exists')
     try {
       const server = this.serverModel.peek(zeroconfService.name.split('-')[1])
       this.sss.fromCache().syncServer(server, 250)
