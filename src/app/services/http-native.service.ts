@@ -42,7 +42,6 @@ export class HttpNativeService {
   async request<T> (url: string, options: HttpNativeOptions): Promise<T> {
     this.http.setDataSerializer('json')
     this.http.setHeader('*', 'app-version', version)
-    this.http.setRequestTimeout(5)
     if (options.method === Method.post && !options.data) {
       options.data = { }
     }
