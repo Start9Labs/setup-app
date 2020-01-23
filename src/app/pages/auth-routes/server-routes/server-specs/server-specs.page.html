@@ -16,11 +16,16 @@
   <ion-spinner *ngIf="loading" class="center" name="lines" color="warning"></ion-spinner>
 
   <ion-item-group>
-    <ion-item *ngFor="let spec of specs | keyvalue : asIsOrder">
+    <ion-item *ngFor="let spec of specs | keyvalue : asIsOrder" [class.break-all]="spec.key === 'torAddress'">
       <ion-label position="stacked">{{ spec.key }}</ion-label>
       <ion-text color="medium">
         <h5>{{ spec.value }}</h5>
       </ion-text>
+      <ion-note slot="end" *ngIf="spec.key === 'torAddress'">
+        <ion-button (click)="copyTor()" fill="outline" size="small">
+          Copy
+        </ion-button>
+      </ion-note>
     </ion-item>
   </ion-item-group>
 

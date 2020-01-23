@@ -43,7 +43,7 @@ export class ServerMetricsPage {
     }
   }
 
-  asIsOrder (a: any, b: any) {
+  asIsOrder () {
     return 1
   }
 }
