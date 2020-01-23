@@ -14,12 +14,11 @@ export class ServerDaemon {
   ) { }
 
   async start (): Promise<void> {
-    if (!this.going) this.poll()
-  }
+    if (this.going) { return }
 
-  private async poll () {
+    console.log('starting server daemon')
+
     this.going = true
-
 
     while (this.going) {
       this.sss.fromCache().syncServers()
@@ -28,6 +27,7 @@ export class ServerDaemon {
   }
 
   stop () {
+    console.log('stopping server daemon')
     this.going = false
     this.sss.clearCache()
   }

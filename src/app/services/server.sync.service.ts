@@ -129,6 +129,8 @@ export class ServerSync {
   async syncServers (): Promise<void> {
     if (this.syncing) { return }
 
+    console.log('syncing servers')
+
     this.syncing = true
     await doForAtLeast(1000, this.serverModel.peekAll().map(server => this.syncServer(server)))
     this.syncing = false

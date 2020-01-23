@@ -19,7 +19,7 @@ export class SettingsPage {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Caution',
-      message: 'Please make sure no one is snooping. And remember to keep your mnemonic phrase private and secure.',
+      message: 'Please make sure no one is snooping. And remember to keep your mnemonic seed private and secure.',
       buttons: [
         {
           text: 'Cancel',
@@ -40,7 +40,7 @@ export class SettingsPage {
   async presentAlertViewMnemonic () {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
-      header: 'Mnemonic Phrase',
+      header: 'Mnemonic Seed',
       message: `${this.authService.mnemonic!.join(' ')}`,
       buttons: ['Close'],
     })
@@ -51,7 +51,7 @@ export class SettingsPage {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Wait!',
-      message: 'Are you sure you want to wipe the keychain on this device? All servers will be forgotten. You will need your mnemonic phrase to regain access to your servers.',
+      message: 'Are you sure you want to wipe the keychain on this device? All servers will be forgotten. You will need your mnemonic seed to regain access to your servers.',
       buttons: [
         {
           text: 'Cancel',
@@ -75,7 +75,7 @@ export class SettingsPage {
 
   rateApp () {
     if (this.platform.is('ios')) {
-      window.open('https://apps.apple.com/us/app/start9-companion.12345678', '_system')
+      window.open('https://apps.apple.com/app/start9-companion/id1496204174', '_system')
     } else if (this.platform.is('android')) {
       window.open('market://details?id=com.start9-companion.android.app', '_system')
     }

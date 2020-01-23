@@ -1,4 +1,9 @@
-.mnemonic-input {
-  background-color: var(--ion-color-light);
-  height: 80px;
+.naked-item {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+}
+
+ion-textarea {
+  margin-top: 0;
+  padding-left: 12px;
 }

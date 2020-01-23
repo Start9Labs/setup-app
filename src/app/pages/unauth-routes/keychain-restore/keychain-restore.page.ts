@@ -15,8 +15,15 @@ export class KeychainRestorePage {
   ) { }
 
   async login () {
+    const sanitized = this.mnemonic.trim().toLowerCase()
+
+    if (!new RegExp(/^[a-z\s]+$/).test(sanitized)) {
+      this.error = 'invalid characters detected'
+      return
+    }
+
     try {
-      await this.authService.login(this.mnemonic.split(new RegExp('[^a-z]+')))
+      await this.authService.login(sanitized.split(new RegExp(/\s/)))
     } catch (e) {
       this.error = e.message
     }

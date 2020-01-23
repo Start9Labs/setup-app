@@ -22,6 +22,8 @@ export class ZeroconfDaemon {
 
     if (!this.platform.is('cordova')) { return }
 
+    console.log('starting zeroconf daemon')
+
     await this.zeroconf.reInit()
 
     this.zeroconfSub = this.zeroconf.watch('_http._tcp.', 'local.').subscribe(result => {
@@ -31,6 +33,7 @@ export class ZeroconfDaemon {
 
   stop () {
     if (this.zeroconfSub) {
+      console.log('stopping zeroconf daemon')
       this.zeroconfSub.unsubscribe()
       this.zeroconfSub = undefined
     }

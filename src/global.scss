@@ -101,3 +101,10 @@ ion-refresher ion-refresher-content {
 ion-infinite-scroll ion-infinite-scroll-content {
   --color: var(--ion-color-warning) !important;
 }
+
+* {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}

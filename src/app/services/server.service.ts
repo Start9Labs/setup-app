@@ -794,15 +794,24 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
         },
       },
     },
-    notifications: {
-      name: 'Notification Preferences',
-      type: 'list',
-      description: 'how you want to be notified',
-      range: '[1,3]',
-      default: ['email'],
+    advanced: {
+      name: 'Advanced',
+      type: 'object',
+      description: 'Advanced settings',
+      nullable: false,
+      nullByDefault: false,
       spec: {
-        type: 'enum',
-        values: ['email', 'text', 'call', 'push', 'webhook'],
+        notifications: {
+          name: 'Notification Preferences',
+          type: 'list',
+          description: 'how you want to be notified',
+          range: '[1,3]',
+          default: ['email'],
+          spec: {
+            type: 'enum',
+            values: ['email', 'text', 'call', 'push', 'webhook'],
+          },
+        },
       },
     },
     port: {
