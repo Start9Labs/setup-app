@@ -196,7 +196,6 @@ export function fromUserInput (id: string, label: string): S9ServerBuilder {
 export function toS9Server (builder: Required<S9ServerBuilder>): S9Server {
   return {
     ...builder,
-    updating: false,
     badge: 0,
     notifications: [],
   }

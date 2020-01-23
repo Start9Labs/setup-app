@@ -5,6 +5,7 @@ import { ServerService } from './server.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { AppModel, AppStatus } from '../models/app-model'
 import { doForAtLeast, tryAll, pauseFor } from '../util/misc.util'
+import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 
 @Injectable({
   providedIn: 'root',
@@ -57,7 +58,7 @@ export class SyncNotifier {
   providedIn: 'root',
 })
 export class ServerSyncService {
-  private cached: ServerSync
+  private cached: ServerSync | undefined
 
   constructor (
     private readonly serverService: ServerService,
@@ -65,18 +66,27 @@ export class ServerSyncService {
     private readonly zeroconfDaemon: ZeroconfDaemon,
     private readonly appModel: AppModel,
     private readonly syncNotifier: SyncNotifier,
-  ) { }
-
-  refreshCache (): ServerSync {
-    this.cached = this.fresh()
-    return this.cached
+  ) {
+    this.zeroconfDaemon.watch().subscribe(zeroconfService => this.handleZeroconfUpdate(zeroconfService) )
   }
 
   fromCache (): ServerSync {
     return this.cached || this.refreshCache()
   }
 
-  fresh (): ServerSync {
+  clearCache () {
+    if (this.cached) {
+      this.cached.updatingCache = { }
+      this.cached = undefined
+    }
+  }
+
+  private refreshCache (): ServerSync {
+    this.cached = this.fresh()
+    return this.cached
+  }
+
+  private fresh (): ServerSync {
     return new ServerSync(
       this.serverService,
       this.serverModel,
@@ -86,9 +96,20 @@ export class ServerSyncService {
       new Date(),
     )
   }
+
+  private async handleZeroconfUpdate (zeroconfService: ZeroconfService | null): Promise<void> {
+    if (!zeroconfService) { return }
+    try {
+      const server = this.serverModel.peek(zeroconfService.name.split('-')[1])
+      this.fromCache().syncServer(server, 250)
+    } catch (e) {
+      console.warn(e.message)
+    }
+  }
 }
 
 export class ServerSync {
+  updatingCache: { [serverId: string]: boolean } = { }
   syncing: boolean
   timeBeforeUnreachable = 7000
 
@@ -101,23 +122,30 @@ export class ServerSync {
     readonly initialized_at:  Date,
   ) { }
 
+  clearCache () {
+    this.updatingCache = { }
+  }
+
   async syncServers (): Promise<void> {
     if (this.syncing) { return }
 
     this.syncing = true
-    console.log('syncing servers: ', this.serverModel.darkCache)
     await doForAtLeast(1000, this.serverModel.peekAll().map(server => this.syncServer(server)))
     this.syncing = false
   }
 
   async syncServer (server: Readonly<S9Server>, retryIn?: number): Promise<void> {
-    if (server.updating && retryIn) {
-      console.log('syncServer retrying in: ', retryIn)
+    const serverUpdating = this.updatingCache[server.id]
+
+    if (serverUpdating && retryIn) {
       return this.retry(server, retryIn)
     }
-    if (server.updating) { console.log(`Server ${server.id} already updating.`); return }
+    if (serverUpdating) {
+      console.log(`Server ${server.id} already updating.`)
+      return
+    }
 
-    this.serverModel.update(server.id, { updating: true })
+    this.updatingCache[server.id] = true
 
     if (!this.zeroconfDaemon.getService(server.id)) {
       if (this.hasBeenRunningSufficientlyLong(server)) {
@@ -126,10 +154,13 @@ export class ServerSync {
     } else {
       await this.syncServerAttributes(server)
     }
-    this.serverModel.update(server.id, { updating: false })
+
+    this.updatingCache[server.id] = false
+
     const updatedServer = this.serverModel.peek(server.id)
 
     await this.serverModel.saveAll()
+
     this.syncNotifier.handleNotifications(updatedServer)
   }
 
@@ -175,12 +206,10 @@ export class ServerSync {
   }
 
   private async retry (server: S9Server, retryIn: number): Promise<void> {
-    console.log(`syncServer called while server updating. Will retry in ${retryIn / 1000} seconds`)
+    console.log(`syncServer called while server updating. Retrying in ${retryIn} seconds`)
     await pauseFor(retryIn)
-    console.log('ready to retry.')
     return this.syncServer(server, retryIn)
   }
-
 }
 
 const serverUnreachable = () =>  ({ status: ServerStatus.UNREACHABLE, statusAt: new Date().toISOString() })

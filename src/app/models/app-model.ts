@@ -8,9 +8,7 @@ import { diff, both } from '../util/misc.util'
 export class AppModel {
   lightCache: { [serverId: string]: BehaviorSubject <{ [appId: string]: BehaviorSubject<AppInstalled> }> } = { }
 
-  constructor () {
-    console.log('AppModel: ', JSON.stringify(this.lightCache))
-   }
+  constructor () { }
 
   watch (serverId: string, appId: string): BehaviorSubject<AppInstalled> {
     if (!this.lightCache[serverId])              throw new Error(`Expected cached apps for server ${serverId}.`)

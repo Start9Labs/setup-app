@@ -16,9 +16,7 @@ export class ServerModel {
   constructor (
     private readonly storage: Storage,
     private readonly appModel: AppModel,
-  ) {
-    console.log('ServerModel initial cache: ', JSON.stringify(this.darkCache))
-  }
+  ) { }
 
   watch (serverId: string) : BehaviorSubject<S9Server> {
     if (!this.darkCache[serverId]) throw new Error (`Expected cached server for ${serverId} but none found`)
@@ -58,6 +56,7 @@ export class ServerModel {
   }
 
   count (): number { return this.peekAll().length }
+
   peekAll (): Readonly<S9Server>[] { return Object.values(this.darkCache).map(s => s.value) }
 
   clearCache () {
@@ -87,7 +86,6 @@ export interface S9ServerStorable {
 }
 
 export interface S9Server extends S9ServerStorable {
-  updating: boolean
   status: ServerStatus
   statusAt: string
   versionLatest: string
@@ -142,7 +140,6 @@ export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): 
     torAddress,
     versionInstalled,
     versionLatest: '0.0.0',
-    updating: false,
     status: ServerStatus.UNKNOWN,
     statusAt: new Date().toISOString(),
     privkey: deriveKeys(mnemonic, id).privkey,

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, NgZone } from '@angular/core'
 import { ServerModel, S9Server } from 'src/app/models/server-model'
 import { NavController } from '@ionic/angular'
 import { ServerSyncService } from 'src/app/services/server.sync.service'
@@ -17,12 +17,17 @@ export class ServerListPage {
     public serverModel: ServerModel,
     public sss: ServerSyncService,
     private readonly navCtrl: NavController,
+    private readonly zone: NgZone,
   ) { }
 
   ngOnInit () {
     this.servers = this.serverModel.peekAll()
     this.deltaSubscription = this.serverModel.serverDelta$.subscribe(a => {
-      if (a) { this.servers = this.serverModel.peekAll() }
+      if (a) {
+        this.zone.run(() => {
+          this.servers = this.serverModel.peekAll()
+        })
+      }
     })
   }
 

@@ -106,7 +106,6 @@ export class ObjectConfigComponent {
     modal.onWillDismiss().then(res => {
       this.editedChange.emit(this.edited || res.data.edited)
       if (res.data.edited) {
-        console.log(res.data)
         this.config[keyval.key] = res.data.value
       }
     })
