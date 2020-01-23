@@ -13,9 +13,9 @@ import { HttpNativeService, getAuthHeader } from './http-native.service'
   providedIn: 'root',
 })
 export class SetupService {
-  private static readonly setupAttempts = 10
-  private static readonly timeout = 3000
-  private static readonly waitForMS = 1000
+  private static readonly setupAttempts = 8
+  private static readonly timeout = 3 // seconds
+  private static readonly waitForMS = 1000 // miliseconds
   public message = ''
 
   constructor (

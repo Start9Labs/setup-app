@@ -103,7 +103,7 @@ export class ServerService {
     const data: Lan.PostInstallAppReq = {
       version,
     }
-    const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(serverId, `/apps/${appId}/install`, { method: Method.post, data, timeout: 240000 })
+    const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(serverId, `/apps/${appId}/install`, { method: Method.post, data })
     await this.appModel.create(serverId, installed)
     return installed
   }

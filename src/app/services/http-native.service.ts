@@ -5,7 +5,6 @@ import { S9BuilderWith } from './setup.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { TokenSigner } from 'jsontokens'
 import { Method } from '../types/enums'
-import { pauseFor } from '../util/misc.util'
 const version = require('../../../package.json').version
 
 @Injectable({
@@ -96,7 +95,7 @@ export interface HttpNativeOptions {
     [key: string]: string | number
   }
   serializer?: 'json' | 'urlencoded' | 'utf8' | 'multipart'
-  timeout?: number
+  timeout?: number // seconds
   headers?: {
     [key: string]: string
   }
