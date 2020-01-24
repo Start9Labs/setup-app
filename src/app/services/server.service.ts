@@ -446,14 +446,16 @@ const mockApiServer: Lan.GetServerRes = {
   versionInstalled: '0.1.0',
   versionLatest: '0.1.0',
   status: ServerStatus.RUNNING,
-  notifications: [  {
-    id: '123e4567-e89b-12d3-a456-426655440000',
-    appId: 'bitcoind',
-    createdAt: '2019-12-26T14:20:30.872Z',
-    code: '101',
-    title: 'Install Complete',
-    message: 'Installation of bitcoind has successfully completed.',
-  }],
+  notifications: [
+    // {
+    //   id: '123e4567-e89b-12d3-a456-426655440000',
+    //   appId: 'bitcoind',
+    //   createdAt: '2019-12-26T14:20:30.872Z',
+    //   code: '101',
+    //   title: 'Install Complete',
+    //   message: 'Installation of bitcoind has successfully completed.',
+    // },
+  ],
 }
 
 const mockApiServerMetrics: Lan.GetServerMetricsRes = {

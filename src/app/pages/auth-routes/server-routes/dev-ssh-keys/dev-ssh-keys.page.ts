@@ -1,10 +1,9 @@
 import { Component } from '@angular/core'
-import { ServerModel, SSHFingerprint } from 'src/app/models/server-model'
+import { SSHFingerprint } from 'src/app/models/server-model'
 import { S9Server } from 'src/app/models/server-model'
 import { ActivatedRoute } from '@angular/router'
 import { AlertController, LoadingController } from '@ionic/angular'
 import { ServerService } from 'src/app/services/server.service'
-import { Observable } from 'rxjs'
 
 @Component({
   selector: 'dev-ssh-keys',

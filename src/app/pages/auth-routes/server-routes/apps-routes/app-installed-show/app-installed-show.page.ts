@@ -39,7 +39,12 @@ export class AppInstalledShowPage {
       console.error(e.message)
     }
 
+    this.getApp()
+  }
+
+  async doRefresh (event: any) {
     await this.getApp()
+    event.target.complete()
   }
 
   async getApp (): Promise<void> {

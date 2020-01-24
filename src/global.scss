@@ -25,6 +25,11 @@
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
 
+.naked-item {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+}
+
 .loader {
   --spinner-color: var(--ion-color-warning) !important;
 }
@@ -83,6 +88,11 @@
   --color: white;
 }
 
+ion-textarea {
+  margin-top: 0;
+  padding-left: 12px;
+}
+
 ion-note {
   max-width: 180px;
   overflow: hidden;
@@ -100,6 +110,10 @@ ion-refresher ion-refresher-content {
 
 ion-infinite-scroll ion-infinite-scroll-content {
   --color: var(--ion-color-warning) !important;
+}
+
+ion-alert {
+  --background: var(--ion-color-light) !important;
 }
 
 * {
