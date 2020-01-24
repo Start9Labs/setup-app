@@ -192,8 +192,12 @@ export function mapSpecToConfigList (spec: ValueSpecList, value: string[] | numb
   value.forEach((val: string | number | object, i: number) => {
     value[i] = fn(val)
   })
-  // * MUT * add list elements until min satisfied
-  getDefaultList(spec, value)
+
+  const min = Range.from(spec.range).integralMin() || 0
+  if (value.length < min) {
+    console.log('list too short, marking spec invalid', spec, value)
+    spec.invalid = true
+  }
 
   return value
 }
@@ -208,7 +212,7 @@ export function getDefaultConfigValue (spec: ValueSpec): object | string | numbe
     case 'number':
       return spec.default ? getDefaultNumber(spec.default) : null
     case 'list':
-      return getDefaultList(spec)
+      return getDefaultList(spec.default)
     case 'enum':
       return getDefaultEnum(spec.default)
     case 'boolean':
@@ -250,29 +254,8 @@ export function getDefaultBoolean (defaultVal: boolean): boolean {
   return defaultVal
 }
 
-export function getDefaultList (spec: ValueSpecList, list: any[] = []): object[] | string[] {
-  const listSpec = spec.spec
-
-  let fn: (i: number) => string | object = () => ({ })
-  switch (listSpec.type) {
-    case 'object':
-      fn = () => getDefaultObject(listSpec.spec)
-      break
-    case 'string':
-      fn = (i: number) => getDefaultString(spec.default[i] as string | DefaultString)
-      break
-    case 'enum':
-      fn = (i: number) => getDefaultEnum(spec.default[i] as string)
-      break
-  }
-
-  const len = Range.from(spec.range).integralMin() || 0
-
-  for (let i = list.length; i < len; i++) {
-    list.push(fn(i))
-  }
-
-  return list
+export function getDefaultList (defaultVal: any[]): any[] {
+  return defaultVal
 }
 
 export function getDefaultDescription (spec: ValueSpec): string | undefined {

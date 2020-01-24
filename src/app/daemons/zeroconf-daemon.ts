@@ -9,7 +9,7 @@ import { Platform } from '@ionic/angular'
 export class ZeroconfDaemon {
   private readonly serviceFound$ : BehaviorSubject<ZeroconfService | null> = new BehaviorSubject(null)
   watch (): Observable<ZeroconfService | null> { return this.serviceFound$ }
-  services: { [hostname: string]: ZeroconfService } = { }
+  services: { [hostname: string]: ZeroconfServiceExt } = { }
   private zeroconfSub: Subscription | undefined
 
   constructor (
@@ -26,6 +26,8 @@ export class ZeroconfDaemon {
 
     await this.zeroconf.reInit()
 
+    setTimeout(now => this.purgeOld(now), 4000, new Date().valueOf())
+
     this.zeroconfSub = this.zeroconf.watch('_http._tcp.', 'local.').subscribe(result => {
       this.handleServiceUpdate(result)
     })
@@ -37,7 +39,6 @@ export class ZeroconfDaemon {
       this.zeroconfSub.unsubscribe()
       this.zeroconfSub = undefined
     }
-    this.services = { }
   }
 
   handleServiceUpdate (result: ZeroconfResult) {
@@ -49,13 +50,21 @@ export class ZeroconfDaemon {
       && service.ipv4Addresses.length
     ) {
       console.log(`discovered start9 server: ${service.name}`)
-      this.services[service.name] = service
+      this.services[service.name] = { ...service, discoveredAt: new Date().valueOf() }
       this.serviceFound$.next(service)
     }
   }
 
   getService (serverId: string): ZeroconfService | undefined {
     return this.services[`start9-${serverId}`]
+  }
+
+  purgeOld (initializedAt: number) {
+    Object.keys(this.services).forEach(key => {
+      if (this.services[key].discoveredAt < initializedAt) {
+        delete this.services[key]
+      }
+    })
   }
 
   // @TODO remove
@@ -78,4 +87,4 @@ export class ZeroconfDaemon {
   }
 }
 
-
+export type ZeroconfServiceExt = ZeroconfService & { discoveredAt: number }

@@ -4,7 +4,7 @@ import { ServerModel, ServerStatus } from 'src/app/models/server-model'
 import { NavController, AlertController, ActionSheetController, LoadingController } from '@ionic/angular'
 import { S9Server } from 'src/app/models/server-model'
 import { ActionSheetButton } from '@ionic/core'
-import { AppStatus, AppModel, AppInstalled } from 'src/app/models/app-model'
+import { AppModel, AppInstalled } from 'src/app/models/app-model'
 import * as compareVersions from 'compare-versions'
 import { ServerService } from 'src/app/services/server.service'
 import { ServerSyncService } from 'src/app/services/server.sync.service'
@@ -16,7 +16,7 @@ import { Observable, BehaviorSubject } from 'rxjs'
   styleUrls: ['server-show.page.scss'],
 })
 export class ServerShowPage {
-  error: string
+  error = ''
   view: 'apps' | 'about' = 'apps'
   loading = true
   compareVersions = compareVersions

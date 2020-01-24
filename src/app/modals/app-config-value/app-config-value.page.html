@@ -39,7 +39,7 @@
         <ion-icon slot="icon-only" name="close"></ion-icon>
       </ion-button>
     </ion-item>
-    <p *ngIf="spec.default" class="ion-padding-start">
+    <p *ngIf="spec.type !== 'list' && spec.default" class="ion-padding-start">
       <ion-text color="medium">
         Default: {{ getDefaultDescription(spec) }}
         <span *ngIf="spec.type === 'number' && spec.units"> {{ spec.units }}</span>

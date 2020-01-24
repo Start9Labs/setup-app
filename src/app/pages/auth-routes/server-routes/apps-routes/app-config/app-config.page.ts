@@ -12,7 +12,7 @@ import { BehaviorSubject } from 'rxjs'
 })
 export class AppConfigPage {
   loading = false
-  error: string
+  error = ''
   app$: BehaviorSubject<AppInstalled>
   appId: string
   spec: AppConfigSpec

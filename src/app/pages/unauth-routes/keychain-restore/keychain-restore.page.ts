@@ -7,7 +7,7 @@ import { AuthService } from 'src/app/services/auth.service'
   styleUrls: ['./keychain-restore.page.scss'],
 })
 export class KeychainRestorePage {
-  error: string
+  error = ''
   mnemonic: string
 
   constructor (

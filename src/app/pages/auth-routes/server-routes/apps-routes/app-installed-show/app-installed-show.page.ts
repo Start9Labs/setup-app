@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router'
 import { AppInstalled, AppStatus, AppModel } from 'src/app/models/app-model'
 import { ClipboardService } from 'src/app/services/clipboard.service'
 import { ActionSheetButton } from '@ionic/core'
-import { Observable, BehaviorSubject } from 'rxjs'
+import { BehaviorSubject } from 'rxjs'
 
 @Component({
   selector: 'app-installed-show',
@@ -14,7 +14,7 @@ import { Observable, BehaviorSubject } from 'rxjs'
 })
 export class AppInstalledShowPage {
   loading = true
-  error: string
+  error = ''
   app$: BehaviorSubject<AppInstalled>
   appId: string
   serverId: string
@@ -36,7 +36,7 @@ export class AppInstalledShowPage {
     try {
       this.app$ = this.appModel.watch(this.serverId, this.appId)
     } catch (e) {
-      console.error
+      console.error(e.message)
     }
 
     await this.getApp()

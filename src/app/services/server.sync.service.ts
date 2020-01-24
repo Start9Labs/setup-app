@@ -197,8 +197,7 @@ export class ServerSync {
   }
 
   private hasBeenRunningSufficientlyLong (server: S9Server): boolean {
-    return (server.status === ServerStatus.UNKNOWN) &&
-           (this.initialized_at.valueOf() + this.timeBeforeUnreachable < new Date().valueOf())
+    return this.initialized_at.valueOf() + this.timeBeforeUnreachable < new Date().valueOf()
 
   }
 

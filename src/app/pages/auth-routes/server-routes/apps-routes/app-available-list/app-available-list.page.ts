@@ -10,7 +10,7 @@ import { ActivatedRoute } from '@angular/router'
 })
 export class AppAvailableListPage {
   loading = true
-  error: string
+  error = ''
   apps: AppAvailablePreview[] = []
   serverId: string
 

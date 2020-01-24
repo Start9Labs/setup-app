@@ -6,8 +6,6 @@ import { AppAvailableFull } from 'src/app/models/app-model'
 import { ServerService } from 'src/app/services/server.service'
 import { NavController, AlertController, LoadingController } from '@ionic/angular'
 import * as compareVersions from 'compare-versions'
-import { Observable } from 'rxjs'
-import { first } from 'rxjs/operators'
 
 @Component({
   selector: 'app-available-show',
@@ -16,7 +14,7 @@ import { first } from 'rxjs/operators'
 })
 export class AppAvailableShowPage {
   loading = true
-  error: string
+  error = ''
   serverId: string
   app: AppAvailableFull = { } as AppAvailableFull
   compareVersions = compareVersions

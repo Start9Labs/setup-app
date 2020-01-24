@@ -5,7 +5,7 @@
         <ion-icon name="arrow-back"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>{{ keyval.value.name }}</ion-title>
+    <ion-title>{{ keyval.value.type === 'list' ? keyval.value.name : keyval.key }}</ion-title>
     <ion-buttons *ngIf="keyval.value.type === 'object' && keyval.value.nullable" slot="end">
       <ion-button color="danger" (click)="presentAlertDestroy()">
         Delete
