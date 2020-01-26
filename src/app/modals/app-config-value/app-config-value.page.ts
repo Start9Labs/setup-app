@@ -22,7 +22,6 @@ export class AppConfigValuePage {
   ) { }
 
   ngOnInit () {
-    console.log('spec', this.spec)
     this.inputValue = this.value ? String(this.value) : ''
   }
 
