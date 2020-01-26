@@ -89,7 +89,7 @@ export class AppAvailableShowPage {
   async presentAlertInstall () {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
-      header: 'Caution',
+      header: 'Confirm',
       message: `Are you sure you want to install ${this.app.title} ${this.app.versionViewing}?`,
       buttons: [
         {
@@ -112,7 +112,7 @@ export class AppAvailableShowPage {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Caution',
-      message: `Are you sure you want to uninstall ${this.app.title}?`,
+      message: `Are you sure you want to uninstall ${this.app.title}? All app data will be permanently deleted.`,
       buttons: [
         {
           text: 'Cancel',
