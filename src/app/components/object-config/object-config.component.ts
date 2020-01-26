@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core'
-import { AppConfigSpec, ValueSpec, ValueSpecString, ValueSpecObject } from 'src/app/models/app-model'
+import { AppConfigSpec, ValueSpec, ValueSpecString, ValueSpecObject, ValueSpecNumber } from 'src/app/models/app-model'
 import { ModalController, AlertController } from '@ionic/angular'
 import { AppConfigNestedPage } from 'src/app/modals/app-config-nested/app-config-nested.page'
 import * as configUtil from '../../util/config.util'
@@ -93,7 +93,7 @@ export class ObjectConfigComponent {
     await alert.present()
   }
 
-  async presentModalValueEdit (keyval: { key: string, value: ValueSpecString }) {
+  async presentModalValueEdit (keyval: { key: string, value: ValueSpecString | ValueSpecNumber }) {
     const modal = await this.modalCtrl.create({
       backdropDismiss: false,
       component: AppConfigValuePage,

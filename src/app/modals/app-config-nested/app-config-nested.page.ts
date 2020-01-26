@@ -111,7 +111,7 @@ export class AppConfigNestedPage {
       backdropDismiss: false,
       component: AppConfigValuePage,
       componentProps: {
-        spec: this.keyval.value,
+        spec: (this.keyval.value as ValueSpecList).spec,
         value: index ? (this.value as any[])[index] : '',
       },
     })
