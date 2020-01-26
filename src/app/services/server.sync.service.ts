@@ -50,7 +50,7 @@ export class SyncNotifier {
       ],
     })
     await toast.present()
-    this.serverModel.update(server.id, updates)
+    this.serverModel.updateCache(server.id, updates)
   }
 }
 
@@ -167,14 +167,13 @@ export class ServerSync {
   }
 
   async syncServerAttributes (server: S9Server): Promise<void> {
-    const [serverRes, appsRes] = await tryAll( [
-          this.serverService.getServer(server.id),
-          pauseFor(250).then(() => this.serverService.getInstalledApps(server.id)),
-        ],
-    )
+    const [serverRes, appsRes] = await tryAll([
+      this.serverService.getServer(server.id),
+      pauseFor(250).then(() => this.serverService.getInstalledApps(server.id)),
+    ])
 
     switch (serverRes.result) {
-      case 'resolve' : this.serverModel.update(server.id, serverRes.value); break
+      case 'resolve' : this.serverModel.updateCache(server.id, serverRes.value); break
       case 'reject'  : {
         console.error(`get server request for ${server.id} rejected with ${JSON.stringify(serverRes.value)}`)
         this.markServerUnreachable(server)
@@ -202,7 +201,7 @@ export class ServerSync {
   }
 
   private markServerUnreachable (server: S9Server): void {
-    this.serverModel.update(server.id, serverUnreachable())
+    this.serverModel.updateCache(server.id, serverUnreachable())
     this.appModel.updateAppsUniformly(server.id, appUnreachable())
   }
 

@@ -160,7 +160,7 @@ export class ServerShowPage {
               alert.message = 'Server must have a name'
               return false
             }
-            this.serverModel.update(this.serverId, { label: inputValue })
+            this.serverModel.updateCache(this.serverId, { label: inputValue })
             this.serverModel.saveAll()
           },
         },
@@ -202,7 +202,7 @@ export class ServerShowPage {
 
     try {
       await this.serverService.updateAgent(this.serverId, server.versionLatest)
-      this.serverModel.update(this.serverId, { status: ServerStatus.UPDATING, statusAt: new Date().toISOString() })
+      this.serverModel.updateCache(this.serverId, { status: ServerStatus.UPDATING, statusAt: new Date().toISOString() })
     } catch (e) {
       this.error = e.message
     } finally {
@@ -318,7 +318,8 @@ export class ServerShowPage {
   }
 
   async forget () {
-    await this.serverModel.remove(this.serverId)
+    await this.serverModel.removeFromCache(this.serverId)
+    await this.serverModel.saveAll()
     await this.navCtrl.navigateRoot(['/auth'])
   }
 }

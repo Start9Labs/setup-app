@@ -35,7 +35,8 @@ export class SetupPage {
     // attempt to acquire all connection info for new server + check status asynchronously
     try {
       const server = await this.setupService.setup(serverData, this.productKey)
-      await this.serverModel.create(server)
+      await this.serverModel.createInCache(server)
+      await this.serverModel.saveAll()
       await this.navController.navigateRoot(['/auth'])
     } catch (e) {
       this.error = `Error: ${e.message}`

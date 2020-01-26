@@ -35,7 +35,7 @@ export class ServerNotificationsPage {
 
     this.server$.pipe(first()).subscribe(async s => {
       this.notifications = await this.getNotifications()
-      this.serverModel.update(s.id, { badge: 0 })
+      this.serverModel.updateCache(s.id, { badge: 0 })
     })
   }
 

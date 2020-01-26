@@ -29,7 +29,7 @@ export class ServerModel {
   }
 
   // no op if missing
-  remove (serverId: string): void {
+  removeFromCache (serverId: string): void {
     if (this.darkCache[serverId]) {
       this.darkCache[serverId].complete()
       delete this.darkCache[serverId]
@@ -38,7 +38,7 @@ export class ServerModel {
   }
 
   // no op if missing
-  update (serverId: string, update: Partial<S9Server>): void {
+  updateCache (serverId: string, update: Partial<S9Server>): void {
     if (this.darkCache[serverId]) {
       const updatedServer = { ...this.darkCache[serverId].value, ...update }
       this.darkCache[serverId].next(updatedServer)
@@ -47,7 +47,7 @@ export class ServerModel {
   }
 
   // no op if already exists
-  create (server: S9Server): void {
+  createInCache (server: S9Server): void {
     if (!this.darkCache[server.id]) {
       this.darkCache[server.id] = new BehaviorSubject(server)
       this.appModel.createServerCache(server.id)
@@ -60,14 +60,14 @@ export class ServerModel {
   peekAll (): Readonly<S9Server>[] { return Object.values(this.darkCache).map(s => s.value) }
 
   clearCache () {
-    this.peekAll().forEach( s => this.remove(s.id) )
+    this.peekAll().forEach( s => this.removeFromCache(s.id) )
     this.darkCache = { }
   }
 
   async load (mnemonic: string[]): Promise<void> {
     const fromStorage: S9ServerStore = await this.storage.get('servers') || []
     fromStorage.forEach(s => {
-      this.create(fromStorableServer(s, mnemonic))
+      this.createInCache(fromStorableServer(s, mnemonic))
     })
   }
 
