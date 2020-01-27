@@ -67,12 +67,10 @@ export class AppComponent {
     if (authStatus === AuthStatus.VERIFIED) {
       if (this.firstAuth) {
         await this.serverModel.load(this.authService.mnemonic!)
-        this.initDaemons()
         this.firstAuth = false
         await this.router.navigate(['/auth'])
-      } else {
-        this.restartDaemons()
       }
+      this.startDaemons()
     // missing (no mnemonic)
     } else if (authStatus === AuthStatus.MISSING) {
       this.clearModels()
@@ -85,14 +83,10 @@ export class AppComponent {
     }
   }
 
-  private initDaemons () {
-    this.zeroconfDaemon.start()
-    this.serverDaemon.start()
-  }
-
-  private restartDaemons () {
-    this.zeroconfDaemon.start()
-    this.serverDaemon.start()
+  private startDaemons () {
+    const timeToPurge = 2000
+    this.zeroconfDaemon.start(timeToPurge)
+    setTimeout(() => this.serverDaemon.start(), timeToPurge + 1000)
   }
 
   private stopDaemons () {

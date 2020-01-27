@@ -17,7 +17,7 @@ export class ZeroconfDaemon {
     private readonly zeroconf: Zeroconf,
   ) { }
 
-  async start () {
+  async start (timeToPurge: number) {
     // return this.mock()
 
     if (!this.platform.is('cordova')) { return }
@@ -26,7 +26,7 @@ export class ZeroconfDaemon {
 
     await this.zeroconf.reInit()
 
-    setTimeout(now => this.purgeOld(now), 4000, new Date().valueOf())
+    setTimeout(now => this.purgeOld(now), timeToPurge, new Date().valueOf())
 
     this.zeroconfSub = this.zeroconf.watch('_http._tcp.', 'local.').subscribe(result => {
       this.handleServiceUpdate(result)
