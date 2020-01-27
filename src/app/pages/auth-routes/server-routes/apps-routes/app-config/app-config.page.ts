@@ -38,7 +38,6 @@ export class AppConfigPage {
     const app = this.app$.value
     if (app.status === AppStatus.RECOVERABLE) {
       await this.presentAlertRecoverable()
-      this.edited = true
     } else {
       await this.getConfig()
     }
@@ -116,6 +115,7 @@ export class AppConfigPage {
           text: 'Keep Data',
           handler: () => {
             this.getConfig()
+            this.edited = true
           },
         },
       ],
@@ -134,6 +134,7 @@ export class AppConfigPage {
           text: 'Cancel',
           handler: () => {
             this.getConfig()
+            this.edited = true
           },
         },
         {

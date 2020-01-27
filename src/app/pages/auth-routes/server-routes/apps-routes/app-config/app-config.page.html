@@ -17,13 +17,13 @@
 <ion-content class="ion-padding-bottom">
 
   <ion-item *ngIf="error">
-    <ion-text class="ion-text-wrap" color="danger">{{error}}</ion-text>
+    <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
   </ion-item>
 
   <ion-spinner *ngIf="loading" class="center" name="lines" color="warning"></ion-spinner>
 
   <ion-item-group *ngIf="config" class="ion-text-wrap">
-    <div *ngIf="['NEEDS_CONFIG', 'RECOVERABLE'].includes((app$ | async)?.status)">
+    <div *ngIf="['NEEDS_CONFIG', 'RECOVERABLE'].includes((app$ | async)?.status) && !edited">
       <ion-item-divider>
         <ion-text>Initial Config</ion-text>
       </ion-item-divider>
