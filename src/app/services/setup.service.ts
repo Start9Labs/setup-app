@@ -35,14 +35,14 @@ export class SetupService {
       await pauseFor(SetupService.waitForMS)
     }
 
-    throw new Error(`failed ${this.message}`)
+    throw new Error(`Failed ${this.message}`)
   }
 
   private async setupAttempt (builder: S9ServerBuilder, productKey: string): Promise<S9ServerBuilder> {
 
     // enable lan
     if (!hasValues(['zeroconf'], builder)) {
-      this.message = `discovering server on local network`
+      this.message = `discovering server on local network. Please see "Helpful Hints" below.`
       builder.zeroconf = this.zeroconfDaemon.getService(builder.id)
     }
 
@@ -54,7 +54,7 @@ export class SetupService {
 
     // tor acquisition
     if (hasValues(['zeroconf', 'versionInstalled'], builder) && !hasValues(['torAddress'], builder)) {
-      this.message = `getting tor address`
+      this.message = `getting server tor address`
       builder.torAddress = await this.getTor(builder)
     }
 
@@ -71,7 +71,7 @@ export class SetupService {
 
     // register pubkey
     if (hasValues(['zeroconf', 'versionInstalled', 'torAddress', 'pubkey', 'privkey'], builder) && !builder.registered) {
-      this.message = `registering pubkey`
+      this.message = `registering pubkey. Server may already be claimed.`
       builder.registered = await this.registerPubkey(builder, productKey) // true or false
     }
 
@@ -81,7 +81,7 @@ export class SetupService {
       builder.registered &&
       builder.status !== ServerStatus.RUNNING
     ) {
-      this.message = `getting server`
+      this.message = `getting server information`
       await this.getServer(builder)
         .then(serverRes => {
           builder = { ...builder, ...serverRes }

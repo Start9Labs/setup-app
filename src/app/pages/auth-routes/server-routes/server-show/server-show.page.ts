@@ -261,7 +261,7 @@ export class ServerShowPage {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Caution',
-      message: `Are you sure you want to forget ${server.label} on this device?`,
+      message: `Are you sure you want to forget ${server.label} on this device? You can add it back later. The server itself will not be affected.`,
       buttons: [
         {
           text: 'Cancel',
