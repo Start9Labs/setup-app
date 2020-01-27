@@ -766,10 +766,8 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
                 description: 'the ip of the rule maker',
                 nullable: false,
                 default: '192.168.1.0',
-                pattern: {
-                  regex: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$',
-                  description: 'may only contain numbers and periods',
-                },
+                pattern: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$',
+                patternDescription: 'may only contain numbers and periods',
               },
             },
           },
@@ -781,10 +779,8 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
           nullable: false,
           // @TODO what if default charset doesn't align with regex. No protection here?
           default: 'defaultrpcusername',
-          pattern: {
-            regex: '^[a-zA-Z]+$',
-            description: 'must contain only letters and be less than 50 characters in length.',
-          },
+          pattern: '^[a-zA-Z]+$',
+          patternDescription: 'must contain only letters and be less than 50 characters in length.',
         },
         rpcpass: {
           name: 'RPC User Password',
@@ -842,10 +838,8 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
       default: ['192.168.1.1'],
       spec: {
         type: 'string',
-        pattern: {
-          regex: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$',
-          description: 'may only contain numbers and periods',
-        },
+        pattern: '((^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$)|(^[a-z2-7]{16}\.onion$)|(^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$))',
+        patternDescription: 'may only contain numbers and periods',
       },
     },
     rpcauth: {

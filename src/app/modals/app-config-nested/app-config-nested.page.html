@@ -7,7 +7,7 @@
     </ion-buttons>
     <ion-title>{{ keyval.value.name }}</ion-title>
     <ion-buttons *ngIf="keyval.value.type === 'object' && keyval.value.nullable" slot="end">
-      <ion-button color="danger" (click)="presentAlertDestroy()">
+      <ion-button color="danger" (click)="presentAlertDestroyObject()">
         Delete
       </ion-button>
     </ion-buttons>

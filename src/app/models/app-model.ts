@@ -191,10 +191,8 @@ export interface WithStandalone {
 
 export interface ListValueSpecString extends ValueSpecBase {
   type: 'string'
-  pattern?: {
-    regex: string
-    description: string
-  }
+  pattern?: string
+  patternDescription?: string
 }
 
 export interface ValueSpecString extends ListValueSpecString, WithStandalone {

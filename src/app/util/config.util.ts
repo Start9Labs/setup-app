@@ -126,9 +126,7 @@ export function mapSpecToConfigString (spec: ListValueSpecString, value: string)
     return value
   }
 
-  const pattern = spec.pattern
-
-  if (pattern && !RegExp(pattern.regex).test(value)) {
+  if (spec.pattern && !RegExp(spec.pattern).test(value)) {
     spec.invalid = true
   }
 

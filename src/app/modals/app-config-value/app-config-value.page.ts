@@ -36,7 +36,7 @@ export class AppConfigValuePage {
   }
 
   async done () {
-    if (this.error) { return }
+    if (!this.validate) { return }
 
     const toReturn = this.inputValue || null
 
@@ -56,21 +56,22 @@ export class AppConfigValuePage {
   }
 
   handleInput () {
-    // test blank
-    if (!this.inputValue && !this.spec.nullable && this.edited) {
-      this.error = 'Value cannot be blank'
-      return
-    }
-
+    this.error = ''
     this.edited = true
+  }
 
+  validate (): boolean {
+    // test blank
+    if (!this.inputValue && !this.spec.nullable) {
+      this.error = 'Value cannot be blank'
+      return false
+    }
     // test pattern if string
     if (this.spec.type === 'string' && this.inputValue) {
-      const pattern = this.spec.pattern
-      if (pattern && !RegExp(pattern.regex).test(this.inputValue)) {
-        this.error = pattern.description
-      } else {
-        this.error = ''
+      const { pattern, patternDescription } = this.spec
+      if (pattern && !RegExp(pattern).test(this.inputValue)) {
+        this.error = patternDescription || ''
+        return false
       }
     }
     // test range if number
@@ -78,17 +79,21 @@ export class AppConfigValuePage {
       const range = Range.from(this.spec.range)
       if (this.spec.integral && !RegExp('^[-+]?[0-9]+$').test(this.inputValue)) {
         this.error = 'Value must be an integer'
+        return false
       } else if (!this.spec.integral && !RegExp('^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)$').test(this.inputValue)) {
         this.error = 'Value must be a number'
+        return false
       } else {
         try {
           range.checkIncludes(Number(this.inputValue))
-          this.error = ''
         } catch (e) {
           this.error = e.message
+          return false
         }
       }
     }
+    this.error = ''
+    return true
   }
 
   async presentAlertUnsaved () {

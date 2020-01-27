@@ -88,7 +88,7 @@ export class AppConfigNestedPage {
     if (this.min && (this.value as any[]).length <= this.min) {
       await this.presentAlertMinReached()
     } else {
-      await this.presentAlertDelete(index)
+      await this.presentAlertDeleteEntry(index)
     }
   }
 
@@ -167,7 +167,7 @@ export class AppConfigNestedPage {
     await alert.present()
   }
 
-  async presentAlertDelete (index: number) {
+  async presentAlertDeleteEntry (index: number) {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Caution',
@@ -190,7 +190,7 @@ export class AppConfigNestedPage {
     await alert.present()
   }
 
-  async presentAlertDestroy () {
+  async presentAlertDestroyObject () {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Caution',
@@ -215,17 +215,5 @@ export class AppConfigNestedPage {
   destroy () {
     this.edited = true
     this.dismiss(true)
-  }
-
-  validate (value: string) {
-    // test blank
-    if (!value) {
-      throw new Error('cannot be blank')
-    }
-    // test pattern
-    const pattern = ((this.keyval.value as ValueSpecList).spec as ValueSpecString).pattern
-    if (pattern && !RegExp(pattern.regex).test(value)) {
-      throw new Error(pattern.description)
-    }
   }
 }
