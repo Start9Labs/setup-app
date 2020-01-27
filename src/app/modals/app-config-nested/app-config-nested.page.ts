@@ -112,14 +112,14 @@ export class AppConfigNestedPage {
       component: AppConfigValuePage,
       componentProps: {
         spec: (this.keyval.value as ValueSpecList).spec,
-        value: index ? (this.value as any[])[index] : '',
+        value: index !== undefined ? (this.value as any[])[index] : '',
       },
     })
 
     modal.onWillDismiss().then(res => {
       this.edited = this.edited || res.data.edited
       if (res.data.edited) {
-        index ? (this.value as any)[index] = res.data.value : (this.value as any[]).push(res.data.value)
+        index !== undefined ? (this.value as any)[index] = res.data.value : (this.value as any[]).push(res.data.value)
       }
     })
 

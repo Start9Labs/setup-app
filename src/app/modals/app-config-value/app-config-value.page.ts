@@ -36,7 +36,7 @@ export class AppConfigValuePage {
   }
 
   async done () {
-    if (!this.validate) { return }
+    if (!this.validate()) { return }
 
     const toReturn = this.inputValue || null
 

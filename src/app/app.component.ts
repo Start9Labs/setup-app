@@ -54,11 +54,7 @@ export class AppComponent {
       // do Cordova things if Cordova
       if (platform.is('cordova')) {
         // style status bar for iOS and Android
-        if (platform.is('ios')) {
-          this.statusBar.styleDefault()
-        } else {
-          this.statusBar.styleLightContent()
-        }
+        this.statusBar.styleLightContent()
         setTimeout(() => {
           this.splashScreen.hide()
         }, 300)
