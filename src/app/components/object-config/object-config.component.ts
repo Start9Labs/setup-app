@@ -86,6 +86,7 @@ export class ObjectConfigComponent {
           handler: () => {
             this.config[keyval.key] = configUtil.mapSpecToConfigObject(keyval.value)
             this.presentModalConfigNested(keyval)
+            this.edited = true
           },
         },
       ],

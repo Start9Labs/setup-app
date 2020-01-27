@@ -140,6 +140,7 @@ export class AppConfigNestedPage {
           text: 'Create',
           handler: () => {
             (this.value as object[]).push(configUtil.mapSpecToConfigObject(objectSpec))
+            this.edited = true
           },
         },
       ],
@@ -181,8 +182,8 @@ export class AppConfigNestedPage {
           text: 'Delete',
           cssClass: 'alert-danger',
           handler: async () => {
-            this.edited = true;
             (this.value as any[]).splice(index, 1)
+            this.edited = true
           },
         },
       ],
