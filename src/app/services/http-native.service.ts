@@ -58,13 +58,10 @@ export class HttpNativeService {
     } catch (e) {
       console.error(e)
       let message: string
-      if (e.error && typeof e.error === 'object') {
-        message = e.error.message || e.message || JSON.stringify(e.error)
-      } else if (e.errors && e.errors.length && Array.isArray(e.errors)) {
-        const error = e.errors[0]
-        message = error.message || JSON.stringify(error)
-      } else {
-        message = e.message || JSON.stringify(e)
+      try {
+        message = JSON.parse(e.error).message
+      } catch (e) {
+        message = e.error
       }
       throw new Error(message)
     }
