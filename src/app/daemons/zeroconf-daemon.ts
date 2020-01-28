@@ -12,7 +12,7 @@ export class ZeroconfDaemon {
   watch (): Observable<ZeroconfService | null> { return this.serviceFound$ }
   services: { [hostname: string]: ZeroconfServiceExt } = { }
   private zeroconfSub: Subscription | undefined
-  readonly timeToPurge = 2000
+  readonly timeToPurge = 4000
 
   constructor (
     private readonly platform: Platform,
@@ -50,6 +50,7 @@ export class ZeroconfDaemon {
 
   clearAndStop () {
     this.stop()
+    console.log('clearing all zerconf services')
     this.services = { }
   }
 
@@ -60,11 +61,17 @@ export class ZeroconfDaemon {
       service.name.startsWith('start9-')
       && action === 'resolved'
       && service.ipv4Addresses[0]
-      && !(this.services[service.name] && service.ipv4Addresses[0] === this.services[service.name].ipv4Addresses[0])
     ) {
-      console.log(`discovered start9 server: ${JSON.stringify(service)}`)
-      this.services[service.name] = { ...service, discoveredAt: new Date().valueOf() }
-      this.serviceFound$.next(service)
+      // if exists with same IP, update discoveredAt
+      if (this.services[service.name] && service.ipv4Addresses[0] === this.services[service.name].ipv4Addresses[0]) {
+        console.log(`updating zeroconf service discoveredAt: ${service.name}`)
+        this.services[service.name].discoveredAt = new Date().valueOf()
+      // if not exists, add it
+      } else {
+        console.log(`discovered zeroconf service: ${service.name}`)
+        this.services[service.name] = { ...service, discoveredAt: new Date().valueOf() }
+        this.serviceFound$.next(service)
+      }
     }
   }
 
@@ -75,6 +82,7 @@ export class ZeroconfDaemon {
   purgeOld (initializedAt: number) {
     Object.keys(this.services).forEach(key => {
       if (this.services[key].discoveredAt < initializedAt) {
+        console.log(`purging zeroconf service: ${this.services[key].name}`)
         delete this.services[key]
       }
     })
