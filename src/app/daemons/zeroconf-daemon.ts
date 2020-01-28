@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core'
 import { Zeroconf, ZeroconfResult, ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { Subscription, BehaviorSubject, Observable } from 'rxjs'
 import { Platform } from '@ionic/angular'
+import { pauseFor } from '../util/misc.util'
 
 @Injectable({
   providedIn: 'root',

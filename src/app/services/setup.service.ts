@@ -42,7 +42,7 @@ export class SetupService {
 
     // enable lan
     if (!hasValues(['zeroconf'], builder)) {
-      this.message = `discovering server on local network. Please see "Helpful Hints" below.`
+      this.message = `discovering server on local network. Please check your Product Key and see "Instructions" below.`
       builder.zeroconf = this.zeroconfDaemon.getService(builder.id)
     }
 

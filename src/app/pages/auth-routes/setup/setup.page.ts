@@ -3,6 +3,8 @@ import { NavController, LoadingController } from '@ionic/angular'
 import { ServerModel } from 'src/app/models/server-model'
 import { idFromSerial } from 'src/app/models/server-model'
 import { SetupService, fromUserInput } from 'src/app/services/setup.service'
+import { ZeroconfDaemon } from 'src/app/daemons/zeroconf-daemon'
+import { Subscription } from 'rxjs'
 
 @Component({
   selector: 'setup',
@@ -13,13 +15,25 @@ export class SetupPage {
   error = ''
   label = ''
   productKey = ''
+  zeroconfMonitor: Subscription
+  serviceFound = false
 
   constructor (
     private readonly navController: NavController,
     private readonly setupService: SetupService,
     private readonly serverModel: ServerModel,
     private readonly loadingCtrl: LoadingController,
+    public zeroconfDaemon: ZeroconfDaemon,
   ) { }
+
+  ngOnInit () {
+    this.serviceFound = !!Object.entries(this.zeroconfDaemon.services).length
+    this.zeroconfMonitor = this.zeroconfDaemon.watch().subscribe(service => { this.serviceFound = !!service })
+  }
+
+  ngOnDestroy () {
+    this.zeroconfMonitor.unsubscribe()
+  }
 
   async submit (): Promise<void> {
     const id = idFromSerial(this.productKey)

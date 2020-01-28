@@ -15,30 +15,39 @@
     <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
   </ion-item>
 
-  <ion-item-group style="margin-bottom: 40px;">
-    <ion-item>
-      <ion-input maxlength="8" placeholder="Product ID (located on device)" [(ngModel)]="productKey"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-input placeholder="Friendly Name (ex. My Server)" [(ngModel)]="label"></ion-input>
-    </ion-item>
-  </ion-item-group>
-  <ion-button [disabled]="productKey.length !== 8 || !label" expand="block" fill="outline" (click)="submit()">
-    Connect
-  </ion-button>
+  <ion-item *ngIf="!serviceFound">
+    <ion-label class="ion-text-wrap">
+      <h2>No Start9 Servers discovered on local network.</h2>
+    </ion-label>
+  </ion-item>
+
+  <div *ngIf="serviceFound">
+    <ion-item-group style="margin-bottom: 40px;">
+      <ion-item>
+        <ion-input maxlength="8" placeholder="Product Key (located on device)" [(ngModel)]="productKey"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input placeholder="Friendly Name (ex. My Server)" [(ngModel)]="label"></ion-input>
+      </ion-item>
+    </ion-item-group>
+    <ion-button [disabled]="productKey.length !== 8 || !label" expand="block" fill="outline" (click)="submit()">
+      Connect
+    </ion-button>
+  </div>
 
   <ion-item-group>
     <ion-item-divider></ion-item-divider>
     <ion-item>
       <ion-label class="ion-text-wrap">
-        <h2>Helpful Notes</h2>
+        <ion-text color="warning"><h2>Instructions</h2></ion-text>
         <br />
         <ion-text color="medium">
           <p>
-            <li>Ensure your server is connected to power and startup tone has sounded.</li>
-            <li>Ensure your server is connected to wireless router via ethernet cable</li>
-            <li>Ensure your phone is conncted to router's own wifi network</li>
-            <li>Try restarting this Companion app</li>
+            <li>Connect your server to power using provided power adapter.</li>
+            <li><ion-text color="warning">Your server is ready when you hear the 2nd chime. It is the longer and more pleasant noise and can take up to 2 minutes.</ion-text></li>
+            <li>Connect your server to your router's Ethernet port using provided Ethernet cable.</li>
+            <li>Connect your phone to router's own wifi network</li>
+            <li>Enter the Product Key located on the bottom of your server.</li>
           </p>
         </ion-text>
       </ion-label>
