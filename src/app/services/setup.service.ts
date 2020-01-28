@@ -25,21 +25,28 @@ export class SetupService {
   ) { }
 
   async setup (builder: S9ServerBuilder, productKey: string): Promise<S9Server> {
+    // @TODO delete
+    // return this.mockServer(builder)
+
     for (let i = 0; i < SetupService.setupAttempts; i ++) {
-      // @TODO delete
-      // builder = this.mockServer(builder)
-      builder = await this.setupAttempt(builder, productKey)
-      if (isFullySetup(builder)) {
-        return toS9Server(builder)
-      }
+      builder = await this.discoverAttempt(builder)
       await pauseFor(SetupService.waitForMS)
     }
 
-    throw new Error(`Failed ${this.message}`)
+    if (!isDiscovered(builder)) {
+      throw new Error(`Failed ${this.message}`)
+    }
+
+    builder = await this.setupAttempt(builder, productKey)
+
+    if (!isFullySetup(builder)) {
+      throw new Error(`Failed ${this.message}`)
+    }
+
+    return toS9Server(builder)
   }
 
-  private async setupAttempt (builder: S9ServerBuilder, productKey: string): Promise<S9ServerBuilder> {
-
+  private async discoverAttempt (builder: S9ServerBuilder): Promise<S9ServerBuilder> {
     // enable lan
     if (!hasValues(['zeroconf'], builder)) {
       this.message = `discovering server on local network. Please check your Product Key and see "Instructions" below.`
@@ -52,14 +59,18 @@ export class SetupService {
       builder.versionInstalled = await this.getVersion(builder)
     }
 
+    return builder
+  }
+
+  private async setupAttempt (builder: S9BuilderWith<'zeroconf' | 'versionInstalled'>, productKey: string): Promise<S9ServerBuilder> {
     // tor acquisition
-    if (hasValues(['zeroconf', 'versionInstalled'], builder) && !hasValues(['torAddress'], builder)) {
+    if (!hasValues(['torAddress'], builder)) {
       this.message = `getting server tor address`
       builder.torAddress = await this.getTor(builder)
     }
 
     // derive keys
-    if (hasValues(['zeroconf', 'versionInstalled', 'torAddress'], builder) && !hasValues(['pubkey', 'privkey'], builder)) {
+    if (hasValues(['torAddress'], builder) && !hasValues(['pubkey', 'privkey'], builder)) {
       this.message = 'getting mnemonic'
       if (this.authService.mnemonic) {
         this.message = `deriving keys`
@@ -70,14 +81,14 @@ export class SetupService {
     }
 
     // register pubkey
-    if (hasValues(['zeroconf', 'versionInstalled', 'torAddress', 'pubkey', 'privkey'], builder) && !builder.registered) {
+    if (hasValues(['torAddress', 'pubkey', 'privkey'], builder) && !builder.registered) {
       this.message = `registering pubkey. Server may already be claimed.`
       builder.registered = await this.registerPubkey(builder, productKey) // true or false
     }
 
     // get server
     if (
-      hasValues(['zeroconf', 'versionInstalled', 'torAddress', 'pubkey', 'privkey'], builder) &&
+      hasValues(['torAddress', 'pubkey', 'privkey'], builder) &&
       builder.registered &&
       builder.status !== ServerStatus.RUNNING
     ) {
@@ -177,6 +188,10 @@ export interface S9ServerBuilder {
 
 export function hasValues<T extends keyof S9ServerBuilder> (t: T[], s: S9ServerBuilder): s is S9BuilderWith<T> {
   return t.every(k => !!s[k])
+}
+
+export function isDiscovered (ss: S9ServerBuilder): ss is S9BuilderWith<'zeroconf' | 'versionInstalled'> {
+  return hasValues(['zeroconf', 'versionInstalled'], ss)
 }
 
 export function isFullySetup (ss: S9ServerBuilder): ss is Required<S9ServerBuilder> {
