@@ -26,7 +26,7 @@ export class SetupService {
 
   async setup (builder: S9ServerBuilder, productKey: string): Promise<S9Server> {
     // @TODO delete
-    // return this.mockServer(builder)
+    // return toS9Server(this.mockServer(builder))
 
     for (let i = 0; i < SetupService.setupAttempts; i ++) {
       builder = await this.discoverAttempt(builder)

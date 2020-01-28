@@ -342,7 +342,7 @@ async function mockGetAvailableApp (): Promise<Lan.GetAppAvailableRes> {
 // @TODO move-to-test-folders
 async function mockGetAvailableApps (): Promise<Lan.GetAppsAvailableRes> {
   await pauseFor(1000)
-  return [mockApiAppAvailablePreview, mockApiAppAvailablePreview, mockApiAppAvailablePreview]
+  return mockApiAppsAvailablePreview
 }
 
 // @TODO move-to-test-folders
@@ -354,13 +354,13 @@ async function mockGetAvailableAppVersionInfo (): Promise<Lan.GetAppAvailableVer
 // @TODO move-to-test-folders
 async function mockGetInstalledApp (): Promise<Lan.GetAppInstalledRes> {
   await pauseFor(1000)
-  return mockApiAppInstalled
+  return mockApiAppsInstalled[0]
 }
 
 // @TODO move-to-test-folders
 async function mockGetInstalledApps (): Promise<Lan.GetAppsInstalledRes> {
   await pauseFor(1000)
-  return [mockApiAppInstalled]
+  return mockApiAppsInstalled
 }
 
 // @TODO move-to-test-folders
@@ -378,7 +378,7 @@ async function mockGetAppConfig (): Promise<Lan.GetAppConfigRes> {
 // @TODO move-to-test-folders
 async function mockInstallApp (): Promise<Lan.PostInstallAppRes> {
   await pauseFor(1000)
-  return mockApiAppInstalled
+  return mockApiAppsInstalled[0]
 }
 
 // @TODO move-to-test-folders
@@ -536,21 +536,46 @@ const mockApiNotifications: Lan.GetNotificationsRes = [
 ]
 
 // @TODO move-to-test-folders
-const mockApiAppAvailablePreview: ApiAppAvailablePreview = {
-  id: 'bitcoind',
-  versionLatest: '0.19.0',
-  versionInstalled: null,
-  status: AppStatus.INSTALLING,
-  statusAt: new Date().toISOString(),
-  title: 'Bitcoin Core',
-  descriptionShort: 'Bitcoin is an innovative payment network and new kind of money.',
-  // server specific
-  iconURL: 'assets/img/bitcoin_core.png',
-}
+const mockApiAppsAvailablePreview: ApiAppAvailablePreview[] = [
+  {
+    id: 'bitcoind',
+    versionLatest: '0.19.0',
+    versionInstalled: '0.19.0',
+    status: AppStatus.UNKNOWN,
+    statusAt: new Date().toISOString(),
+    title: 'Bitcoin Core',
+    descriptionShort: 'Bitcoin is an innovative payment network and new kind of money.',
+    // server specific
+    iconURL: 'assets/img/bitcoin_core.png',
+  },
+  {
+    id: 'cups',
+    versionLatest: '0.1.0',
+    versionInstalled: '0.1.0',
+    status: AppStatus.UNKNOWN,
+    statusAt: new Date().toISOString(),
+    title: 'Cups Messenger',
+    descriptionShort: 'P2P encrypted messaging over Tor.',
+    // server specific
+    iconURL: 'assets/img/cups.png',
+  },
+  {
+    id: 'uptime',
+    versionLatest: '0.1.0',
+    versionInstalled: null,
+    status: AppStatus.UNKNOWN,
+    statusAt: new Date().toISOString(),
+    title: 'Uptime Friends',
+    descriptionShort: `Perform automatic health checks for your and your friend's servers.`,
+    // server specific
+    iconURL: 'assets/img/uptime.png',
+  },
+]
 
 // @TODO move-to-test-folders
 const mockApiAppAvailableFull: ApiAppAvailableFull = {
-  ...mockApiAppAvailablePreview,
+  ...mockApiAppsAvailablePreview[0],
+  versionInstalled: null,
   releaseNotes: 'Segit and more cool things!',
   descriptionLong: 'Bitcoin is an innovative payment network and new kind of money. Bitcoin utilizes a robust p2p network to garner decentralized consensus.',
   versions: ['0.19.0', '0.18.1', '0.17.0'],
@@ -562,16 +587,28 @@ const mockApiAppAvailableVersionInfo: ApiAppVersionInfo = {
 }
 
 // @TODO move-to-test-folders
-const mockApiAppInstalled: ApiAppInstalled = {
-  id: 'bitcoind',
-  versionLatest: '0.19.0',
-  versionInstalled: '0.18.1',
-  title: 'Bitcoin Core',
-  torAddress: 'sample-bitcoin-tor-address',
-  status: AppStatus.RECOVERABLE,
-  statusAt: new Date().toISOString(),
-  iconURL: 'assets/img/bitcoin_core.png',
-}
+const mockApiAppsInstalled: ApiAppInstalled[] = [
+  {
+    id: 'bitcoind',
+    versionLatest: '0.19.0',
+    versionInstalled: '0.18.1',
+    title: 'Bitcoin Core',
+    torAddress: 'sample-bitcoin-tor-address.onion',
+    status: AppStatus.RUNNING,
+    statusAt: new Date().toISOString(),
+    iconURL: 'assets/img/bitcoin_core.png',
+  },
+  {
+    id: 'cups',
+    versionLatest: '0.1.0',
+    versionInstalled: '0.1.0',
+    title: 'Cups Messenger',
+    torAddress: 'sample-cups-tor-address.onion',
+    status: AppStatus.NEEDS_CONFIG,
+    statusAt: new Date().toISOString(),
+    iconURL: 'assets/img/cups.png',
+  },
+]
 
 // @TODO move-to-test-folders
 const mockApiAppLogs: string[] = [
