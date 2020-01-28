@@ -77,10 +77,10 @@ export class AppConfigValuePage {
     // test range if number
     if (this.spec.type === 'number' && this.inputValue) {
       const range = Range.from(this.spec.range)
-      if (this.spec.integral && !RegExp('^[-+]?[0-9]+$').test(this.inputValue)) {
+      if (this.spec.integral && !RegExp(/^[-+]?[0-9]+$/).test(this.inputValue)) {
         this.error = 'Value must be an integer'
         return false
-      } else if (!this.spec.integral && !RegExp('^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)$').test(this.inputValue)) {
+      } else if (!this.spec.integral && !RegExp(/^[0-9]*\.?[0-9]+$/).test(this.inputValue)) {
         this.error = 'Value must be a number'
         return false
       } else {
