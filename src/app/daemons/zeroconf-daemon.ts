@@ -11,22 +11,23 @@ export class ZeroconfDaemon {
   watch (): Observable<ZeroconfService | null> { return this.serviceFound$ }
   services: { [hostname: string]: ZeroconfServiceExt } = { }
   private zeroconfSub: Subscription | undefined
+  readonly timeToPurge = 2000
 
   constructor (
     private readonly platform: Platform,
     private readonly zeroconf: Zeroconf,
   ) { }
 
-  async start (timeToPurge: number) {
+  async start () {
     // return this.mock()
 
-    if (!this.platform.is('cordova')) { return }
+    if (this.zeroconfSub || !this.platform.is('cordova')) { return }
 
     console.log('starting zeroconf daemon')
 
     await this.zeroconf.reInit()
 
-    setTimeout(now => this.purgeOld(now), timeToPurge, new Date().valueOf())
+    setTimeout(now => this.purgeOld(now), this.timeToPurge, new Date().valueOf())
 
     this.zeroconfSub = this.zeroconf.watch('_http._tcp.', 'local.').subscribe(result => {
       this.handleServiceUpdate(result)
@@ -41,15 +42,26 @@ export class ZeroconfDaemon {
     }
   }
 
+  reset () {
+    this.stop()
+    this.start()
+  }
+
+  clearAndStop () {
+    this.stop()
+    this.services = { }
+  }
+
   handleServiceUpdate (result: ZeroconfResult) {
     const { action, service } = result
 
     if (
       service.name.startsWith('start9-')
       && action === 'resolved'
-      && service.ipv4Addresses.length
+      && service.ipv4Addresses[0]
+      && !(this.services[service.name] && service.ipv4Addresses[0] === this.services[service.name].ipv4Addresses[0])
     ) {
-      console.log(`discovered start9 server: ${service.name}`)
+      console.log(`discovered start9 server: ${JSON.stringify(service)}`)
       this.services[service.name] = { ...service, discoveredAt: new Date().valueOf() }
       this.serviceFound$.next(service)
     }

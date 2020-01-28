@@ -206,7 +206,7 @@ export class ServerSync {
   }
 
   private async retry (server: S9Server, retryIn: number): Promise<void> {
-    console.log(`syncServer called while server updating. Retrying in ${retryIn} seconds`)
+    console.log(`syncServer called while server updating. Retrying in ${retryIn} milliseconds`)
     await pauseFor(retryIn)
     return this.syncServer(server, retryIn)
   }

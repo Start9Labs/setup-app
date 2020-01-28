@@ -11,19 +11,19 @@ export class AppModel {
   constructor () { }
 
   watch (serverId: string, appId: string): BehaviorSubject<AppInstalled> {
-    if (!this.lightCache[serverId])              throw new Error(`Expected cached apps for server ${serverId}.`)
-    if (!this.lightCache[serverId].value[appId]) throw new Error(`Expected cached app ${appId} for server ${serverId}.`)
+    if (!this.lightCache[serverId])              throw new Error(`No cached apps for server ${serverId}`)
+    if (!this.lightCache[serverId].value[appId]) throw new Error(`No cached app ${appId} for server ${serverId}`)
     return this.lightCache[serverId].value[appId]
   }
 
   watchServerCache (serverId:  string): Observable<{ [appId: string]: BehaviorSubject<AppInstalled> }> {
-    if (!this.lightCache[serverId]) throw new Error(`Expected cached apps for server ${serverId}.`)
+    if (!this.lightCache[serverId]) throw new Error(`No cached apps for server ${serverId}`)
     return this.lightCache[serverId]
   }
 
   peek (serverId: string, appId: string): AppInstalled {
-    if (!this.lightCache[serverId])              throw new Error(`Expected cached apps for server ${serverId}.`)
-    if (!this.lightCache[serverId].value[appId]) throw new Error(`Expected cached app ${appId} for server ${serverId}.`)
+    if (!this.lightCache[serverId])              throw new Error(`No cached apps for server ${serverId}`)
+    if (!this.lightCache[serverId].value[appId]) throw new Error(`No cached app ${appId} for server ${serverId}`)
     return this.lightCache[serverId].value[appId].value
   }
 
@@ -36,14 +36,14 @@ export class AppModel {
   }
 
   peekServerCache (serverId: string): { [appId: string]: BehaviorSubject<AppInstalled> } {
-    if (!this.lightCache[serverId]) throw new Error(`Expected cached apps for server ${serverId}.`)
+    if (!this.lightCache[serverId]) throw new Error(`No cached apps for server ${serverId}`)
     return this.lightCache[serverId].value
   }
 
    // no op if already exists
    // will notify subscribers to the server's app array
   create (serverId: string, app: AppInstalled): void {
-    if (!this.lightCache[serverId]) throw new Error(`Expected cached apps for server ${serverId}.`)
+    if (!this.lightCache[serverId]) throw new Error(`No cached apps for server ${serverId}`)
     if (!this.peekS(serverId, app.id)) {
       const previousCache = this.peekServerCache(serverId)
       previousCache[app.id] = new BehaviorSubject(app)
@@ -57,7 +57,7 @@ export class AppModel {
   }
 
   update (serverId: string, appId: string, update: Partial<AppInstalled>): void {
-    if (!this.lightCache[serverId]) { throw new Error(`Expected cached apps for server ${serverId}.`) }
+    if (!this.lightCache[serverId]) { throw new Error(`No cached apps for server ${serverId}`) }
     if (this.peekS(serverId, appId)) {
       const updatedApp = { ...this.peek(serverId, appId), ...update }
       this.lightCache[serverId].value[appId].next(updatedApp)
@@ -67,7 +67,7 @@ export class AppModel {
 
    // no op if missing
   remove (serverId: string, appId: string): void {
-    if (!this.lightCache[serverId]) { throw new Error(`Expected cached apps for server ${serverId}.`) }
+    if (!this.lightCache[serverId]) { throw new Error(`No cached apps for server ${serverId}`) }
     if (this.peekS(serverId, appId)) {
       const previousCache = this.peekServerCache(serverId)
       this.lightCache[serverId].value[appId].complete()

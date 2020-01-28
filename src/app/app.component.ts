@@ -5,6 +5,7 @@ import { StatusBar } from '@ionic-native/status-bar/ngx'
 import { ServerModel } from './models/server-model'
 import { ServerDaemon } from './daemons/server-daemon'
 import { ZeroconfDaemon } from './daemons/zeroconf-daemon'
+import { WifiDaemon } from './daemons/wifi-daemon'
 import { AuthService } from './services/auth.service'
 import { Router } from '@angular/router'
 import { AuthStatus } from './types/enums'
@@ -27,6 +28,7 @@ export class AppComponent {
     private readonly appModel: AppModel,
     private readonly zeroconfDaemon: ZeroconfDaemon,
     private readonly serverDaemon: ServerDaemon,
+    private readonly wifiDaemon: WifiDaemon,
     private readonly authService: AuthService,
     private readonly router: Router,
     private readonly modalCtrl: ModalController,
@@ -84,13 +86,14 @@ export class AppComponent {
   }
 
   private startDaemons () {
-    const timeToPurge = 2000
-    this.zeroconfDaemon.start(timeToPurge)
-    setTimeout(() => this.serverDaemon.start(), timeToPurge + 1000)
+    this.zeroconfDaemon.start()
+    this.wifiDaemon.start()
+    setTimeout(() => this.serverDaemon.start(), this.zeroconfDaemon.timeToPurge + 1000)
   }
 
   private stopDaemons () {
     this.serverDaemon.stop()
+    this.wifiDaemon.stop()
     this.zeroconfDaemon.stop()
   }
 

@@ -66,7 +66,7 @@ export class ServerShowPage {
     const server = this.server$.value
     const buttons: ActionSheetButton[] = [
       {
-        text: 'Edit friendly name',
+        text: 'Edit Friendly Name',
         icon: 'pricetag',
         handler: () => {
           this.presentAlertEditName()
@@ -77,21 +77,21 @@ export class ServerShowPage {
     if (server.status === ServerStatus.RUNNING) {
       buttons.push(
         {
-          text: 'Server info',
+          text: 'Server Specs',
           icon: 'information-circle-outline',
           handler: () => {
             this.navCtrl.navigateForward(['specs'], { relativeTo: this.route })
           },
         },
         {
-          text: 'Server metrics',
+          text: 'Server Metrics',
           icon: 'pulse',
           handler: () => {
             this.navCtrl.navigateForward(['metrics'], { relativeTo: this.route })
           },
         },
         {
-          text: 'Developer options',
+          text: 'Developer Options',
           icon: 'code',
           handler: () => {
             this.navCtrl.navigateForward(['developer-options'], { relativeTo: this.route })

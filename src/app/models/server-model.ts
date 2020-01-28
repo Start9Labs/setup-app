@@ -19,12 +19,12 @@ export class ServerModel {
   ) { }
 
   watch (serverId: string) : BehaviorSubject<S9Server> {
-    if (!this.darkCache[serverId]) throw new Error (`Expected cached server for ${serverId} but none found`)
+    if (!this.darkCache[serverId]) throw new Error (`No cached server for ${serverId}`)
     return this.darkCache[serverId]
   }
 
   peek (serverId: string): S9Server {
-    if (!this.darkCache[serverId] || !this.darkCache[serverId].value) throw new Error (`Expected cached server for ${serverId} but none found`)
+    if (!this.darkCache[serverId] || !this.darkCache[serverId].value) throw new Error (`No cached server for ${serverId}`)
     return this.darkCache[serverId].value
   }
 
