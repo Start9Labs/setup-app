@@ -41,7 +41,7 @@ export class ServerSpecsPage {
   }
 
   async copyTor () {
-    await this.clipboardService.copy(this.specs['torAddress'] as string || '')
+    await this.clipboardService.copy(this.specs['Tor Address'] as string || '')
   }
 
   asIsOrder () {

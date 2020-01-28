@@ -490,8 +490,8 @@ const mockApiServerMetrics: Lan.GetServerMetricsRes = {
 }
 
 const mockApiServerSpecs: Lan.GetServerSpecsRes = {
-  'model': 'S0',
-  'torAddress': 'nfsnjkcnaskjnlkasnfa.onion',
+  'Model': 'S0',
+  'Tor Address': 'nfsnjkcnaskjnlkasnfa.onion',
   'CPU': 'Broadcom BCM2711, Quad core Cortex-A72 (ARM v8) 64-bit SoC @ 1.5GHz',
   'RAM': '4GB LPDDR4-2400 SDRAM',
   'WiFI': '2.4 GHz and 5.0 GHz IEEE 802.11ac wireless, Bluetooth 5.0, BLE',

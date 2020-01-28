@@ -31,9 +31,6 @@ export class WifiDaemon {
         this.zeroconfDaemon.clearAndStop()
       })
     }
-    this.network.onChange().subscribe((value) => {
-      console.log('** change monitor ** ', value)
-    })
   }
 
   stop () {

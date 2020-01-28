@@ -1,6 +1,5 @@
 import { Component } from '@angular/core'
 import { SSHFingerprint } from 'src/app/models/server-model'
-import { S9Server } from 'src/app/models/server-model'
 import { ActivatedRoute } from '@angular/router'
 import { AlertController, LoadingController } from '@ionic/angular'
 import { ServerService } from 'src/app/services/server.service'
@@ -13,7 +12,6 @@ import { ServerService } from 'src/app/services/server.service'
 export class DevSSHKeysPage {
   error = ''
   loading = true
-  server: S9Server
   fingerprints: SSHFingerprint[] = []
   serverId: string
 
