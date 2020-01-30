@@ -20,7 +20,7 @@ export class ZeroconfDaemon {
   ) { }
 
   async start () {
-    // return this.mock()
+    return this.mock()
 
     if (this.zeroconfSub || !this.platform.is('cordova')) { return }
 
