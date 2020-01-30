@@ -11,7 +11,7 @@ import { HttpNativeService } from './http-native.service'
 @Injectable({
   providedIn: 'root',
 })
-export class ServerService {
+export class XServerService {
   constructor (
     private readonly httpService: HttpNativeService,
     private readonly appModel: AppModel,
@@ -146,6 +146,29 @@ export class ServerService {
     return this.httpService.authServerRequest<Lan.PostAddSSHKeyRes>(serverId, `/sshKeys`, { method: Method.post, data })
   }
 
+  async getWifi (serverId: string): Promise<string[]> {
+    return this.httpService.authServerRequest<Lan.GetWifiRes>(serverId, `/wifi`, { method: Method.get })
+  }
+
+  async addWifi (serverId: string, ssid: string, password: string): Promise<void> {
+    const data: Lan.PostAddWifiReq = {
+      ssid,
+      password,
+    }
+    await this.httpService.authServerRequest<Lan.PostAddWifiRes>(serverId, `/wifi`, { method: Method.post, data })
+  }
+
+  async updateWifi (serverId: string, ssid: string, password: string): Promise<void> {
+    const data: Lan.PatchWifiReq = {
+      password,
+    }
+    await this.httpService.authServerRequest<Lan.PatchWifiRes>(serverId, `/wifi/${ssid}`, { method: Method.patch, data })
+  }
+
+  async deleteWifi (serverId: string, ssid: string): Promise<void> {
+    await this.httpService.authServerRequest<Lan.DeleteWifiRes>(serverId, `/wifi/${ssid}`, { method: Method.delete })
+  }
+
   async deleteSSHKey (serverId: string, sshKey: string): Promise<void> {
     await this.httpService.authServerRequest<Lan.DeleteSSHKeyRes>(serverId, `/sshKeys/${sshKey}`, { method: Method.delete })
   }
@@ -165,7 +188,7 @@ export class ServerService {
 @Injectable({
   providedIn: 'root',
 })
-export class XServerService {
+export class ServerService {
 
   constructor (
     private readonly appModel: AppModel,
@@ -285,6 +308,22 @@ export class XServerService {
 
   async deleteSSHKey (serverId: string, sshKey: string): Promise<void> {
     await mockDeleteSSHKey()
+  }
+
+  async getWifi (serverId: string): Promise<string[]> {
+    return mockGetWifi()
+  }
+
+  async addWifi (serverId: string, ssid: string, password: string): Promise<void> {
+    await mockAddWifi()
+  }
+
+  async updateWifi (serverId: string, ssid: string, password: string): Promise<void> {
+    await mockUpdateWifi()
+  }
+
+  async deleteWifi (serverId: string, ssid: string): Promise<void> {
+    await mockDeleteWifi()
   }
 
   async restartServer (serverId: string): Promise<void> {
@@ -425,6 +464,27 @@ async function mockAddSSHKey (): Promise<SSHFingerprint> {
 
 // @TODO move-to-test-folders
 async function mockDeleteSSHKey (): Promise<Lan.DeleteSSHKeyRes> {
+  await pauseFor(1000)
+  return { }
+}
+
+// @TODO move-to-test-folders
+async function mockGetWifi (): Promise<string[]> {
+  await pauseFor(1000)
+  return ['Goosers', 'Atlantic_City']
+}
+
+async function mockAddWifi (): Promise<Lan.PostAddWifiRes> {
+  await pauseFor(1000)
+  return { }
+}
+
+async function mockUpdateWifi (): Promise<Lan.PatchWifiRes> {
+  await pauseFor(1000)
+  return { }
+}
+
+async function mockDeleteWifi (): Promise<Lan.DeleteWifiRes> {
   await pauseFor(1000)
   return { }
 }
