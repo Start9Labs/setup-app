@@ -14,7 +14,6 @@ import { HttpNativeService, getAuthHeader } from './http-native.service'
 })
 export class SetupService {
   private static readonly setupAttempts = 8
-  private static readonly timeout = 3 // seconds
   private static readonly waitForMS = 1000 // miliseconds
   public message = ''
 
@@ -106,7 +105,7 @@ export class SetupService {
   async getVersion (builder: S9BuilderWith<'zeroconf'>): Promise<string | undefined> {
     try {
       const host = getLanIP(builder.zeroconf)
-      const { version } = await this.httpService.request<Lan.GetVersionRes>(`http://${host}/version`, { method: Method.get, timeout: SetupService.timeout })
+      const { version } = await this.httpService.request<Lan.GetVersionRes>(`http://${host}/version`, { method: Method.get })
       return version
     } catch (e) {
       return undefined
@@ -115,7 +114,7 @@ export class SetupService {
 
   async getTor (builder: S9BuilderWith<'zeroconf' | 'versionInstalled'>): Promise<string | undefined> {
     try {
-      const { torAddress } = await this.httpService.serverRequest<Lan.GetTorRes>(builder, '/tor', { method: Method.get, timeout: SetupService.timeout })
+      const { torAddress } = await this.httpService.serverRequest<Lan.GetTorRes>(builder, '/tor', { method: Method.get })
       return torAddress
     } catch (e) {
       return undefined
@@ -126,7 +125,7 @@ export class SetupService {
     const { pubkey } = builder
     try {
       const data: Lan.PostRegisterReq = { pubKey: pubkey, productKey }
-      await this.httpService.serverRequest<Lan.PostRegisterRes>(builder, '/register', { method: Method.post, data, timeout: SetupService.timeout })
+      await this.httpService.serverRequest<Lan.PostRegisterRes>(builder, '/register', { method: Method.post, data })
       return true
     } catch (e) {
       return false
@@ -134,7 +133,7 @@ export class SetupService {
   }
 
   async getServer (builder: S9BuilderWith<'zeroconf' | 'versionInstalled' | 'pubkey' | 'privkey' | 'torAddress'>): Promise<Lan.GetServerRes> {
-    return this.httpService.serverRequest<Lan.GetServerRes>(builder, '', { method: Method.get, timeout: SetupService.timeout, headers: getAuthHeader(builder) })
+    return this.httpService.serverRequest<Lan.GetServerRes>(builder, '', { method: Method.get, headers: getAuthHeader(builder) })
   }
 
   // @TODO remove

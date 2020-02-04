@@ -37,3 +37,7 @@ use jarsigner to sign release apk:
 use zipalign to optimize package:
 
 `~/Library/android/sdk/build-tools/29.0.2/zipalign -v 4 platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk ../start9-companion.apk`
+
+add "-[SEM version]" to end of apk name.
+
+Upload to Google Play Developer Console.
