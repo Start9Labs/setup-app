@@ -11,7 +11,7 @@ import { HttpNativeService } from './http-native.service'
 @Injectable({
   providedIn: 'root',
 })
-export class XServerService {
+export class ServerService {
   constructor (
     private readonly httpService: HttpNativeService,
     private readonly appModel: AppModel,
@@ -188,7 +188,7 @@ export class XServerService {
 @Injectable({
   providedIn: 'root',
 })
-export class ServerService {
+export class XServerService {
 
   constructor (
     private readonly appModel: AppModel,
