@@ -94,8 +94,6 @@ export module Lan {
   export type PostAddWifiRes = TwoHundredOK
   export type PostConnectWifiReq = { [k: string]: never }
   export type PostConnectWifiRes = TwoHundredOK
-  export type PatchWifiReq = { password: string }
-  export type PatchWifiRes = TwoHundredOK
   export type DeleteWifiReq = { [k: string]: never }
   export type DeleteWifiRes = TwoHundredOK
   export type GetSSHKeysReq = { [k: string]: never }

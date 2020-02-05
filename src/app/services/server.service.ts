@@ -162,13 +162,6 @@ export class ServerService {
     await this.httpService.authServerRequest<Lan.PostConnectWifiRes>(serverId, encodeURI(`/wifi${ssid}`), { method: Method.post })
   }
 
-  async updateWifi (serverId: string, ssid: string, password: string): Promise<void> {
-    const data: Lan.PatchWifiReq = {
-      password,
-    }
-    await this.httpService.authServerRequest<Lan.PatchWifiRes>(serverId, encodeURI(`/wifi/${ssid}`), { method: Method.patch, data })
-  }
-
   async deleteWifi (serverId: string, ssid: string): Promise<void> {
     await this.httpService.authServerRequest<Lan.DeleteWifiRes>(serverId, `/wifi/${ssid}`, { method: Method.delete })
   }
@@ -324,10 +317,6 @@ export class XServerService {
 
   async connectWifi (serverId: string, ssid: string): Promise<void> {
     await mockConnectWifi()
-  }
-
-  async updateWifi (serverId: string, ssid: string, password: string): Promise<void> {
-    await mockUpdateWifi()
   }
 
   async deleteWifi (serverId: string, ssid: string): Promise<void> {
@@ -491,11 +480,6 @@ async function mockAddWifi (): Promise<Lan.PostAddWifiRes> {
 }
 
 async function mockConnectWifi (): Promise<Lan.PostConnectWifiRes> {
-  await pauseFor(1000)
-  return { }
-}
-
-async function mockUpdateWifi (): Promise<Lan.PatchWifiRes> {
   await pauseFor(1000)
   return { }
 }
