@@ -1,4 +1,4 @@
-import { ValueSpec, ValueSpecList, AppConfigSpec, DefaultString, ValueSpecObject, ValueSpecString, ValueSpecNumber, ValueSpecEnum } from '../models/app-model'
+import { ValueSpec, ValueSpecList, AppConfigSpec, DefaultString, ListValueSpecString, ListValueSpecNumber, ListValueSpecEnum, ListValueSpecObject } from '../models/app-model'
 import * as cryptoUtil from './crypto.util'
 
 export class Range {
@@ -81,11 +81,11 @@ export function mapSpecToConfigValue (spec: ValueSpec, value: any): any {
     case 'enum': return mapSpecToConfigEnum(spec, value)
     case 'object': return mapSpecToConfigObject(spec, value)
     case 'list': return mapSpecToConfigList(spec, value)
-    default: return value
+    case 'boolean': return value
   }
 }
 
-export function mapSpecToConfigObject (spec: ValueSpecObject, value = { }): object {
+export function mapSpecToConfigObject (spec: ListValueSpecObject, value = { }): object {
   if (typeof value !== 'object' || Array.isArray(value)) {
     console.log('not an object', spec, value)
     spec.invalid = true
@@ -113,7 +113,7 @@ export function mapSpecToConfigObject (spec: ValueSpecObject, value = { }): obje
   return value
 }
 
-export function mapSpecToConfigString (spec: ValueSpecString, value: string): string {
+export function mapSpecToConfigString (spec: ListValueSpecString, value: string): string {
   if (typeof value !== 'string') {
     console.log('not a string: ', spec, value)
     spec.invalid = true
@@ -127,7 +127,7 @@ export function mapSpecToConfigString (spec: ValueSpecString, value: string): st
   return value
 }
 
-export function mapSpecToConfigNumber (spec: ValueSpecNumber, value: number) {
+export function mapSpecToConfigNumber (spec: ListValueSpecNumber, value: number) {
   if (typeof value !== 'number') {
     console.log('not a number: ', spec, value)
     spec.invalid = true
@@ -142,7 +142,7 @@ export function mapSpecToConfigNumber (spec: ValueSpecNumber, value: number) {
   return value
 }
 
-export function mapSpecToConfigEnum (spec: ValueSpecEnum, value: string) {
+export function mapSpecToConfigEnum (spec: ListValueSpecEnum, value: string) {
   if (typeof value !== 'string') {
     console.log('not an enum: ', spec, value)
     spec.invalid = true

@@ -174,53 +174,70 @@ export type ValueSpec = ValueSpecString |
 
 export interface ValueSpecBase {
   type: string
-  name: string
-  description: string
-  changeWarning?: string
-  // frontend only
   added?: boolean
   invalid?: boolean
 }
 
-export interface ValueSpecString extends ValueSpecBase {
+export interface WithStandalone {
+  name: string
+  description: string
+  changeWarning?: string
+}
+
+export interface ListValueSpecString extends ValueSpecBase {
   type: 'string'
   pattern?: string
   patternDescription?: string
+}
+
+export interface ValueSpecString extends ListValueSpecString, WithStandalone {
   default?: DefaultString
   nullable: boolean
 }
 
-export interface ValueSpecNumber extends ValueSpecBase {
+export interface ListValueSpecNumber extends ValueSpecBase {
   type: 'number'
   range: string
   integral: boolean
   units?: string
+}
+
+export interface ValueSpecNumber extends ListValueSpecNumber, WithStandalone {
   nullable: boolean
   default?: number
 }
 
-export interface ValueSpecEnum extends ValueSpecBase {
+export interface ListValueSpecEnum extends ValueSpecBase {
   type: 'enum'
   values: string[]
+}
+
+export interface ValueSpecEnum extends ListValueSpecEnum, WithStandalone {
   default: string
 }
 
-export interface ValueSpecObject extends ValueSpecBase {
+export interface ListValueSpecObject extends ValueSpecBase {
   type: 'object'
   spec: AppConfigSpec
+}
+
+export interface ValueSpecObject extends ListValueSpecObject, WithStandalone {
   nullable: boolean
   nullByDefault: boolean
 }
 
-export interface ValueSpecBoolean extends ValueSpecBase {
+export interface ValueSpecBoolean extends ValueSpecBase, WithStandalone {
   type: 'boolean'
   default: boolean
 }
 
 export interface ValueSpecList extends ValueSpecBase {
+  name: string
   type: 'list'
   subtype: 'string' | 'number' | 'enum' | 'object'
-  spec: ValueSpecString | ValueSpecNumber | ValueSpecEnum | ValueSpecObject
+  spec: ListValueSpecString | ListValueSpecNumber | ListValueSpecEnum | ListValueSpecObject
+  description: string
+  changeWarning?: string
   range: string // '[0,1]' (inclusive) OR '[0,*)' (right unbounded), normal math rules
   default: string[] | number[] | DefaultString[] | object[]
 }

@@ -800,6 +800,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
     secondaryNumbers: {
       name: 'Unlucky Numbers',
       type: 'list',
+      subtype: 'number',
       description: 'Numbers that you like but are not your top favorite.',
       spec: {
         type: 'number',
@@ -841,6 +842,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
         rulemakers: {
           name: 'Rule Makers',
           type: 'list',
+          subtype: 'object',
           description: 'the people who make the rules',
           range: '[0,2]',
           default: [],
@@ -900,6 +902,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
         notifications: {
           name: 'Notification Preferences',
           type: 'list',
+          subtype: 'enum',
           description: 'how you want to be notified',
           range: '[1,3]',
           default: ['email'],
@@ -928,6 +931,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
     rpcallowip: {
       name: 'RPC Allowed IPs',
       type: 'list',
+      subtype: 'string',
       description: 'external ip addresses that are authorized to access your Bitcoin node',
       changeWarning: 'Any IP you allow here will have RPC access to your Bitcoin node.',
       range: '[1,10]',
@@ -941,6 +945,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
     rpcauth: {
       name: 'RPC Auth',
       type: 'list',
+      subtype: 'string',
       description: 'api keys that are authorized to access your Bitcoin node.',
       range: '[0,*)',
       default: [],
