@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { LoadingController, ActionSheetController } from '@ionic/angular'
+import { LoadingController, ActionSheetController, AlertController } from '@ionic/angular'
 import { ServerService } from 'src/app/services/server.service'
 import { ActivatedRoute } from '@angular/router'
 import { ActionSheetButton } from '@ionic/core'
@@ -21,6 +21,7 @@ export class ServerWifiPage {
   constructor (
     private readonly route: ActivatedRoute,
     private readonly serverService: ServerService,
+    private readonly alertCtrl: AlertController,
     private readonly loadingCtrl: LoadingController,
     private readonly actionCtrl: ActionSheetController,
   ) { }
@@ -55,12 +56,20 @@ export class ServerWifiPage {
     ]
 
     if (ssid !== this.current) {
-      buttons.unshift({
-        text: 'Connect',
-        handler: () => {
-          this.connect(ssid)
+      buttons.unshift(
+        {
+          text: 'Connect',
+          handler: () => {
+            this.connect(ssid)
+          },
         },
-      })
+        {
+          text: 'Update Password',
+          handler: () => {
+            this.presentAlertUpdatePassword(ssid)
+          },
+        },
+      )
     }
 
     const action = await this.actionCtrl.create({
@@ -68,6 +77,32 @@ export class ServerWifiPage {
     })
 
     await action.present()
+  }
+
+  async presentAlertUpdatePassword (ssid: string) {
+    const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
+      header: 'Update Password',
+      inputs: [
+        {
+          name: 'inputValue',
+          placeholder: 'Enter new password',
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: 'Save',
+          handler: (data: { inputValue: string }) => {
+            this.update(ssid, data.inputValue)
+          },
+        },
+      ],
+    })
+    await alert.present()
   }
 
   async connect (ssid: string): Promise<void> {
@@ -89,7 +124,26 @@ export class ServerWifiPage {
     }
   }
 
-  async save (): Promise<void> {
+  async update (ssid: string, password: string): Promise<void> {
+    const loader = await this.loadingCtrl.create({
+      message: 'Connecting. This could take while...',
+      spinner: 'lines',
+      cssClass: 'loader',
+    })
+    await loader.present()
+
+    try {
+      await this.serverService.updateWifi(this.serverId, ssid, password)
+      this.current = ssid
+      this.error = ''
+    } catch (e) {
+      this.error = e.message
+    } finally {
+      await loader.dismiss()
+    }
+  }
+
+  async add (): Promise<void> {
     const loader = await this.loadingCtrl.create({
       message: 'Connecting. This could take while...',
       spinner: 'lines',

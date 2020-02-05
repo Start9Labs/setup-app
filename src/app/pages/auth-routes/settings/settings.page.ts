@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { AlertController, Platform } from '@ionic/angular'
+import { AlertController } from '@ionic/angular'
 import { AuthService } from 'src/app/services/auth.service'
 
 @Component({
@@ -10,7 +10,6 @@ import { AuthService } from 'src/app/services/auth.service'
 export class SettingsPage {
 
   constructor (
-    private readonly platform: Platform,
     private readonly alertCtrl: AlertController,
     private readonly authService: AuthService,
   ) { }
