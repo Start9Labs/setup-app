@@ -91,7 +91,7 @@ export class ServerShowPage {
           },
         },
         {
-          text: 'Wifi Setup',
+          text: 'Wifi',
           icon: 'wifi',
           handler: () => {
             this.navCtrl.navigateForward(['wifi'], { relativeTo: this.route })

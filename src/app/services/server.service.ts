@@ -146,7 +146,7 @@ export class ServerService {
     return this.httpService.authServerRequest<Lan.PostAddSSHKeyRes>(serverId, `/sshKeys`, { method: Method.post, data })
   }
 
-  async getWifi (serverId: string): Promise<string[]> {
+  async getWifi (serverId: string): Promise<Lan.GetWifiRes> {
     return this.httpService.authServerRequest<Lan.GetWifiRes>(serverId, `/wifi`, { method: Method.get })
   }
 
@@ -158,11 +158,15 @@ export class ServerService {
     await this.httpService.authServerRequest<Lan.PostAddWifiRes>(serverId, `/wifi`, { method: Method.post, data })
   }
 
+  async connectWifi (serverId: string, ssid: string): Promise<void> {
+    await this.httpService.authServerRequest<Lan.PostConnectWifiRes>(serverId, encodeURI(`/wifi${ssid}`), { method: Method.post })
+  }
+
   async updateWifi (serverId: string, ssid: string, password: string): Promise<void> {
     const data: Lan.PatchWifiReq = {
       password,
     }
-    await this.httpService.authServerRequest<Lan.PatchWifiRes>(serverId, `/wifi/${ssid}`, { method: Method.patch, data })
+    await this.httpService.authServerRequest<Lan.PatchWifiRes>(serverId, encodeURI(`/wifi/${ssid}`), { method: Method.patch, data })
   }
 
   async deleteWifi (serverId: string, ssid: string): Promise<void> {
@@ -310,12 +314,16 @@ export class XServerService {
     await mockDeleteSSHKey()
   }
 
-  async getWifi (serverId: string): Promise<string[]> {
+  async getWifi (serverId: string): Promise<Lan.GetWifiRes> {
     return mockGetWifi()
   }
 
   async addWifi (serverId: string, ssid: string, password: string): Promise<void> {
     await mockAddWifi()
+  }
+
+  async connectWifi (serverId: string, ssid: string): Promise<void> {
+    await mockConnectWifi()
   }
 
   async updateWifi (serverId: string, ssid: string, password: string): Promise<void> {
@@ -469,12 +477,20 @@ async function mockDeleteSSHKey (): Promise<Lan.DeleteSSHKeyRes> {
 }
 
 // @TODO move-to-test-folders
-async function mockGetWifi (): Promise<string[]> {
+async function mockGetWifi (): Promise<Lan.GetWifiRes> {
   await pauseFor(1000)
-  return ['Goosers', 'Atlantic_City']
+  return {
+    ssids: ['Goosers', 'Atlantic City'],
+    current: 'Goosers',
+  }
 }
 
 async function mockAddWifi (): Promise<Lan.PostAddWifiRes> {
+  await pauseFor(1000)
+  return { }
+}
+
+async function mockConnectWifi (): Promise<Lan.PostConnectWifiRes> {
   await pauseFor(1000)
   return { }
 }

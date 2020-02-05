@@ -89,9 +89,11 @@ export module Lan {
   export type DeleteNotificationReq = { [k: string]: never }
   export type DeleteNotificationRes = TwoHundredOK
   export type GetWifiReq = { [k: string]: never }
-  export type GetWifiRes = string[]
+  export type GetWifiRes = { ssids: string[], current: string }
   export type PostAddWifiReq = { ssid: string, password: string }
   export type PostAddWifiRes = TwoHundredOK
+  export type PostConnectWifiReq = { [k: string]: never }
+  export type PostConnectWifiRes = TwoHundredOK
   export type PatchWifiReq = { password: string }
   export type PatchWifiRes = TwoHundredOK
   export type DeleteWifiReq = { [k: string]: never }
