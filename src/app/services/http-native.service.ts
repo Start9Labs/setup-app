@@ -5,6 +5,7 @@ import { S9BuilderWith } from './setup.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
 import { TokenSigner } from 'jsontokens'
 import { Method } from '../types/enums'
+import * as uuid from 'uuid'
 const version = require('../../../package.json').version
 
 @Injectable({
@@ -76,8 +77,10 @@ export class HttpNativeService {
 }
 
 export function getAuthHeader (server: S9Server | S9BuilderWith<'privkey'>): { 'Authorization': string } {
-  const past = Math.floor((new Date().getTime() - 30000) / 1000)
-  const tokenPayload = { 'iss': 'start9-companion', 'iat': past, 'exp': past + 60 }
+  const tokenPayload = {
+    'iss': 'start9-companion',
+    'jti': uuid.v4(),
+  }
   const token = new TokenSigner('ES256K', server.privkey).sign(tokenPayload)
 
   return { 'Authorization': 'Bearer ' + token }
