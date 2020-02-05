@@ -75,9 +75,9 @@ export class SettingsPage {
 
   rateApp () {
     if (this.platform.is('ios')) {
-      window.open('https://apps.apple.com/app/start9-companion/id1496204174', '_system')
+      window.open('https://apps.apple.com/app/start9-companion-app/id1496204174', '_system')
     } else if (this.platform.is('android')) {
-      window.open('market://details?id=com.start9-companion.android.app', '_system')
+      window.open('market://details?id=com.start9labs.start9companion', '_system')
     }
   }
 }

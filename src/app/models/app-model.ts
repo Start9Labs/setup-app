@@ -172,76 +172,55 @@ export type ValueSpec = ValueSpecString |
                         ValueSpecList |
                         ValueSpecObject
 
-export type ListValueSpec = ListValueSpecString |
-                            ListValueSpecNumber |
-                            ListValueSpecEnum |
-                            ListValueSpecObject
-
 export interface ValueSpecBase {
   type: string
+  name: string
+  description: string
+  changeWarning?: string
+  // frontend only
   added?: boolean
   invalid?: boolean
 }
 
-export interface WithStandalone {
-  name: string
-  description: string
-  changeWarning?: string
-}
-
-export interface ListValueSpecString extends ValueSpecBase {
+export interface ValueSpecString extends ValueSpecBase {
   type: 'string'
   pattern?: string
   patternDescription?: string
-}
-
-export interface ValueSpecString extends ListValueSpecString, WithStandalone {
   default?: DefaultString
   nullable: boolean
 }
 
-export interface ListValueSpecNumber extends ValueSpecBase {
+export interface ValueSpecNumber extends ValueSpecBase {
   type: 'number'
   range: string
   integral: boolean
   units?: string
-}
-
-export interface ValueSpecNumber extends ListValueSpecNumber, WithStandalone {
   nullable: boolean
   default?: number
 }
 
-export interface ListValueSpecEnum extends ValueSpecBase {
+export interface ValueSpecEnum extends ValueSpecBase {
   type: 'enum'
   values: string[]
-}
-
-export interface ValueSpecEnum extends ListValueSpecEnum, WithStandalone {
   default: string
 }
 
-export interface ListValueSpecObject extends ValueSpecBase {
+export interface ValueSpecObject extends ValueSpecBase {
   type: 'object'
   spec: AppConfigSpec
-}
-
-export interface ValueSpecObject extends ListValueSpecObject, WithStandalone {
   nullable: boolean
   nullByDefault: boolean
 }
 
-export interface ValueSpecBoolean extends ValueSpecBase, WithStandalone {
+export interface ValueSpecBoolean extends ValueSpecBase {
   type: 'boolean'
   default: boolean
 }
 
 export interface ValueSpecList extends ValueSpecBase {
-  name: string
   type: 'list'
-  spec: ListValueSpec
-  description: string
-  changeWarning?: string
+  subtype: 'string' | 'number' | 'enum' | 'object'
+  spec: ValueSpecString | ValueSpecNumber | ValueSpecEnum | ValueSpecObject
   range: string // '[0,1]' (inclusive) OR '[0,*)' (right unbounded), normal math rules
   default: string[] | number[] | DefaultString[] | object[]
 }

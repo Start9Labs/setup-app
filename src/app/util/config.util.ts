@@ -1,4 +1,4 @@
-import { ValueSpec, ValueSpecList, AppConfigSpec, WithStandalone, ListValueSpecObject, ListValueSpecString, ListValueSpecEnum, DefaultString, ListValueSpecNumber } from '../models/app-model'
+import { ValueSpec, ValueSpecList, AppConfigSpec, DefaultString, ValueSpecObject, ValueSpecString, ValueSpecNumber, ValueSpecEnum } from '../models/app-model'
 import * as cryptoUtil from './crypto.util'
 
 export class Range {
@@ -76,22 +76,16 @@ export function mapSpecToConfigValue (spec: ValueSpec, value: any): any {
   }
 
   switch (spec.type) {
-    case 'object':
-      return mapSpecToConfigObject(spec, value)
-    case 'string':
-      return mapSpecToConfigString(spec, value)
-    case 'number':
-      return mapSpecToConfigNumber(spec, value)
-    case 'list':
-      return mapSpecToConfigList(spec, value)
-    case 'enum':
-      return mapSpecToConfigEnum(spec, value)
-    default:
-      return value
+    case 'string': return mapSpecToConfigString(spec, value)
+    case 'number': return mapSpecToConfigNumber(spec, value)
+    case 'enum': return mapSpecToConfigEnum(spec, value)
+    case 'object': return mapSpecToConfigObject(spec, value)
+    case 'list': return mapSpecToConfigList(spec, value)
+    default: return value
   }
 }
 
-export function mapSpecToConfigObject (spec: ListValueSpecObject, value = { }): object {
+export function mapSpecToConfigObject (spec: ValueSpecObject, value = { }): object {
   if (typeof value !== 'object' || Array.isArray(value)) {
     console.log('not an object', spec, value)
     spec.invalid = true
@@ -119,7 +113,7 @@ export function mapSpecToConfigObject (spec: ListValueSpecObject, value = { }): 
   return value
 }
 
-export function mapSpecToConfigString (spec: ListValueSpecString, value: string): string {
+export function mapSpecToConfigString (spec: ValueSpecString, value: string): string {
   if (typeof value !== 'string') {
     console.log('not a string: ', spec, value)
     spec.invalid = true
@@ -133,7 +127,7 @@ export function mapSpecToConfigString (spec: ListValueSpecString, value: string)
   return value
 }
 
-export function mapSpecToConfigNumber (spec: ListValueSpecNumber, value: number) {
+export function mapSpecToConfigNumber (spec: ValueSpecNumber, value: number) {
   if (typeof value !== 'number') {
     console.log('not a number: ', spec, value)
     spec.invalid = true
@@ -148,7 +142,7 @@ export function mapSpecToConfigNumber (spec: ListValueSpecNumber, value: number)
   return value
 }
 
-export function mapSpecToConfigEnum (spec: ListValueSpecEnum, value: string) {
+export function mapSpecToConfigEnum (spec: ValueSpecEnum, value: string) {
   if (typeof value !== 'string') {
     console.log('not an enum: ', spec, value)
     spec.invalid = true
@@ -173,9 +167,6 @@ export function mapSpecToConfigList (spec: ValueSpecList, value: string[] | numb
 
   let fn: (val: object | string | number) => string | object | number = () => ({ })
   switch (listSpec.type) {
-    case 'object':
-      fn = (val: object) => mapSpecToConfigObject(listSpec, val)
-      break
     case 'string':
       fn = (val: string) => mapSpecToConfigString(listSpec, val)
       break
@@ -184,6 +175,9 @@ export function mapSpecToConfigList (spec: ValueSpecList, value: string[] | numb
       break
     case 'enum':
       fn = (val: string) => mapSpecToConfigEnum(listSpec, val)
+      break
+    case 'object':
+      fn = (val: object) => mapSpecToConfigObject(listSpec, val)
       break
   }
   // map nested values
@@ -200,7 +194,7 @@ export function mapSpecToConfigList (spec: ValueSpecList, value: string[] | numb
   return value
 }
 
-export function getDefaultConfigValue (spec: ValueSpec): object | string | number | object[] | string[] | boolean | null {
+export function getDefaultConfigValue (spec: ValueSpec): string | number | object | string[] | number[] | object[] | boolean | null {
 
   switch (spec.type) {
     case 'object':
@@ -208,13 +202,11 @@ export function getDefaultConfigValue (spec: ValueSpec): object | string | numbe
     case 'string':
       return spec.default ? getDefaultString(spec.default) : null
     case 'number':
-      return spec.default ? getDefaultNumber(spec.default) : null
+      return spec.default || null
     case 'list':
-      return getDefaultList(spec.default)
     case 'enum':
-      return getDefaultEnum(spec.default)
     case 'boolean':
-      return getDefaultBoolean(spec.default)
+      return spec.default
   }
 }
 
@@ -238,22 +230,6 @@ export function getDefaultString (defaultVal: string | DefaultString): string {
 
     return s
   }
-}
-
-export function getDefaultNumber (defaultVal: number): number {
-  return defaultVal
-}
-
-export function getDefaultEnum (defaultVal: string): string {
-  return defaultVal
-}
-
-export function getDefaultBoolean (defaultVal: boolean): boolean {
-  return defaultVal
-}
-
-export function getDefaultList (defaultVal: any[]): any[] {
-  return defaultVal
 }
 
 export function getDefaultDescription (spec: ValueSpec): string | undefined {
