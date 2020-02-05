@@ -69,7 +69,7 @@
           <h5>{{ (app$ | async)?.versionInstalled }}</h5>
         </ion-text>
       </ion-item>
-      <ion-item>
+      <ion-item *ngIf="(app$ | async)?.torAddress">
         <ion-label position="stacked">Tor Address</ion-label>
         <ion-text style="word-break: break-all;" color="medium">
           <h5>{{ (app$ | async)?.torAddress }}</h5>

@@ -84,10 +84,17 @@ export class ServerShowPage {
           },
         },
         {
-          text: 'Server Metrics',
+          text: 'Metrics',
           icon: 'pulse',
           handler: () => {
             this.navCtrl.navigateForward(['metrics'], { relativeTo: this.route })
+          },
+        },
+        {
+          text: 'Wifi',
+          icon: 'wifi',
+          handler: () => {
+            this.navCtrl.navigateForward(['wifi'], { relativeTo: this.route })
           },
         },
         {

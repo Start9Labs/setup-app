@@ -146,6 +146,33 @@ export class ServerService {
     return this.httpService.authServerRequest<Lan.PostAddSSHKeyRes>(serverId, `/sshKeys`, { method: Method.post, data })
   }
 
+  async getWifi (serverId: string): Promise<Lan.GetWifiRes> {
+    return this.httpService.authServerRequest<Lan.GetWifiRes>(serverId, `/wifi`, { method: Method.get })
+  }
+
+  async addWifi (serverId: string, ssid: string, password: string): Promise<void> {
+    const data: Lan.PostAddWifiReq = {
+      ssid,
+      password,
+    }
+    await this.httpService.authServerRequest<Lan.PostAddWifiRes>(serverId, `/wifi`, { method: Method.post, data })
+  }
+
+  async connectWifi (serverId: string, ssid: string): Promise<void> {
+    await this.httpService.authServerRequest<Lan.PostConnectWifiRes>(serverId, encodeURI(`/wifi${ssid}`), { method: Method.post })
+  }
+
+  async updateWifi (serverId: string, ssid: string, password: string): Promise<void> {
+    const data: Lan.PatchWifiReq = {
+      password,
+    }
+    await this.httpService.authServerRequest<Lan.PatchWifiRes>(serverId, encodeURI(`/wifi/${ssid}`), { method: Method.patch, data })
+  }
+
+  async deleteWifi (serverId: string, ssid: string): Promise<void> {
+    await this.httpService.authServerRequest<Lan.DeleteWifiRes>(serverId, `/wifi/${ssid}`, { method: Method.delete })
+  }
+
   async deleteSSHKey (serverId: string, sshKey: string): Promise<void> {
     await this.httpService.authServerRequest<Lan.DeleteSSHKeyRes>(serverId, `/sshKeys/${sshKey}`, { method: Method.delete })
   }
@@ -287,6 +314,26 @@ export class XServerService {
     await mockDeleteSSHKey()
   }
 
+  async getWifi (serverId: string): Promise<Lan.GetWifiRes> {
+    return mockGetWifi()
+  }
+
+  async addWifi (serverId: string, ssid: string, password: string): Promise<void> {
+    await mockAddWifi()
+  }
+
+  async connectWifi (serverId: string, ssid: string): Promise<void> {
+    await mockConnectWifi()
+  }
+
+  async updateWifi (serverId: string, ssid: string, password: string): Promise<void> {
+    await mockUpdateWifi()
+  }
+
+  async deleteWifi (serverId: string, ssid: string): Promise<void> {
+    await mockDeleteWifi()
+  }
+
   async restartServer (serverId: string): Promise<void> {
     await mockRestartServer()
   }
@@ -425,6 +472,35 @@ async function mockAddSSHKey (): Promise<SSHFingerprint> {
 
 // @TODO move-to-test-folders
 async function mockDeleteSSHKey (): Promise<Lan.DeleteSSHKeyRes> {
+  await pauseFor(1000)
+  return { }
+}
+
+// @TODO move-to-test-folders
+async function mockGetWifi (): Promise<Lan.GetWifiRes> {
+  await pauseFor(1000)
+  return {
+    ssids: ['Goosers', 'Atlantic City'],
+    current: 'Goosers',
+  }
+}
+
+async function mockAddWifi (): Promise<Lan.PostAddWifiRes> {
+  await pauseFor(1000)
+  return { }
+}
+
+async function mockConnectWifi (): Promise<Lan.PostConnectWifiRes> {
+  await pauseFor(1000)
+  return { }
+}
+
+async function mockUpdateWifi (): Promise<Lan.PatchWifiRes> {
+  await pauseFor(1000)
+  return { }
+}
+
+async function mockDeleteWifi (): Promise<Lan.DeleteWifiRes> {
   await pauseFor(1000)
   return { }
 }
@@ -740,6 +816,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
     secondaryNumbers: {
       name: 'Unlucky Numbers',
       type: 'list',
+      subtype: 'number',
       description: 'Numbers that you like but are not your top favorite.',
       spec: {
         type: 'number',
@@ -781,6 +858,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
         rulemakers: {
           name: 'Rule Makers',
           type: 'list',
+          subtype: 'object',
           description: 'the people who make the rules',
           range: '[0,2]',
           default: [],
@@ -840,6 +918,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
         notifications: {
           name: 'Notification Preferences',
           type: 'list',
+          subtype: 'enum',
           description: 'how you want to be notified',
           range: '[1,3]',
           default: ['email'],
@@ -868,6 +947,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
     rpcallowip: {
       name: 'RPC Allowed IPs',
       type: 'list',
+      subtype: 'string',
       description: 'external ip addresses that are authorized to access your Bitcoin node',
       changeWarning: 'Any IP you allow here will have RPC access to your Bitcoin node.',
       range: '[1,10]',
@@ -881,6 +961,7 @@ const mockApiAppConfig: Lan.GetAppConfigRes = {
     rpcauth: {
       name: 'RPC Auth',
       type: 'list',
+      subtype: 'string',
       description: 'api keys that are authorized to access your Bitcoin node.',
       range: '[0,*)',
       default: [],

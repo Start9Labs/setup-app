@@ -1,0 +1,42 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="['/auth', 'servers', serverId]"></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      Wifi Setup
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding-top">
+
+  <ion-item-group>
+    <ion-item-divider>Add Wifi Network</ion-item-divider>
+    <ion-item>
+      <ion-input placeholder="Network Name (SSID)" [(ngModel)]="ssid"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-input type="password" placeholder="Password" [(ngModel)]="password"></ion-input>
+    </ion-item>
+  </ion-item-group>
+
+  <ion-button [disabled]="!ssid" expand="block" fill="outline" (click)="add()" style="margin: 20px 0;">
+    Connect
+  </ion-button>
+
+  <ion-item-group>
+    <ion-item-divider>Saved Networks</ion-item-divider>
+    <div *ngIf="!loading">
+      <ion-item button detail="false" *ngFor="let ssid of savedNetworks; let i = index" (click)="presentAction(ssid, i)">
+        <ion-label>{{ ssid }}</ion-label>
+        <ion-icon *ngIf="ssid === current" name="wifi" color="success"></ion-icon>
+      </ion-item>
+    </div>
+  </ion-item-group>
+
+  <div *ngIf="loading" class="sublist-spinner">
+    <ion-spinner name="lines" color="warning"></ion-spinner>
+  </div>
+
+</ion-content>

@@ -172,11 +172,6 @@ export type ValueSpec = ValueSpecString |
                         ValueSpecList |
                         ValueSpecObject
 
-export type ListValueSpec = ListValueSpecString |
-                            ListValueSpecNumber |
-                            ListValueSpecEnum |
-                            ListValueSpecObject
-
 export interface ValueSpecBase {
   type: string
   added?: boolean
@@ -239,7 +234,8 @@ export interface ValueSpecBoolean extends ValueSpecBase, WithStandalone {
 export interface ValueSpecList extends ValueSpecBase {
   name: string
   type: 'list'
-  spec: ListValueSpec
+  subtype: 'string' | 'number' | 'enum' | 'object'
+  spec: ListValueSpecString | ListValueSpecNumber | ListValueSpecEnum | ListValueSpecObject
   description: string
   changeWarning?: string
   range: string // '[0,1]' (inclusive) OR '[0,*)' (right unbounded), normal math rules

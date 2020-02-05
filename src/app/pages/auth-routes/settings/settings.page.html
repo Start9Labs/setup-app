@@ -21,7 +21,7 @@
 
   <ion-item-group>
     <ion-item-divider>More</ion-item-divider>
-    <ion-item button detail="false" (click)="rateApp()">
+    <ion-item button detail="false" [href]="platform.is('ios') ? 'itms-apps://apps.apple.com/app/start9-companion-app/id1496204174' : 'market://details?id=com.start9labs.start9companion'" target="_system">
       <ion-icon slot="start" color="danger" name="heart"></ion-icon>
       <ion-label>Rate This App</ion-label>
       <div slot="end">
@@ -31,7 +31,7 @@
     <ion-item href="https://start9labs.com/pages/faq" target="_blank">
       <ion-label>View FAQ</ion-label>
     </ion-item>
-    <ion-item button detail="false" (click)="openEmail()">
+    <ion-item button detail="false" href="mailto:support@start9labs.com" target="_system">
       <ion-label>Contact Support</ion-label>
     </ion-item>
   </ion-item-group>

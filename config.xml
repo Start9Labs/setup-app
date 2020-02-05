@@ -1,17 +1,13 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.start9labs.start9companion" version="1.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.start9labs.start9companion" version="1.1.0" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Start9 Companion</name>
-    <description>companion app for the Start9 personal server</description>
+    <description>Companion app for the Start9 personal server</description>
     <author email="ops@start9labs.com" href="https://start9labs.com/">Start9 Labs</author>
     <content src="index.html" />
     <access origin="*" />
-    <allow-intent href="http://*/*" />
-    <allow-intent href="https://*/*" />
-    <allow-intent href="tel:*" />
-    <allow-intent href="sms:*" />
+    <allow-intent href="https://start9labs.com/*" />
     <allow-intent href="mailto:*" />
-    <allow-intent href="geo:*" />
-    <preference name="android-minSdkVersion" value="21" />
+    <preference name="android-minSdkVersion" value="23" />
     <preference name="android-targetSdkVersion" value="29" />
     <preference name="StatusBarStyle" value="default" />
     <preference name="AutoHideSplashScreen" value="false" />
@@ -48,8 +44,7 @@
         <splash density="port-xxxhdpi" src="resources/android/splash/drawable-port-xxxhdpi-screen.png" />
     </platform>
     <platform name="ios">
-        <allow-intent href="itms:*" />
-        <allow-intent href="itms-apps:*" />
+        <allow-intent href="itms-apps://apps.apple.com/app/start9-companion-app/id1496204174" />
         <icon height="57" src="resources/ios/icon/icon.png" width="57" />
         <icon height="114" src="resources/ios/icon/icon@2x.png" width="114" />
         <icon height="20" src="resources/ios/icon/icon-20.png" width="20" />

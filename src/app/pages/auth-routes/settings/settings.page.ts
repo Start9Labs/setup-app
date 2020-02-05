@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { AlertController, Platform } from '@ionic/angular'
+import { AlertController } from '@ionic/angular'
 import { AuthService } from 'src/app/services/auth.service'
 
 @Component({
@@ -10,7 +10,6 @@ import { AuthService } from 'src/app/services/auth.service'
 export class SettingsPage {
 
   constructor (
-    private readonly platform: Platform,
     private readonly alertCtrl: AlertController,
     private readonly authService: AuthService,
   ) { }
@@ -67,17 +66,5 @@ export class SettingsPage {
       ],
     })
     await alert.present()
-  }
-
-  openEmail () {
-    window.open('mailto:support@start9labs.com', '_system')
-  }
-
-  rateApp () {
-    if (this.platform.is('ios')) {
-      window.open('https://apps.apple.com/app/start9-companion/id1496204174', '_system')
-    } else if (this.platform.is('android')) {
-      window.open('market://details?id=com.start9-companion.android.app', '_system')
-    }
   }
 }
