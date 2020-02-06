@@ -23,12 +23,12 @@ export class SetupPage {
     private readonly setupService: SetupService,
     private readonly serverModel: ServerModel,
     private readonly loadingCtrl: LoadingController,
-    public zeroconfDaemon: ZeroconfDaemon,
+    private readonly zeroconfDaemon: ZeroconfDaemon,
   ) { }
 
   ngOnInit () {
     this.serviceFound = !!Object.entries(this.zeroconfDaemon.services).length
-    this.zeroconfMonitor = this.zeroconfDaemon.watch().subscribe(service => { this.serviceFound = !!service })
+    this.zeroconfMonitor = this.zeroconfDaemon.watchFound().subscribe(service => { this.serviceFound = !!service })
   }
 
   ngOnDestroy () {

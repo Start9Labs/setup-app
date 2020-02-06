@@ -67,7 +67,7 @@ export class ServerSyncService {
     private readonly appModel: AppModel,
     private readonly syncNotifier: SyncNotifier,
   ) {
-    this.zeroconfDaemon.watch().subscribe(zeroconfService => this.handleZeroconfUpdate(zeroconfService) )
+    this.zeroconfDaemon.watchFound().subscribe(zeroconfService => this.handleZeroconfUpdate(zeroconfService) )
   }
 
   fromCache (): ServerSync {

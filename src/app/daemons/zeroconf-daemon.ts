@@ -9,7 +9,9 @@ import { pauseFor } from '../util/misc.util'
 })
 export class ZeroconfDaemon {
   private readonly serviceFound$ : BehaviorSubject<ZeroconfService | null> = new BehaviorSubject(null)
-  watch (): Observable<ZeroconfService | null> { return this.serviceFound$ }
+  private readonly serviceUpdated$ : BehaviorSubject<ZeroconfService | null> = new BehaviorSubject(null)
+  watchFound (): Observable<ZeroconfService | null> { return this.serviceFound$ }
+  watchUpdated (): Observable<ZeroconfService | null> { return this.serviceUpdated$ }
   services: { [hostname: string]: ZeroconfServiceExt } = { }
   private zeroconfSub: Subscription | undefined
   readonly timeToPurge = 4000
@@ -64,8 +66,9 @@ export class ZeroconfDaemon {
     ) {
       // if exists with same IP, update discoveredAt
       if (this.services[service.name] && service.ipv4Addresses[0] === this.services[service.name].ipv4Addresses[0]) {
-        console.log(`updating zeroconf service discoveredAt: ${service.name}`)
+        console.log(`rediscovered zeroconf service: ${service.name}`)
         this.services[service.name].discoveredAt = new Date().valueOf()
+        this.serviceUpdated$.next(service)
       // if not exists, add it
       } else {
         console.log(`discovered zeroconf service: ${service.name}`)
