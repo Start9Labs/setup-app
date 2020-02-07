@@ -182,7 +182,7 @@ export class ServerShowPage {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Confirm',
-      message: `Update Agent OS to ${server.versionLatest}?`,
+      message: `Update MeshOS to ${server.versionLatest}?`,
       buttons: [
         {
           text: 'Cancel',

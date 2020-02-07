@@ -37,7 +37,7 @@
   <ion-button
     *ngIf="(server$ | async)?.status === 'RUNNING' && compareVersions((server$ | async)?.versionInstalled, (server$ | async)?.versionLatest) === -1"
     style="margin: 16px 0;" expand="block" fill="outline" (click)="presentAlertUpdate()">
-    Update Agent to {{ (server$ | async)?.versionLatest }}
+    Update MeshOS to {{ (server$ | async)?.versionLatest }}
   </ion-button>
 
   <ion-item-group>
