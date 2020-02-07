@@ -159,7 +159,7 @@ export class ServerService {
   }
 
   async connectWifi (serverId: string, ssid: string): Promise<void> {
-    await this.httpService.authServerRequest<Lan.PostConnectWifiRes>(serverId, encodeURI(`/wifi${ssid}`), { method: Method.post })
+    await this.httpService.authServerRequest<Lan.PostConnectWifiRes>(serverId, encodeURI(`/wifi/${ssid}`), { method: Method.post })
   }
 
   async deleteWifi (serverId: string, ssid: string): Promise<void> {
