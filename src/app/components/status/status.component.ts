@@ -26,7 +26,7 @@ export class StatusComponent {
   handleServerStatus () {
     switch (this.serverStatus) {
       case ServerStatus.UNKNOWN:
-        this.display = 'Connecting'
+        this.display = 'Connecting...'
         this.color = 'dark'
         break
       case ServerStatus.UNREACHABLE:
@@ -42,7 +42,7 @@ export class StatusComponent {
         this.color = 'success'
         break
       case ServerStatus.UPDATING:
-        this.display = 'Updating'
+        this.display = 'Updating...'
         this.color = 'primary'
         break
       default:
@@ -57,11 +57,11 @@ export class StatusComponent {
         this.color = 'dark'
         break
       case AppStatus.REMOVING:
-        this.display = 'Removing'
+        this.display = 'Removing...'
         this.color = 'danger'
         break
       case AppStatus.RESTARTING:
-        this.display = 'Restarting'
+        this.display = 'Restarting...'
         this.color = 'warning'
         break
       case AppStatus.NEEDS_CONFIG:
@@ -82,7 +82,7 @@ export class StatusComponent {
         this.color = 'danger'
         break
       case AppStatus.INSTALLING:
-        this.display = 'Installing'
+        this.display = 'Installing...'
         this.color = 'warning'
         break
       case AppStatus.DEAD:
