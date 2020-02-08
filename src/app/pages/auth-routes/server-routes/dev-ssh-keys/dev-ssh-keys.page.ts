@@ -3,6 +3,7 @@ import { SSHFingerprint } from 'src/app/models/server-model'
 import { ActivatedRoute } from '@angular/router'
 import { AlertController, LoadingController } from '@ionic/angular'
 import { ServerService } from 'src/app/services/server.service'
+import { pauseFor } from 'src/app/util/misc.util'
 
 @Component({
   selector: 'dev-ssh-keys',
@@ -24,7 +25,13 @@ export class DevSSHKeysPage {
 
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
-    await this.getSSHKeys()
+
+    await Promise.all([
+      this.getSSHKeys(),
+      pauseFor(600),
+    ])
+
+    this.loading = false
   }
 
   async doRefresh (event: any) {
@@ -38,8 +45,6 @@ export class DevSSHKeysPage {
       this.error = ''
     } catch (e) {
       this.error = e.message
-    } finally {
-      this.loading = false
     }
   }
 

@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router'
 import { AppInstalled, AppConfigSpec, AppStatus, AppModel } from 'src/app/models/app-model'
 import { ServerService } from 'src/app/services/server.service'
 import { BehaviorSubject } from 'rxjs'
+import { pauseFor } from 'src/app/util/misc.util'
 
 @Component({
   selector: 'app-config',
@@ -11,7 +12,7 @@ import { BehaviorSubject } from 'rxjs'
   styleUrls: ['./app-config.page.scss'],
 })
 export class AppConfigPage {
-  loading = false
+  loading = true
   error = ''
   app$: BehaviorSubject<AppInstalled>
   appId: string
@@ -34,16 +35,19 @@ export class AppConfigPage {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
     this.appId = this.route.snapshot.paramMap.get('appId') as string
     this.app$ = this.appModel.watch(this.serverId, this.appId)
-
     const app = this.app$.value
     if (app.status === AppStatus.RECOVERABLE) {
       await this.presentAlertRecoverable()
     } else {
-      await this.getConfig()
+      await Promise.all([
+        this.getConfig(true),
+        pauseFor(600),
+      ])
+      this.loading = false
     }
   }
 
-  async getConfig () {
+  async getConfig (initialLoad = false) {
     this.loading = true
     try {
       const { spec, config } = await this.serverService.getAppConfig(this.serverId, this.appId)
@@ -52,7 +56,7 @@ export class AppConfigPage {
     } catch (e) {
       this.error = e.message
     } finally {
-      this.loading = false
+      if (!initialLoad) { this.loading = false }
     }
   }
 
@@ -159,7 +163,7 @@ export class AppConfigPage {
           text: `Leave`,
           cssClass: 'alert-danger',
           handler: () => {
-            alert.dismiss().then(() => this.navigateBack())
+            this.navigateBack()
           },
         },
         {

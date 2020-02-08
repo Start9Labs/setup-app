@@ -3,11 +3,15 @@
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="['/auth', 'servers', serverId]"></ion-back-button>
     </ion-buttons>
-    <ion-title>Sovereign App Store</ion-title>
+    <ion-title>Store</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding-top ion-padding-bottom">
+
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content refreshingSpinner="lines"></ion-refresher-content>
+  </ion-refresher>
 
   <ion-spinner *ngIf="loading" class="center" name="lines" color="warning"></ion-spinner>
 

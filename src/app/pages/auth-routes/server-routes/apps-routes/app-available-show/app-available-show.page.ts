@@ -6,6 +6,7 @@ import { AppAvailableFull } from 'src/app/models/app-model'
 import { ServerService } from 'src/app/services/server.service'
 import { NavController, AlertController, LoadingController } from '@ionic/angular'
 import * as compareVersions from 'compare-versions'
+import { pauseFor } from 'src/app/util/misc.util'
 
 @Component({
   selector: 'app-available-show',
@@ -28,11 +29,15 @@ export class AppAvailableShowPage {
   ) { }
 
   async ngOnInit () {
-    try {
-      this.serverId = this.route.snapshot.paramMap.get('serverId') as string
+    this.serverId = this.route.snapshot.paramMap.get('serverId') as string
+    const appId = this.route.snapshot.paramMap.get('appId') as string
 
-      const appId = this.route.snapshot.paramMap.get('appId') as string
-      this.app = await this.serverService.getAvailableApp(this.serverId, appId)
+    try {
+      const [app] = await Promise.all([
+        this.serverService.getAvailableApp(this.serverId, appId),
+        pauseFor(600),
+      ])
+      this.app = app
     } catch (e) {
       this.error = e.message
     } finally {

@@ -6,6 +6,7 @@ import { AppInstalled, AppStatus, AppModel } from 'src/app/models/app-model'
 import { ClipboardService } from 'src/app/services/clipboard.service'
 import { ActionSheetButton } from '@ionic/core'
 import { BehaviorSubject } from 'rxjs'
+import { pauseFor } from 'src/app/util/misc.util'
 
 @Component({
   selector: 'app-installed-show',
@@ -33,13 +34,14 @@ export class AppInstalledShowPage {
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
     this.appId = this.route.snapshot.paramMap.get('appId') as string
-    try {
-      this.app$ = this.appModel.watch(this.serverId, this.appId)
-    } catch (e) {
-      console.error(e.message)
-    }
+    this.app$ = this.appModel.watch(this.serverId, this.appId)
 
-    this.getApp()
+    await Promise.all([
+      this.getApp(),
+      pauseFor(600),
+    ])
+
+    this.loading = false
   }
 
   async doRefresh (event: any) {
@@ -55,8 +57,6 @@ export class AppInstalledShowPage {
       this.error = ''
     } catch (e) {
       this.error = e.message
-    } finally {
-      this.loading = false
     }
   }
 
@@ -81,7 +81,7 @@ export class AppInstalledShowPage {
           text: 'App Config',
           icon: 'construct',
           handler: () => {
-            this.navigate(action, ['config'])
+            this.navigate(['config'])
           },
         },
       )
@@ -92,14 +92,14 @@ export class AppInstalledShowPage {
         text: 'View Logs',
         icon: 'paper',
         handler: () => {
-          this.navigate(action, ['logs'])
+          this.navigate(['logs'])
         },
       },
       {
         text: 'Store Listing',
         icon: 'appstore',
         handler: () => {
-          this.navigate(action, ['/auth', 'servers', this.serverId, 'apps', 'available', app.id])
+          this.navigate(['/auth', 'servers', this.serverId, 'apps', 'available', app.id])
         },
       },
     )
@@ -201,8 +201,7 @@ export class AppInstalledShowPage {
     }
   }
 
-  private async navigate (menu: HTMLIonActionSheetElement, path: string[]): Promise<void> {
-    await menu.dismiss()
+  private async navigate (path: string[]): Promise<void> {
     await this.navCtrl.navigateForward(path, { relativeTo: this.route })
   }
 }

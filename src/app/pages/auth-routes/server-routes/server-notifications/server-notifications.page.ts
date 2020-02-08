@@ -6,6 +6,7 @@ import { ServerService } from 'src/app/services/server.service'
 import { LoadingController } from '@ionic/angular'
 import { Observable } from 'rxjs'
 import { first } from 'rxjs/operators'
+import { pauseFor } from 'src/app/util/misc.util'
 
 @Component({
   selector: 'server-notifications',
@@ -19,7 +20,7 @@ export class ServerNotificationsPage {
   page = 1
   needInfinite = false
   readonly perPage = 20
-  server$: Observable<S9Server>
+  server: S9Server
   serverId: string
 
   constructor (
@@ -31,12 +32,14 @@ export class ServerNotificationsPage {
 
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
-    this.server$ = this.serverModel.watchOne(this.serverId)
-
-    this.server$.pipe(first()).subscribe(async s => {
-      this.notifications = await this.getNotifications()
-      this.serverModel.updateCache(s.id, { badge: 0 })
-    })
+    this.server = this.serverModel.peekOne(this.serverId)
+    const [notifications] = await Promise.all([
+      this.getNotifications(),
+      pauseFor(600),
+    ])
+    this.notifications = notifications
+    this.serverModel.updateCache(this.serverId, { badge: 0 })
+    this.loading = false
   }
 
   async doRefresh (e: any) {
@@ -61,7 +64,6 @@ export class ServerNotificationsPage {
     } catch (e) {
       this.error = e.message
     } finally {
-      this.loading = false
       return notifications
     }
   }

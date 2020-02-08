@@ -9,6 +9,7 @@ import * as compareVersions from 'compare-versions'
 import { ServerService } from 'src/app/services/server.service'
 import { ServerSyncService } from 'src/app/services/server.sync.service'
 import { Observable, BehaviorSubject } from 'rxjs'
+import { pauseFor } from 'src/app/util/misc.util'
 
 @Component({
   selector: 'server-show',
@@ -41,7 +42,12 @@ export class ServerShowPage {
     this.server$ = this.serverModel.watchOne(this.serverId)
     this.serverApps$ = this.appModel.watchServerCache(this.serverId)
 
-    this.getServerAndApps()
+    await Promise.all([
+      this.getServerAndApps(),
+      pauseFor(600),
+    ])
+
+    this.loading = false
   }
 
   async doRefresh (event: any) {
@@ -51,14 +57,11 @@ export class ServerShowPage {
 
   async getServerAndApps () {
     const server = this.server$.value
-    this.loading = true
     try {
       await this.sss.fromCache().syncServer(server)
       this.error = ''
     } catch (e) {
       this.error = e.message
-    } finally {
-      this.loading = false
     }
   }
 
@@ -77,31 +80,31 @@ export class ServerShowPage {
     if (server.status === ServerStatus.RUNNING) {
       buttons.push(
         {
-          text: 'Server Specs',
+          text: 'Wifi',
+          icon: 'wifi',
+          handler: () => {
+            this.navigate(['wifi'])
+          },
+        },
+        {
+          text: 'About This Server',
           icon: 'information-circle-outline',
           handler: () => {
-            this.navigate(action, ['specs'])
+            this.navigate(['specs'])
           },
         },
         {
           text: 'Metrics',
           icon: 'pulse',
           handler: () => {
-            this.navigate(action, ['metrics'])
-          },
-        },
-        {
-          text: 'Wifi',
-          icon: 'wifi',
-          handler: () => {
-            this.navigate(action, ['wifi'])
+            this.navigate(['metrics'])
           },
         },
         {
           text: 'Developer Options',
           icon: 'code',
           handler: () => {
-            this.navigate(action, ['developer-options'])
+            this.navigate(['developer-options'])
           },
         },
       )
@@ -330,8 +333,7 @@ export class ServerShowPage {
     await this.navCtrl.navigateRoot(['/auth'])
   }
 
-  private async navigate (menu: HTMLIonActionSheetElement, path: string[]): Promise<void> {
-    await menu.dismiss()
+  private async navigate (path: string[]): Promise<void> {
     await this.navCtrl.navigateForward(path, { relativeTo: this.route })
   }
 }

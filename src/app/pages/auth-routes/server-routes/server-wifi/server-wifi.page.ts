@@ -3,6 +3,7 @@ import { LoadingController, ActionSheetController, ToastController } from '@ioni
 import { ServerService } from 'src/app/services/server.service'
 import { ActivatedRoute } from '@angular/router'
 import { ActionSheetButton } from '@ionic/core'
+import { pauseFor } from 'src/app/util/misc.util'
 
 @Component({
   selector: 'server-wifi',
@@ -26,9 +27,15 @@ export class ServerWifiPage {
     private readonly toastCtrl: ToastController,
   ) { }
 
-  ngOnInit () {
+  async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
-    this.getWifi()
+
+    await Promise.all([
+      this.getWifi,
+      pauseFor(600),
+    ])
+
+    this.loading = false
   }
 
   async doRefresh (event: any) {
@@ -44,8 +51,6 @@ export class ServerWifiPage {
       this.error = ''
     } catch (e) {
       this.error = e.message
-    } finally {
-      this.loading = false
     }
   }
 

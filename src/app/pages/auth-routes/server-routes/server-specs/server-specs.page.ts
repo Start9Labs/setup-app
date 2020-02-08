@@ -4,6 +4,7 @@ import { ServerSpecs } from 'src/app/models/server-model'
 import { ServerService } from 'src/app/services/server.service'
 import { ClipboardService } from 'src/app/services/clipboard.service'
 import { ZeroconfDaemon } from 'src/app/daemons/zeroconf-daemon'
+import { pauseFor } from 'src/app/util/misc.util'
 
 @Component({
   selector: 'server-specs',
@@ -32,7 +33,12 @@ export class ServerSpecsPage {
       if (zeroconf) {
         this.lanIP = zeroconf.ipv4Addresses[0]
       }
-      this.specs = await this.serverService.getServerSpecs(this.serverId)
+
+      const [specs] = await Promise.all([
+        this.serverService.getServerSpecs(this.serverId),
+        pauseFor(600),
+      ])
+      this.specs = specs
     } catch (e) {
       this.error = e.message
     } finally {

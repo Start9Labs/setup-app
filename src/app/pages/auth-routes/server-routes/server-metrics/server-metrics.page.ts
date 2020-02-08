@@ -4,6 +4,7 @@ import { ServerModel, ServerMetrics } from 'src/app/models/server-model'
 import { S9Server } from 'src/app/models/server-model'
 import { ServerService } from 'src/app/services/server.service'
 import { Observable } from 'rxjs'
+import { pauseFor } from 'src/app/util/misc.util'
 
 @Component({
   selector: 'server-metrics',
@@ -24,7 +25,13 @@ export class ServerMetricsPage {
 
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
-    await this.getMetrics()
+
+    await Promise.all([
+      this.getMetrics(),
+      pauseFor(600),
+    ])
+
+    this.loading = false
   }
 
   async doRefresh (event: any) {
@@ -38,8 +45,6 @@ export class ServerMetricsPage {
       this.error = ''
     } catch (e) {
       this.error = e.message
-    } finally {
-      this.loading = false
     }
   }
 

@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router'
 import { ServerService } from 'src/app/services/server.service'
 import { AppModel } from 'src/app/models/app-model'
 import { IonContent } from '@ionic/angular'
+import { pauseFor } from 'src/app/util/misc.util'
 
 @Component({
   selector: 'app-logs',
@@ -27,22 +28,28 @@ export class AppLogsPage {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
     this.appId = this.route.snapshot.paramMap.get('appId') as string
 
-    await this.getLogs()
+    await Promise.all([
+      this.getLogs(true),
+      pauseFor(600),
+    ])
+
+    this.loading = false
   }
 
-  async getLogs () {
+  async getLogs (initialLoad = false) {
+    const app = this.appModel.peek(this.serverId, this.appId)
+    this.loading = true
+    this.logs = ''
+
     try {
-      const app = this.appModel.peek(this.serverId, this.appId)
-      this.loading = true
-      this.logs = ''
       const logs = await this.serverService.getAppLogs(this.serverId, app.id)
       this.logs = logs.join('\n\n')
       this.error = ''
-      this.loading = false
       setTimeout(async () => await this.content.scrollToBottom(100), 200)
     } catch (e) {
       this.error = e.message
-      this.loading = false
+    } finally {
+      if (!initialLoad) { this.loading = false }
     }
   }
 

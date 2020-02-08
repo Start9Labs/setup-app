@@ -44,7 +44,7 @@ export class SyncNotifier {
           side: 'end',
           text: 'View',
           handler: () => {
-            toast.dismiss().then(() => this.navCtrl.navigateForward(['/auth', 'servers', server.id, 'notifications']))
+            this.navCtrl.navigateForward(['/auth', 'servers', server.id, 'notifications'])
           },
         },
       ],
