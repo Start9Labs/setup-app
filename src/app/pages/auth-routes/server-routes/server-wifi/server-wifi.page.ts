@@ -31,7 +31,7 @@ export class ServerWifiPage {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
 
     await Promise.all([
-      this.getWifi,
+      this.getWifi(),
       pauseFor(600),
     ])
 
