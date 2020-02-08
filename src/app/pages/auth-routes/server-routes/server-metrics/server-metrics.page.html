@@ -7,11 +7,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding-top">
-
-  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
-    <ion-refresher-content refreshingSpinner="lines"></ion-refresher-content>
-  </ion-refresher>
+<ion-content>
 
   <ion-item *ngIf="error" style="margin-bottom: 16px;">
     <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>

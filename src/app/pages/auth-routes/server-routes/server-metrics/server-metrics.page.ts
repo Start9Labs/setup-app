@@ -1,9 +1,7 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { ServerModel, ServerMetrics } from 'src/app/models/server-model'
-import { S9Server } from 'src/app/models/server-model'
+import { ServerMetrics } from 'src/app/models/server-model'
 import { ServerService } from 'src/app/services/server.service'
-import { Observable } from 'rxjs'
 import { pauseFor } from 'src/app/util/misc.util'
 
 @Component({
@@ -14,9 +12,9 @@ import { pauseFor } from 'src/app/util/misc.util'
 export class ServerMetricsPage {
   error = ''
   loading = true
+  going = false
   serverId: string
-
-  metrics: ServerMetrics
+  metrics: ServerMetrics = { }
 
   constructor (
     private readonly route: ActivatedRoute,
@@ -32,19 +30,34 @@ export class ServerMetricsPage {
     ])
 
     this.loading = false
+
+    this.startDaemon()
   }
 
-  async doRefresh (event: any) {
-    await this.getMetrics()
-    event.target.complete()
+  ngOnDestroy () {
+    this.stopDaemon()
   }
 
-  async getMetrics () {
+  async startDaemon (): Promise<void> {
+    this.going = true
+    while (this.going) {
+      await this.getMetrics()
+    }
+  }
+
+  stopDaemon () {
+    this.going = false
+  }
+
+  async getMetrics (): Promise<void> {
     try {
-      this.metrics = await this.serverService.getServerMetrics(this.serverId)
-      this.error = ''
+      const metrics = await this.serverService.getServerMetrics(this.serverId)
+      Object.entries(metrics).forEach(([key, value]) => {
+        this.metrics[key] = value
+      })
     } catch (e) {
       this.error = e.message
+      this.stopDaemon()
     }
   }
 
