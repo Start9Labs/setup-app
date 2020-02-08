@@ -143,18 +143,23 @@ export class ServerWifiPage {
   }
 
   private async confirmWifi (ssid: string): Promise<void> {
+    const timeout = 4000
     const maxAttempts = 5
     let attempts = 0
 
     while (attempts < maxAttempts) {
       try {
-        const { current, ssids } = await this.serverService.getWifi(this.serverId, 4)
+        const start = new Date().valueOf()
+        const { current, ssids } = await this.serverService.getWifi(this.serverId, timeout / 1000)
+        const end = new Date().valueOf()
         if (current === ssid) {
           this.savedNetworks = ssids
           this.current = current
           break
         } else {
           attempts++
+          const diff = end - start
+          await pauseFor(Math.max(0, timeout - diff))
           if (attempts === maxAttempts) {
             this.savedNetworks = ssids
             this.current = current

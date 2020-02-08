@@ -64,7 +64,7 @@ export class HttpNativeService {
       } catch (e) {
         message = e.error
       }
-      throw new Error(message)
+      throw new Error(message || 'Unknown Error')
     }
   }
 
