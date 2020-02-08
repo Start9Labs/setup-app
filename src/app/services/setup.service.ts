@@ -62,14 +62,8 @@ export class SetupService {
   }
 
   private async setupAttempt (builder: S9BuilderWith<'zeroconf' | 'versionInstalled'>, productKey: string): Promise<S9ServerBuilder> {
-    // tor acquisition
-    if (!hasValues(['torAddress'], builder)) {
-      this.message = `getting server tor address`
-      builder.torAddress = await this.getTor(builder)
-    }
-
     // derive keys
-    if (hasValues(['torAddress'], builder) && !hasValues(['pubkey', 'privkey'], builder)) {
+    if (!hasValues(['pubkey', 'privkey'], builder)) {
       this.message = 'getting mnemonic'
       if (this.authService.mnemonic) {
         this.message = `deriving keys`
@@ -80,14 +74,20 @@ export class SetupService {
     }
 
     // register pubkey
-    if (hasValues(['torAddress', 'pubkey', 'privkey'], builder) && !builder.registered) {
+    if (hasValues(['pubkey', 'privkey'], builder) && !builder.registered) {
       this.message = `registering pubkey. Server may already be claimed.`
       builder.registered = await this.registerPubkey(builder, productKey) // true or false
     }
 
+    // tor acquisition
+    if (hasValues(['pubkey', 'privkey'], builder) && !hasValues(['torAddress'], builder)) {
+      this.message = `getting server tor address`
+      builder.torAddress = await this.getTor(builder)
+    }
+
     // get server
     if (
-      hasValues(['torAddress', 'pubkey', 'privkey'], builder) &&
+      hasValues(['pubkey', 'privkey', 'torAddress'], builder) &&
       builder.registered &&
       builder.status !== ServerStatus.RUNNING
     ) {
@@ -112,16 +112,7 @@ export class SetupService {
     }
   }
 
-  async getTor (builder: S9BuilderWith<'zeroconf' | 'versionInstalled'>): Promise<string | undefined> {
-    try {
-      const { torAddress } = await this.httpService.serverRequest<Lan.GetTorRes>(builder, '/tor', { method: Method.get })
-      return torAddress
-    } catch (e) {
-      return undefined
-    }
-  }
-
-  async registerPubkey (builder: S9BuilderWith<'zeroconf' | 'versionInstalled' | 'pubkey'>, productKey: string): Promise<boolean> {
+  async registerPubkey (builder: S9BuilderWith<'zeroconf' | 'versionInstalled' | 'pubkey' | 'privkey'>, productKey: string): Promise<boolean> {
     const { pubkey } = builder
     try {
       const data: Lan.PostRegisterReq = { pubKey: pubkey, productKey }
@@ -129,6 +120,15 @@ export class SetupService {
       return true
     } catch (e) {
       return false
+    }
+  }
+
+  async getTor (builder: S9BuilderWith<'zeroconf' | 'versionInstalled' | 'pubkey' | 'privkey'>): Promise<string | undefined> {
+    try {
+      const { torAddress } = await this.httpService.serverRequest<Lan.GetTorRes>(builder, '/tor', { method: Method.get })
+      return torAddress
+    } catch (e) {
+      return undefined
     }
   }
 
