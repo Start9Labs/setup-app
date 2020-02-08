@@ -4,64 +4,70 @@ import { AppModel } from './app-model'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { deriveKeys } from '../util/crypto.util'
 import * as CryptoJS from 'crypto-js'
-import { BehaviorSubject, Subject } from 'rxjs'
+import { BehaviorSubject, Observable } from 'rxjs'
 
 @Injectable({
   providedIn: 'root',
 })
 export class ServerModel {
-  darkCache: { [id: string]: BehaviorSubject<S9Server> } = { }
-  serverDelta$ : Subject<boolean> = new Subject()
+  darkCache$: BehaviorSubject <{ [id: string]: BehaviorSubject<S9Server> }> = new BehaviorSubject({ })
 
   constructor (
     private readonly storage: Storage,
     private readonly appModel: AppModel,
   ) { }
 
-  watch (serverId: string) : BehaviorSubject<S9Server> {
-    if (!this.darkCache[serverId]) throw new Error (`No cached server for ${serverId}`)
-    return this.darkCache[serverId]
+  watchOne (id: string): BehaviorSubject<S9Server> {
+    if (!this.darkCache$.value[id]) throw new Error (`No cached server for ${id}`)
+    return this.darkCache$.value[id]
   }
 
-  peek (serverId: string): S9Server {
-    if (!this.darkCache[serverId] || !this.darkCache[serverId].value) throw new Error (`No cached server for ${serverId}`)
-    return this.darkCache[serverId].value
+  watchAll (): Observable<{ [id: string]: BehaviorSubject<S9Server> }> {
+    return this.darkCache$
   }
+
+  peekOne (id: string): Readonly<S9Server> {
+    if (!this.darkCache$.value[id] || !this.darkCache$.value[id].value) throw new Error (`No cached server for ${id}`)
+    return this.darkCache$.value[id].value
+  }
+
+  peekAll (): Readonly<S9Server>[] {
+    return Object.values(this.darkCache$.value).map(s => s.value)
+  }
+
+  count (): number { return this.peekAll().length }
 
   // no op if missing
-  removeFromCache (serverId: string): void {
-    if (this.darkCache[serverId]) {
-      this.darkCache[serverId].complete()
-      delete this.darkCache[serverId]
-      this.serverDelta$.next(true)
+  removeFromCache (id: string): void {
+    if (this.darkCache$.value[id]) {
+      const previousCache = this.darkCache$.value
+      this.darkCache$.value[id].complete()
+      delete previousCache[id]
+      this.darkCache$.next(previousCache)
     }
   }
 
   // no op if missing
-  updateCache (serverId: string, update: Partial<S9Server>): void {
-    if (this.darkCache[serverId]) {
-      const updatedServer = { ...this.darkCache[serverId].value, ...update }
-      this.darkCache[serverId].next(updatedServer)
-      this.serverDelta$.next(true)
+  updateCache (id: string, update: Partial<S9Server>): void {
+    if (this.darkCache$.value[id]) {
+      const updatedServer = { ...this.peekOne(id), ...update }
+      this.darkCache$.value[id].next(updatedServer)
     }
   }
 
   // no op if already exists
   createInCache (server: S9Server): void {
-    if (!this.darkCache[server.id]) {
-      this.darkCache[server.id] = new BehaviorSubject(server)
+    if (!this.darkCache$.value[server.id]) {
+      const previousCache = this.darkCache$.value
+      previousCache[server.id] = new BehaviorSubject(server)
       this.appModel.createServerCache(server.id)
-      this.serverDelta$.next(true)
+      this.darkCache$.next(previousCache)
     }
   }
 
-  count (): number { return this.peekAll().length }
-
-  peekAll (): Readonly<S9Server>[] { return Object.values(this.darkCache).map(s => s.value) }
-
   clearCache () {
-    this.peekAll().forEach( s => this.removeFromCache(s.id) )
-    this.darkCache = { }
+    this.peekAll().forEach(s => this.removeFromCache(s.id) )
+    this.darkCache$.complete()
   }
 
   async load (mnemonic: string[]): Promise<void> {

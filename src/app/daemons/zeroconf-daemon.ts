@@ -18,14 +18,14 @@ export class ZeroconfDaemon {
     private readonly zeroconf: Zeroconf,
   ) { }
 
-  async start () {
+  async start (restart: boolean) {
     // return this.mock()
 
     if (this.zeroconfSub || !this.platform.is('cordova')) { return }
 
     console.log('starting zeroconf daemon')
 
-    await this.zeroconf.reInit()
+    if (restart) { await this.zeroconf.reInit() }
 
     setTimeout(now => this.purgeOld(now), this.timeToPurge, new Date().valueOf())
 
@@ -44,7 +44,7 @@ export class ZeroconfDaemon {
 
   reset () {
     this.stop()
-    this.start()
+    this.start(true)
   }
 
   clearAndStop () {

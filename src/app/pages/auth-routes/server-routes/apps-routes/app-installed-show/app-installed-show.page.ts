@@ -81,7 +81,7 @@ export class AppInstalledShowPage {
           text: 'App Config',
           icon: 'construct',
           handler: () => {
-            this.navCtrl.navigateForward(['config'], { relativeTo: this.route })
+            this.navigate(action, ['config'])
           },
         },
       )
@@ -92,14 +92,14 @@ export class AppInstalledShowPage {
         text: 'View Logs',
         icon: 'paper',
         handler: () => {
-          this.navCtrl.navigateForward(['logs'], { relativeTo: this.route })
+          this.navigate(action, ['logs'])
         },
       },
       {
         text: 'Store Listing',
         icon: 'appstore',
         handler: () => {
-          this.navCtrl.navigateForward(['/auth', 'servers', this.serverId, 'apps', 'available', app.id])
+          this.navigate(action, ['/auth', 'servers', this.serverId, 'apps', 'available', app.id])
         },
       },
     )
@@ -120,10 +120,6 @@ export class AppInstalledShowPage {
     })
 
     await action.present()
-  }
-
-  async handleReinstall () {
-    this.navCtrl.navigateForward(['/auth', 'server', this.serverId, 'apps', 'available', this.appId])
   }
 
   async stop (): Promise<void> {
@@ -203,5 +199,10 @@ export class AppInstalledShowPage {
     } finally {
       await loader.dismiss()
     }
+  }
+
+  private async navigate (menu: HTMLIonActionSheetElement, path: string[]): Promise<void> {
+    await menu.dismiss()
+    await this.navCtrl.navigateForward(path, { relativeTo: this.route })
   }
 }

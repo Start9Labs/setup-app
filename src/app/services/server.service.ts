@@ -307,7 +307,7 @@ export class XServerService {
     await mockDeleteSSHKey()
   }
 
-  async getWifi (serverId: string): Promise<Lan.GetWifiRes> {
+  async getWifi (serverId: string, timeout = 60): Promise<Lan.GetWifiRes> {
     return mockGetWifi()
   }
 

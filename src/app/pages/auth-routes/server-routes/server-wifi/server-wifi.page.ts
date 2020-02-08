@@ -3,9 +3,6 @@ import { LoadingController, ActionSheetController, ToastController } from '@ioni
 import { ServerService } from 'src/app/services/server.service'
 import { ActivatedRoute } from '@angular/router'
 import { ActionSheetButton } from '@ionic/core'
-import { ZeroconfDaemon } from 'src/app/daemons/zeroconf-daemon'
-import { pauseFor } from 'src/app/util/misc.util'
-import { ZeroconfResult } from '@ionic-native/zeroconf/ngx'
 
 @Component({
   selector: 'server-wifi',
@@ -26,7 +23,6 @@ export class ServerWifiPage {
     private readonly serverService: ServerService,
     private readonly loadingCtrl: LoadingController,
     private readonly actionCtrl: ActionSheetController,
-    private readonly zeroconfDaemon: ZeroconfDaemon,
     private readonly toastCtrl: ToastController,
   ) { }
 

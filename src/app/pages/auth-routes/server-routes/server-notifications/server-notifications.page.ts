@@ -31,7 +31,7 @@ export class ServerNotificationsPage {
 
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
-    this.server$ = this.serverModel.watch(this.serverId)
+    this.server$ = this.serverModel.watchOne(this.serverId)
 
     this.server$.pipe(first()).subscribe(async s => {
       this.notifications = await this.getNotifications()

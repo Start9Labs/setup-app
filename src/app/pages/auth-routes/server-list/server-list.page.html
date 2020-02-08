@@ -29,18 +29,18 @@
     </ion-item>
   </ion-item-group>
 
-  <ion-card button *ngFor="let server of servers" style="margin-bottom: 16px;" (click)="show(server.id)">
+  <ion-card button *ngFor="let server$ of (servers$ | async) | keyvalue" style="margin-bottom: 16px;" (click)="show(server$.key)">
     <ion-item>
       <ion-avatar slot="start">
         <img src="assets/img/cube.png" alt="icon" />
       </ion-avatar>
       <ion-label>
-        <h1>{{ server.label }}</h1>
+        <h1>{{ (server$.value | async)?.label }}</h1>
         <h3>
-          <s9-status [serverStatus]="server.status"></s9-status>
+          <s9-status [serverStatus]="(server$.value | async)?.status"></s9-status>
         </h3>
       </ion-label>
-      <ion-badge slot="end" *ngIf="server.badge" color="danger">{{ server.badge }}</ion-badge>
+      <ion-badge slot="end" *ngIf="(server$.value | async)?.badge" color="danger">{{ (server$.value | async)?.badge }}</ion-badge>
     </ion-item>
   </ion-card>
 

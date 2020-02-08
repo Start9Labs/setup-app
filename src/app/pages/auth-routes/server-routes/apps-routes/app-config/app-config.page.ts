@@ -159,7 +159,7 @@ export class AppConfigPage {
           text: `Leave`,
           cssClass: 'alert-danger',
           handler: () => {
-            this.navigateBack()
+            alert.dismiss().then(() => this.navigateBack())
           },
         },
         {

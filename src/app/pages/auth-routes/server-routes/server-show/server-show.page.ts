@@ -38,7 +38,7 @@ export class ServerShowPage {
 
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
-    this.server$ = this.serverModel.watch(this.serverId)
+    this.server$ = this.serverModel.watchOne(this.serverId)
     this.serverApps$ = this.appModel.watchServerCache(this.serverId)
 
     this.getServerAndApps()
@@ -80,28 +80,28 @@ export class ServerShowPage {
           text: 'Server Specs',
           icon: 'information-circle-outline',
           handler: () => {
-            this.navCtrl.navigateForward(['specs'], { relativeTo: this.route })
+            this.navigate(action, ['specs'])
           },
         },
         {
           text: 'Metrics',
           icon: 'pulse',
           handler: () => {
-            this.navCtrl.navigateForward(['metrics'], { relativeTo: this.route })
+            this.navigate(action, ['metrics'])
           },
         },
         {
           text: 'Wifi',
           icon: 'wifi',
           handler: () => {
-            this.navCtrl.navigateForward(['wifi'], { relativeTo: this.route })
+            this.navigate(action, ['wifi'])
           },
         },
         {
           text: 'Developer Options',
           icon: 'code',
           handler: () => {
-            this.navCtrl.navigateForward(['developer-options'], { relativeTo: this.route })
+            this.navigate(action, ['developer-options'])
           },
         },
       )
@@ -328,5 +328,10 @@ export class ServerShowPage {
     await this.serverModel.removeFromCache(this.serverId)
     await this.serverModel.saveAll()
     await this.navCtrl.navigateRoot(['/auth'])
+  }
+
+  private async navigate (menu: HTMLIonActionSheetElement, path: string[]): Promise<void> {
+    await menu.dismiss()
+    await this.navCtrl.navigateForward(path, { relativeTo: this.route })
   }
 }

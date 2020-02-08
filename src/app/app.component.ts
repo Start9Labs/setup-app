@@ -71,8 +71,10 @@ export class AppComponent {
         await this.serverModel.load(this.authService.mnemonic!)
         this.firstAuth = false
         await this.router.navigate(['/auth'])
+        this.startDaemons()
+      } else {
+        this.startDaemons(true)
       }
-      this.startDaemons()
     // missing (no mnemonic)
     } else if (authStatus === AuthStatus.MISSING) {
       this.clearModels()
@@ -85,8 +87,8 @@ export class AppComponent {
     }
   }
 
-  private startDaemons () {
-    this.zeroconfDaemon.start()
+  private startDaemons (restart = false) {
+    this.zeroconfDaemon.start(restart)
     this.wifiDaemon.start()
     setTimeout(() => this.serverDaemon.start(), this.zeroconfDaemon.timeToPurge + 1000)
   }

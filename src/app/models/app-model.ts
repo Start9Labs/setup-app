@@ -85,8 +85,8 @@ export class AppModel {
   }
 
   clearCache () {
-    Object.keys(this.lightCache).forEach( serverId => {
-      Object.keys(this.lightCache[serverId].value).forEach( appId => {
+    Object.keys(this.lightCache).forEach(serverId => {
+      Object.keys(this.lightCache[serverId].value).forEach(appId => {
         this.lightCache[serverId].value[appId].complete()
       })
       this.lightCache[serverId].complete()
