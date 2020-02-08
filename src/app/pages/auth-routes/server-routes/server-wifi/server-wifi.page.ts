@@ -35,6 +35,11 @@ export class ServerWifiPage {
     this.getWifi()
   }
 
+  async doRefresh (event: any) {
+    await this.getWifi()
+    event.target.complete()
+  }
+
   async getWifi (): Promise<void> {
     try {
       const { ssids, current } = await this.serverService.getWifi(this.serverId)
@@ -87,7 +92,7 @@ export class ServerWifiPage {
 
     try {
       await this.serverService.connectWifi(this.serverId, ssid)
-      await this.discoverService(ssid)
+      await this.confirmWifi(ssid)
       this.error = ''
     } catch (e) {
       this.error = e.message
@@ -106,7 +111,7 @@ export class ServerWifiPage {
 
     try {
       await this.serverService.addWifi(this.serverId, this.ssid, this.password)
-      await this.discoverService(this.ssid)
+      await this.confirmWifi(this.ssid)
       this.ssid = ''
       this.password = ''
       this.error = ''
@@ -136,44 +141,37 @@ export class ServerWifiPage {
     }
   }
 
-  private async discoverService (ssid: string): Promise<void> {
-    let timeRemaining = 10 // seconds
-    // start countdown
-    let interval: NodeJS.Timeout | undefined = setInterval(() => { timeRemaining--; console.log(timeRemaining) }, 1000)
-    // watch for zeroconf updates
-    let success = false
-    let zeroconfMonitor = this.zeroconfDaemon.watchUpdated().subscribe(async service => {
-      // if the updated service pertains to our server
-      if (service && service.name.split('-')[1] === this.serverId) {
-        // stop the countdown while we inquire about wifi networks
-        if (interval) { clearInterval(interval); interval = undefined }
-        await this.getWifi()
-        // if we are connected, end the countdown
-        if (ssid === this.current) {
-          success = true
-          timeRemaining = 0
-        // if we are not conencted, keep going
+  private async confirmWifi (ssid: string): Promise<void> {
+    const maxAttempts = 5
+    let attempts = 0
+
+    while (attempts < maxAttempts) {
+      try {
+        const { current, ssids } = await this.serverService.getWifi(this.serverId, 4)
+        if (current === ssid) {
+          this.savedNetworks = ssids
+          this.current = current
+          break
         } else {
-          // resume countdown
-          if (!interval && timeRemaining) { interval = setInterval(() => { timeRemaining--; console.log(timeRemaining) }, 1000) }
+          attempts++
+          if (attempts === maxAttempts) {
+            this.savedNetworks = ssids
+            this.current = current
+          }
         }
+      } catch (e) {
+        attempts++
+        console.error(e.message)
       }
-    })
+    }
 
-    // **** MOCK ****
-    // setTimeout(() => this.zeroconfDaemon.handleServiceUpdate(result), 4000)
+    if (this.current === ssid) { return }
 
-    // pause until countdown complete
-    while (timeRemaining > 0) { await pauseFor(100) }
-    // clear interval and unsubscribe
-    clearInterval(interval)
-    zeroconfMonitor.unsubscribe()
-    // present success or failure toast
     const toast = await this.toastCtrl.create({
-      header: success ? 'Success!' : 'Failed to connect:',
-      message: success ? `Connected to ${ssid}` : `Check credentials and ensure your phone is also connected to ${ssid}`,
+      header: 'Failed to connect:',
+      message: `Check credentials and try again`,
       position: 'bottom',
-      duration: success ? 2000 : 4000,
+      duration: 4000,
       buttons: [
         {
           side: 'start',
@@ -187,18 +185,4 @@ export class ServerWifiPage {
     })
     await toast.present()
   }
-}
-
-const result: ZeroconfResult = {
-  action: 'resolved',
-  service: {
-    domain: 'local.',
-    type: '_http._tcp',
-    name: 'start9-1f3ce404',
-    hostname: '',
-    ipv4Addresses: ['192.168.20.1'],
-    ipv6Addresses: ['end9823u0ej2fb'],
-    port: 5959,
-    txtRecord: { },
-  },
 }

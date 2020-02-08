@@ -11,6 +11,10 @@
 
 <ion-content class="ion-padding-top">
 
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content refreshingSpinner="lines"></ion-refresher-content>
+  </ion-refresher>
+
   <ion-item *ngIf="error">
     <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
   </ion-item>

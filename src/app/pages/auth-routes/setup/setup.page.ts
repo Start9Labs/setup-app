@@ -28,7 +28,7 @@ export class SetupPage {
 
   ngOnInit () {
     this.serviceFound = !!Object.entries(this.zeroconfDaemon.services).length
-    this.zeroconfMonitor = this.zeroconfDaemon.watchFound().subscribe(service => { this.serviceFound = !!service })
+    this.zeroconfMonitor = this.zeroconfDaemon.watch().subscribe(service => { this.serviceFound = !!service })
   }
 
   ngOnDestroy () {

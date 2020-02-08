@@ -146,8 +146,8 @@ export class ServerService {
     return this.httpService.authServerRequest<Lan.PostAddSSHKeyRes>(serverId, `/sshKeys`, { method: Method.post, data })
   }
 
-  async getWifi (serverId: string): Promise<Lan.GetWifiRes> {
-    return this.httpService.authServerRequest<Lan.GetWifiRes>(serverId, `/wifi`, { method: Method.get })
+  async getWifi (serverId: string, timeout = 60): Promise<Lan.GetWifiRes> {
+    return this.httpService.authServerRequest<Lan.GetWifiRes>(serverId, `/wifi`, { method: Method.get, timeout })
   }
 
   async addWifi (serverId: string, ssid: string, password: string): Promise<void> {
