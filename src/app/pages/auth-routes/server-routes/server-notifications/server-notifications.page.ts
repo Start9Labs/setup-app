@@ -20,7 +20,6 @@ export class ServerNotificationsPage {
   page = 1
   needInfinite = false
   readonly perPage = 20
-  server: S9Server
   serverId: string
 
   constructor (
@@ -32,7 +31,6 @@ export class ServerNotificationsPage {
 
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
-    this.server = this.serverModel.peekOne(this.serverId)
     const [notifications] = await Promise.all([
       this.getNotifications(),
       pauseFor(600),
