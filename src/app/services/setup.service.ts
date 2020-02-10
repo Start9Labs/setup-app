@@ -80,7 +80,7 @@ export class SetupService {
     }
 
     // tor acquisition
-    if (hasValues(['pubkey', 'privkey'], builder) && !hasValues(['torAddress'], builder)) {
+    if (hasValues(['pubkey', 'privkey'], builder) && builder.registered && !hasValues(['torAddress'], builder)) {
       this.message = `getting server tor address`
       builder.torAddress = await this.getTor(builder)
     }
