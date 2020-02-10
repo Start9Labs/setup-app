@@ -17,7 +17,7 @@
     <ion-refresher-content refreshingSpinner="lines"></ion-refresher-content>
   </ion-refresher>
 
-  <ion-item-group *ngIf="!serverModel.count()">
+  <ion-item-group *ngIf="!(serverModel.watchCount() | async)">
     <ion-item>
       <ion-label class="ion-text-wrap">
         <h3>Welcome</h3>
