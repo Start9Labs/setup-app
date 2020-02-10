@@ -5,6 +5,7 @@ import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { deriveKeys } from '../util/crypto.util'
 import * as CryptoJS from 'crypto-js'
 import { BehaviorSubject, Observable } from 'rxjs'
+import { map, first } from 'rxjs/operators'
 
 @Injectable({
   providedIn: 'root',
@@ -35,6 +36,10 @@ export class ServerModel {
     return Object.values(this.darkCache$.value).map(s => s.value)
   }
 
+  watchCount(): Observable<number> {
+    return this.watchAll().pipe(map(x => Object.keys(x).length))
+  }
+
   count (): number { return this.peekAll().length }
 
   // no op if missing
@@ -58,10 +63,11 @@ export class ServerModel {
   // no op if already exists
   createInCache (server: S9Server): void {
     if (!this.darkCache$.value[server.id]) {
-      const previousCache = this.darkCache$.value
-      previousCache[server.id] = new BehaviorSubject(server)
-      this.appModel.createServerCache(server.id)
-      this.darkCache$.next(previousCache)
+      this.darkCache$.asObservable().pipe(first()).subscribe(previousCache => {
+        previousCache[server.id] = new BehaviorSubject(server)
+        this.appModel.createServerCache(server.id)
+        this.darkCache$.next(previousCache)
+      })      
     }
   }
 
