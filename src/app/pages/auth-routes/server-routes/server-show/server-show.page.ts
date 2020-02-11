@@ -205,9 +205,8 @@ export class ServerShowPage {
   }
 }
 
-
-
 type FiniteObservable<T> = Observable<T>
+
 export const squash = map(() => {})
 export function forkPause(ms: number): FiniteObservable<void> {
   return interval(ms).pipe(take(1), squash)

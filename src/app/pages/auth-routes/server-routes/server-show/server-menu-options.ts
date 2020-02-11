@@ -62,10 +62,8 @@ export const EditFriendlyNameAlert: (s: S9Server, h: (a?: any) => any) => AlertO
       },
     ],
     buttons: [
+        CancelButton,
       {
-        text: 'Cancel',
-        role: 'cancel',
-      }, {
         text: 'Done',
         handler
       },
@@ -79,10 +77,7 @@ export const UpdateAlert: (s: S9Server, h: () => any) => AlertOptions = (server,
         header: 'Confirm',
         message: `Update MeshOS to ${server.versionLatest}?`,
         buttons: [
-          {
-            text: 'Cancel',
-            role: 'cancel',
-          },
+            CancelButton,
           {
             text: 'Update',
             handler: () => { handler() }
@@ -97,10 +92,7 @@ export const RestartAlert: (s: S9Server, h: () => any) => AlertOptions = (server
         header: 'Confirm',
         message: `Are you sure you want to restart ${server.label}?`,
         buttons: [
-            {
-                text: 'Cancel',
-                role: 'cancel',
-            },
+            CancelButton,
             {
                 text: 'Restart',
                 cssClass: 'alert-danger',
@@ -116,10 +108,7 @@ export const ShutdownAlert: (s: S9Server, h: () => any) => AlertOptions = (serve
         header: 'Confirm',
         message: `Are you sure you want to shut down ${server.label}?`,
         buttons: [
-          {
-            text: 'Cancel',
-            role: 'cancel',
-          },
+            CancelButton,
           {
             text: 'Shutdown',
             cssClass: 'alert-danger',
@@ -135,10 +124,7 @@ export const ForgetAlert: (s: S9Server, h: () => any) => AlertOptions = (server,
         header: 'Caution',
         message: `Are you sure you want to forget ${server.label} on this device? You can add it back later. The server itself will not be affected.`,
         buttons: [
-          {
-            text: 'Cancel',
-            role: 'cancel',
-          },
+          CancelButton,
           {
             text: 'Forget Server',
             cssClass: 'alert-danger',
@@ -155,4 +141,9 @@ export const LoadingSpinner: (m?: string) => LoadingOptions = (m) => {
         cssClass: 'loader',
         ...toMergeIn,
     } as LoadingOptions
+}
+
+export const CancelButton = {
+    text: 'Cancel',
+    role: 'cancel',
 }
