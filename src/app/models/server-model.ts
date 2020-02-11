@@ -4,77 +4,80 @@ import { AppModel } from './app-model'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { deriveKeys } from '../util/crypto.util'
 import * as CryptoJS from 'crypto-js'
-import { BehaviorSubject, Observable } from 'rxjs'
+import { BehaviorSubject, Observable, Subject, forkJoin } from 'rxjs'
+import { first, map } from 'rxjs/operators'
+import { appendFile, appendFileSync } from 'fs'
+
+export type ServerDeltaType = 'Create' | 'Delete' | 'Update'
 
 @Injectable({
   providedIn: 'root',
 })
 export class ServerModel {
-  darkCache$: BehaviorSubject <{ [id: string]: BehaviorSubject<S9Server> }> = new BehaviorSubject({ })
+  mapSubject$: MapSubject<S9Server> = new MapSubject({})
+  darkCache: { [id: string]: BehaviorSubject<S9Server> } = { }
+  serverDelta$ : Subject<{id: string, deltaType: ServerDeltaType}> = new Subject()
 
   constructor (
     private readonly storage: Storage,
     private readonly appModel: AppModel,
   ) { }
 
-  watchOne (id: string): BehaviorSubject<S9Server> {
-    if (!this.darkCache$.value[id]) throw new Error (`No cached server for ${id}`)
-    return this.darkCache$.value[id]
+  watchAllOfThem(): ObservableWithId<S9Server>[] {
+    return this.mapSubject$.watchAllOfThem()
   }
 
-  watchAll (): Observable<{ [id: string]: BehaviorSubject<S9Server> }> {
-    return this.darkCache$
+  watchThem(ids: string[]): ObservableWithId<S9Server>[] {
+    return this.mapSubject$.watchThem(ids)
   }
 
-  peekOne (id: string): Readonly<S9Server> {
-    if (!this.darkCache$.value[id] || !this.darkCache$.value[id].value) throw new Error (`No cached server for ${id}`)
-    return this.darkCache$.value[id].value
+  watchServerAdds(): Observable<S9Server[]> {
+    return this.mapSubject$.add$
   }
 
-  peekAll (): Readonly<S9Server>[] {
-    return Object.values(this.darkCache$.value).map(s => s.value)
+  watchServerDeletes(): Observable<string[]> {
+    return this.mapSubject$.delete$
   }
 
-  count (): number { return this.peekAll().length }
+  watch (serverId: string) : BehaviorSubject<S9Server> {
+    const toReturn = this.mapSubject$.watchUpdate(serverId)
+    if(!toReturn) throw new Error(`Expected server ${serverId} but not found.`)
+    return toReturn
+  }
+
+  peek (serverId: string): S9Server {
+    const toReturn = this.mapSubject$.peek(serverId)
+    if(!toReturn) throw new Error(`Expected server ${serverId} but not found.`)
+    return toReturn
+  }
 
   // no op if missing
-  removeFromCache (id: string): void {
-    if (this.darkCache$.value[id]) {
-      const previousCache = this.darkCache$.value
-      this.darkCache$.value[id].complete()
-      delete previousCache[id]
-      this.darkCache$.next(previousCache)
-    }
+  removeFromCache (serverId: string): void {
+    this.mapSubject$.delete$.next([serverId])
   }
 
   // no op if missing
   updateCache (id: string, update: Partial<S9Server>): void {
-    if (this.darkCache$.value[id]) {
-      const updatedServer = { ...this.peekOne(id), ...update }
-      this.darkCache$.value[id].next(updatedServer)
-    }
+    this.mapSubject$.update$.next([{...update, id }])
   }
 
   // no op if already exists
   createInCache (server: S9Server): void {
-    if (!this.darkCache$.value[server.id]) {
-      const previousCache = this.darkCache$.value
-      previousCache[server.id] = new BehaviorSubject(server)
-      this.appModel.createServerCache(server.id)
-      this.darkCache$.next(previousCache)
-    }
+    this.mapSubject$.add$.next([server])
   }
 
+  count (): number { return this.peekAll().length }
+
+  peekAll (): Readonly<S9Server>[] { return this.mapSubject$.peekAll() }
+
   clearCache () {
-    this.peekAll().forEach(s => this.removeFromCache(s.id) )
-    this.darkCache$.complete()
+    this.mapSubject$.clear()
   }
 
   async load (mnemonic: string[]): Promise<void> {
     const fromStorage: S9ServerStore = await this.storage.get('servers') || []
-    fromStorage.forEach(s => {
-      this.createInCache(fromStorableServer(s, mnemonic))
-    })
+    const mapped = fromStorage.map(s => fromStorableServer(s, mnemonic))
+    this.mapSubject$.add$.next(mapped)
   }
 
   async saveAll (): Promise<void> {
@@ -176,4 +179,78 @@ export enum ServerStatus {
   UPDATING = 'UPDATING',
   NEEDS_CONFIG = 'NEEDS_CONFIG',
   RUNNING = 'RUNNING',
+}
+
+export type ObservableWithId<T> = {id: string, observe$: Observable<T> }
+export type Update<T extends {id: string}> = Partial<T> & {id: string}
+export class MapSubject<T extends {id: string}> {
+  add$: Subject<T[]> = new Subject()
+  update$: Subject<Update<T>[]> = new Subject()
+  delete$: Subject<string[]> = new Subject()
+  subject: {[id: string]: BehaviorSubject<T>}
+
+  constructor(tMap: {[id: string]: T}){
+    this.add$.subscribe(toAdd => this.add(toAdd))
+    this.update$.subscribe(toUpdate => this.update(toUpdate))
+    this.delete$.subscribe(toDeleteId => this.delete(toDeleteId))
+    
+    this.subject = Object.entries(tMap).reduce( (acc, [id, t]) => {
+      acc[id] = new BehaviorSubject(t)
+      return acc
+    }, {})
+  }
+
+  private add(ts: T[]): void {
+    ts.forEach(t => {
+      console.log(`adding server ${t.id}`)
+      if (!this.subject[t.id]) {
+        this.subject[t.id] = new BehaviorSubject(t)
+      }
+    })
+  }
+
+  private delete(tids: string[]): void {
+    tids.forEach(id => {
+      console.log(`deleting server ${id}`)
+      if (this.subject[id]) {
+        this.subject[id].complete()
+        delete this.subject[id]
+      }
+    })
+  }
+
+  private update(ts: Update<T>[]): void {
+    ts.forEach(t => {
+      console.log(`updating server ${t.id}`)
+      if (this.subject[t.id]) {
+        this.subject[t.id].asObservable().pipe(first()).subscribe( s => {
+          this.subject[t.id].next({...s, ...t})          
+        })
+      }
+    })
+  }
+
+  clear(): void {
+    this.delete$.next(Object.keys(this.subject))
+  }
+
+  watchUpdate(id: string): undefined | BehaviorSubject<T> {
+    return this.subject[id]
+  }
+
+  peek(id: string): undefined | T {
+    return this.subject[id] && this.subject[id].getValue()
+  }
+
+  peekAll(): T[] {
+    return Object.values(this.subject).map(s => s.getValue())
+  }
+
+  watchAllOfThem(): ObservableWithId<T>[] {
+    return Object.entries(this.subject).map( ([id, observe$]) => ({ id, observe$ }))
+  }
+
+  watchThem(ids: string[]): ObservableWithId<T>[] {
+    return ids.map(id => ({id, observe$: this.subject[id]}))
+  }
 }

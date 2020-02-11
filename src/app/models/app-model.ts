@@ -17,7 +17,7 @@ export class AppModel {
   }
 
   watchServerCache (serverId:  string): Observable<{ [appId: string]: BehaviorSubject<AppInstalled> }> {
-    if (!this.lightCache[serverId]) throw new Error(`No cached apps for server ${serverId}`)
+    if (!this.lightCache[serverId]) throw new Error(`Attempted to watch ${serverId}, but no cached apps for server`)
     return this.lightCache[serverId]
   }
 

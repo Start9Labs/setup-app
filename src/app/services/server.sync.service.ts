@@ -100,7 +100,7 @@ export class ServerSyncService {
   private async handleZeroconfUpdate (zeroconfService: ZeroconfService | null): Promise<void> {
     if (!zeroconfService) { return }
     try {
-      const server = this.serverModel.peekOne(zeroconfService.name.split('-')[1])
+      const server = this.serverModel.peek(zeroconfService.name.split('-')[1])
       this.fromCache().syncServer(server, 250)
     } catch (e) {
       console.warn(e.message)
@@ -159,7 +159,7 @@ export class ServerSync {
 
     this.updatingCache[server.id] = false
 
-    const updatedServer = this.serverModel.peekOne(server.id)
+    const updatedServer = this.serverModel.peek(server.id)
 
     await this.serverModel.saveAll()
 
