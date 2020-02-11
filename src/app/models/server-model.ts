@@ -5,8 +5,7 @@ import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { deriveKeys } from '../util/crypto.util'
 import * as CryptoJS from 'crypto-js'
 import { BehaviorSubject, Observable, Subject, forkJoin } from 'rxjs'
-import { first, map } from 'rxjs/operators'
-import { appendFile, appendFileSync } from 'fs'
+import { first } from 'rxjs/operators'
 
 export type ServerDeltaType = 'Create' | 'Delete' | 'Update'
 

@@ -10,6 +10,7 @@ import { ServerService } from 'src/app/services/server.service'
 import { ServerSyncService } from 'src/app/services/server.sync.service'
 import { Observable, BehaviorSubject } from 'rxjs'
 import { pauseFor } from 'src/app/util/misc.util'
+import { first, delay, mergeMap, map } from 'rxjs/operators'
 
 @Component({
   selector: 'server-show',
@@ -42,27 +43,28 @@ export class ServerShowPage {
     this.server$ = this.serverModel.watchServer(this.serverId)
     this.serverApps$ = this.appModel.watchServerCache(this.serverId)
 
-    await Promise.all([
-      this.getServerAndApps(),
-      pauseFor(600),
-    ])
-
-    this.loading = false
+    this.getServerAndApps().pipe(delay(600)).subscribe(() => {
+      this.loading = false
+    })
   }
 
-  async doRefresh (event: any) {
-    await this.getServerAndApps()
-    event.target.complete()
+  doRefresh (event: any) {
+    this.getServerAndApps().subscribe(() => event.target.complete())  
   }
 
-  async getServerAndApps () {
-    const server = this.server$.value
-    try {
-      await this.sss.fromCache().syncServer(server)
-      this.error = ''
-    } catch (e) {
-      this.error = e.message
-    }
+  getServerAndApps(): Observable<void> {
+    return this.server$.pipe(
+      first(), 
+      mergeMap(async server => {
+        try {
+          await this.sss.fromCache().syncServer(server)
+          return {error: ''}
+        } catch (e) {
+          return {error: e.message}
+        }
+      }),
+      map( e => {this.error = e.error || ''} )
+    )
   }
 
   async presentAction (server: S9Server) {
