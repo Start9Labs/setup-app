@@ -8,9 +8,8 @@ import { AppModel, AppInstalled } from 'src/app/models/app-model'
 import * as compareVersions from 'compare-versions'
 import { ServerService } from 'src/app/services/server.service'
 import { ServerSyncService } from 'src/app/services/server.sync.service'
-import { Observable, BehaviorSubject } from 'rxjs'
-import { pauseFor } from 'src/app/util/misc.util'
-import { first, delay, mergeMap, map } from 'rxjs/operators'
+import { Observable, BehaviorSubject, forkJoin, interval } from 'rxjs'
+import { first, delay, mergeMap, map, take, ignoreElements } from 'rxjs/operators'
 
 @Component({
   selector: 'server-show',
@@ -41,30 +40,30 @@ export class ServerShowPage {
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
     this.server$ = this.serverModel.watchServer(this.serverId)
+    this.serverModel.createServerAppCache(this.serverId)
     this.serverApps$ = this.appModel.watchServerCache(this.serverId)
 
-    this.getServerAndApps().pipe(delay(600)).subscribe(() => {
-      this.loading = false
+    forkDoAll(this.getServerAndApps(), forkPause(600)).pipe(squash).subscribe(() => {
+        this.loading = false
     })
   }
 
   doRefresh (event: any) {
-    this.getServerAndApps().subscribe(() => event.target.complete())  
+    this.getServerAndApps().subscribe(() => event.target.complete())
   }
 
-  getServerAndApps(): Observable<void> {
+  getServerAndApps(): FiniteObservable<void> {
     return this.server$.pipe(
-      first(), 
+      take(1),
       mergeMap(async server => {
         try {
           await this.sss.fromCache().syncServer(server)
-          return {error: ''}
+          this.error = ''
         } catch (e) {
-          return {error: e.message}
+          this.error = e.message
         }
-      }),
-      map( e => {this.error = e.error || ''} )
-    )
+      })
+    ) 
   }
 
   async presentAction (server: S9Server) {
@@ -337,4 +336,13 @@ export class ServerShowPage {
   private async navigate (path: string[]): Promise<void> {
     await this.navCtrl.navigateForward(path, { relativeTo: this.route })
   }
+}
+
+type FiniteObservable<T> = Observable<T>
+export const squash = map(() => {})
+export function forkPause(ms: number): FiniteObservable<void> {
+  return interval(ms).pipe(take(1), squash)
+}
+export function forkDoAll(...os: Observable<any>[]): FiniteObservable<any[]> {
+  return forkJoin(os.map(a => a.pipe(take(1))))
 }

@@ -3,7 +3,7 @@ import { ServerModel, S9Server, ObservableWithId } from 'src/app/models/server-m
 import { NavController } from '@ionic/angular'
 import { ServerSyncService } from 'src/app/services/server.sync.service'
 import { Subscription } from 'rxjs'
-import { first } from 'rxjs/operators'
+import { first, take } from 'rxjs/operators'
 
 @Component({
   selector: 'page-server-list',
@@ -28,7 +28,7 @@ export class ServerListPage {
       const serversToWatch = this.serverModel.watchThem(newServers.map(s => s.id))
       
       //@TODO remove
-      serversToWatch[0].observe$.pipe(first()).subscribe(s => console.log(JSON.stringify(s)))
+      serversToWatch[0].observe$.pipe(take(1)).subscribe(s => console.log(JSON.stringify(s)))
       
       this.servers.push(...serversToWatch)
     })

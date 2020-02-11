@@ -5,7 +5,7 @@ import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { deriveKeys } from '../util/crypto.util'
 import * as CryptoJS from 'crypto-js'
 import { BehaviorSubject, Observable, Subject, forkJoin } from 'rxjs'
-import { first } from 'rxjs/operators'
+import { first, take } from 'rxjs/operators'
 
 export type ServerDeltaType = 'Create' | 'Delete' | 'Update'
 
@@ -60,8 +60,12 @@ export class ServerModel {
 
   // no op if already exists
   createInCache (server: S9Server): void {
-    this.appModel.createServerCache(server.id)
+    this.createServerAppCache(server.id)
     this.mapSubject$.add$.next([server])
+  }
+
+  createServerAppCache(sid: string): void {
+    this.appModel.createServerCache(sid)
   }
 
   count (): number { return this.peekAll().length }
@@ -221,7 +225,7 @@ export class MapSubject<T extends {id: string}> {
     ts.forEach(t => {
       console.log(`updating server ${t.id}`)
       if (this.subject[t.id]) {
-        this.subject[t.id].asObservable().pipe(first()).subscribe( s => {
+        this.subject[t.id].asObservable().pipe(take(1)).subscribe( s => {
           this.subject[t.id].next({...s, ...t})          
         })
       }
