@@ -9,7 +9,8 @@ import * as compareVersions from 'compare-versions'
 import { ServerService } from 'src/app/services/server.service'
 import { ServerSyncService } from 'src/app/services/server.sync.service'
 import { Observable, BehaviorSubject, forkJoin, interval } from 'rxjs'
-import { first, delay, mergeMap, map, take, ignoreElements } from 'rxjs/operators'
+import { mergeMap, map, take } from 'rxjs/operators'
+import { EditFriendlyName, Wifi, ServerSpecs, Metrics, DeveloperOptions, Restart, Shutdown, Forget, EditFriendlyNameAlert } from './server-menu-options'
 
 @Component({
   selector: 'server-show',
@@ -68,73 +69,24 @@ export class ServerShowPage {
 
   async presentAction (server: S9Server) {
     const buttons: ActionSheetButton[] = [
-      {
-        text: 'Edit Friendly Name',
-        icon: 'pricetag',
-        handler: () => {
-          this.presentAlertEditName()
-        },
-      },
+        EditFriendlyName  (() => this.presentAlertEditName())
     ]
 
     if (server.status === ServerStatus.RUNNING) {
       buttons.push(
-        {
-          text: 'Wifi',
-          icon: 'wifi',
-          handler: () => {
-            this.navigate(['wifi'])
-          },
-        },
-        {
-          text: 'About This Server',
-          icon: 'information-circle-outline',
-          handler: () => {
-            this.navigate(['specs'])
-          },
-        },
-        {
-          text: 'Metrics',
-          icon: 'pulse',
-          handler: () => {
-            this.navigate(['metrics'])
-          },
-        },
-        {
-          text: 'Developer Options',
-          icon: 'code',
-          handler: () => {
-            this.navigate(['developer-options'])
-          },
-        },
+        Wifi            (() => this.navigate(['wifi'])),
+        ServerSpecs     (() => this.navigate(['specs'])),
+        Metrics         (() => this.navigate(['metrics'])),
+        DeveloperOptions(() => this.navigate(['developer-options']))
       )
     }
 
     buttons.push(
-      {
-        text: 'Restart',
-        icon: 'refresh',
-        handler: () => {
-          this.presentAlertRestart()
-        },
-      },
-      {
-        text: 'Shutdown',
-        icon: 'power',
-        handler: () => {
-          this.presentAlertShutdown()
-        },
-      },
-      {
-        text: 'Forget',
-        cssClass: 'alert-danger',
-        icon: 'trash',
-        handler: () => {
-          this.presentAlertForget()
-        },
-      },
+        Restart         (() => this.presentAlertRestart()),
+        Shutdown        (() => this.presentAlertShutdown()),
+        Forget          (() => this.presentAlertForget()),
     )
-
+    
     const action = await this.actionCtrl.create({
       buttons,
     })
@@ -144,39 +96,20 @@ export class ServerShowPage {
 
   async presentAlertEditName () {
     const server = this.server$.value
-    const alert = await this.alertCtrl.create({
-      backdropDismiss: false,
-      header: 'Friendly Name',
-      inputs: [
-        {
-          name: 'inputValue',
-          type: 'text',
-          value: server.label,
-          placeholder: '(ex. My Server)',
-        },
-      ],
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-        }, {
-          text: 'Done',
-          handler: (data: { inputValue: string }) => {
-            const inputValue = data.inputValue
-            // return if no change
-            if (server.label === inputValue) { return }
-            // throw error if no server name
-            if (!inputValue) {
-              alert.message = 'Server must have a name'
-              return false
-            }
-            this.serverModel.updateCache(this.serverId, { label: inputValue })
-            this.serverModel.saveAll()
-          },
-        },
-      ],
-      cssClass: 'alert-config-value',
-    })
+    const alert = await this.alertCtrl.create(
+      EditFriendlyNameAlert(server, (data: { inputValue: string }) => {
+        const inputValue = data.inputValue
+        // return if no change
+        if (server.label === inputValue) { return }
+        // throw error if no server name
+        if (!inputValue) {
+          alert.message = 'Server must have a name'
+          return false
+        }
+        this.serverModel.updateCache(this.serverId, { label: inputValue })
+        this.serverModel.saveAll()
+    }))
+  
     await alert.present()
   }
 
@@ -337,6 +270,8 @@ export class ServerShowPage {
     await this.navCtrl.navigateForward(path, { relativeTo: this.route })
   }
 }
+
+
 
 type FiniteObservable<T> = Observable<T>
 export const squash = map(() => {})

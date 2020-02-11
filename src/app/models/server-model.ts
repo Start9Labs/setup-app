@@ -195,7 +195,7 @@ export class MapSubject<T extends {id: string}> {
     this.add$.subscribe(toAdd => this.add(toAdd))
     this.update$.subscribe(toUpdate => this.update(toUpdate))
     this.delete$.subscribe(toDeleteId => this.delete(toDeleteId))
-    
+
     this.subject = Object.entries(tMap).reduce( (acc, [id, t]) => {
       acc[id] = new BehaviorSubject(t)
       return acc
