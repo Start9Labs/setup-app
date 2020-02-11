@@ -1,16 +1,16 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar *ngIf="server$ | async as server">
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="['/auth', 'servers']"></ion-back-button>
     </ion-buttons>
-    <ion-title>{{ (server$ | async)?.label }}</ion-title>
+    <ion-title>{{ server.label }}</ion-title>
     <ion-buttons slot="end" class="ion-padding-end">
       <ion-button class="notification-button" [routerLink]="['/auth', 'servers', serverId, 'notifications']"
         color="primary">
-        <ion-badge *ngIf="(server$ | async)?.badge" color="danger">{{ (server$ | async)?.badge }}</ion-badge>
+        <ion-badge *ngIf="server.badge" color="danger">{{ server.badge }}</ion-badge>
         <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
       </ion-button>
-      <ion-button (click)="presentAction(server$ | async)" color="primary">
+      <ion-button (click)="presentAction(server)" color="primary">
         <ion-icon name="more"></ion-icon>
       </ion-button>
     </ion-buttons>
