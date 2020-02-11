@@ -53,9 +53,13 @@ export class ServerMetricsPage {
     try {
       const metrics = await this.serverService.getServerMetrics(this.serverId)
       Object.keys(metrics).forEach(outerKey => {
-        Object.entries(metrics[outerKey]).forEach(([key, value]) => {
-          this.metrics[outerKey][key] = value
-        })
+        if (!this.metrics[outerKey]) {
+          this.metrics[outerKey] = metrics[outerKey]
+        } else {
+          Object.entries(metrics[outerKey]).forEach(([key, value]) => {
+            this.metrics[outerKey][key] = value
+          })
+        }
       })
     } catch (e) {
       this.error = e.message
