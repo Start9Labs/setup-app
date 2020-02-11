@@ -78,6 +78,17 @@ export class ServerShowPage {
     ]
 
     if (server.status === ServerStatus.RUNNING) {
+      if (this.compareVersions(server.versionInstalled, '0.1.1') === -1) {
+        buttons.push(
+          {
+            text: 'Wifi',
+            icon: 'wifi',
+            handler: () => {
+              this.navigate(['wifi'])
+            },
+          },
+        )
+      }
       buttons.push(
         {
           text: 'Wifi',
