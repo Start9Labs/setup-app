@@ -36,12 +36,12 @@
           <img src="assets/img/cube.png" alt="icon" />
         </ion-avatar>
         <ion-label>
-          <h1>{{ (server.observable$ | async)?.label }}</h1>
+          <h1>{{ (server.observe$ | async)?.label }}</h1>
           <h3>
             <s9-status [serverStatus]="server.status"></s9-status>
           </h3>
         </ion-label>
-        <ion-badge slot="end" *ngIf="(server.observable$ | async)?.badge" color="danger">{{ (server.observable$ | async)?.badge }}</ion-badge>
+        <ion-badge slot="end" *ngIf="(server.observe$ | async)?.badge" color="danger">{{ (server.observe$ | async)?.badge }}</ion-badge>
       </ion-item>
     </ion-card>
   </div>
