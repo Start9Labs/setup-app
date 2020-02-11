@@ -52,8 +52,14 @@ export class ServerMetricsPage {
   async getMetrics (): Promise<void> {
     try {
       const metrics = await this.serverService.getServerMetrics(this.serverId)
-      Object.entries(metrics).forEach(([key, value]) => {
-        this.metrics[key] = value
+      Object.keys(metrics).forEach(outerKey => {
+        if (!this.metrics[outerKey]) {
+          this.metrics[outerKey] = metrics[outerKey]
+        } else {
+          Object.entries(metrics[outerKey]).forEach(([key, value]) => {
+            this.metrics[outerKey][key] = value
+          })
+        }
       })
     } catch (e) {
       this.error = e.message
