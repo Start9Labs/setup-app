@@ -3,6 +3,7 @@ import { ServerModel, S9Server, ObservableWithId } from 'src/app/models/server-m
 import { NavController } from '@ionic/angular'
 import { ServerSyncService } from 'src/app/services/server.sync.service'
 import { Subscription } from 'rxjs'
+import { first } from 'rxjs/operators'
 
 @Component({
   selector: 'page-server-list',
@@ -22,9 +23,16 @@ export class ServerListPage {
 
   ngOnInit () {
     this.servers = this.serverModel.watchAllOfThem()
+
     this.addServersSubscription = this.serverModel.watchServerAdds().subscribe(newServers => {
-      this.servers.push(...this.serverModel.watchThem(newServers.map(s => s.id)))
+      const serversToWatch = this.serverModel.watchThem(newServers.map(s => s.id))
+      
+      //@TODO remove
+      serversToWatch[0].observe$.pipe(first()).subscribe(s => console.log(JSON.stringify(s)))
+      
+      this.servers.push(...serversToWatch)
     })
+
     this.deleteServersSubscription = this.serverModel.watchServerDeletes().subscribe(deletedIds => {
       deletedIds.forEach(id => {
         const i = this.servers.findIndex(s => s.id === id)
@@ -40,5 +48,10 @@ export class ServerListPage {
 
   async show (id: string) {
     await this.navCtrl.navigateForward(['/auth', 'servers', id])
+  }
+
+  ngOnDestroy(){
+    this.addServersSubscription.unsubscribe()
+    this.deleteServersSubscription.unsubscribe()
   }
 }
