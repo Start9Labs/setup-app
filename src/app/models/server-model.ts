@@ -63,6 +63,7 @@ export class ServerModel {
 
   // no op if already exists
   createInCache (server: S9Server): void {
+    this.appModel.createServerCache(server.id)
     this.mapSubject$.add$.next([server])
   }
 
