@@ -25,7 +25,7 @@ export class HttpNativeService {
     path: string,
     options: HttpNativeOptions,
   ): Promise<T> {
-    const server = this.serverModel.peek(serverId)
+    const server = this.serverModel.peekServer(serverId)
     options.headers = Object.assign(options.headers || { }, getAuthHeader(server))
     return this.serverRequest(server, path, options)
   }

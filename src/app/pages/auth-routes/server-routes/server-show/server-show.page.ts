@@ -39,7 +39,7 @@ export class ServerShowPage {
 
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
-    this.server$ = this.serverModel.watch(this.serverId)
+    this.server$ = this.serverModel.watchServer(this.serverId)
     this.serverApps$ = this.appModel.watchServerCache(this.serverId)
 
     await Promise.all([

@@ -15,8 +15,6 @@ export type ServerDeltaType = 'Create' | 'Delete' | 'Update'
 })
 export class ServerModel {
   mapSubject$: MapSubject<S9Server> = new MapSubject({})
-  darkCache: { [id: string]: BehaviorSubject<S9Server> } = { }
-  serverDelta$ : Subject<{id: string, deltaType: ServerDeltaType}> = new Subject()
 
   constructor (
     private readonly storage: Storage,
@@ -39,13 +37,13 @@ export class ServerModel {
     return this.mapSubject$.delete$
   }
 
-  watch (serverId: string) : BehaviorSubject<S9Server> {
+  watchServer (serverId: string) : BehaviorSubject<S9Server> {
     const toReturn = this.mapSubject$.watchUpdate(serverId)
     if(!toReturn) throw new Error(`Expected server ${serverId} but not found.`)
     return toReturn
   }
 
-  peek (serverId: string): S9Server {
+  peekServer (serverId: string): S9Server {
     const toReturn = this.mapSubject$.peek(serverId)
     if(!toReturn) throw new Error(`Expected server ${serverId} but not found.`)
     return toReturn
