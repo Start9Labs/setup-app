@@ -10,7 +10,7 @@ import { ServerService } from 'src/app/services/server.service'
 import { ServerSyncService } from 'src/app/services/server.sync.service'
 import { Observable, BehaviorSubject, forkJoin, interval } from 'rxjs'
 import { mergeMap, map, take } from 'rxjs/operators'
-import { EditFriendlyName, Wifi, ServerSpecs, Metrics, DeveloperOptions, Restart, Shutdown, Forget, EditFriendlyNameAlert } from './server-menu-options'
+import { EditFriendlyName, Wifi, ServerSpecs, Metrics, DeveloperOptions, Restart, Shutdown, Forget, EditFriendlyNameAlert, UpdateAlert, LoadingSpinner, RestartAlert, ShutdownAlert, ForgetAlert } from './server-menu-options'
 
 @Component({
   selector: 'server-show',
@@ -115,32 +115,39 @@ export class ServerShowPage {
 
   async presentAlertUpdate () {
     const server = this.server$.value
-    const alert = await this.alertCtrl.create({
-      backdropDismiss: false,
-      header: 'Confirm',
-      message: `Update MeshOS to ${server.versionLatest}?`,
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-        },
-        {
-          text: 'Update',
-          handler: async () => {
-            this.update()
-          },
-        },
-      ],
-    })
+    const alert = await this.alertCtrl.create(
+      UpdateAlert(server, () => this.update())    
+    )
+    await alert.present()
+  }
+
+  async presentAlertRestart () {
+    const server = this.server$.value
+    const alert = await this.alertCtrl.create(
+      RestartAlert(server, () => this.restart())
+   )
+    await alert.present()
+  }
+
+  async presentAlertShutdown () {
+    const server = this.server$.value
+    const alert = await this.alertCtrl.create(
+      ShutdownAlert(server, () => this.shutdown())
+    )
+    await alert.present()
+  }
+
+  async presentAlertForget () {
+    const server = this.server$.value
+    const alert = await this.alertCtrl.create(
+      ForgetAlert(server, () => this.forget())      
+    )
     await alert.present()
   }
 
   async update () {
     const server = this.server$.value
-    const loader = await this.loadingCtrl.create({
-      spinner: 'lines',
-      cssClass: 'loader',
-    })
+    const loader = await this.loadingCtrl.create(LoadingSpinner())
     await loader.present()
 
     try {
@@ -153,82 +160,11 @@ export class ServerShowPage {
     }
   }
 
-  async presentAlertRestart () {
-    const server = this.server$.value
-    const alert = await this.alertCtrl.create({
-      backdropDismiss: false,
-      header: 'Confirm',
-      message: `Are you sure you want to restart ${server.label}?`,
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-        },
-        {
-          text: 'Restart',
-          cssClass: 'alert-danger',
-          handler: async () => {
-            this.restart()
-          },
-        },
-      ],
-    })
-    await alert.present()
-  }
-
-  async presentAlertShutdown () {
-    const server = this.server$.value
-    const alert = await this.alertCtrl.create({
-      backdropDismiss: false,
-      header: 'Confirm',
-      message: `Are you sure you want to shut down ${server.label}?`,
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-        },
-        {
-          text: 'Shutdown',
-          cssClass: 'alert-danger',
-          handler: async () => {
-            this.shutdown()
-          },
-        },
-      ],
-    })
-    await alert.present()
-  }
-
-  async presentAlertForget () {
-    const server = this.server$.value
-    const alert = await this.alertCtrl.create({
-      backdropDismiss: false,
-      header: 'Caution',
-      message: `Are you sure you want to forget ${server.label} on this device? You can add it back later. The server itself will not be affected.`,
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-        },
-        {
-          text: 'Forget Server',
-          cssClass: 'alert-danger',
-          handler: async () => {
-            this.forget()
-          },
-        },
-      ],
-    })
-    await alert.present()
-  }
-
   async restart () {
     const server = this.server$.value
-    const loader = await this.loadingCtrl.create({
-      spinner: 'lines',
-      message: `Restarting ${server.label}...`,
-      cssClass: 'loader',
-    })
+    const loader = await this.loadingCtrl.create(
+      LoadingSpinner(`Restarting ${server.label}...`)
+    )
     await loader.present()
 
     try {
@@ -243,11 +179,9 @@ export class ServerShowPage {
 
   async shutdown () {
     const server = this.server$.value
-    const loader = await this.loadingCtrl.create({
-      spinner: 'lines',
-      message: `Shutting down ${server.label}...`,
-      cssClass: 'loader',
-    })
+    const loader = await this.loadingCtrl.create(
+      LoadingSpinner(`Shutting down ${server.label}...`)
+    )
     await loader.present()
 
     try {
