@@ -108,7 +108,7 @@ export class ServerShowPage {
         }
         this.serverModel.updateCache(this.serverId, { label: inputValue })
         this.serverModel.saveAll()
-    }))
+      }))
   
     await alert.present()
   }

@@ -67,7 +67,7 @@ export const EditFriendlyNameAlert: (s: S9Server, h: (a?: any) => any) => AlertO
         role: 'cancel',
       }, {
         text: 'Done',
-        handler: () => { handler() }
+        handler
       },
     ],
     cssClass: 'alert-config-value',
