@@ -10,7 +10,7 @@
         <ion-badge *ngIf="(server$ | async)?.badge" color="danger">{{ (server$ | async)?.badge }}</ion-badge>
         <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
       </ion-button>
-      <ion-button (click)="presentAction()" color="primary">
+      <ion-button (click)="presentAction(server$ | async)" color="primary">
         <ion-icon name="more"></ion-icon>
       </ion-button>
     </ion-buttons>

@@ -65,8 +65,7 @@ export class ServerShowPage {
     }
   }
 
-  async presentAction () {
-    const server = this.server$.value
+  async presentAction (server: S9Server) {
     const buttons: ActionSheetButton[] = [
       {
         text: 'Edit Friendly Name',
