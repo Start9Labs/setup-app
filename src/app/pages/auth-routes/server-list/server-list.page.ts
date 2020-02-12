@@ -1,5 +1,6 @@
 import { Component } from '@angular/core'
-import { ServerModel, S9Server, ObservableWithId } from 'src/app/models/server-model'
+import { ServerModel, S9Server } from 'src/app/models/server-model'
+import { ObservableWithId } from "src/app/util/map-subject.util"
 import { NavController } from '@ionic/angular'
 import { ServerSyncService } from 'src/app/services/server.sync.service'
 import { Subscription } from 'rxjs'

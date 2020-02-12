@@ -100,7 +100,7 @@ export class AppComponent {
   }
 
   private clearModels () {
-    this.serverModel.clearCache()
+    this.serverModel.clear()
     this.appModel.clearCache()
   }
 
