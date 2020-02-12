@@ -53,7 +53,7 @@ export class ServerShowPage {
     this.getServerAndApps().subscribe(() => event.target.complete())
   }
 
-  getServerAndApps(): FiniteObservable<void> {
+  getServerAndApps (): FiniteObservable<void> {
     return this.server$.pipe(
       take(1),
       mergeMap(async server => {
@@ -63,13 +63,13 @@ export class ServerShowPage {
         } catch (e) {
           this.error = e.message
         }
-      })
-    ) 
+      }),
+    )
   }
 
   async presentAction (server: S9Server) {
     const buttons: ActionSheetButton[] = [
-        EditFriendlyName  (() => this.presentAlertEditName())
+        EditFriendlyName  (() => this.presentAlertEditName()),
     ]
 
     if (server.status === ServerStatus.RUNNING) {
@@ -77,7 +77,7 @@ export class ServerShowPage {
         Wifi            (() => this.navigate(['wifi'])),
         ServerSpecs     (() => this.navigate(['specs'])),
         Metrics         (() => this.navigate(['metrics'])),
-        DeveloperOptions(() => this.navigate(['developer-options']))
+        DeveloperOptions(() => this.navigate(['developer-options'])),
       )
     }
 
@@ -86,7 +86,7 @@ export class ServerShowPage {
         Shutdown        (() => this.presentAlertShutdown()),
         Forget          (() => this.presentAlertForget()),
     )
-    
+
     const action = await this.actionCtrl.create({
       buttons,
     })
@@ -109,14 +109,14 @@ export class ServerShowPage {
         this.serverModel.updateCache(this.serverId, { label: inputValue })
         this.serverModel.saveAll()
       }))
-  
+
     await alert.present()
   }
 
   async presentAlertUpdate () {
     const server = this.server$.value
     const alert = await this.alertCtrl.create(
-      UpdateAlert(server, () => this.update())    
+      UpdateAlert(server, () => this.update()),
     )
     await alert.present()
   }
@@ -124,7 +124,7 @@ export class ServerShowPage {
   async presentAlertRestart () {
     const server = this.server$.value
     const alert = await this.alertCtrl.create(
-      RestartAlert(server, () => this.restart())
+      RestartAlert(server, () => this.restart()),
    )
     await alert.present()
   }
@@ -132,7 +132,7 @@ export class ServerShowPage {
   async presentAlertShutdown () {
     const server = this.server$.value
     const alert = await this.alertCtrl.create(
-      ShutdownAlert(server, () => this.shutdown())
+      ShutdownAlert(server, () => this.shutdown()),
     )
     await alert.present()
   }
@@ -140,7 +140,7 @@ export class ServerShowPage {
   async presentAlertForget () {
     const server = this.server$.value
     const alert = await this.alertCtrl.create(
-      ForgetAlert(server, () => this.forget())      
+      ForgetAlert(server, () => this.forget()),
     )
     await alert.present()
   }
@@ -163,7 +163,7 @@ export class ServerShowPage {
   async restart () {
     const server = this.server$.value
     const loader = await this.loadingCtrl.create(
-      LoadingSpinner(`Restarting ${server.label}...`)
+      LoadingSpinner(`Restarting ${server.label}...`),
     )
     await loader.present()
 
@@ -180,7 +180,7 @@ export class ServerShowPage {
   async shutdown () {
     const server = this.server$.value
     const loader = await this.loadingCtrl.create(
-      LoadingSpinner(`Shutting down ${server.label}...`)
+      LoadingSpinner(`Shutting down ${server.label}...`),
     )
     await loader.present()
 
@@ -207,10 +207,10 @@ export class ServerShowPage {
 
 type FiniteObservable<T> = Observable<T>
 
-export const squash = map(() => {})
-export function forkPause(ms: number): FiniteObservable<void> {
+export const squash = map(() => { })
+export function forkPause (ms: number): FiniteObservable<void> {
   return interval(ms).pipe(take(1), squash)
 }
-export function forkDoAll(...os: Observable<any>[]): FiniteObservable<any[]> {
+export function forkDoAll (...os: Observable<any>[]): FiniteObservable<any[]> {
   return forkJoin(os.map(a => a.pipe(take(1))))
 }
