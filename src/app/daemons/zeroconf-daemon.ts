@@ -19,19 +19,19 @@ export class ZeroconfDaemon {
   ) { }
 
   async start (restart: boolean) {
-    // return this.mock()
+    return this.mock()
 
-    if (this.zeroconfSub || !this.platform.is('cordova')) { return }
+    // if (this.zeroconfSub || !this.platform.is('cordova')) { return }
 
-    console.log('starting zeroconf daemon')
+    // console.log('starting zeroconf daemon')
 
-    if (restart) { await this.zeroconf.reInit() }
+    // if (restart) { await this.zeroconf.reInit() }
 
-    setTimeout(now => this.purgeOld(now), this.timeToPurge, new Date().valueOf())
+    // setTimeout(now => this.purgeOld(now), this.timeToPurge, new Date().valueOf())
 
-    this.zeroconfSub = this.zeroconf.watch('_http._tcp.', 'local.').subscribe(result => {
-      this.handleServiceUpdate(result)
-    })
+    // this.zeroconfSub = this.zeroconf.watch('_http._tcp.', 'local.').subscribe(result => {
+    //   this.handleServiceUpdate(result)
+    // })
   }
 
   stop () {

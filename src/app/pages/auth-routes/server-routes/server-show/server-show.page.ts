@@ -69,7 +69,7 @@ export class ServerShowPage {
 
   async presentAction (server: S9Server) {
     const buttons: ActionSheetButton[] = [
-        EditFriendlyName  (() => this.presentAlertEditName()),
+        EditFriendlyName  (() => this.presentAlertEditName(server)),
     ]
 
     if (server.status === ServerStatus.RUNNING) {
@@ -94,8 +94,7 @@ export class ServerShowPage {
     await action.present()
   }
 
-  async presentAlertEditName () {
-    const server = this.server$.value
+  async presentAlertEditName (server: S9Server) {
     const alert = await this.alertCtrl.create(
       EditFriendlyNameAlert(server, (data: { inputValue: string }) => {
         const inputValue = data.inputValue

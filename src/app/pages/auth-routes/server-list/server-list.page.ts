@@ -18,7 +18,7 @@ export class ServerListPage {
   constructor (
     public serverModel: ServerModel,
     private readonly sss: ServerSyncService,
-    private readonly navCtrl: NavController,    
+    private readonly navCtrl: NavController,
   ) { }
 
   ngOnInit () {
@@ -26,10 +26,6 @@ export class ServerListPage {
 
     this.addServersSubscription = this.serverModel.watchServerAdds().subscribe(newServers => {
       const serversToWatch = this.serverModel.watchThem(newServers.map(s => s.id))
-      
-      //@TODO remove
-      serversToWatch[0].observe$.pipe(take(1)).subscribe(s => console.log(JSON.stringify(s)))
-      
       this.servers.push(...serversToWatch)
     })
 
@@ -50,7 +46,7 @@ export class ServerListPage {
     await this.navCtrl.navigateForward(['/auth', 'servers', id])
   }
 
-  ngOnDestroy(){
+  ngOnDestroy () {
     this.addServersSubscription.unsubscribe()
     this.deleteServersSubscription.unsubscribe()
   }

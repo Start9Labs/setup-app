@@ -8,10 +8,11 @@ import * as configUtil from '../util/config.util'
 import { pauseFor } from '../util/misc.util'
 import { HttpNativeService } from './http-native.service'
 
+
 @Injectable({
   providedIn: 'root',
 })
-export class ServerService {
+export class XServerService {
   constructor (
     private readonly httpService: HttpNativeService,
     private readonly appModel: AppModel,
@@ -185,7 +186,7 @@ export class ServerService {
 @Injectable({
   providedIn: 'root',
 })
-export class XServerService {
+export class ServerService {
 
   constructor (
     private readonly appModel: AppModel,
