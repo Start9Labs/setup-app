@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
-import { AppModel } from './app-model'
+import { ServerAppModel } from './server-app-model'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { deriveKeys } from '../util/crypto.util'
 import * as CryptoJS from 'crypto-js'
@@ -15,9 +15,10 @@ export type ServerDeltaType = 'Create' | 'Delete' | 'Update'
 export class ServerModel extends MapSubject<S9Server> {
   constructor (
     private readonly storage: Storage,
-    private readonly appModel: AppModel,
+    private readonly serverAppModel: ServerAppModel,
   ) { super({ }) }
 
+  // TODO ?
   watchServerAdds (): Observable<S9Server[]> {
     return this.add$.asObservable()
   }
@@ -55,7 +56,7 @@ export class ServerModel extends MapSubject<S9Server> {
   }
 
   createServerAppCache (sid: string): void {
-    this.appModel.createServerCache(sid)
+    this.serverAppModel.create(sid)
   }
 
   count (): number { return this.peekAll().length }

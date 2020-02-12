@@ -52,17 +52,19 @@
       <ion-text color="primary">Sovereign App Store</ion-text>
     </ion-item>
 
-    <ion-item *ngFor="let app$ of (serverApps$ | async) | keyvalue" [routerLink]="['apps', 'installed', app$.key]">
-      <ion-avatar slot="start">
-        <img [src]="(app$.value | async)?.iconURL" alt="icon" />
-      </ion-avatar>
-      <ion-label>
-        <h2>{{ (app$.value | async)?.title }}</h2>
-        <h3>{{ (app$.value | async)?.versionInstalled }}</h3>
-      </ion-label>
-      <ion-note slot="end">
-        <s9-status [appStatus]="(app$.value | async)?.status"></s9-status>
-      </ion-note>
+    <ion-item *ngFor="let app$ of apps" [routerLink]="['apps', 'installed', app$.id]">
+      <div *ngVar="app$.observe$ | async as app">
+        <ion-avatar slot="start">
+          <img [src]="app.iconURL" alt="icon" />
+        </ion-avatar>
+        <ion-label>
+          <h2>{{ app.title }}</h2>
+          <h3>{{ app.versionInstalled }}</h3>
+        </ion-label>
+        <ion-note slot="end">
+          <s9-status [appStatus]="app.status"></s9-status>
+        </ion-note>
+      </div>
     </ion-item>
   </ion-item-group>
 

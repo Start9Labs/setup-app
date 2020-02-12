@@ -9,7 +9,7 @@ import { WifiDaemon } from './daemons/wifi-daemon'
 import { AuthService } from './services/auth.service'
 import { Router } from '@angular/router'
 import { AuthStatus } from './types/enums'
-import { AppModel } from './models/app-model'
+import { ServerAppModel } from './models/server-app-model'
 import { AuthenticatePage } from './modals/authenticate/authenticate.page'
 
 @Component({
@@ -25,7 +25,7 @@ export class AppComponent {
     private readonly splashScreen: SplashScreen,
     private readonly statusBar: StatusBar,
     private readonly serverModel: ServerModel,
-    private readonly appModel: AppModel,
+    private readonly appModel: ServerAppModel,
     private readonly zeroconfDaemon: ZeroconfDaemon,
     private readonly serverDaemon: ServerDaemon,
     private readonly wifiDaemon: WifiDaemon,

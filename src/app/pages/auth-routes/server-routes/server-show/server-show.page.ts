@@ -4,13 +4,15 @@ import { ServerModel, ServerStatus } from 'src/app/models/server-model'
 import { NavController, AlertController, ActionSheetController, LoadingController } from '@ionic/angular'
 import { S9Server } from 'src/app/models/server-model'
 import { ActionSheetButton } from '@ionic/core'
-import { AppModel, AppInstalled } from 'src/app/models/app-model'
+import { AppInstalled, AppModel } from 'src/app/models/app-model'
 import * as compareVersions from 'compare-versions'
 import { ServerService } from 'src/app/services/server.service'
 import { ServerSyncService } from 'src/app/services/server.sync.service'
-import { Observable, BehaviorSubject, forkJoin, interval } from 'rxjs'
+import { Observable, BehaviorSubject, forkJoin, interval, Subscription } from 'rxjs'
 import { mergeMap, map, take } from 'rxjs/operators'
 import * as Menu from './server-menu-options'
+import { ServerAppModel } from 'src/app/models/server-app-model'
+import { ObservableWithId } from 'src/app/util/map-subject.util'
 
 @Component({
   selector: 'server-show',
@@ -24,7 +26,12 @@ export class ServerShowPage {
   compareVersions = compareVersions
   server$: BehaviorSubject<S9Server>
   serverId: string
-  serverApps$: Observable<{ [appId: string]: BehaviorSubject<AppInstalled> }>
+  appModel: AppModel
+  apps: ObservableWithId<AppInstalled>[]
+
+  addAppsSubscription: Subscription
+  deleteAppsSubscription: Subscription
+
 
   constructor (
     private readonly route: ActivatedRoute,
@@ -35,18 +42,36 @@ export class ServerShowPage {
     private readonly loadingCtrl: LoadingController,
     private readonly serverService: ServerService,
     private readonly sss: ServerSyncService,
-    readonly appModel: AppModel,
+    readonly serverAppModel: ServerAppModel,
   ) { }
 
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
     this.server$ = this.serverModel.watchServer(this.serverId)
     this.serverModel.createServerAppCache(this.serverId)
-    this.serverApps$ = this.appModel.watchServerCache(this.serverId)
+
+    this.appModel = this.serverAppModel.get(this.serverId)
+
+    this.apps = this.appModel.watchAllOfThem()
+    this.addAppsSubscription = this.appModel.watchAppAdds().subscribe(newApps => {
+      const serversToWatch = this.appModel.watchThem(newApps.map(a => a.id))
+      this.apps.push(...serversToWatch)
+    })
+    this.deleteAppsSubscription = this.appModel.watchAppDeletes().subscribe(deletedIds => {
+      deletedIds.forEach(id => {
+        const i = this.apps.findIndex(a => a.id === id)
+        this.apps.splice(i, 1)
+      })
+    })
 
     forkDoAll(this.getServerAndApps(), forkPause(600)).pipe(squash).subscribe(() => {
         this.loading = false
     })
+  }
+
+  ngOnDestroy () {
+    this.addAppsSubscription.unsubscribe()
+    this.deleteAppsSubscription.unsubscribe()
   }
 
   doRefresh (event: any) {

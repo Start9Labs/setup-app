@@ -5,6 +5,7 @@ import { AppInstalled, AppConfigSpec, AppStatus, AppModel } from 'src/app/models
 import { ServerService } from 'src/app/services/server.service'
 import { BehaviorSubject } from 'rxjs'
 import { pauseFor } from 'src/app/util/misc.util'
+import { ServerAppModel } from 'src/app/models/server-app-model'
 
 @Component({
   selector: 'app-config',
@@ -20,11 +21,12 @@ export class AppConfigPage {
   config: object
   edited = false
   serverId: string
+  appModel: AppModel
 
   constructor (
     private readonly navCtrl: NavController,
     private readonly route: ActivatedRoute,
-    private readonly appModel: AppModel,
+    private readonly serverAppModel: ServerAppModel,
     private readonly serverService: ServerService,
     private readonly loadingCtrl: LoadingController,
     private readonly alertCtrl: AlertController,
@@ -34,7 +36,8 @@ export class AppConfigPage {
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
     this.appId = this.route.snapshot.paramMap.get('appId') as string
-    this.app$ = this.appModel.watch(this.serverId, this.appId)
+    this.appModel = this.serverAppModel.get(this.serverId)
+    this.app$ = this.appModel.watchApp(this.appId)
     const app = this.app$.value
     if (app.status === AppStatus.RECOVERABLE) {
       await this.presentAlertRecoverable()
@@ -90,7 +93,7 @@ export class AppConfigPage {
         await this.serverService.startApp(this.serverId, app)
       // if not RUNNING beforehand, set status to STOPPED
       } else {
-        this.appModel.update(this.serverId, this.appId, { status: AppStatus.STOPPED, statusAt: new Date().toISOString() })
+        this.appModel.updateCache(this.appId, { status: AppStatus.STOPPED, statusAt: new Date().toISOString() })
       }
 
       await this.navigateBack()

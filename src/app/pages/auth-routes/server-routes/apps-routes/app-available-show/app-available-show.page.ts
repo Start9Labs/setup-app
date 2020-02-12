@@ -113,6 +113,50 @@ export class AppAvailableShowPage {
     await alert.present()
   }
 
+async presentAlertDowngrade () {
+    const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
+      header: 'Confirm',
+      message: `Are you sure you want to downgrade ${this.app.title} from ${this.app.versionInstalled} to ${this.app.versionViewing}?`,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: 'Downgrade',
+          cssClass: 'alert-success',
+          handler: () => {
+            this.install()
+          },
+        },
+      ],
+    })
+    await alert.present()
+  }
+
+async presentAlertUpgrade () {
+    const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
+      header: 'Confirm',
+      message: `Are you sure you want to update ${this.app.title} from ${this.app.versionInstalled} to ${this.app.versionViewing}?`,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: 'Downgrade',
+          cssClass: 'alert-success',
+          handler: () => {
+            this.install()
+          },
+        },
+      ],
+    })
+    await alert.present()
+  }
+
   async presentAlertUninstall () {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,

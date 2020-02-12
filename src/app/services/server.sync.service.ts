@@ -3,9 +3,10 @@ import { ToastController, NavController } from '@ionic/angular'
 import { ServerModel, S9Server, ServerStatus } from '../models/server-model'
 import { ServerService } from './server.service'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
-import { AppModel, AppStatus } from '../models/app-model'
+import { AppStatus } from '../models/app-model'
 import { doForAtLeast, tryAll, pauseFor } from '../util/misc.util'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
+import { ServerAppModel } from '../models/server-app-model'
 
 @Injectable({
   providedIn: 'root',
@@ -64,7 +65,7 @@ export class ServerSyncService {
     private readonly serverService: ServerService,
     private readonly serverModel: ServerModel,
     private readonly zeroconfDaemon: ZeroconfDaemon,
-    private readonly appModel: AppModel,
+    private readonly serverAppModel: ServerAppModel,
     private readonly syncNotifier: SyncNotifier,
   ) {
     this.zeroconfDaemon.watch().subscribe(zeroconfService => this.handleZeroconfUpdate(zeroconfService) )
@@ -91,7 +92,7 @@ export class ServerSyncService {
       this.serverService,
       this.serverModel,
       this.zeroconfDaemon,
-      this.appModel,
+      this.serverAppModel,
       this.syncNotifier,
       new Date(),
     )
@@ -117,7 +118,7 @@ export class ServerSync {
     private readonly serverService: ServerService,
     private readonly serverModel: ServerModel,
     private readonly zeroconfDaemon: ZeroconfDaemon,
-    private readonly appModel: AppModel,
+    private readonly serverAppModel: ServerAppModel,
     private readonly syncNotifier: SyncNotifier,
     readonly initialized_at:  Date,
   ) { }
@@ -184,12 +185,12 @@ export class ServerSync {
     switch (appsRes.result) {
       case 'resolve' : {
 
-        this.appModel.syncAppCache(server.id, appsRes.value)
+        this.serverAppModel.get(server.id).syncAppCache(appsRes.value)
         break
       }
       case 'reject'  : {
         console.error(`get apps request for ${server.id} rejected with ${JSON.stringify(appsRes.value)}`)
-        this.appModel.updateAppsUniformly(server.id, appUnreachable())
+        this.serverAppModel.get(server.id).updateAppsUniformly(appUnreachable())
         break
       }
     }
@@ -202,7 +203,7 @@ export class ServerSync {
 
   private markServerUnreachable (server: S9Server): void {
     this.serverModel.updateCache(server.id, serverUnreachable())
-    this.appModel.updateAppsUniformly(server.id, appUnreachable())
+    this.serverAppModel.get(server.id).updateAppsUniformly(appUnreachable())
   }
 
   private async retry (server: S9Server, retryIn: number): Promise<void> {

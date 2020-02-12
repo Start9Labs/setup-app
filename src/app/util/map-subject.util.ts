@@ -15,6 +15,7 @@ export class MapSubject<T extends { id: string }> {
   update$: Subject<Update<T>[]> = new Subject()
   delete$: Subject<string[]> = new Subject()
   subject: { [id: string]: BehaviorSubject<T> }
+
   constructor (tMap: { [id: string]: T}) {
     this.add$.subscribe(toAdd => this.add(toAdd))
     this.update$.subscribe(toUpdate => this.update(toUpdate))
@@ -55,7 +56,12 @@ export class MapSubject<T extends { id: string }> {
     })
   }
 
-  clear (): void { this.delete$.next(Object.keys(this.subject)) }
+  clear (): void {
+    this.delete$.next(Object.keys(this.subject))
+    this.add$.complete()
+    this.delete$.complete()
+    this.update$.complete()
+  }
 
   watchUpdate (id: string): undefined | BehaviorSubject<T> {
     return this.subject[id]

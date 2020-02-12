@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core'
 import { Method } from '../types/enums'
-import { AppInstalled, AppAvailablePreview, AppAvailableFull, AppStatus, AppConfigSpec, AppModel, Rules } from '../models/app-model'
+import { AppInstalled, AppAvailablePreview, AppAvailableFull, AppStatus, AppConfigSpec, Rules } from '../models/app-model'
 import { S9Notification, SSHFingerprint, ServerStatus } from '../models/server-model'
 import { Lan, ApiAppAvailablePreview, ApiAppAvailableFull, ApiAppInstalled, ApiServer, ApiAppVersionInfo } from '../types/api-types'
 import { S9BuilderWith } from './setup.service'
 import * as configUtil from '../util/config.util'
 import { pauseFor } from '../util/misc.util'
 import { HttpNativeService } from './http-native.service'
-
+import { ServerAppModel } from '../models/server-app-model'
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +15,7 @@ import { HttpNativeService } from './http-native.service'
 export class ServerService {
   constructor (
     private readonly httpService: HttpNativeService,
-    private readonly appModel: AppModel,
+    private readonly appModel: ServerAppModel,
   ) { }
 
   async getServer (serverId: string): Promise<ApiServer> {
@@ -105,23 +105,23 @@ export class ServerService {
       version,
     }
     const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(serverId, `/apps/${appId}/install`, { method: Method.post, data })
-    await this.appModel.create(serverId, installed)
+    await this.appModel.get(serverId).createInCache(installed)
     return installed
   }
 
   async uninstallApp (serverId: string, appId: string): Promise<void> {
     await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(serverId, `/apps/${appId}/uninstall`, { method: Method.post })
-    await this.appModel.remove(serverId, appId)
+    await this.appModel.get(serverId).removeFromCache(appId)
   }
 
   async startApp (serverId: string, app: AppInstalled): Promise<void> {
     await this.httpService.authServerRequest<Lan.PostStartAppRes>(serverId, `/apps/${app.id}/start`, { method: Method.post })
-    this.appModel.update(serverId, app.id, { status: AppStatus.RUNNING, statusAt: new Date().toISOString() })
+    this.appModel.get(serverId).updateCache(app.id, { status: AppStatus.RUNNING, statusAt: new Date().toISOString() })
   }
 
   async stopApp (serverId: string, app: AppInstalled): Promise<void> {
     await this.httpService.authServerRequest<Lan.PostStopAppRes>(serverId, `/apps/${app.id}/stop`, { method: Method.post })
-    this.appModel.update(serverId, app.id, { status: AppStatus.STOPPED, statusAt: new Date().toISOString() })
+    this.appModel.get(serverId).updateCache(app.id, { status: AppStatus.STOPPED, statusAt: new Date().toISOString() })
   }
 
   async updateAppConfig (serverId: string, app: AppInstalled, config: object): Promise<void> {
@@ -133,7 +133,7 @@ export class ServerService {
 
   async wipeAppData (serverId: string, app: AppInstalled): Promise<void> {
     await this.httpService.authServerRequest<Lan.PostWipeAppDataRes>(serverId, `/apps/${app.id}/wipe`, { method: Method.post })
-    this.appModel.update(serverId, app.id, { status: AppStatus.NEEDS_CONFIG, statusAt: new Date().toISOString() })
+    this.appModel.get(serverId).updateCache(app.id, { status: AppStatus.NEEDS_CONFIG, statusAt: new Date().toISOString() })
   }
 
   async getSSHKeys (serverId: string): Promise<SSHFingerprint[]> {
@@ -189,7 +189,7 @@ export class ServerService {
 export class XServerService {
 
   constructor (
-    private readonly appModel: AppModel,
+    private readonly appModel: ServerAppModel,
   ) { }
 
   async getServer (serverId: string | S9BuilderWith<'zeroconf' | 'privkey' | 'versionInstalled' | 'torAddress'>): Promise<ApiServer> {
@@ -269,13 +269,13 @@ export class XServerService {
 
   async installApp (serverId: string, appId: string, version: string): Promise<AppInstalled> {
     const installed = await mockInstallApp()
-    await this.appModel.create(serverId, installed)
+    await this.appModel.get(serverId).createInCache(installed)
     return installed
   }
 
   async uninstallApp (serverId: string, appId: string): Promise<void> {
     await mockUninstallApp()
-    await this.appModel.remove(serverId, appId)
+    await this.appModel.get(serverId).removeFromCache(appId)
   }
 
   async startApp (serverId: string, app: AppInstalled): Promise<void> {

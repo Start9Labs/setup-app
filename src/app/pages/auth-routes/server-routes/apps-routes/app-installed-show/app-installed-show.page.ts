@@ -7,6 +7,7 @@ import { ClipboardService } from 'src/app/services/clipboard.service'
 import { ActionSheetButton } from '@ionic/core'
 import { BehaviorSubject } from 'rxjs'
 import { pauseFor } from 'src/app/util/misc.util'
+import { ServerAppModel } from 'src/app/models/server-app-model'
 
 @Component({
   selector: 'app-installed-show',
@@ -19,6 +20,7 @@ export class AppInstalledShowPage {
   app$: BehaviorSubject<AppInstalled>
   appId: string
   serverId: string
+  appModel: AppModel
 
   constructor (
     private readonly alertCtrl: AlertController,
@@ -28,13 +30,14 @@ export class AppInstalledShowPage {
     private readonly clipboardService: ClipboardService,
     private readonly loadingCtrl: LoadingController,
     private readonly serverService: ServerService,
-    private readonly appModel: AppModel,
+    private readonly serverAppModel: ServerAppModel,
   ) { }
 
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
     this.appId = this.route.snapshot.paramMap.get('appId') as string
-    this.app$ = this.appModel.watch(this.serverId, this.appId)
+    this.appModel = this.serverAppModel.get(this.serverId)
+    this.app$ = this.appModel.watchApp(this.appId)
 
     await Promise.all([
       this.getApp(),
@@ -52,8 +55,8 @@ export class AppInstalledShowPage {
   async getApp (): Promise<void> {
     try {
       const appRes = await this.serverService.getInstalledApp(this.serverId, this.appId)
-      this.app$ = this.app$ || this.appModel.watch(this.serverId, this.appId)
-      this.appModel.update(this.serverId, this.appId, appRes)
+      this.app$ = this.app$ || this.appModel.watchApp(this.appId)
+      this.appModel.updateCache(this.appId, appRes)
       this.error = ''
     } catch (e) {
       this.error = e.message
