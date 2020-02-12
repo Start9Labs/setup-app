@@ -53,18 +53,16 @@
     </ion-item>
 
     <ion-item *ngFor="let app$ of apps" [routerLink]="['apps', 'installed', app$.id]">
-      <div *ngVar="app$.observe$ | async as app">
-        <ion-avatar slot="start">
-          <img [src]="app.iconURL" alt="icon" />
-        </ion-avatar>
-        <ion-label>
-          <h2>{{ app.title }}</h2>
-          <h3>{{ app.versionInstalled }}</h3>
-        </ion-label>
-        <ion-note slot="end">
-          <s9-status [appStatus]="app.status"></s9-status>
-        </ion-note>
-      </div>
+      <ion-avatar slot="start">
+        <img [src]="(app$.observe$ | async).iconURL" alt="icon" />
+      </ion-avatar>
+      <ion-label>
+        <h2>{{ (app$.observe$ | async).title }}</h2>
+        <h3>{{ (app$.observe$ | async).versionInstalled }}</h3>
+      </ion-label>
+      <ion-note slot="end">
+        <s9-status [appStatus]="(app$.observe$ | async).status"></s9-status>
+      </ion-note>
     </ion-item>
   </ion-item-group>
 
