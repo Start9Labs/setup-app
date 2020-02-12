@@ -25,24 +25,24 @@ export class SetupService {
 
   async setup (builder: S9ServerBuilder, productKey: string): Promise<S9Server> {
     // **** Mock ****
-    return toS9Server(this.mockServer(builder))
+    // return toS9Server(this.mockServer(builder))
 
-    // for (let i = 0; i < SetupService.setupAttempts; i ++) {
-    //   builder = await this.discoverAttempt(builder)
-    //   await pauseFor(SetupService.waitForMS)
-    // }
+    for (let i = 0; i < SetupService.setupAttempts; i ++) {
+      builder = await this.discoverAttempt(builder)
+      await pauseFor(SetupService.waitForMS)
+    }
 
-    // if (!isDiscovered(builder)) {
-    //   throw new Error(`Failed ${this.message}`)
-    // }
+    if (!isDiscovered(builder)) {
+      throw new Error(`Failed ${this.message}`)
+    }
 
-    // builder = await this.setupAttempt(builder, productKey)
+    builder = await this.setupAttempt(builder, productKey)
 
-    // if (!isFullySetup(builder)) {
-    //   throw new Error(`Failed ${this.message}`)
-    // }
+    if (!isFullySetup(builder)) {
+      throw new Error(`Failed ${this.message}`)
+    }
 
-    // return toS9Server(builder)
+    return toS9Server(builder)
   }
 
   private async discoverAttempt (builder: S9ServerBuilder): Promise<S9ServerBuilder> {

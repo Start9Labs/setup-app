@@ -10,7 +10,7 @@ import { ServerService } from 'src/app/services/server.service'
 import { ServerSyncService } from 'src/app/services/server.sync.service'
 import { Observable, BehaviorSubject, forkJoin, interval } from 'rxjs'
 import { mergeMap, map, take } from 'rxjs/operators'
-import { EditFriendlyName, Wifi, ServerSpecs, Metrics, DeveloperOptions, Restart, Shutdown, Forget, EditFriendlyNameAlert, UpdateAlert, LoadingSpinner, RestartAlert, ShutdownAlert, ForgetAlert } from './server-menu-options'
+import * as Menu from './server-menu-options'
 
 @Component({
   selector: 'server-show',
@@ -69,22 +69,22 @@ export class ServerShowPage {
 
   async presentAction (server: S9Server) {
     const buttons: ActionSheetButton[] = [
-        EditFriendlyName  (() => this.presentAlertEditName(server)),
+      Menu.EditFriendlyName(() => this.presentAlertEditName(server)),
     ]
 
     if (server.status === ServerStatus.RUNNING) {
       buttons.push(
-        Wifi            (() => this.navigate(['wifi'])),
-        ServerSpecs     (() => this.navigate(['specs'])),
-        Metrics         (() => this.navigate(['metrics'])),
-        DeveloperOptions(() => this.navigate(['developer-options'])),
+        Menu.Wifi(() => this.navigate(['wifi'])),
+        Menu.ServerSpecs(() => this.navigate(['specs'])),
+        Menu.Metrics(() => this.navigate(['metrics'])),
+        Menu.DeveloperOptions(() => this.navigate(['developer-options'])),
       )
     }
 
     buttons.push(
-        Restart         (() => this.presentAlertRestart()),
-        Shutdown        (() => this.presentAlertShutdown()),
-        Forget          (() => this.presentAlertForget()),
+      Menu.Restart(() => this.presentAlertRestart(server)),
+      Menu.Shutdown(() => this.presentAlertShutdown(server)),
+      Menu.Forget(() => this.presentAlertForget(server)),
     )
 
     const action = await this.actionCtrl.create({
@@ -96,12 +96,10 @@ export class ServerShowPage {
 
   async presentAlertEditName (server: S9Server) {
     const alert = await this.alertCtrl.create(
-      EditFriendlyNameAlert(server, (data: { inputValue: string }) => {
+      Menu.EditFriendlyNameAlert(server, (data: { inputValue: string }) => {
         const inputValue = data.inputValue
-        // return if no change
-        if (server.label === inputValue) { return }
-        // throw error if no server name
-        if (!inputValue) {
+        if (server.label === inputValue) { return } // return if no change
+        if (!inputValue) {                          // throw error if no server name
           alert.message = 'Server must have a name'
           return false
         }
@@ -115,38 +113,35 @@ export class ServerShowPage {
   async presentAlertUpdate () {
     const server = this.server$.value
     const alert = await this.alertCtrl.create(
-      UpdateAlert(server, () => this.update()),
+      Menu.UpdateAlert(server, () => this.update()),
     )
     await alert.present()
   }
 
-  async presentAlertRestart () {
-    const server = this.server$.value
+  async presentAlertRestart (server: S9Server) {
     const alert = await this.alertCtrl.create(
-      RestartAlert(server, () => this.restart()),
-   )
-    await alert.present()
-  }
-
-  async presentAlertShutdown () {
-    const server = this.server$.value
-    const alert = await this.alertCtrl.create(
-      ShutdownAlert(server, () => this.shutdown()),
+      Menu.RestartAlert(server, () => this.restart()),
     )
     await alert.present()
   }
 
-  async presentAlertForget () {
-    const server = this.server$.value
+  async presentAlertShutdown (server: S9Server) {
     const alert = await this.alertCtrl.create(
-      ForgetAlert(server, () => this.forget()),
+      Menu.ShutdownAlert(server, () => this.shutdown()),
+    )
+    await alert.present()
+  }
+
+  async presentAlertForget (server: S9Server) {
+    const alert = await this.alertCtrl.create(
+      Menu.ForgetAlert(server, () => this.forget()),
     )
     await alert.present()
   }
 
   async update () {
     const server = this.server$.value
-    const loader = await this.loadingCtrl.create(LoadingSpinner())
+    const loader = await this.loadingCtrl.create(Menu.LoadingSpinner())
     await loader.present()
 
     try {
@@ -162,7 +157,7 @@ export class ServerShowPage {
   async restart () {
     const server = this.server$.value
     const loader = await this.loadingCtrl.create(
-      LoadingSpinner(`Restarting ${server.label}...`),
+      Menu.LoadingSpinner(`Restarting ${server.label}...`),
     )
     await loader.present()
 
@@ -179,7 +174,7 @@ export class ServerShowPage {
   async shutdown () {
     const server = this.server$.value
     const loader = await this.loadingCtrl.create(
-      LoadingSpinner(`Shutting down ${server.label}...`),
+      Menu.LoadingSpinner(`Shutting down ${server.label}...`),
     )
     await loader.present()
 
@@ -206,7 +201,7 @@ export class ServerShowPage {
 
 type FiniteObservable<T> = Observable<T>
 
-export const squash = map(() => { })
+export const squash = map(() => { return })
 export function forkPause (ms: number): FiniteObservable<void> {
   return interval(ms).pipe(take(1), squash)
 }
