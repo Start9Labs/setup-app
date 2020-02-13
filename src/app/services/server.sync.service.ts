@@ -69,7 +69,7 @@ export class ServerSyncService {
     private readonly syncNotifier: SyncNotifier,
   ) {
     this.zeroconfDaemon.watch().subscribe(
-      zeroconfService => this.handleZeroconfUpdate(zeroconfService) 
+      zeroconfService => this.handleZeroconfUpdate(zeroconfService),
     )
   }
 
