@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, ChangeDetectionStrategy } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { ServerModel, ServerStatus } from 'src/app/models/server-model'
 import { NavController, AlertController, ActionSheetController, LoadingController } from '@ionic/angular'
@@ -8,30 +8,32 @@ import { AppInstalled, AppModel } from 'src/app/models/app-model'
 import * as compareVersions from 'compare-versions'
 import { ServerService } from 'src/app/services/server.service'
 import { ServerSyncService } from 'src/app/services/server.sync.service'
-import { Observable, BehaviorSubject, forkJoin, interval, Subscription } from 'rxjs'
-import { mergeMap, map, take } from 'rxjs/operators'
+import { Observable, forkJoin, interval, Subscription } from 'rxjs'
+import { map, take } from 'rxjs/operators'
 import * as Menu from './server-menu-options'
 import { ServerAppModel } from 'src/app/models/server-app-model'
-import { ObservableWithId } from 'src/app/util/map-subject.util'
+import { PropertySubject, PropertyObservableWithId, peekProperties, fromPropertyObservable } from 'src/app/util/property-subject.util'
+import { pauseFor } from 'src/app/util/misc.util'
 
 @Component({
   selector: 'server-show',
   templateUrl: 'server-show.page.html',
   styleUrls: ['server-show.page.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ServerShowPage {
   error = ''
   view: 'apps' | 'about' = 'apps'
   loading = true
   compareVersions = compareVersions
-  server$: BehaviorSubject<S9Server>
+
+  server: PropertySubject<S9Server>
+  apps: PropertyObservableWithId<AppInstalled>[]
+
   serverId: string
-  appModel: AppModel
-  apps: ObservableWithId<AppInstalled>[]
 
   addAppsSubscription: Subscription
   deleteAppsSubscription: Subscription
-
 
   constructor (
     private readonly route: ActivatedRoute,
@@ -47,26 +49,27 @@ export class ServerShowPage {
 
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
-    this.server$ = this.serverModel.watchServer(this.serverId)
+    this.server = this.serverModel.watchServerProperties(this.serverId)
     this.serverModel.createServerAppCache(this.serverId)
 
-    this.appModel = this.serverAppModel.get(this.serverId)
+    const appModel = this.serverAppModel.get(this.serverId)
 
-    this.apps = this.appModel.watchAllOfThem()
-    this.addAppsSubscription = this.appModel.watchAppAdds().subscribe(newApps => {
-      const serversToWatch = this.appModel.watchThem(newApps.map(a => a.id))
+    this.apps = appModel.watchAll()
+
+    this.addAppsSubscription = appModel.watchAppAdds().subscribe(newApps => {
+      const serversToWatch = appModel.watchThese(newApps.map(a => a.id))
       this.apps.push(...serversToWatch)
     })
-    this.deleteAppsSubscription = this.appModel.watchAppDeletes().subscribe(deletedIds => {
+
+    this.deleteAppsSubscription = appModel.watchAppDeletes().subscribe(deletedIds => {
       deletedIds.forEach(id => {
         const i = this.apps.findIndex(a => a.id === id)
         this.apps.splice(i, 1)
       })
     })
 
-    forkDoAll(this.getServerAndApps(), forkPause(600)).pipe(squash).subscribe(() => {
-        this.loading = false
-    })
+    await Promise.all([this.getServerAndApps(), pauseFor(600)])
+    this.loading = false
   }
 
   ngOnDestroy () {
@@ -74,49 +77,48 @@ export class ServerShowPage {
     this.deleteAppsSubscription.unsubscribe()
   }
 
-  doRefresh (event: any) {
-    this.getServerAndApps().subscribe(() => event.target.complete())
+  async doRefresh (event: any) {
+    await this.getServerAndApps()
+    event.target.complete()
   }
 
-  getServerAndApps (): FiniteObservable<void> {
-    return this.server$.pipe(
-      take(1),
-      mergeMap(async server => {
-        try {
-          await this.sss.fromCache().syncServer(server)
-          this.error = ''
-        } catch (e) {
-          this.error = e.message
-        }
-      }),
-    )
-  }
-
-  async presentAction (server: S9Server) {
-    const buttons: ActionSheetButton[] = [
-      Menu.EditFriendlyName(() => this.presentAlertEditName(server)),
-    ]
-
-    if (server.status === ServerStatus.RUNNING) {
-      buttons.push(
-        Menu.Wifi(() => this.navigate(['wifi'])),
-        Menu.ServerSpecs(() => this.navigate(['specs'])),
-        Menu.Metrics(() => this.navigate(['metrics'])),
-        Menu.DeveloperOptions(() => this.navigate(['developer-options'])),
-      )
+  async getServerAndApps (): Promise<void> {
+    const server = peekProperties(this.server)
+    try {
+      this.sss.fromCache().syncServer(server)
+      this.error = ''
+    } catch (e) {
+      this.error = e.message
     }
+  }
 
-    buttons.push(
-      Menu.Restart(() => this.presentAlertRestart(server)),
-      Menu.Shutdown(() => this.presentAlertShutdown(server)),
-      Menu.Forget(() => this.presentAlertForget(server)),
-    )
+  async presentAction (pittedServer: PropertySubject<S9Server>) {
+    fromPropertyObservable(pittedServer).pipe(take(1)).subscribe(async server => {
+      const buttons: ActionSheetButton[] = [
+        Menu.EditFriendlyName(() => this.presentAlertEditName(server)),
+      ]
 
-    const action = await this.actionCtrl.create({
-      buttons,
+      if (server.status === ServerStatus.RUNNING) {
+        buttons.push(
+          Menu.Wifi(() => this.navigate(['wifi'])),
+          Menu.ServerSpecs(() => this.navigate(['specs'])),
+          Menu.Metrics(() => this.navigate(['metrics'])),
+          Menu.DeveloperOptions(() => this.navigate(['developer-options'])),
+        )
+      }
+
+      buttons.push(
+        Menu.Restart(() => this.presentAlertRestart(server)),
+        Menu.Shutdown(() => this.presentAlertShutdown(server)),
+        Menu.Forget(() => this.presentAlertForget(server)),
+      )
+
+      const action = await this.actionCtrl.create({
+        buttons,
+      })
+
+      await action.present()
     })
-
-    await action.present()
   }
 
   async presentAlertEditName (server: S9Server) {
@@ -128,31 +130,32 @@ export class ServerShowPage {
           alert.message = 'Server must have a name'
           return false
         }
-        this.serverModel.updateCache(this.serverId, { label: inputValue })
+        this.serverModel.updateServer(this.serverId, { label: inputValue })
         this.serverModel.saveAll()
       }))
 
     await alert.present()
   }
 
-  async presentAlertUpdate () {
-    const server = this.server$.value
-    const alert = await this.alertCtrl.create(
-      Menu.UpdateAlert(server, () => this.update()),
-    )
-    await alert.present()
+  async presentAlertUpdate (propertiesSubject: PropertySubject<S9Server>) {
+    fromPropertyObservable(propertiesSubject).pipe(take(1)).subscribe(async server => {
+      const alert = await this.alertCtrl.create(
+        Menu.UpdateAlert(server, () => this.update(server)),
+      )
+      await alert.present()
+    })
   }
 
   async presentAlertRestart (server: S9Server) {
     const alert = await this.alertCtrl.create(
-      Menu.RestartAlert(server, () => this.restart()),
+      Menu.RestartAlert(server, () => this.restart(server)),
     )
     await alert.present()
   }
 
   async presentAlertShutdown (server: S9Server) {
     const alert = await this.alertCtrl.create(
-      Menu.ShutdownAlert(server, () => this.shutdown()),
+      Menu.ShutdownAlert(server, () => this.shutdown(server)),
     )
     await alert.present()
   }
@@ -164,14 +167,13 @@ export class ServerShowPage {
     await alert.present()
   }
 
-  async update () {
-    const server = this.server$.value
+  async update (server: S9Server) {
     const loader = await this.loadingCtrl.create(Menu.LoadingSpinner())
     await loader.present()
 
     try {
       await this.serverService.updateAgent(this.serverId, server.versionLatest)
-      this.serverModel.updateCache(this.serverId, { status: ServerStatus.UPDATING, statusAt: new Date().toISOString() })
+      this.serverModel.updateServer(this.serverId, { status: ServerStatus.UPDATING, statusAt: new Date().toISOString() })
     } catch (e) {
       this.error = e.message
     } finally {
@@ -179,8 +181,7 @@ export class ServerShowPage {
     }
   }
 
-  async restart () {
-    const server = this.server$.value
+  async restart (server: S9Server) {
     const loader = await this.loadingCtrl.create(
       Menu.LoadingSpinner(`Restarting ${server.label}...`),
     )
@@ -196,8 +197,7 @@ export class ServerShowPage {
     }
   }
 
-  async shutdown () {
-    const server = this.server$.value
+  async shutdown (server: S9Server) {
     const loader = await this.loadingCtrl.create(
       Menu.LoadingSpinner(`Shutting down ${server.label}...`),
     )
@@ -214,7 +214,7 @@ export class ServerShowPage {
   }
 
   async forget () {
-    await this.serverModel.removeFromCache(this.serverId)
+    await this.serverModel.removeServer(this.serverId)
     await this.serverModel.saveAll()
     await this.navCtrl.navigateRoot(['/auth'])
   }

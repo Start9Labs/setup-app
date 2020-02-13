@@ -1,13 +1,13 @@
 <ion-header>
-  <ion-toolbar *ngVar="(server$ | async) as server">
+  <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="['/auth', 'servers']"></ion-back-button>
     </ion-buttons>
-    <ion-title>{{ server.label }}</ion-title>
+    <ion-title>{{ server['label'] | async }}</ion-title>
     <ion-buttons slot="end" class="ion-padding-end">
       <ion-button class="notification-button" [routerLink]="['/auth', 'servers', serverId, 'notifications']"
         color="primary">
-        <ion-badge *ngIf="server.badge" color="danger">{{ server.badge }}</ion-badge>
+        <ion-badge *ngIf="server['badge'] | async" color="danger">{{ server['badge'] | async }}</ion-badge>
         <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
       </ion-button>
       <ion-button (click)="presentAction(server)" color="primary">
@@ -17,8 +17,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content *ngVar="(server$ | async) as serverC">
-
+<ion-content>
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content refreshingSpinner="lines"></ion-refresher-content>
   </ion-refresher>
@@ -28,16 +27,16 @@
       <ion-label>
         <h5>Status</h5>
         <h1>
-          <s9-status [serverStatus]="serverC.status"></s9-status>
+          <s9-status [serverStatus]="(server['status'] | async)"></s9-status>
         </h1>
       </ion-label>
     </ion-item>
   </ion-item-group>
 
   <ion-button
-    *ngIf="serverC.status === 'RUNNING' && compareVersions(serverC.versionInstalled, serverC.versionLatest) === -1"
-    style="margin: 16px 0;" expand="block" fill="outline" (click)="presentAlertUpdate()">
-    Update MeshOS to {{ serverC.versionLatest }}
+    *ngIf="(server['status'] | async) === 'RUNNING' && compareVersions((server['versionInstalled'] | async), (server['versionLatest'] | async)) === -1"
+    style="margin: 16px 0;" expand="block" fill="outline" (click)="presentAlertUpdate(server)">
+    Update MeshOS to {{ (server['versionLatest'] | async) }}
   </ion-button>
 
   <ion-item-group>
@@ -52,21 +51,21 @@
       <ion-text color="primary">Sovereign App Store</ion-text>
     </ion-item>
 
-    <ion-item *ngFor="let app$ of apps" [routerLink]="['apps', 'installed', app$.id]">
+    <ion-item *ngFor="let app of apps" [routerLink]="['apps', 'installed', app.id]">
       <ion-avatar slot="start">
-        <img [src]="(app$.observe$ | async).iconURL" alt="icon" />
+        <img [src]="app.observe['iconURL'] | async" alt="icon" />
       </ion-avatar>
       <ion-label>
-        <h2>{{ (app$.observe$ | async).title }}</h2>
-        <h3>{{ (app$.observe$ | async).versionInstalled }}</h3>
+        <h2>{{ app.observe['title'] | async }}</h2>
+        <h3>{{ app.observe['versionInstalled'] | async }}</h3>
       </ion-label>
       <ion-note slot="end">
-        <s9-status [appStatus]="(app$.observe$ | async).status"></s9-status>
+        <s9-status [appStatus]="app.observe['status'] | async"></s9-status>
       </ion-note>
     </ion-item>
   </ion-item-group>
 
-  <div *ngIf="loading && !appModel.count(serverId)" class="sublist-spinner">
+  <div *ngIf="loading && !apps.length" class="sublist-spinner">
     <ion-spinner name="lines" color="warning"></ion-spinner>
   </div>
 

@@ -1,7 +1,5 @@
 import { Component } from '@angular/core'
-import { S9Server } from 'src/app/models/server-model'
 import { ActivatedRoute } from '@angular/router'
-import { ServerModel } from 'src/app/models/server-model'
 import { AppAvailableFull } from 'src/app/models/app-model'
 import { ServerService } from 'src/app/services/server.service'
 import { NavController, AlertController, LoadingController } from '@ionic/angular'

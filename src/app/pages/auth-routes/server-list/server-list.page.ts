@@ -1,9 +1,9 @@
 import { Component } from '@angular/core'
 import { ServerModel, S9Server } from 'src/app/models/server-model'
-import { ObservableWithId } from 'src/app/util/map-subject.util'
 import { NavController } from '@ionic/angular'
 import { ServerSyncService } from 'src/app/services/server.sync.service'
 import { Subscription } from 'rxjs'
+import { PropertyObservableWithId } from 'src/app/util/property-subject.util'
 
 @Component({
   selector: 'page-server-list',
@@ -11,7 +11,8 @@ import { Subscription } from 'rxjs'
   styleUrls: ['./server-list.page.scss'],
 })
 export class ServerListPage {
-  servers: ObservableWithId<S9Server>[]
+  servers: PropertyObservableWithId<S9Server>[]
+
   addServersSubscription: Subscription
   deleteServersSubscription: Subscription
 
@@ -22,10 +23,10 @@ export class ServerListPage {
   ) { }
 
   ngOnInit () {
-    this.servers = this.serverModel.watchAllOfThem()
+    this.servers = this.serverModel.watchAll()
 
     this.addServersSubscription = this.serverModel.watchServerAdds().subscribe(newServers => {
-      const serversToWatch = this.serverModel.watchThem(newServers.map(s => s.id))
+      const serversToWatch = this.serverModel.watchThese(newServers.map(s => s.id))
       this.servers.push(...serversToWatch)
     })
 

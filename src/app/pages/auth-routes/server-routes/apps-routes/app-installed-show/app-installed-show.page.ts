@@ -8,6 +8,7 @@ import { ActionSheetButton } from '@ionic/core'
 import { BehaviorSubject } from 'rxjs'
 import { pauseFor } from 'src/app/util/misc.util'
 import { ServerAppModel } from 'src/app/models/server-app-model'
+import { PropertySubject, peekProperties } from 'src/app/util/property-subject.util'
 
 @Component({
   selector: 'app-installed-show',
@@ -17,7 +18,7 @@ import { ServerAppModel } from 'src/app/models/server-app-model'
 export class AppInstalledShowPage {
   loading = true
   error = ''
-  app$: BehaviorSubject<AppInstalled>
+  app: PropertySubject<AppInstalled>
   appId: string
   serverId: string
   appModel: AppModel
@@ -37,7 +38,7 @@ export class AppInstalledShowPage {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
     this.appId = this.route.snapshot.paramMap.get('appId') as string
     this.appModel = this.serverAppModel.get(this.serverId)
-    this.app$ = this.appModel.watchApp(this.appId)
+    this.app = this.appModel.watchAppProperties(this.appId)
 
     await Promise.all([
       this.getApp(),
@@ -55,8 +56,8 @@ export class AppInstalledShowPage {
   async getApp (): Promise<void> {
     try {
       const appRes = await this.serverService.getInstalledApp(this.serverId, this.appId)
-      this.app$ = this.app$ || this.appModel.watchApp(this.appId)
-      this.appModel.updateCache(this.appId, appRes)
+      this.app = this.app || this.appModel.watchAppProperties(this.appId)
+      this.appModel.updateApp(this.appId, appRes)
       this.error = ''
     } catch (e) {
       this.error = e.message
@@ -64,12 +65,12 @@ export class AppInstalledShowPage {
   }
 
   async copyTor () {
-    const app = this.app$.value
+    const app = peekProperties(this.app)
     await this.clipboardService.copy(app.torAddress || '')
   }
 
   async presentAction () {
-    const app = this.app$.value
+    const app = peekProperties(this.app)
     const buttons : ActionSheetButton[] = []
 
     if (([
@@ -126,7 +127,7 @@ export class AppInstalledShowPage {
   }
 
   async stop (): Promise<void> {
-    const app = this.app$.value
+    const app = peekProperties(this.app)
     const loader = await this.loadingCtrl.create({
       message: `Stopping ${app.title}. This could take a while...`,
       spinner: 'lines',
@@ -145,7 +146,7 @@ export class AppInstalledShowPage {
   }
 
   async start (): Promise<void> {
-    const app = this.app$.value
+    const app = peekProperties(this.app)
     const loader = await this.loadingCtrl.create({
       message: `Starting ${app.title}...`,
       spinner: 'lines',
@@ -163,7 +164,7 @@ export class AppInstalledShowPage {
   }
 
   async presentAlertUninstall () {
-    const app = this.app$.value
+    const app = peekProperties(this.app)
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Caution',
@@ -186,7 +187,7 @@ export class AppInstalledShowPage {
   }
 
   async uninstall (): Promise<void> {
-    const app = this.app$.value
+    const app = peekProperties(this.app)
     const loader = await this.loadingCtrl.create({
       message: `Uninstalling ${app.title}`,
       spinner: 'lines',

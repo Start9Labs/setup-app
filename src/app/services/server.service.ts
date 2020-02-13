@@ -12,7 +12,7 @@ import { ServerAppModel } from '../models/server-app-model'
 @Injectable({
   providedIn: 'root',
 })
-export class ServerService {
+export class XServerService {
   constructor (
     private readonly httpService: HttpNativeService,
     private readonly appModel: ServerAppModel,
@@ -105,23 +105,23 @@ export class ServerService {
       version,
     }
     const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(serverId, `/apps/${appId}/install`, { method: Method.post, data })
-    await this.appModel.get(serverId).createInCache(installed)
+    await this.appModel.get(serverId).createApp(installed)
     return installed
   }
 
   async uninstallApp (serverId: string, appId: string): Promise<void> {
     await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(serverId, `/apps/${appId}/uninstall`, { method: Method.post })
-    await this.appModel.get(serverId).removeFromCache(appId)
+    await this.appModel.get(serverId).removeApp(appId)
   }
 
   async startApp (serverId: string, app: AppInstalled): Promise<void> {
     await this.httpService.authServerRequest<Lan.PostStartAppRes>(serverId, `/apps/${app.id}/start`, { method: Method.post })
-    this.appModel.get(serverId).updateCache(app.id, { status: AppStatus.RUNNING, statusAt: new Date().toISOString() })
+    this.appModel.get(serverId).updateApp(app.id, { status: AppStatus.RUNNING, statusAt: new Date().toISOString() })
   }
 
   async stopApp (serverId: string, app: AppInstalled): Promise<void> {
     await this.httpService.authServerRequest<Lan.PostStopAppRes>(serverId, `/apps/${app.id}/stop`, { method: Method.post })
-    this.appModel.get(serverId).updateCache(app.id, { status: AppStatus.STOPPED, statusAt: new Date().toISOString() })
+    this.appModel.get(serverId).updateApp(app.id, { status: AppStatus.STOPPED, statusAt: new Date().toISOString() })
   }
 
   async updateAppConfig (serverId: string, app: AppInstalled, config: object): Promise<void> {
@@ -133,7 +133,7 @@ export class ServerService {
 
   async wipeAppData (serverId: string, app: AppInstalled): Promise<void> {
     await this.httpService.authServerRequest<Lan.PostWipeAppDataRes>(serverId, `/apps/${app.id}/wipe`, { method: Method.post })
-    this.appModel.get(serverId).updateCache(app.id, { status: AppStatus.NEEDS_CONFIG, statusAt: new Date().toISOString() })
+    this.appModel.get(serverId).updateApp(app.id, { status: AppStatus.NEEDS_CONFIG, statusAt: new Date().toISOString() })
   }
 
   async getSSHKeys (serverId: string): Promise<SSHFingerprint[]> {
@@ -186,7 +186,7 @@ export class ServerService {
 @Injectable({
   providedIn: 'root',
 })
-export class XServerService {
+export class ServerService {
 
   constructor (
     private readonly appModel: ServerAppModel,
@@ -269,13 +269,13 @@ export class XServerService {
 
   async installApp (serverId: string, appId: string, version: string): Promise<AppInstalled> {
     const installed = await mockInstallApp()
-    await this.appModel.get(serverId).createInCache(installed)
+    await this.appModel.get(serverId).createApp(installed)
     return installed
   }
 
   async uninstallApp (serverId: string, appId: string): Promise<void> {
     await mockUninstallApp()
-    await this.appModel.get(serverId).removeFromCache(appId)
+    await this.appModel.get(serverId).removeApp(appId)
   }
 
   async startApp (serverId: string, app: AppInstalled): Promise<void> {

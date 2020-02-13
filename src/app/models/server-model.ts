@@ -4,10 +4,9 @@ import { ServerAppModel } from './server-app-model'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { deriveKeys } from '../util/crypto.util'
 import * as CryptoJS from 'crypto-js'
-import { BehaviorSubject, Observable } from 'rxjs'
+import { Observable } from 'rxjs'
 import { MapSubject } from '../util/map-subject.util'
-
-export type ServerDeltaType = 'Create' | 'Delete' | 'Update'
+import { PropertySubject } from '../util/property-subject.util'
 
 @Injectable({
   providedIn: 'root',
@@ -18,7 +17,6 @@ export class ServerModel extends MapSubject<S9Server> {
     private readonly serverAppModel: ServerAppModel,
   ) { super({ }) }
 
-  // TODO ?
   watchServerAdds (): Observable<S9Server[]> {
     return this.add$.asObservable()
   }
@@ -27,8 +25,8 @@ export class ServerModel extends MapSubject<S9Server> {
     return this.delete$.asObservable()
   }
 
-  watchServer (serverId: string) : BehaviorSubject<S9Server> {
-    const toReturn = this.watchUpdate(serverId)
+  watchServerProperties (serverId: string) : PropertySubject<S9Server> {
+    const toReturn = this.watch(serverId)
     if (!toReturn) throw new Error(`Expected server ${serverId} but not found.`)
     return toReturn
   }
@@ -39,18 +37,15 @@ export class ServerModel extends MapSubject<S9Server> {
     return toReturn
   }
 
-  // no op if missing
-  removeFromCache (serverId: string): void {
+  removeServer (serverId: string): void {
     this.delete$.next([serverId])
   }
 
-  // no op if missing
-  updateCache (id: string, update: Partial<S9Server>): void {
+  updateServer (id: string, update: Partial<S9Server>): void {
     this.update$.next([{ ...update, id }])
   }
 
-  // no op if already exists
-  createInCache (server: S9Server): void {
+  createServer (server: S9Server): void {
     this.createServerAppCache(server.id)
     this.add$.next([server])
   }
@@ -58,8 +53,6 @@ export class ServerModel extends MapSubject<S9Server> {
   createServerAppCache (sid: string): void {
     this.serverAppModel.create(sid)
   }
-
-  count (): number { return this.peekAll().length }
 
   async load (mnemonic: string[]): Promise<void> {
     const fromStorage: S9ServerStore = await this.storage.get('servers') || []

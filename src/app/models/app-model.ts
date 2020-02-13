@@ -1,8 +1,7 @@
-import { BehaviorSubject, Observable } from 'rxjs'
+import { Observable } from 'rxjs'
 import { MapSubject } from '../util/map-subject.util'
 import { diff } from '../util/misc.util'
-
-export type ServerDeltaType = 'Create' | 'Delete' | 'Update'
+import { PropertySubject } from '../util/property-subject.util'
 
 export class AppModel extends MapSubject<AppInstalled> {
   constructor (private readonly serverId: string) { super({ }) }
@@ -15,8 +14,8 @@ export class AppModel extends MapSubject<AppInstalled> {
     return this.delete$.asObservable()
   }
 
-  watchApp (appId: string) : BehaviorSubject<AppInstalled> {
-    const toReturn = this.watchUpdate(appId)
+  watchAppProperties (appId: string) : PropertySubject<AppInstalled> {
+    const toReturn = this.watch(appId)
     if (!toReturn) throw new Error(`Expected app ${appId} but not found.`)
     return toReturn
   }
@@ -27,49 +26,44 @@ export class AppModel extends MapSubject<AppInstalled> {
     return toReturn
   }
 
-  // no op if already exists
-  createInCache (app: AppInstalled): void {
+  createApp (app: AppInstalled): void {
     this.add$.next([app])
   }
 
-  // no op if missing
-  removeFromCache (appId: string): void {
+  removeApp (appId: string): void {
     this.delete$.next([appId])
   }
 
-  // no op if missing
-  updateCache (id: string, update: Partial<AppInstalled>): void {
+  updateApp (id: string, update: Partial<AppInstalled>): void {
     this.update$.next([{ ...update, id }])
-  }
-
-  count (): number { return this.peekAll().length }
-
-  private deleteDiff (apps: AppInstalled[]): void {
-    const currentAppIds = apps.map(a => a.id)
-    const previousAppIds = Object.keys(this.subject)
-    const appsToDelete = diff(previousAppIds, currentAppIds)
-    this.delete$.next(appsToDelete)
   }
 
   upsertApps (apps: AppInstalled[]): void {
     apps.forEach(app => {
       if (this.subject[app.id]) {
-        this.updateCache(app.id, app)
+        this.updateApp(app.id, app)
       } else {
-        this.createInCache(app)
+        this.createApp(app)
       }
     })
   }
 
   syncAppCache (upToDateApps : AppInstalled[]) {
-    this.deleteDiff(upToDateApps)
+    this.deleteNonexistentApps(upToDateApps)
     this.upsertApps(upToDateApps)
   }
 
   updateAppsUniformly (uniformUpdate: Partial<AppInstalled>) {
     Object.keys(this.subject).forEach(appId => {
-      this.updateCache(appId, uniformUpdate)
+      this.updateApp(appId, uniformUpdate)
     })
+  }
+
+  private deleteNonexistentApps (apps: AppInstalled[]): void {
+    const currentAppIds = apps.map(a => a.id)
+    const previousAppIds = Object.keys(this.subject)
+    const appsToDelete = diff(previousAppIds, currentAppIds)
+    this.delete$.next(appsToDelete)
   }
 }
 

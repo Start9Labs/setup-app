@@ -51,7 +51,7 @@ export class SyncNotifier {
       ],
     })
     await toast.present()
-    this.serverModel.updateCache(server.id, updates)
+    this.serverModel.updateServer(server.id, updates)
   }
 }
 
@@ -174,7 +174,7 @@ export class ServerSync {
     ])
 
     switch (serverRes.result) {
-      case 'resolve' : this.serverModel.updateCache(server.id, serverRes.value); break
+      case 'resolve' : this.serverModel.updateServer(server.id, serverRes.value); break
       case 'reject'  : {
         console.error(`get server request for ${server.id} rejected with ${JSON.stringify(serverRes.value)}`)
         this.markServerUnreachable(server)
@@ -202,7 +202,7 @@ export class ServerSync {
   }
 
   private markServerUnreachable (server: S9Server): void {
-    this.serverModel.updateCache(server.id, serverUnreachable())
+    this.serverModel.updateServer(server.id, serverUnreachable())
     this.serverAppModel.get(server.id).updateAppsUniformly(appUnreachable())
   }
 

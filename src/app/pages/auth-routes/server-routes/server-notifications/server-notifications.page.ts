@@ -36,7 +36,7 @@ export class ServerNotificationsPage {
       pauseFor(600),
     ])
     this.notifications = notifications
-    this.serverModel.updateCache(this.serverId, { badge: 0 })
+    this.serverModel.updateServer(this.serverId, { badge: 0 })
     this.loading = false
   }
 
