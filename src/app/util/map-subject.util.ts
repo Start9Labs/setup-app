@@ -17,14 +17,21 @@ export class MapSubject<T extends { id: string }> {
   subject: { [id: string]: PropertySubject<T> }
 
   constructor (tMap: { [id: string]: T}) {
-    this.add$ = this.addPump$.pipe(map(toAdd => this.add(toAdd)))
-    this.delete$ = this.deletePump$.pipe(map(toDeleteId => this.delete(toDeleteId)))
-    this.updatePump$.subscribe(toUpdate => this.update(toUpdate))
-
+    this.init()
     this.subject = Object.entries(tMap).reduce((acc, [id, t]) => {
       acc[id] = initPropertySubject(t)
       return acc
     }, { })
+  }
+
+  private init () {
+    this.addPump$ = new BehaviorSubject([])
+    this.updatePump$ = new BehaviorSubject([])
+    this.deletePump$ = new BehaviorSubject([])
+
+    this.add$ = this.addPump$.pipe(map(toAdd => this.add(toAdd)))
+    this.delete$ = this.deletePump$.pipe(map(toDeleteId => this.delete(toDeleteId)))
+    this.updatePump$.subscribe(toUpdate => this.update(toUpdate))
   }
 
   private add (ts: T[]): T[] {
@@ -69,9 +76,10 @@ export class MapSubject<T extends { id: string }> {
 
   clear (): void {
     this.deletePump$.next(Object.keys(this.subject))
-    this.addPump$.next([])
-    this.updatePump$.next([])
-    this.deletePump$.next([])
+    this.addPump$.complete()
+    this.updatePump$.complete()
+    this.deletePump$.complete()
+    this.init()
   }
 
   watch (id: string): undefined | PropertySubject<T> {
