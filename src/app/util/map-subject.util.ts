@@ -7,9 +7,9 @@ export type Update<T extends { id: string }> = Partial<T> & {
 }
 
 export class MapSubject<T extends { id: string }> {
-  addPump$: Subject<T[]> = new Subject()
-  updatePump$: Subject<Update<T>[]> = new Subject()
-  deletePump$: Subject<string[]> = new Subject()
+  addPump$: BehaviorSubject<T[]> = new BehaviorSubject([])
+  updatePump$: BehaviorSubject<Update<T>[]> = new BehaviorSubject([])
+  deletePump$: BehaviorSubject<string[]> = new BehaviorSubject([])
 
   add$: Observable<T[]>
   delete$: Observable<string[]>
@@ -70,8 +70,8 @@ export class MapSubject<T extends { id: string }> {
   clear (): void {
     this.deletePump$.next(Object.keys(this.subject))
     this.addPump$.complete()
-    this.deletePump$.complete()
     this.updatePump$.complete()
+    this.deletePump$.complete()
   }
 
   watch (id: string): undefined | PropertySubject<T> {
