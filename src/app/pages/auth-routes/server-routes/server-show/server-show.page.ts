@@ -104,12 +104,12 @@ export class ServerShowPage {
           Menu.ServerSpecs(() => this.navigate(['specs'])),
           Menu.Metrics(() => this.navigate(['metrics'])),
           Menu.DeveloperOptions(() => this.navigate(['developer-options'])),
+          Menu.Restart(() => this.presentAlertRestart(server)),
+          Menu.Shutdown(() => this.presentAlertShutdown(server)),
         )
       }
 
       buttons.push(
-        Menu.Restart(() => this.presentAlertRestart(server)),
-        Menu.Shutdown(() => this.presentAlertShutdown(server)),
         Menu.Forget(() => this.presentAlertForget(server)),
       )
 
