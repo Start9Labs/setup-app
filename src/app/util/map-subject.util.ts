@@ -25,10 +25,8 @@ export class MapSubject<T extends { id: string }> {
   }
 
   private add (ts: T[]): T[] {
-    console.log(`adding somethings...`, ts)
     ts.forEach(t => {
       if (!this.subject[t.id]) {
-        console.log(`we are adding something`, initPropertySubject(t))
         this.subject[t.id] = initPropertySubject(t)
       }
     })
@@ -46,19 +44,14 @@ export class MapSubject<T extends { id: string }> {
 
   // missing keys in the update do *not* delete existing keys
   private update (ts: Update<T>[]): void {
-    console.log(`we're updating the following things...`, JSON.stringify(ts))
     ts.forEach(t => {
       if (this.subject[t.id]) {
         const propertiesAreSubjects = this.subject[t.id] as PropertySubject<T>
         Object.entries(t).forEach(([kt, vt]) => {
-          console.log(`Here is the property we are considering updating:`, kt, vt)
           if (propertiesAreSubjects[kt] as BehaviorSubject<any>) {
-
             propertiesAreSubjects[kt].pipe(take(1)).subscribe(vp => {
               if (vp !== vt) {
-                console.log(`Property we are updating:`, kt, vt)
                 propertiesAreSubjects[kt].next(vt)
-
                }
             })
           } else {

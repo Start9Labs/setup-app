@@ -140,10 +140,7 @@ export class ServerSync {
   }
 
   async syncServer (server: Readonly<S9Server>, retryIn?: number): Promise<void> {
-    console.log(`Server to update:`, JSON.stringify(server))
-
     const serverUpdating = this.updatingCache[server.id]
-
     console.log(`Server ${server.id} Syncing.`)
 
     if (serverUpdating && retryIn) {
@@ -165,10 +162,7 @@ export class ServerSync {
     }
 
     this.updatingCache[server.id] = false
-
     const updatedServer = this.serverModel.peekServer(server.id)
-    console.log(`Updated server:`, JSON.stringify(updatedServer))
-
     await this.serverModel.saveAll()
 
     this.syncNotifier.handleNotifications(updatedServer)

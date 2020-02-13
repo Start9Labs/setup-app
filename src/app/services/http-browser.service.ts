@@ -45,10 +45,6 @@ export class HttpBrowserService {
 
   async request<T> (method: Method, url: string, options: HttpBrowserOptions, body: any, TIMEOUT: number): Promise<T> {
     const newOptions = appendDefaultOptions(options)
-    // console.log('Request Method: ', method)
-    // console.log('Request URL: ', url)
-    // console.log('Request Body: ', body)
-    // console.log('Request Options: ', newOptions)
 
     let call: () => Observable<HttpEvent<T>>
     switch (method) {

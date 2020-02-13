@@ -39,8 +39,6 @@ export class AppModel extends MapSubject<AppInstalled> {
   }
 
   upsertApps (apps: AppInstalled[]): void {
-    console.log('upserting apps!', JSON.stringify(apps))
-
     apps.forEach(app => {
       if (this.subject[app.id]) {
         this.updateApp(app.id, app)
