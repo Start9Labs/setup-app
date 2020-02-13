@@ -12,7 +12,7 @@ import { pauseFor } from 'src/app/util/misc.util'
   styleUrls: ['./server-list.page.scss'],
 })
 export class ServerListPage {
-  servers: PropertyObservableWithId<S9Server>[]
+  servers: PropertyObservableWithId<S9Server>[] = []
 
   addServersSubscription: Subscription
   deleteServersSubscription: Subscription
@@ -27,7 +27,9 @@ export class ServerListPage {
     this.servers = this.serverModel.watchAll()
 
     this.addServersSubscription = this.serverModel.watchServerAdds().subscribe(newServers => {
+      console.log(`new servers`, JSON.stringify(newServers))
       const serversToWatch = this.serverModel.watchThese(newServers.map(s => s.id))
+      console.log(`servers watching`, JSON.stringify(serversToWatch))
       this.servers.push(...serversToWatch)
     })
 

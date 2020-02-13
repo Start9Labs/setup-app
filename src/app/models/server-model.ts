@@ -18,11 +18,11 @@ export class ServerModel extends MapSubject<S9Server> {
   ) { super({ }) }
 
   watchServerAdds (): Observable<S9Server[]> {
-    return this.add$.asObservable()
+    return this.watchAdd()
   }
 
   watchServerDeletes (): Observable<string[]> {
-    return this.delete$.asObservable()
+    return this.watchDelete()
   }
 
   watchServerProperties (serverId: string) : PropertySubject<S9Server> {
@@ -38,17 +38,17 @@ export class ServerModel extends MapSubject<S9Server> {
   }
 
   removeServer (serverId: string): void {
-    this.delete$.next([serverId])
+    this.deletePump$.next([serverId])
   }
 
   updateServer (id: string, update: Partial<S9Server>): void {
-    this.update$.next([{ ...update, id }])
+    this.updatePump$.next([{ ...update, id }])
   }
 
   createServer (server: S9Server): void {
     console.log(`adding server`, server)
     this.createServerAppCache(server.id)
-    this.add$.next([server])
+    this.addPump$.next([server])
   }
 
   createServerAppCache (sid: string): void {
@@ -58,7 +58,7 @@ export class ServerModel extends MapSubject<S9Server> {
   async load (mnemonic: string[]): Promise<void> {
     const fromStorage: S9ServerStore = await this.storage.get('servers') || []
     const mapped = fromStorage.map(s => fromStorableServer(s, mnemonic))
-    this.add$.next(mapped)
+    this.addPump$.next(mapped)
   }
 
   async saveAll (): Promise<void> {

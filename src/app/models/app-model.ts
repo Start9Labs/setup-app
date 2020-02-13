@@ -7,11 +7,11 @@ export class AppModel extends MapSubject<AppInstalled> {
   constructor (private readonly serverId: string) { super({ }) }
 
   watchAppAdds (): Observable<AppInstalled[]> {
-    return this.add$.asObservable()
+    return this.watchAdd()
   }
 
   watchAppDeletes (): Observable<string[]> {
-    return this.delete$.asObservable()
+    return this.watchDelete()
   }
 
   watchAppProperties (appId: string) : PropertySubject<AppInstalled> {
@@ -27,15 +27,15 @@ export class AppModel extends MapSubject<AppInstalled> {
   }
 
   createApp (app: AppInstalled): void {
-    this.add$.next([app])
+    this.addPump$.next([app])
   }
 
   removeApp (appId: string): void {
-    this.delete$.next([appId])
+    this.deletePump$.next([appId])
   }
 
   updateApp (id: string, update: Partial<AppInstalled>): void {
-    this.update$.next([{ ...update, id }])
+    this.updatePump$.next([{ ...update, id }])
   }
 
   upsertApps (apps: AppInstalled[]): void {
@@ -63,7 +63,7 @@ export class AppModel extends MapSubject<AppInstalled> {
     const currentAppIds = apps.map(a => a.id)
     const previousAppIds = Object.keys(this.subject)
     const appsToDelete = diff(previousAppIds, currentAppIds)
-    this.delete$.next(appsToDelete)
+    this.deletePump$.next(appsToDelete)
   }
 }
 
