@@ -25,7 +25,7 @@ export class HttpBrowserService {
     method: Method,
     options: HttpBrowserOptions = { },
     body: any = { },
-    TIMEOUT = 60, // seconds
+    TIMEOUT = 10, // seconds
   ): Promise<T> {
     const authOptions = appendAuthOptions(server, options)
     return this.serverRequest(server, path, method, authOptions, body, TIMEOUT)
@@ -37,7 +37,7 @@ export class HttpBrowserService {
     method: Method,
     options: HttpBrowserOptions = { },
     body: any = { },
-    TIMEOUT = 60, // seconds
+    TIMEOUT = 10, // seconds
   ): Promise<T> {
     const url = this.s9Url(server, path)
     return this.request(method, url, options, body, TIMEOUT)
