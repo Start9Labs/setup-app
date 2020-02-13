@@ -78,7 +78,10 @@ export class ServerShowPage {
   }
 
   async doRefresh (event: any) {
-    await this.getServerAndApps()
+    await Promise.all([
+      this.getServerAndApps(),
+      pauseFor(600),
+    ])
     event.target.complete()
   }
 

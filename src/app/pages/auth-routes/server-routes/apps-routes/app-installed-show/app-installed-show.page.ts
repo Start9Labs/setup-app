@@ -49,7 +49,10 @@ export class AppInstalledShowPage {
   }
 
   async doRefresh (event: any) {
-    await this.getApp()
+    await Promise.all([
+      this.getApp(),
+      pauseFor(600),
+    ])
     event.target.complete()
   }
 
