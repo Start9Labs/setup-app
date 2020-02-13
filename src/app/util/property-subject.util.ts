@@ -1,5 +1,5 @@
-import { BehaviorSubject, Observable, combineLatest, of } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { BehaviorSubject, Observable, combineLatest, of, pairs } from 'rxjs'
+import { map, pairwise, tap } from 'rxjs/operators'
 
 export type PropertyObservableWithId<T> = {
   id: string

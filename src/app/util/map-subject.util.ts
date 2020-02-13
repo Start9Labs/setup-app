@@ -1,13 +1,13 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs'
 import { take, map } from 'rxjs/operators'
-import { PropertySubject, initPropertySubject, completePropertyObservable, peekProperties, PropertyObservableWithId, asPropertyObservable } from './property-subject.util'
+import { PropertySubject, initPropertySubject, completePropertyObservable, peekProperties, PropertyObservableWithId, asPropertyObservable, PropertyObservable } from './property-subject.util'
 
 export type Update<T extends { id: string }> = Partial<T> & {
   id: string
 }
 
 export class MapSubject<T extends { id: string }> {
-  private add$: Subject<T[]>
+  private add$: Subject<PropertyObservableWithId<T>[]>
   protected update$: Subject<Update<T>[]>
   private delete$: Subject<string[]>
 
@@ -29,23 +29,25 @@ export class MapSubject<T extends { id: string }> {
   }
 
   add (ts: T[]): void {
-    console.log(`does add fire?`, JSON.stringify(ts))
-    ts.forEach(t => {
-      if (!this.subject[t.id]) {
-        this.subject[t.id] = initPropertySubject(t)
-      }
-    })
-    this.add$.next(ts)
+    this.add$.next(
+      ts.filter(t => !this.subject[t.id]).map(t => {
+        const newSubject = initPropertySubject(t)
+        this.subject[t.id] = newSubject
+        return { observe: newSubject, id: t.id }
+      }),
+    )
   }
 
   delete (tids: string[]): void {
+    const toReturn = [] as string[]
     tids.forEach(id => {
       if (this.subject[id]) {
         completePropertyObservable(this.subject[id])
         delete this.subject[id]
+        toReturn.push(id)
       }
     })
-    this.delete$.next(tids)
+    this.delete$.next(toReturn)
   }
 
   // missing keys in the update do *not* delete existing keys
@@ -82,7 +84,7 @@ export class MapSubject<T extends { id: string }> {
     return this.subject[id]
   }
 
-  watchAdd (): Observable<T[]> {
+  watchAdd (): Observable<PropertyObservableWithId<T>[]> {
     return this.add$
   }
 

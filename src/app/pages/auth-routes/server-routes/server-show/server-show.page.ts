@@ -55,9 +55,8 @@ export class ServerShowPage {
 
     this.apps = appModel.watchAll()
 
-    this.addAppsSubscription = appModel.watchAppAdds().subscribe(newApps => {
-      const serversToWatch = appModel.watchThese(newApps.map(a => a.id))
-      this.apps.push(...serversToWatch)
+    this.addAppsSubscription = appModel.watchAppAdds().subscribe(newAppObservables => {
+      this.apps.push(...newAppObservables)
     })
 
     this.deleteAppsSubscription = appModel.watchAppDeletes().subscribe(deletedIds => {

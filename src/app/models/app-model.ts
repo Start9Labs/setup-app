@@ -1,12 +1,12 @@
 import { Observable } from 'rxjs'
-import { MapSubject } from '../util/map-subject.util'
-import { diff } from '../util/misc.util'
-import { PropertySubject } from '../util/property-subject.util'
+import { MapSubject, Update } from '../util/map-subject.util'
+import { diff, partitionArray } from '../util/misc.util'
+import { PropertySubject, PropertyObservable, PropertyObservableWithId } from '../util/property-subject.util'
 
 export class AppModel extends MapSubject<AppInstalled> {
   constructor (private readonly serverId: string) { super({ }) }
 
-  watchAppAdds (): Observable<AppInstalled[]> {
+  watchAppAdds (): Observable<PropertyObservableWithId<AppInstalled>[]> {
     return this.watchAdd()
   }
 
@@ -26,26 +26,30 @@ export class AppModel extends MapSubject<AppInstalled> {
     return toReturn
   }
 
-  createApp (app: AppInstalled): void {
-    this.add([app])
+  createApp (apps: AppInstalled[] | AppInstalled): void {
+    if (Array.isArray(apps)) {
+      this.add(apps)
+    } else {
+      this.add([apps])
+    }
   }
 
   removeApp (appId: string): void {
     this.delete([appId])
   }
 
-  updateApp (id: string, update: Partial<AppInstalled>): void {
-    this.update$.next([{ ...update, id }])
+  updateApp (updates: Update<AppInstalled>[] | Update<AppInstalled>): void {
+    if (Array.isArray(updates)) {
+      this.update$.next(updates)
+    } else {
+      this.update$.next([updates])
+    }
   }
 
   upsertApps (apps: AppInstalled[]): void {
-    apps.forEach(app => {
-      if (this.subject[app.id]) {
-        this.updateApp(app.id, app)
-      } else {
-        this.createApp(app)
-      }
-    })
+    const [updates, creates] = partitionArray(apps, a => !!this.subject[a.id])
+    this.updateApp(updates)
+    this.createApp(creates)
   }
 
   syncAppCache (upToDateApps : AppInstalled[]) {
@@ -54,9 +58,9 @@ export class AppModel extends MapSubject<AppInstalled> {
   }
 
   updateAppsUniformly (uniformUpdate: Partial<AppInstalled>) {
-    Object.keys(this.subject).forEach(appId => {
-      this.updateApp(appId, uniformUpdate)
-    })
+    this.updateApp(Object.keys(this.subject).map(appId => ({
+      ...uniformUpdate, id: appId,
+    })))
   }
 
   private deleteNonexistentApps (apps: AppInstalled[]): void {

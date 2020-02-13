@@ -116,12 +116,12 @@ export class ServerService {
 
   async startApp (serverId: string, app: AppInstalled): Promise<void> {
     await this.httpService.authServerRequest<Lan.PostStartAppRes>(serverId, `/apps/${app.id}/start`, { method: Method.post })
-    this.appModel.get(serverId).updateApp(app.id, { status: AppStatus.RUNNING, statusAt: new Date().toISOString() })
+    this.appModel.get(serverId).updateApp({ id: app.id, status: AppStatus.RUNNING, statusAt: new Date().toISOString() })
   }
 
   async stopApp (serverId: string, app: AppInstalled): Promise<void> {
     await this.httpService.authServerRequest<Lan.PostStopAppRes>(serverId, `/apps/${app.id}/stop`, { method: Method.post })
-    this.appModel.get(serverId).updateApp(app.id, { status: AppStatus.STOPPED, statusAt: new Date().toISOString() })
+    this.appModel.get(serverId).updateApp({ id: app.id, status: AppStatus.STOPPED, statusAt: new Date().toISOString() })
   }
 
   async updateAppConfig (serverId: string, app: AppInstalled, config: object): Promise<void> {
@@ -133,7 +133,7 @@ export class ServerService {
 
   async wipeAppData (serverId: string, app: AppInstalled): Promise<void> {
     await this.httpService.authServerRequest<Lan.PostWipeAppDataRes>(serverId, `/apps/${app.id}/wipe`, { method: Method.post })
-    this.appModel.get(serverId).updateApp(app.id, { status: AppStatus.NEEDS_CONFIG, statusAt: new Date().toISOString() })
+    this.appModel.get(serverId).updateApp({ id: app.id,  status: AppStatus.NEEDS_CONFIG, statusAt: new Date().toISOString() })
   }
 
   async getSSHKeys (serverId: string): Promise<SSHFingerprint[]> {

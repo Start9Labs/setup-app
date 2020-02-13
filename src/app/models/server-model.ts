@@ -6,7 +6,7 @@ import { deriveKeys } from '../util/crypto.util'
 import * as CryptoJS from 'crypto-js'
 import { Observable } from 'rxjs'
 import { MapSubject } from '../util/map-subject.util'
-import { PropertySubject } from '../util/property-subject.util'
+import { PropertySubject, PropertyObservableWithId } from '../util/property-subject.util'
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +17,7 @@ export class ServerModel extends MapSubject<S9Server> {
     private readonly serverAppModel: ServerAppModel,
   ) { super({ }) }
 
-  watchServerAdds (): Observable<S9Server[]> {
+  watchServerAdds (): Observable<PropertyObservableWithId<S9Server>[]> {
     return this.watchAdd()
   }
 
