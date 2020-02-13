@@ -26,7 +26,9 @@ export class ServerListPage {
     this.servers = this.serverModel.watchAll()
 
     this.addServersSubscription = this.serverModel.watchServerAdds().subscribe(newServers => {
+      console.log('server-list, added servers:', newServers)
       const serversToWatch = this.serverModel.watchThese(newServers.map(s => s.id))
+      console.log('servers to watch', serversToWatch)
       this.servers.push(...serversToWatch)
     })
 

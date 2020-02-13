@@ -140,7 +140,7 @@ export class ServerSync {
   }
 
   async syncServer (server: Readonly<S9Server>, retryIn?: number): Promise<void> {
-    console.log(`Server to update:`, server)
+    console.log(`Server to update:`, JSON.stringify(server))
 
     const serverUpdating = this.updatingCache[server.id]
 
@@ -167,7 +167,7 @@ export class ServerSync {
     this.updatingCache[server.id] = false
 
     const updatedServer = this.serverModel.peekServer(server.id)
-    console.log(`Updated server:`, updatedServer)
+    console.log(`Updated server:`, JSON.stringify(updatedServer))
 
     await this.serverModel.saveAll()
 
