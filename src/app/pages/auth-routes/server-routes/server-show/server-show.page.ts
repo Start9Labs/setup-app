@@ -55,14 +55,10 @@ export class ServerShowPage {
 
     this.apps = appModel.watchAll()
 
-    console.log('Made it here', 1)
-
     this.addAppsSubscription = appModel.watchAppAdds().subscribe(newApps => {
       const serversToWatch = appModel.watchThese(newApps.map(a => a.id))
       this.apps.push(...serversToWatch)
     })
-
-    console.log('Made it here', 2)
 
     this.deleteAppsSubscription = appModel.watchAppDeletes().subscribe(deletedIds => {
       deletedIds.forEach(id => {
@@ -71,11 +67,7 @@ export class ServerShowPage {
       })
     })
 
-    console.log('Made it here', 3)
-
     await Promise.all([this.getServerAndApps(), pauseFor(600)])
-
-    console.log('Made it here', 4)
     this.loading = false
   }
 
