@@ -110,30 +110,30 @@ export class ServerService {
   }
 
   async uninstallApp (serverId: string, appId: string): Promise<void> {
-    await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(serverId, `/apps/${appId}/uninstall`, { method: Method.post })
+    await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(serverId, `/apps/${appId}/uninstall`, { method: Method.post, timeout: 30 })
     await this.appModel.get(serverId).removeApp(appId)
   }
 
   async startApp (serverId: string, app: AppInstalled): Promise<void> {
-    await this.httpService.authServerRequest<Lan.PostStartAppRes>(serverId, `/apps/${app.id}/start`, { method: Method.post })
-    this.appModel.get(serverId).updateApp({ id: app.id, status: AppStatus.RUNNING, statusAt: new Date().toISOString() })
+    await this.httpService.authServerRequest<Lan.PostStartAppRes>(serverId, `/apps/${app.id}/start`, { method: Method.post, timeout: 30 })
+    this.appModel.get(serverId).updateApp({id: app.id, status: AppStatus.RUNNING, statusAt: new Date().toISOString() })
   }
 
   async stopApp (serverId: string, app: AppInstalled): Promise<void> {
-    await this.httpService.authServerRequest<Lan.PostStopAppRes>(serverId, `/apps/${app.id}/stop`, { method: Method.post })
-    this.appModel.get(serverId).updateApp({ id: app.id, status: AppStatus.STOPPED, statusAt: new Date().toISOString() })
+    await this.httpService.authServerRequest<Lan.PostStopAppRes>(serverId, `/apps/${app.id}/stop`, { method: Method.post, timeout: 30 })
+    this.appModel.get(serverId).updateApp({id: app.id, status: AppStatus.STOPPED, statusAt: new Date().toISOString() })
   }
 
   async updateAppConfig (serverId: string, app: AppInstalled, config: object): Promise<void> {
     const data: Lan.PostUpdateAppConfigReq = {
       config,
     }
-    await this.httpService.authServerRequest<Lan.PostUpdateAppConfigRes>(serverId, `/apps/${app.id}/config`, { method: Method.patch, data })
+    await this.httpService.authServerRequest<Lan.PostUpdateAppConfigRes>(serverId, `/apps/${app.id}/config`, { method: Method.patch, data, timeout: 30 })
   }
 
   async wipeAppData (serverId: string, app: AppInstalled): Promise<void> {
-    await this.httpService.authServerRequest<Lan.PostWipeAppDataRes>(serverId, `/apps/${app.id}/wipe`, { method: Method.post })
-    this.appModel.get(serverId).updateApp({ id: app.id,  status: AppStatus.NEEDS_CONFIG, statusAt: new Date().toISOString() })
+    await this.httpService.authServerRequest<Lan.PostWipeAppDataRes>(serverId, `/apps/${app.id}/wipe`, { method: Method.post, timeout: 30 })
+    this.appModel.get(serverId).updateApp({id: app.id, status: AppStatus.NEEDS_CONFIG, statusAt: new Date().toISOString() })
   }
 
   async getSSHKeys (serverId: string): Promise<SSHFingerprint[]> {
@@ -147,7 +147,7 @@ export class ServerService {
     return this.httpService.authServerRequest<Lan.PostAddSSHKeyRes>(serverId, `/sshKeys`, { method: Method.post, data })
   }
 
-  async getWifi (serverId: string, timeout = 60): Promise<Lan.GetWifiRes> {
+  async getWifi (serverId: string, timeout?: number): Promise<Lan.GetWifiRes> {
     return this.httpService.authServerRequest<Lan.GetWifiRes>(serverId, `/wifi`, { method: Method.get, timeout })
   }
 
@@ -172,11 +172,11 @@ export class ServerService {
   }
 
   async restartServer (serverId: string): Promise<void> {
-    await this.httpService.authServerRequest<Lan.PostRestartServerRes>(serverId, '/restart', { method: Method.post })
+    await this.httpService.authServerRequest<Lan.PostRestartServerRes>(serverId, '/restart', { method: Method.post, timeout: 30 })
   }
 
   async shutdownServer (serverId: string): Promise<void> {
-    await this.httpService.authServerRequest<Lan.PostShutdownServerRes>(serverId, '/shutdown', { method: Method.post })
+    await this.httpService.authServerRequest<Lan.PostShutdownServerRes>(serverId, '/shutdown', { method: Method.post, timeout: 30 })
   }
 }
 

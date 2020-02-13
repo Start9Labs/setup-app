@@ -39,7 +39,10 @@ export class ServerWifiPage {
   }
 
   async doRefresh (event: any) {
-    await this.getWifi()
+    await Promise.all([
+      this.getWifi(),
+      pauseFor(600),
+    ])
     event.target.complete()
   }
 

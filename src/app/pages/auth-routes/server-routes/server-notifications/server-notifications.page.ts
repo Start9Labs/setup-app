@@ -42,7 +42,10 @@ export class ServerNotificationsPage {
 
   async doRefresh (e: any) {
     this.page = 1
-    this.notifications = await this.getNotifications()
+    await Promise.all([
+      this.getNotifications(),
+      pauseFor(600),
+    ])
     e.target.complete()
   }
 

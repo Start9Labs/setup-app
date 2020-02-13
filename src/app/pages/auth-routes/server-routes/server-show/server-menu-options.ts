@@ -4,7 +4,7 @@ import { ActionSheetButton } from '@ionic/core'
 
 export const EditFriendlyName = (handler: () => Promise<any>) => ({
     text: 'Edit Friendly Name',
-    icon: 'pricetag',
+    icon: 'bookmark-outline',
     handler: () => { handler() },
 })
 
@@ -28,7 +28,7 @@ export const Metrics = (handler) => ({
 
 export const DeveloperOptions = (handler) => ({
     text: 'Developer Options',
-    icon: 'code',
+    icon: 'terminal-outline',
     handler: () => { handler() },
 } as ActionSheetButton)
 
@@ -47,7 +47,7 @@ export const Shutdown = (handler) => ({
 export const Forget = (handler) => ({
   text: 'Forget',
   cssClass: 'alert-danger',
-  icon: 'trash',
+  icon: 'trash-outline',
   handler: () => { handler() },
 } as ActionSheetButton)
 

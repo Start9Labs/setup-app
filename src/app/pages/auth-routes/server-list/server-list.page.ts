@@ -4,6 +4,7 @@ import { NavController } from '@ionic/angular'
 import { ServerSyncService } from 'src/app/services/server.sync.service'
 import { Subscription } from 'rxjs'
 import { PropertyObservableWithId } from 'src/app/util/property-subject.util'
+import { pauseFor } from 'src/app/util/misc.util'
 
 @Component({
   selector: 'page-server-list',
@@ -38,7 +39,10 @@ export class ServerListPage {
   }
 
   async doRefresh (event: any) {
-    await this.sss.fromCache().syncServers()
+    await Promise.all([
+      this.sss.fromCache().syncServers(),
+      pauseFor(600),
+    ])
     event.target.complete()
   }
 

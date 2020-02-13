@@ -43,7 +43,7 @@
           <ion-item-sliding *ngIf="['string', 'number'].includes(keyval.value.spec.type)">
             <ion-item-options side="end">
               <ion-item-option color="danger" (click)="deleteEntry(i)">
-                <ion-icon slot="icon-only" name="trash"></ion-icon>
+                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
               </ion-item-option>
             </ion-item-options>
             <ion-item button detail="false" (click)="presentModalValueEdit(i)">
