@@ -69,9 +69,9 @@ export class MapSubject<T extends { id: string }> {
 
   clear (): void {
     this.deletePump$.next(Object.keys(this.subject))
-    this.addPump$.complete()
-    this.updatePump$.complete()
-    this.deletePump$.complete()
+    this.addPump$.next([])
+    this.updatePump$.next([])
+    this.deletePump$.next([])
   }
 
   watch (id: string): undefined | PropertySubject<T> {
