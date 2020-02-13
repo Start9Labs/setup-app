@@ -28,6 +28,7 @@ export class MapSubject<T extends { id: string }> {
   }
 
   private add (ts: T[]): T[] {
+    console.log(`does add fire?`, JSON.stringify(ts))
     ts.forEach(t => {
       if (!this.subject[t.id]) {
         this.subject[t.id] = initPropertySubject(t)
