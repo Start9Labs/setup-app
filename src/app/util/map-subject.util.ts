@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs'
-import { take } from 'rxjs/operators'
+import { take, map } from 'rxjs/operators'
 import { PropertySubject, initPropertySubject, completePropertyObservable, peekProperties, PropertyObservableWithId, asPropertyObservable } from './property-subject.util'
 
 export type Update<T extends { id: string }> = Partial<T> & {
@@ -7,16 +7,19 @@ export type Update<T extends { id: string }> = Partial<T> & {
 }
 
 export class MapSubject<T extends { id: string }> {
-  add$: Subject<T[]> = new Subject()
-  update$: Subject<Update<T>[]> = new Subject()
-  delete$: Subject<string[]> = new Subject()
+  addPump$: Subject<T[]> = new Subject()
+  updatePump$: Subject<Update<T>[]> = new Subject()
+  deletePump$: Subject<string[]> = new Subject()
+
+  add$: Observable<T[]>
+  delete$: Observable<string[]>
 
   subject: { [id: string]: PropertySubject<T> }
 
   constructor (tMap: { [id: string]: T}) {
-    this.add$.subscribe(toAdd => this.add(toAdd))
-    this.update$.subscribe(toUpdate => this.update(toUpdate))
-    this.delete$.subscribe(toDeleteId => this.delete(toDeleteId))
+    this.add$ = this.addPump$.pipe(map(toAdd => this.add(toAdd)))
+    this.delete$ = this.deletePump$.pipe(map(toDeleteId => this.delete(toDeleteId)))
+    this.updatePump$.subscribe(toUpdate => this.update(toUpdate))
 
     this.subject = Object.entries(tMap).reduce((acc, [id, t]) => {
       acc[id] = initPropertySubject(t)
@@ -33,13 +36,14 @@ export class MapSubject<T extends { id: string }> {
     return ts
   }
 
-  private delete (tids: string[]): void {
+  private delete (tids: string[]): string[] {
     tids.forEach(id => {
       if (this.subject[id]) {
         completePropertyObservable(this.subject[id])
         delete this.subject[id]
       }
     })
+    return tids
   }
 
   // missing keys in the update do *not* delete existing keys
@@ -63,14 +67,22 @@ export class MapSubject<T extends { id: string }> {
   }
 
   clear (): void {
-    this.delete$.next(Object.keys(this.subject))
-    this.add$.complete()
-    this.delete$.complete()
-    this.update$.complete()
+    this.deletePump$.next(Object.keys(this.subject))
+    this.addPump$.complete()
+    this.deletePump$.complete()
+    this.updatePump$.complete()
   }
 
   watch (id: string): undefined | PropertySubject<T> {
     return this.subject[id]
+  }
+
+  watchAdd (): Observable<T[]> {
+    return this.add$
+  }
+
+  watchDelete (): Observable<string[]> {
+    return this.delete$
   }
 
   peek (id: string): undefined | T {
