@@ -46,6 +46,7 @@ export class ServerModel extends MapSubject<S9Server> {
   }
 
   createServer (server: S9Server): void {
+    console.log(`adding server`, server)
     this.createServerAppCache(server.id)
     this.add$.next([server])
   }

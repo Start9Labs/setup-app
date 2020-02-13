@@ -42,7 +42,7 @@
   <ion-item-group>
     <ion-item-divider>Apps</ion-item-divider>
 
-    <ion-item *ngIf="error && !loading">
+    <ion-item *ngIf="error && !(loading$ | async)">
       <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
     </ion-item>
 
@@ -65,7 +65,7 @@
     </ion-item>
   </ion-item-group>
 
-  <div *ngIf="loading && !apps.length" class="sublist-spinner">
+  <div *ngIf="(loading$ | async) && !apps.length" class="sublist-spinner">
     <ion-spinner name="lines" color="warning"></ion-spinner>
   </div>
 

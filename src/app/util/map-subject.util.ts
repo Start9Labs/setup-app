@@ -24,12 +24,15 @@ export class MapSubject<T extends { id: string }> {
     }, { })
   }
 
-  private add (ts: T[]): void {
+  private add (ts: T[]): T[] {
+    console.log(`adding somethings...`, ts)
     ts.forEach(t => {
       if (!this.subject[t.id]) {
+        console.log(`we are adding something`, initPropertySubject(t))
         this.subject[t.id] = initPropertySubject(t)
       }
     })
+    return ts
   }
 
   private delete (tids: string[]): void {
