@@ -7,12 +7,9 @@ export type Update<T extends { id: string }> = Partial<T> & {
 }
 
 export class MapSubject<T extends { id: string }> {
-  addPump$: Subject<T[]>
-  updatePump$: Subject<Update<T>[]>
-  deletePump$: Subject<string[]>
-
-  add$: Observable<T[]>
-  delete$: Observable<string[]>
+  private add$: Subject<T[]>
+  protected update$: Subject<Update<T>[]>
+  private delete$: Subject<string[]>
 
   subject: { [id: string]: PropertySubject<T> }
 
@@ -25,33 +22,30 @@ export class MapSubject<T extends { id: string }> {
   }
 
   private init () {
-    this.addPump$ = new Subject()
-    this.updatePump$ = new Subject()
-    this.deletePump$ = new Subject()
-
-    this.add$ = this.addPump$.pipe(map(toAdd => this.add(toAdd)))
-    this.delete$ = this.deletePump$.pipe(map(toDeleteId => this.delete(toDeleteId)))
-    this.updatePump$.subscribe(toUpdate => this.update(toUpdate))
+    this.add$ = new Subject()
+    this.update$ = new Subject()
+    this.update$.subscribe(s => this.update(s))
+    this.delete$ = new Subject()
   }
 
-  private add (ts: T[]): T[] {
+  add (ts: T[]): void {
     console.log(`does add fire?`, JSON.stringify(ts))
     ts.forEach(t => {
       if (!this.subject[t.id]) {
         this.subject[t.id] = initPropertySubject(t)
       }
     })
-    return ts
+    this.add$.next(ts)
   }
 
-  private delete (tids: string[]): string[] {
+  delete (tids: string[]): void {
     tids.forEach(id => {
       if (this.subject[id]) {
         completePropertyObservable(this.subject[id])
         delete this.subject[id]
       }
     })
-    return tids
+    this.delete$.next(tids)
   }
 
   // missing keys in the update do *not* delete existing keys
@@ -75,11 +69,11 @@ export class MapSubject<T extends { id: string }> {
   }
 
   clear (): void {
-    this.deletePump$.next(Object.keys(this.subject))
+    this.delete(Object.keys(this.subject))
 
-    this.addPump$.complete()
-    this.updatePump$.complete()
-    this.deletePump$.complete()
+    this.add$.complete()
+    this.update$.complete()
+    this.delete$.complete()
 
     this.init()
   }

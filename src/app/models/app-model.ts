@@ -27,15 +27,15 @@ export class AppModel extends MapSubject<AppInstalled> {
   }
 
   createApp (app: AppInstalled): void {
-    this.addPump$.next([app])
+    this.add([app])
   }
 
   removeApp (appId: string): void {
-    this.deletePump$.next([appId])
+    this.delete([appId])
   }
 
   updateApp (id: string, update: Partial<AppInstalled>): void {
-    this.updatePump$.next([{ ...update, id }])
+    this.update$.next([{ ...update, id }])
   }
 
   upsertApps (apps: AppInstalled[]): void {
@@ -63,7 +63,7 @@ export class AppModel extends MapSubject<AppInstalled> {
     const currentAppIds = apps.map(a => a.id)
     const previousAppIds = Object.keys(this.subject)
     const appsToDelete = diff(previousAppIds, currentAppIds)
-    this.deletePump$.next(appsToDelete)
+    this.delete(appsToDelete)
   }
 }
 
