@@ -49,7 +49,10 @@ export class AppInstalledShowPage {
   }
 
   async doRefresh (event: any) {
-    await this.getApp()
+    await Promise.all([
+      this.getApp(),
+      pauseFor(600),
+    ])
     event.target.complete()
   }
 
@@ -83,7 +86,7 @@ export class AppInstalledShowPage {
       buttons.push(
         {
           text: 'App Config',
-          icon: 'construct',
+          icon: 'construct-outline',
           handler: () => {
             this.navigate(['config'])
           },
@@ -94,14 +97,14 @@ export class AppInstalledShowPage {
     buttons.push(
       {
         text: 'View Logs',
-        icon: 'paper',
+        icon: 'newspaper-outline',
         handler: () => {
           this.navigate(['logs'])
         },
       },
       {
         text: 'Store Listing',
-        icon: 'appstore',
+        icon: 'aperture-outline',
         handler: () => {
           this.navigate(['/auth', 'servers', this.serverId, 'apps', 'available', app.id])
         },
@@ -112,7 +115,7 @@ export class AppInstalledShowPage {
       buttons.push({
         text: 'Uninstall',
         cssClass: 'alert-danger',
-        icon: 'trash',
+        icon: 'trash-outline',
         handler: () => {
           this.presentAlertUninstall()
         },
