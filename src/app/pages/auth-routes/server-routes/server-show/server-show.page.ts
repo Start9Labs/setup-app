@@ -8,7 +8,7 @@ import { AppInstalled, AppModel } from 'src/app/models/app-model'
 import * as compareVersions from 'compare-versions'
 import { ServerService } from 'src/app/services/server.service'
 import { ServerSyncService } from 'src/app/services/server.sync.service'
-import { Observable, forkJoin, interval, Subscription } from 'rxjs'
+import { Observable, forkJoin, interval, Subscription, BehaviorSubject } from 'rxjs'
 import { map, take } from 'rxjs/operators'
 import * as Menu from './server-menu-options'
 import { ServerAppModel } from 'src/app/models/server-app-model'
@@ -19,7 +19,6 @@ import { pauseFor } from 'src/app/util/misc.util'
   selector: 'server-show',
   templateUrl: 'server-show.page.html',
   styleUrls: ['server-show.page.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ServerShowPage {
   error = ''
@@ -56,10 +55,14 @@ export class ServerShowPage {
 
     this.apps = appModel.watchAll()
 
+    console.log('Made it here', 1)
+
     this.addAppsSubscription = appModel.watchAppAdds().subscribe(newApps => {
       const serversToWatch = appModel.watchThese(newApps.map(a => a.id))
       this.apps.push(...serversToWatch)
     })
+
+    console.log('Made it here', 2)
 
     this.deleteAppsSubscription = appModel.watchAppDeletes().subscribe(deletedIds => {
       deletedIds.forEach(id => {
@@ -68,7 +71,11 @@ export class ServerShowPage {
       })
     })
 
+    console.log('Made it here', 3)
+
     await Promise.all([this.getServerAndApps(), pauseFor(600)])
+
+    console.log('Made it here', 4)
     this.loading = false
   }
 

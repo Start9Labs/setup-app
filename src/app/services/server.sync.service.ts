@@ -68,7 +68,9 @@ export class ServerSyncService {
     private readonly serverAppModel: ServerAppModel,
     private readonly syncNotifier: SyncNotifier,
   ) {
-    this.zeroconfDaemon.watch().subscribe(zeroconfService => this.handleZeroconfUpdate(zeroconfService) )
+    this.zeroconfDaemon.watch().subscribe(
+      zeroconfService => this.handleZeroconfUpdate(zeroconfService) 
+    )
   }
 
   fromCache (): ServerSync {
@@ -138,7 +140,11 @@ export class ServerSync {
   }
 
   async syncServer (server: Readonly<S9Server>, retryIn?: number): Promise<void> {
+    console.log(`Server to update:`, JSON.stringify(server))
+
     const serverUpdating = this.updatingCache[server.id]
+
+    console.log(`Server ${server.id} Syncing.`)
 
     if (serverUpdating && retryIn) {
       return this.retry(server, retryIn)
@@ -161,6 +167,7 @@ export class ServerSync {
     this.updatingCache[server.id] = false
 
     const updatedServer = this.serverModel.peekServer(server.id)
+    console.log(`Updated server:`, JSON.stringify(updatedServer))
 
     await this.serverModel.saveAll()
 
@@ -184,7 +191,6 @@ export class ServerSync {
 
     switch (appsRes.result) {
       case 'resolve' : {
-
         this.serverAppModel.get(server.id).syncAppCache(appsRes.value)
         break
       }
