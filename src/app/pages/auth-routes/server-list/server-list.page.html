@@ -41,7 +41,7 @@
             <s9-status [serverStatus]="server.observe['status'] | async"></s9-status>
           </h3>
         </ion-label>
-        <ion-badge slot="end" *ngIf="server.observe['badge'] | async" color="danger">{{ server.observe['badge'] }}</ion-badge>
+        <ion-badge slot="end" *ngIf="server.observe['badge'] | async" color="danger">{{ server.observe['badge'] | async }}</ion-badge>
       </ion-item>
     </ion-card>
   </div>

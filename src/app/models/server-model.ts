@@ -38,17 +38,17 @@ export class ServerModel extends MapSubject<S9Server> {
   }
 
   removeServer (serverId: string): void {
-    this.deletePump$.next([serverId])
+    this.delete([serverId])
   }
 
   updateServer (id: string, update: Partial<S9Server>): void {
-    this.updatePump$.next([{ ...update, id }])
+    this.update$.next([{ ...update, id }])
   }
 
   createServer (server: S9Server): void {
     console.log(`adding server`, server)
     this.createServerAppCache(server.id)
-    this.addPump$.next([server])
+    this.add([server])
   }
 
   createServerAppCache (sid: string): void {
@@ -58,7 +58,7 @@ export class ServerModel extends MapSubject<S9Server> {
   async load (mnemonic: string[]): Promise<void> {
     const fromStorage: S9ServerStore = await this.storage.get('servers') || []
     const mapped = fromStorage.map(s => fromStorableServer(s, mnemonic))
-    this.addPump$.next(mapped)
+    this.add(mapped)
   }
 
   async saveAll (): Promise<void> {
