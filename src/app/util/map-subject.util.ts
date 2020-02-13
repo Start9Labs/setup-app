@@ -7,9 +7,9 @@ export type Update<T extends { id: string }> = Partial<T> & {
 }
 
 export class MapSubject<T extends { id: string }> {
-  addPump$: BehaviorSubject<T[]> = new BehaviorSubject([])
-  updatePump$: BehaviorSubject<Update<T>[]> = new BehaviorSubject([])
-  deletePump$: BehaviorSubject<string[]> = new BehaviorSubject([])
+  addPump$: Subject<T[]>
+  updatePump$: Subject<Update<T>[]>
+  deletePump$: Subject<string[]>
 
   add$: Observable<T[]>
   delete$: Observable<string[]>
@@ -25,9 +25,9 @@ export class MapSubject<T extends { id: string }> {
   }
 
   private init () {
-    this.addPump$ = new BehaviorSubject([])
-    this.updatePump$ = new BehaviorSubject([])
-    this.deletePump$ = new BehaviorSubject([])
+    this.addPump$ = new Subject()
+    this.updatePump$ = new Subject()
+    this.deletePump$ = new Subject()
 
     this.add$ = this.addPump$.pipe(map(toAdd => this.add(toAdd)))
     this.delete$ = this.deletePump$.pipe(map(toDeleteId => this.delete(toDeleteId)))
@@ -76,9 +76,11 @@ export class MapSubject<T extends { id: string }> {
 
   clear (): void {
     this.deletePump$.next(Object.keys(this.subject))
+
     this.addPump$.complete()
     this.updatePump$.complete()
     this.deletePump$.complete()
+
     this.init()
   }
 
