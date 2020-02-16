@@ -23,6 +23,10 @@
     <ion-refresher-content pullingIcon="lines" refreshingSpinner="lines"></ion-refresher-content>
   </ion-refresher>
 
+  <ion-item *ngIf="error && !(loading$ | async)">
+    <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
+  </ion-item>
+
   <ion-item-group>
     <ion-item>
       <ion-label>
@@ -34,23 +38,27 @@
     </ion-item>
   </ion-item-group>
 
+  <ion-button *ngIf="!versionLatest" style="margin: 16px;" expand="block" fill="outline" (click)="getVersionLatest(server)">
+    Check for Updates
+    <ion-icon slot="end" name="refresh-outline"></ion-icon>
+  </ion-button>
+
   <ion-button
-    *ngIf="(server['status'] | async) === 'RUNNING' && compareVersions((server['versionInstalled'] | async), (server['versionLatest'] | async)) === -1"
-    style="margin: 16px 0;" expand="block" fill="outline" (click)="presentAlertUpdate(server)">
-    Update MeshOS to {{ (server['versionLatest'] | async) }}
+    *ngIf=" versionLatest && (server['status'] | async) === 'RUNNING' && compareVersions((server['versionInstalled'] | async), versionLatest) === -1"
+    style="margin: 16px;" expand="block" fill="outline" color="success" (click)="presentAlertUpdate(server)">
+    Update MeshOS to {{ versionLatest }}
   </ion-button>
 
   <ion-item-group>
-    <ion-item-divider>Apps</ion-item-divider>
+    <ion-item-divider>Discover</ion-item-divider>
 
-    <ion-item *ngIf="error && !(loading$ | async)">
-      <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
+    <ion-item [routerLink]="['apps', 'available']" detail="false">
+      <ion-icon slot="start" size="large" name="apps-outline" color="primary"></ion-icon>
+      <ion-label><ion-text color="primary">Sovereign App Store</ion-text></ion-label>
+      <ion-icon slot="end" name="arrow-forward-outline" color="primary"></ion-icon>
     </ion-item>
 
-    <ion-item [routerLink]="['apps', 'available']">
-      <ion-icon slot="start" size="large" name="apps" color="primary"></ion-icon>
-      <ion-text color="primary">Sovereign App Store</ion-text>
-    </ion-item>
+    <ion-item-divider>Apps Installed</ion-item-divider>
 
     <ion-item *ngFor="let app of apps" [routerLink]="['apps', 'installed', app.id]">
       <ion-avatar slot="start">

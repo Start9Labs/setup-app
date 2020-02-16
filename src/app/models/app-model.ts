@@ -77,12 +77,12 @@ export interface BaseApp {
     title: string
     status: AppStatus | null
     statusAt: string
-    versionLatest: string
     versionInstalled: string | null
     iconURL: string
   }
 
   export interface AppAvailablePreview extends BaseApp {
+    versionLatest: string
     descriptionShort: string
   }
 

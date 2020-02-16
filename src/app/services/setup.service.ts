@@ -143,7 +143,6 @@ export class SetupService {
       label: builder.label,
       torAddress: 'agent-tor-address-isaverylongaddresssothaticantestwrapping.onion',
       versionInstalled: '0.1.0',
-      versionLatest: '0.1.0',
       status: ServerStatus.RUNNING,
       statusAt: new Date().toISOString(),
       privkey: 'testprivkey',
@@ -175,7 +174,6 @@ export interface S9ServerBuilder {
   status: ServerStatus
   statusAt: string
   versionInstalled?: string
-  versionLatest?: string
 
   privkey?: string
   pubkey?: string
@@ -228,7 +226,6 @@ const defaultBuilder: Required<S9ServerBuilder> = {
   status:           undefined as any,
   statusAt:         undefined as any,
   versionInstalled: undefined as any,
-  versionLatest:    undefined as any,
   privkey:          undefined as any,
   pubkey:           undefined as any,
   registered:       undefined as any,

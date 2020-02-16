@@ -70,10 +70,10 @@ export const EditFriendlyNameAlert: (s: S9Server, h: (a?: any) => any) => AlertO
   cssClass: 'alert-config-value',
 } as AlertOptions)
 
-export const UpdateAlert: (s: S9Server, h: () => any) => AlertOptions = (server, handler) => ({
+export const UpdateAlert: (s: S9Server, version: string, h: () => any) => AlertOptions = (server, version, handler) => ({
     backdropDismiss: false,
     header: 'Confirm',
-    message: `Update MeshOS to ${server.versionLatest}?`,
+    message: `Update MeshOS to ${version}?`,
     buttons: [
       CancelButton, {
         text: 'Update',
