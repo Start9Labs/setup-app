@@ -1,14 +1,14 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core'
+import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { ServerModel, ServerStatus } from 'src/app/models/server-model'
 import { NavController, AlertController, ActionSheetController, LoadingController } from '@ionic/angular'
 import { S9Server } from 'src/app/models/server-model'
 import { ActionSheetButton } from '@ionic/core'
-import { AppInstalled, AppModel } from 'src/app/models/app-model'
+import { AppInstalled } from 'src/app/models/app-model'
 import * as compareVersions from 'compare-versions'
 import { ServerService } from 'src/app/services/server.service'
 import { ServerSyncService } from 'src/app/services/server.sync.service'
-import { Observable, forkJoin, interval, Subscription, BehaviorSubject } from 'rxjs'
+import { Observable, forkJoin, interval, Subscription } from 'rxjs'
 import { map, take } from 'rxjs/operators'
 import * as Menu from './server-menu-options'
 import { ServerAppModel } from 'src/app/models/server-app-model'
@@ -24,6 +24,7 @@ export class ServerShowPage {
   error = ''
   view: 'apps' | 'about' = 'apps'
   loading = true
+  versionLatest: string | undefined
   compareVersions = compareVersions
 
   server: PropertySubject<S9Server>
@@ -119,6 +120,20 @@ export class ServerShowPage {
     })
   }
 
+  async getVersionLatest (server: S9Server): Promise<void> {
+    const loader = await this.loadingCtrl.create(Menu.LoadingSpinner('Checking for updates...'))
+    await loader.present()
+
+    try {
+      const { versionLatest } = await this.serverService.getVersionLatest(server.id)
+      this.versionLatest = versionLatest
+    } catch (e) {
+      this.error = e.message
+    } finally {
+      await loader.dismiss()
+    }
+  }
+
   async presentAlertEditName (server: S9Server) {
     const alert = await this.alertCtrl.create(
       Menu.EditFriendlyNameAlert(server, (data: { inputValue: string }) => {
@@ -138,7 +153,7 @@ export class ServerShowPage {
   async presentAlertUpdate (propertiesSubject: PropertySubject<S9Server>) {
     fromPropertyObservable(propertiesSubject).pipe(take(1)).subscribe(async server => {
       const alert = await this.alertCtrl.create(
-        Menu.UpdateAlert(server, () => this.update(server)),
+        Menu.UpdateAlert(server, this.versionLatest!, () => this.update(server)),
       )
       await alert.present()
     })
@@ -170,7 +185,7 @@ export class ServerShowPage {
     await loader.present()
 
     try {
-      await this.serverService.updateAgent(this.serverId, server.versionLatest)
+      await this.serverService.updateAgent(this.serverId, this.versionLatest!)
       this.serverModel.updateServer(this.serverId, { status: ServerStatus.UPDATING, statusAt: new Date().toISOString() })
     } catch (e) {
       this.error = e.message

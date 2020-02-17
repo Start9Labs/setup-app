@@ -78,7 +78,6 @@ export interface S9ServerStorable {
 export interface S9Server extends S9ServerStorable {
   status: ServerStatus
   statusAt: string
-  versionLatest: string
   privkey: string // derive from mnemonic + torAddress
   badge: number
   notifications: S9Notification[]
@@ -129,7 +128,6 @@ export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): 
     label,
     torAddress,
     versionInstalled,
-    versionLatest: '0.0.0',
     status: ServerStatus.UNKNOWN,
     statusAt: new Date().toISOString(),
     privkey: deriveKeys(mnemonic, id).privkey,

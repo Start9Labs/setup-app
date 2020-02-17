@@ -8,12 +8,12 @@ interface ApiAppBase {
   title: string
   status: AppStatus | null
   statusAt: string
-  versionLatest: string
   versionInstalled: string | null
   iconURL: string
 }
 
 export interface ApiAppAvailablePreview extends ApiAppBase {
+  versionLatest: string
   descriptionShort: string
 }
 
@@ -31,8 +31,6 @@ export interface ApiAppInstalled extends ApiAppBase {
 export interface ApiServer {
   status: ServerStatus
   versionInstalled: string
-  versionLatest: string
-  notifications: S9Notification[]
 }
 
 export interface ApiAppConfig {
@@ -54,6 +52,8 @@ export module Lan {
   export type PostRegisterRes = TwoHundredOK
   export type GetServerReq = { [k: string]: never }
   export type GetServerRes = ApiServer
+  export type GetVersionLatestReq = { [k: string]: never }
+  export type GetVersionLatestRes = { versionLatest: string }
   export type GetServerSpecsReq = { [k: string]: never }
   export type GetServerSpecsRes = ServerSpecs
   export type GetServerMetricsReq = { [k: string]: never }
