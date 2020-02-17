@@ -7,6 +7,8 @@ import { AppStatus } from '../models/app-model'
 import { doForAtLeast, tryAll, pauseFor } from '../util/misc.util'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { ServerAppModel } from '../models/server-app-model'
+import { filter, take, map } from 'rxjs/operators'
+import { BehaviorSubject } from 'rxjs'
 
 @Injectable({
   providedIn: 'root',
@@ -112,8 +114,8 @@ export class ServerSyncService {
 }
 
 export class ServerSync {
-  updatingCache: { [serverId: string]: boolean } = { }
-  syncing: boolean
+  updatingCache: { [serverId: string]: BehaviorSubject<boolean> } = { }
+  isSyncing$: BehaviorSubject<boolean> = new BehaviorSubject(false)
   timeBeforeUnreachable = 7000
 
   constructor (
@@ -130,17 +132,21 @@ export class ServerSync {
   }
 
   async syncServers (): Promise<void> {
-    if (this.syncing) { return }
+    if (this.isSyncing$.getValue()) {
+      return this.isSyncing$.pipe(filter(s => !s), take(1), map(a => { console.log('returning from sync wait') })).toPromise()
+    }
 
     console.log('syncing servers')
-
-    this.syncing = true
+    this.isSyncing$.next(true)
     await doForAtLeast(1000, this.serverModel.peekAll().map(server => this.syncServer(server)))
-    this.syncing = false
+    console.log('syncing servers complete')
+    this.isSyncing$.next(false)
   }
 
   async syncServer (server: Readonly<S9Server>, retryIn?: number): Promise<void> {
-    const serverUpdating = this.updatingCache[server.id]
+    if (!this.updatingCache[server.id]) this.updatingCache[server.id] = new BehaviorSubject(false)
+
+    const serverUpdating = this.updatingCache[server.id].getValue()
     console.log(`Server ${server.id} Syncing.`)
 
     if (serverUpdating && retryIn) {
@@ -148,10 +154,10 @@ export class ServerSync {
     }
     if (serverUpdating) {
       console.log(`Server ${server.id} already updating.`)
-      return
+      return this.updatingCache[server.id].pipe(filter(s => !s), take(1), map(a => { })).toPromise()
     }
 
-    this.updatingCache[server.id] = true
+    this.updatingCache[server.id].next(true)
 
     if (!this.zeroconfDaemon.getService(server.id)) {
       if (this.hasBeenRunningSufficientlyLong(server)) {
@@ -161,7 +167,7 @@ export class ServerSync {
       await this.syncServerAttributes(server)
     }
 
-    this.updatingCache[server.id] = false
+    this.updatingCache[server.id].next(false)
     const updatedServer = this.serverModel.peekServer(server.id)
     await this.serverModel.saveAll()
 

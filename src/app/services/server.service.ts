@@ -164,7 +164,7 @@ export class ServerService {
   }
 
   async deleteWifi (serverId: string, ssid: string): Promise<void> {
-    await this.httpService.authServerRequest<Lan.DeleteWifiRes>(serverId, `/wifi/${ssid}`, { method: Method.delete })
+    await this.httpService.authServerRequest<Lan.DeleteWifiRes>(serverId, encodeURI(`/wifi/${ssid}`), { method: Method.delete })
   }
 
   async deleteSSHKey (serverId: string, sshKey: string): Promise<void> {

@@ -76,17 +76,14 @@ export class ServerShowPage {
   }
 
   async doRefresh (event: any) {
-    await Promise.all([
-      this.getServerAndApps(),
-      pauseFor(600),
-    ])
+    await this.getServerAndApps()
     event.target.complete()
   }
 
   async getServerAndApps (): Promise<void> {
     const server = peekProperties(this.server)
     try {
-      this.sss.fromCache().syncServer(server)
+      await this.sss.fromCache().syncServer(server)
       this.error = ''
     } catch (e) {
       this.error = e.message
