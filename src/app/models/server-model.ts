@@ -27,13 +27,13 @@ export class ServerModel extends MapSubject<S9Server> {
 
   watchServerProperties (serverId: string) : PropertySubject<S9Server> {
     const toReturn = this.watch(serverId)
-    if (!toReturn) throw new Error(`Expected server ${serverId} but not found.`)
+    if (!toReturn) throw new Error(`Tried to watch server. Expected server ${JSON.stringify(serverId)} but not found.`)
     return toReturn
   }
 
   peekServer (serverId: string): S9Server {
     const toReturn = this.peek(serverId)
-    if (!toReturn) throw new Error(`Expected server ${serverId} but not found.`)
+    if (!toReturn) throw new Error(`Tried to peek server. Expected server ${JSON.stringify(serverId)} but not found.`)
     return toReturn
   }
 

@@ -26,6 +26,7 @@ export class ServerListPage {
     this.servers = this.serverModel.watchAll()
 
     this.addServersSubscription = this.serverModel.watchServerAdds().subscribe(newServers => {
+      console.log(`new servers inbound...`, newServers)
       this.servers.push(...newServers)
     })
 

@@ -9,6 +9,7 @@ import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { ServerAppModel } from '../models/server-app-model'
 import { filter, take, map } from 'rxjs/operators'
 import { BehaviorSubject } from 'rxjs'
+import { isFalse, squash } from '../util/rxjs.util'
 
 @Injectable({
   providedIn: 'root',
@@ -154,7 +155,7 @@ export class ServerSync {
     }
     if (serverUpdating) {
       console.log(`Server ${server.id} already updating.`)
-      return this.updatingCache[server.id].pipe(filter(s => !s), take(1), map(a => { })).toPromise()
+      return this.updatingCache[server.id].pipe(isFalse, take(1), squash).toPromise()
     }
 
     this.updatingCache[server.id].next(true)

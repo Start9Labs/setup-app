@@ -23,6 +23,7 @@ export class ServerService {
   }
 
   async getVersionLatest (serverId: string): Promise<Lan.GetVersionLatestRes> {
+    console.log(`Getting version lated for serverId ${serverId}`)
     return this.httpService.authServerRequest<Lan.GetVersionLatestRes>(serverId, '/versionLatest', { method: Method.get })
   }
 

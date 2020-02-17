@@ -8,8 +8,8 @@ import { AppInstalled } from 'src/app/models/app-model'
 import * as compareVersions from 'compare-versions'
 import { ServerService } from 'src/app/services/server.service'
 import { ServerSyncService } from 'src/app/services/server.sync.service'
-import { Observable, forkJoin, interval, Subscription } from 'rxjs'
-import { map, take } from 'rxjs/operators'
+import { Subscription, BehaviorSubject } from 'rxjs'
+import { take } from 'rxjs/operators'
 import * as Menu from './server-menu-options'
 import { ServerAppModel } from 'src/app/models/server-app-model'
 import { PropertySubject, PropertyObservableWithId, peekProperties, fromPropertyObservable } from 'src/app/util/property-subject.util'
@@ -23,7 +23,7 @@ import { pauseFor } from 'src/app/util/misc.util'
 export class ServerShowPage {
   error = ''
   view: 'apps' | 'about' = 'apps'
-  loading = true
+  loading$ = new BehaviorSubject(true)
   versionLatest: string | undefined
   compareVersions = compareVersions
 
@@ -68,7 +68,7 @@ export class ServerShowPage {
     })
 
     await Promise.all([this.getServerAndApps(), pauseFor(600)])
-    this.loading = false
+    this.loading$.next(false)
   }
 
   ngOnDestroy () {
@@ -120,18 +120,20 @@ export class ServerShowPage {
     })
   }
 
-  async getVersionLatest (server: S9Server): Promise<void> {
-    const loader = await this.loadingCtrl.create(Menu.LoadingSpinner('Checking for updates...'))
-    await loader.present()
+  async getVersionLatest (pittedServer: PropertySubject<S9Server>): Promise<void> {
+    fromPropertyObservable(pittedServer).pipe(take(1)).subscribe(async server => {
+      const loader = await this.loadingCtrl.create(Menu.LoadingSpinner('Checking for updates...'))
+      await loader.present()
 
-    try {
-      const { versionLatest } = await this.serverService.getVersionLatest(server.id)
-      this.versionLatest = versionLatest
-    } catch (e) {
-      this.error = e.message
-    } finally {
-      await loader.dismiss()
-    }
+      try {
+        const { versionLatest } = await this.serverService.getVersionLatest(server.id)
+        this.versionLatest = versionLatest
+      } catch (e) {
+        this.error = e.message
+      } finally {
+        await loader.dismiss()
+      }
+    })
   }
 
   async presentAlertEditName (server: S9Server) {
@@ -143,7 +145,7 @@ export class ServerShowPage {
           alert.message = 'Server must have a name'
           return false
         }
-        this.serverModel.updateServer(this.serverId, { label: inputValue })
+        this.serverModel.updateServer(server.id, { label: inputValue })
         this.serverModel.saveAll()
       }))
 
@@ -175,7 +177,7 @@ export class ServerShowPage {
 
   async presentAlertForget (server: S9Server) {
     const alert = await this.alertCtrl.create(
-      Menu.ForgetAlert(server, () => this.forget()),
+      Menu.ForgetAlert(server, () => this.forget(server)),
     )
     await alert.present()
   }
@@ -185,8 +187,8 @@ export class ServerShowPage {
     await loader.present()
 
     try {
-      await this.serverService.updateAgent(this.serverId, this.versionLatest!)
-      this.serverModel.updateServer(this.serverId, { status: ServerStatus.UPDATING, statusAt: new Date().toISOString() })
+      await this.serverService.updateAgent(server.id, this.versionLatest!)
+      this.serverModel.updateServer(server.id, { status: ServerStatus.UPDATING, statusAt: new Date().toISOString() })
     } catch (e) {
       this.error = e.message
     } finally {
@@ -201,7 +203,7 @@ export class ServerShowPage {
     await loader.present()
 
     try {
-      await this.serverService.restartServer(this.serverId)
+      await this.serverService.restartServer(server.id)
       await this.navCtrl.pop()
     } catch (e) {
       this.error = e.mesasge
@@ -217,7 +219,7 @@ export class ServerShowPage {
     await loader.present()
 
     try {
-      await this.serverService.shutdownServer(this.serverId)
+      await this.serverService.shutdownServer(server.id)
       await this.navCtrl.pop()
     } catch (e) {
       this.error = e.mesasge
@@ -226,8 +228,8 @@ export class ServerShowPage {
     }
   }
 
-  async forget () {
-    await this.serverModel.removeServer(this.serverId)
+  async forget (server: S9Server) {
+    await this.serverModel.removeServer(server.id)
     await this.serverModel.saveAll()
     await this.navCtrl.navigateRoot(['/auth'])
   }
@@ -235,14 +237,4 @@ export class ServerShowPage {
   private async navigate (path: string[]): Promise<void> {
     await this.navCtrl.navigateForward(path, { relativeTo: this.route })
   }
-}
-
-type FiniteObservable<T> = Observable<T>
-
-export const squash = map(() => { return })
-export function forkPause (ms: number): FiniteObservable<void> {
-  return interval(ms).pipe(take(1), squash)
-}
-export function forkDoAll (...os: Observable<any>[]): FiniteObservable<any[]> {
-  return forkJoin(os.map(a => a.pipe(take(1))))
 }

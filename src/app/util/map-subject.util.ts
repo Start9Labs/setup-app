@@ -1,6 +1,6 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs'
 import { take, map } from 'rxjs/operators'
-import { PropertySubject, initPropertySubject, completePropertyObservable, peekProperties, PropertyObservableWithId, asPropertyObservable, PropertyObservable } from './property-subject.util'
+import { PropertySubject, initPropertySubject, completePropertyObservable, peekProperties, PropertyObservableWithId, asPropertyObservable } from './property-subject.util'
 
 export type Update<T extends { id: string }> = Partial<T> & {
   id: string
@@ -14,18 +14,14 @@ export class MapSubject<T extends { id: string }> {
   subject: { [id: string]: PropertySubject<T> }
 
   constructor (tMap: { [id: string]: T}) {
-    this.init()
-    this.subject = Object.entries(tMap).reduce((acc, [id, t]) => {
-      acc[id] = initPropertySubject(t)
-      return acc
-    }, { })
-  }
-
-  private init () {
     this.add$ = new Subject()
     this.update$ = new Subject()
     this.update$.subscribe(s => this.update(s))
     this.delete$ = new Subject()
+    this.subject = Object.entries(tMap).reduce((acc, [id, t]) => {
+      acc[id] = initPropertySubject(t)
+      return acc
+    }, { })
   }
 
   add (ts: T[]): void {
@@ -72,12 +68,6 @@ export class MapSubject<T extends { id: string }> {
 
   clear (): void {
     this.delete(Object.keys(this.subject))
-
-    this.add$.complete()
-    this.update$.complete()
-    this.delete$.complete()
-
-    this.init()
   }
 
   watch (id: string): undefined | PropertySubject<T> {
