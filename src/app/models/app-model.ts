@@ -71,6 +71,8 @@ export class AppModel extends MapSubject<AppInstalled> {
   }
 }
 
+type FullyQualifiedUrl = string
+type RelativeUrl = string
 
 export interface BaseApp {
     id: string
@@ -84,6 +86,7 @@ export interface BaseApp {
   export interface AppAvailablePreview extends BaseApp {
     versionLatest: string
     descriptionShort: string
+    iconUrl: FullyQualifiedUrl
   }
 
   export interface AppAvailableFull extends AppAvailablePreview {
@@ -95,6 +98,7 @@ export interface BaseApp {
 
   export interface AppInstalled extends BaseApp {
     torAddress?: string
+    iconURL: RelativeUrl
   }
 
   export type AppConfigSpec = { [key: string]: ValueSpec }

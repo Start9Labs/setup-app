@@ -62,7 +62,7 @@
 
     <ion-item *ngFor="let app of apps" [routerLink]="['apps', 'installed', app.id]">
       <ion-avatar slot="start">
-        <img [src]="app.observe['iconURL'] | async" alt="icon" />
+        <img [src]="iconFullUrl$(server, app) | async" alt="icon" />
       </ion-avatar>
       <ion-label>
         <h2>{{ app.observe['title'] | async }}</h2>

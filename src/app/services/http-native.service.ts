@@ -36,7 +36,7 @@ export class HttpNativeService {
     path: string,
     options: HttpNativeOptions,
   ): Promise<T> {
-    const url = this.s9Url(server, path)
+    const url = s9Url(this.zerconfDaemon, server, path)
     return this.request<T>(url, options)
   }
 
@@ -67,13 +67,13 @@ export class HttpNativeService {
       throw new Error(message || 'Unknown Error')
     }
   }
+}
 
-  s9Url (server: S9Server | S9BuilderWith<'versionInstalled'>, path: string): string {
-    const zeroconf = this.zerconfDaemon.getService(server.id)
-    if (!zeroconf) { throw new Error('S9 Server not found on LAN') }
-    const host = getLanIP(zeroconf)
-    return `http://${host}/v${server.versionInstalled.charAt(0)}${path}`
-  }
+export function s9Url(zcd: ZeroconfDaemon, server: S9Server | S9BuilderWith<'versionInstalled'>, path: string): string {
+  const zeroconf = zcd.getService(server.id)
+  if (!zeroconf) { throw new Error('S9 Server not found on LAN') }
+  const host = getLanIP(zeroconf)
+  return `http://${host}/v${server.versionInstalled.charAt(0)}${path}`
 }
 
 export function getAuthHeader (server: S9Server | S9BuilderWith<'privkey'>): { 'Authorization': string } {

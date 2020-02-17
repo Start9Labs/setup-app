@@ -8,12 +8,14 @@ import { AppInstalled } from 'src/app/models/app-model'
 import * as compareVersions from 'compare-versions'
 import { ServerService } from 'src/app/services/server.service'
 import { ServerSyncService } from 'src/app/services/server.sync.service'
-import { Subscription, BehaviorSubject } from 'rxjs'
-import { take } from 'rxjs/operators'
+import { Subscription, BehaviorSubject, Observable, of, combineLatest } from 'rxjs'
+import { take, map, mergeMap } from 'rxjs/operators'
 import * as Menu from './server-menu-options'
 import { ServerAppModel } from 'src/app/models/server-app-model'
 import { PropertySubject, PropertyObservableWithId, peekProperties, fromPropertyObservable } from 'src/app/util/property-subject.util'
 import { pauseFor } from 'src/app/util/misc.util'
+import { ZeroconfDaemon } from 'src/app/daemons/zeroconf-daemon'
+import { s9Url } from 'src/app/services/http-native.service'
 
 @Component({
   selector: 'server-show',
@@ -44,6 +46,7 @@ export class ServerShowPage {
     private readonly loadingCtrl: LoadingController,
     private readonly serverService: ServerService,
     private readonly sss: ServerSyncService,
+    private readonly zcd: ZeroconfDaemon,
     readonly serverAppModel: ServerAppModel,
   ) { }
 
@@ -90,6 +93,15 @@ export class ServerShowPage {
       this.error = e.message
     }
   }
+
+  public iconFullUrl$ (server: PropertySubject<S9Server>, app: PropertyObservableWithId<AppInstalled>) : Observable<string> {
+    return combineLatest(
+      fromPropertyObservable(server), app.observe['iconURL'],
+    ).pipe(
+        map( ([s, relativeUrl]) =>  s9Url(this.zcd, s, relativeUrl))
+    )
+  }
+
 
   async presentAction (pittedServer: PropertySubject<S9Server>) {
     fromPropertyObservable(pittedServer).pipe(take(1)).subscribe(async server => {
