@@ -15,7 +15,7 @@ import { ServerAppModel } from 'src/app/models/server-app-model'
 import { PropertySubject, PropertyObservableWithId, peekProperties, fromPropertyObservable } from 'src/app/util/property-subject.util'
 import { pauseFor } from 'src/app/util/misc.util'
 import { ZeroconfDaemon } from 'src/app/daemons/zeroconf-daemon'
-import { s9Url } from 'src/app/services/http-native.service'
+import { s9Url, s9UrlNoVersion } from 'src/app/services/http-native.service'
 
 @Component({
   selector: 'server-show',
@@ -95,10 +95,10 @@ export class ServerShowPage {
   }
 
   public iconFullUrl$ (server: PropertySubject<S9Server>, app: PropertyObservableWithId<AppInstalled>) : Observable<string> {
-    return combineLatest(
+    return  combineLatest(
       fromPropertyObservable(server), app.observe['iconURL'],
     ).pipe(
-        map( ([s, relativeUrl]) =>  s9Url(this.zcd, s, relativeUrl))
+      map(([s, relativeUrl]) => s9UrlNoVersion(this.zcd, s, relativeUrl)),
     )
   }
 
