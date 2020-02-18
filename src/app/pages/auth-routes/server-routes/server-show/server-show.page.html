@@ -44,7 +44,7 @@
   </ion-button>
 
   <ion-button
-    *ngIf=" versionLatest && (server['status'] | async) === 'RUNNING' && compareVersions((server['versionInstalled'] | async), versionLatest) === -1"
+    *ngIf="versionLatest && (server['status'] | async) === 'RUNNING' && compareVersions((server['versionInstalled'] | async), versionLatest) === -1"
     style="margin: 16px;" expand="block" fill="outline" color="success" (click)="presentAlertUpdate(server)">
     Update MeshOS to {{ versionLatest }}
   </ion-button>
@@ -62,7 +62,10 @@
 
     <ion-item *ngFor="let app of apps" [routerLink]="['apps', 'installed', app.id]">
       <ion-avatar slot="start">
-        <img [src]="iconFullUrl$(server, app) | async" alt="icon" />
+        <!-- @COMPAT 0.1.1 -->
+        <img *ngIf="compareVersions((server['versionInstalled'] | async), '0.1.2') === -1" [src]="app.observe['iconURL'] | async" alt="icon" />
+        <!-- end. and delete *ngIf below -->
+        <img *ngIf="compareVersions((server['versionInstalled'] | async), '0.1.1') === 1" [src]="iconFullUrl$(server, app) | async" alt="icon" />
       </ion-avatar>
       <ion-label>
         <h2>{{ app.observe['title'] | async }}</h2>

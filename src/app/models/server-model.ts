@@ -81,6 +81,7 @@ export interface S9Server extends S9ServerStorable {
   privkey: string // derive from mnemonic + torAddress
   badge: number
   notifications: S9Notification[]
+  versionLatest?: string // @COMPAT 0.1.1
 }
 
 export interface S9Notification {
