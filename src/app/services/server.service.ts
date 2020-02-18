@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Method } from '../types/enums'
 import { AppInstalled, AppAvailablePreview, AppAvailableFull, AppStatus, AppConfigSpec, Rules } from '../models/app-model'
-import { S9Notification, SSHFingerprint, ServerStatus } from '../models/server-model'
+import { S9Notification, SSHFingerprint, ServerStatus, ServerModel } from '../models/server-model'
 import { Lan, ApiAppAvailablePreview, ApiAppAvailableFull, ApiAppInstalled, ApiServer, ApiAppVersionInfo } from '../types/api-types'
 import { S9BuilderWith } from './setup.service'
 import * as configUtil from '../util/config.util'
@@ -16,6 +16,7 @@ export class ServerService {
   constructor (
     private readonly httpService: HttpNativeService,
     private readonly appModel: ServerAppModel,
+    private readonly serverModel: ServerModel,
   ) { }
 
   async getServer (serverId: string): Promise<ApiServer> {
@@ -24,7 +25,8 @@ export class ServerService {
 
   async getVersionLatest (serverId: string): Promise<Lan.GetVersionLatestRes> {
     console.log(`Getting version lated for serverId ${serverId}`)
-    return this.httpService.authServerRequest<Lan.GetVersionLatestRes>(serverId, '/versionLatest', { method: Method.get })
+    const server = this.serverModel.peekServer(serverId)
+    return this.httpService.serverRequest<Lan.GetVersionLatestRes>(server, '/versionLatest', { method: Method.get }, false)
   }
 
   async getServerSpecs (serverId: string): Promise<Lan.GetServerSpecsRes> {
