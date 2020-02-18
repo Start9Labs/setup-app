@@ -25,7 +25,7 @@ export class HttpBrowserService {
     method: Method,
     options: HttpBrowserOptions = { },
     body: any = { },
-    TIMEOUT = 60, // seconds
+    TIMEOUT = 10, // seconds
   ): Promise<T> {
     const authOptions = appendAuthOptions(server, options)
     return this.serverRequest(server, path, method, authOptions, body, TIMEOUT)
@@ -37,7 +37,7 @@ export class HttpBrowserService {
     method: Method,
     options: HttpBrowserOptions = { },
     body: any = { },
-    TIMEOUT = 60, // seconds
+    TIMEOUT = 10, // seconds
   ): Promise<T> {
     const url = this.s9Url(server, path)
     return this.request(method, url, options, body, TIMEOUT)
@@ -45,10 +45,6 @@ export class HttpBrowserService {
 
   async request<T> (method: Method, url: string, options: HttpBrowserOptions, body: any, TIMEOUT: number): Promise<T> {
     const newOptions = appendDefaultOptions(options)
-    // console.log('Request Method: ', method)
-    // console.log('Request URL: ', url)
-    // console.log('Request Body: ', body)
-    // console.log('Request Options: ', newOptions)
 
     let call: () => Observable<HttpEvent<T>>
     switch (method) {

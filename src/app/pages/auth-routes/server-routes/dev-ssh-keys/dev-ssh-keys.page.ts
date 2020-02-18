@@ -35,7 +35,10 @@ export class DevSSHKeysPage {
   }
 
   async doRefresh (event: any) {
-    await this.getSSHKeys()
+    await Promise.all([
+      this.getSSHKeys(),
+      pauseFor(600),
+    ])
     event.target.complete()
   }
 

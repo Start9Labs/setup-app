@@ -36,13 +36,16 @@ export class ServerNotificationsPage {
       pauseFor(600),
     ])
     this.notifications = notifications
-    this.serverModel.updateCache(this.serverId, { badge: 0 })
+    this.serverModel.updateServer(this.serverId, { badge: 0 })
     this.loading = false
   }
 
   async doRefresh (e: any) {
     this.page = 1
-    this.notifications = await this.getNotifications()
+    await Promise.all([
+      this.getNotifications(),
+      pauseFor(600),
+    ])
     e.target.complete()
   }
 

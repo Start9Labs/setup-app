@@ -25,8 +25,9 @@ export class HttpNativeService {
     path: string,
     options: HttpNativeOptions,
   ): Promise<T> {
-    const server = this.serverModel.peekOne(serverId)
+    const server = this.serverModel.peekServer(serverId)
     options.headers = Object.assign(options.headers || { }, getAuthHeader(server))
+    options.timeout = options.timeout || 10
     return this.serverRequest(server, path, options)
   }
 
@@ -34,8 +35,9 @@ export class HttpNativeService {
     server: S9Server | S9BuilderWith<'versionInstalled'>,
     path: string,
     options: HttpNativeOptions,
+    withVersion = true,
   ): Promise<T> {
-    const url = this.s9Url(server, path)
+    const url = withVersion ? s9Url(this.zerconfDaemon, server, path) : s9UrlNoVersion(this.zerconfDaemon, server, path)
     return this.request<T>(url, options)
   }
 
@@ -47,7 +49,6 @@ export class HttpNativeService {
     }
 
     console.log('Request URL: ', url)
-    // console.log('Request Options: ', options, '. Request * Full Headers: ', this.http.getHeaders('*'))
 
     try {
       const res = await this.http.sendRequest(url, options)
@@ -67,13 +68,20 @@ export class HttpNativeService {
       throw new Error(message || 'Unknown Error')
     }
   }
+}
 
-  s9Url (server: S9Server | S9BuilderWith<'versionInstalled'>, path: string): string {
-    const zeroconf = this.zerconfDaemon.getService(server.id)
-    if (!zeroconf) { throw new Error('S9 Server not found on LAN') }
-    const host = getLanIP(zeroconf)
-    return `http://${host}/v${server.versionInstalled.charAt(0)}${path}`
-  }
+export function s9Url (zcd: ZeroconfDaemon, server: S9Server | S9BuilderWith<'versionInstalled'>, path: string): string {
+  const zeroconf = zcd.getService(server.id)
+  if (!zeroconf) { throw new Error('S9 Server not found on LAN') }
+  const host = getLanIP(zeroconf)
+  return `http://${host}/v${server.versionInstalled.charAt(0)}${path}`
+}
+
+export function s9UrlNoVersion (zcd: ZeroconfDaemon, server: S9Server | S9BuilderWith<'versionInstalled'>, path: string): string {
+  const zeroconf = zcd.getService(server.id)
+  if (!zeroconf) { throw new Error('S9 Server not found on LAN') }
+  const host = getLanIP(zeroconf)
+  return `http://${host}${path}`
 }
 
 export function getAuthHeader (server: S9Server | S9BuilderWith<'privkey'>): { 'Authorization': string } {

@@ -30,7 +30,10 @@ export class AppAvailableListPage {
   }
 
   async doRefresh (e: any) {
-    await this.getApps()
+    await Promise.all([
+      this.getApps(),
+      pauseFor(600),
+    ])
     e.target.complete()
   }
 

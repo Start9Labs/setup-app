@@ -1,7 +1,5 @@
 import { Component } from '@angular/core'
-import { S9Server } from 'src/app/models/server-model'
 import { ActivatedRoute } from '@angular/router'
-import { ServerModel } from 'src/app/models/server-model'
 import { AppAvailableFull } from 'src/app/models/app-model'
 import { ServerService } from 'src/app/services/server.service'
 import { NavController, AlertController, LoadingController } from '@ionic/angular'
@@ -103,6 +101,50 @@ export class AppAvailableShowPage {
         },
         {
           text: 'Install',
+          cssClass: 'alert-success',
+          handler: () => {
+            this.install()
+          },
+        },
+      ],
+    })
+    await alert.present()
+  }
+
+async presentAlertDowngrade () {
+    const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
+      header: 'Confirm',
+      message: `Are you sure you want to downgrade ${this.app.title} from ${this.app.versionInstalled} to ${this.app.versionViewing}?`,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: 'Downgrade',
+          cssClass: 'alert-success',
+          handler: () => {
+            this.install()
+          },
+        },
+      ],
+    })
+    await alert.present()
+  }
+
+async presentAlertUpgrade () {
+    const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
+      header: 'Confirm',
+      message: `Are you sure you want to update ${this.app.title} from ${this.app.versionInstalled} to ${this.app.versionViewing}?`,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: 'Downgrade',
           cssClass: 'alert-success',
           handler: () => {
             this.install()

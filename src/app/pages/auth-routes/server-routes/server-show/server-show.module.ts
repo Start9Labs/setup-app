@@ -5,6 +5,7 @@ import { IonicModule } from '@ionic/angular'
 import { RouterModule, Routes } from '@angular/router'
 import { ServerShowPage } from './server-show.page'
 import { StatusComponentModule } from 'src/app/components/status/status.components.module'
+import { VarDirective } from 'src/app/util/ng-var.directive'
 
 const routes: Routes = [
   {
@@ -21,6 +22,6 @@ const routes: Routes = [
     IonicModule,
     RouterModule.forChild(routes),
   ],
-  declarations: [ServerShowPage],
+  declarations: [ServerShowPage, VarDirective],
 })
 export class ServerShowPageModule { }

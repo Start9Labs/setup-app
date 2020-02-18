@@ -1,80 +1,64 @@
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
-import { AppModel } from './app-model'
+import { ServerAppModel } from './server-app-model'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { deriveKeys } from '../util/crypto.util'
 import * as CryptoJS from 'crypto-js'
-import { BehaviorSubject, Observable } from 'rxjs'
+import { Observable } from 'rxjs'
+import { MapSubject } from '../util/map-subject.util'
+import { PropertySubject, PropertyObservableWithId } from '../util/property-subject.util'
 
 @Injectable({
   providedIn: 'root',
 })
-export class ServerModel {
-  darkCache$: BehaviorSubject <{ [id: string]: BehaviorSubject<S9Server> }> = new BehaviorSubject({ })
-
+export class ServerModel extends MapSubject<S9Server> {
   constructor (
     private readonly storage: Storage,
-    private readonly appModel: AppModel,
-  ) { }
+    private readonly serverAppModel: ServerAppModel,
+  ) { super({ }) }
 
-  watchOne (id: string): BehaviorSubject<S9Server> {
-    if (!this.darkCache$.value[id]) throw new Error (`No cached server for ${id}`)
-    return this.darkCache$.value[id]
+  watchServerAdds (): Observable<PropertyObservableWithId<S9Server>[]> {
+    return this.watchAdd()
   }
 
-  watchAll (): Observable<{ [id: string]: BehaviorSubject<S9Server> }> {
-    return this.darkCache$
+  watchServerDeletes (): Observable<string[]> {
+    return this.watchDelete()
   }
 
-  peekOne (id: string): Readonly<S9Server> {
-    if (!this.darkCache$.value[id] || !this.darkCache$.value[id].value) throw new Error (`No cached server for ${id}`)
-    return this.darkCache$.value[id].value
+  watchServerProperties (serverId: string) : PropertySubject<S9Server> {
+    const toReturn = this.watch(serverId)
+    if (!toReturn) throw new Error(`Tried to watch server. Expected server ${JSON.stringify(serverId)} but not found.`)
+    return toReturn
   }
 
-  peekAll (): Readonly<S9Server>[] {
-    return Object.values(this.darkCache$.value).map(s => s.value)
+  peekServer (serverId: string): S9Server {
+    const toReturn = this.peek(serverId)
+    if (!toReturn) throw new Error(`Tried to peek server. Expected server ${JSON.stringify(serverId)} but not found.`)
+    return toReturn
   }
 
-  count (): number { return this.peekAll().length }
-
-  // no op if missing
-  removeFromCache (id: string): void {
-    if (this.darkCache$.value[id]) {
-      const previousCache = this.darkCache$.value
-      this.darkCache$.value[id].complete()
-      delete previousCache[id]
-      this.darkCache$.next(previousCache)
-    }
+  removeServer (serverId: string): void {
+    this.delete([serverId])
   }
 
-  // no op if missing
-  updateCache (id: string, update: Partial<S9Server>): void {
-    if (this.darkCache$.value[id]) {
-      const updatedServer = { ...this.peekOne(id), ...update }
-      this.darkCache$.value[id].next(updatedServer)
-    }
+  updateServer (id: string, update: Partial<S9Server>): void {
+    this.update$.next([{ ...update, id }])
   }
 
-  // no op if already exists
-  createInCache (server: S9Server): void {
-    if (!this.darkCache$.value[server.id]) {
-      const previousCache = this.darkCache$.value
-      previousCache[server.id] = new BehaviorSubject(server)
-      this.appModel.createServerCache(server.id)
-      this.darkCache$.next(previousCache)
-    }
+  createServer (server: S9Server): void {
+    console.log(`adding server`, server)
+    this.createServerAppCache(server.id)
+    this.add([server])
   }
 
-  clearCache () {
-    this.peekAll().forEach(s => this.removeFromCache(s.id) )
-    this.darkCache$.complete()
+  createServerAppCache (sid: string): void {
+    this.serverAppModel.create(sid)
   }
 
   async load (mnemonic: string[]): Promise<void> {
     const fromStorage: S9ServerStore = await this.storage.get('servers') || []
-    fromStorage.forEach(s => {
-      this.createInCache(fromStorableServer(s, mnemonic))
-    })
+    const mapped = fromStorage.map(s => fromStorableServer(s, mnemonic))
+    this.add(mapped)
   }
 
   async saveAll (): Promise<void> {
@@ -94,7 +78,6 @@ export interface S9ServerStorable {
 export interface S9Server extends S9ServerStorable {
   status: ServerStatus
   statusAt: string
-  versionLatest: string
   privkey: string // derive from mnemonic + torAddress
   badge: number
   notifications: S9Notification[]
@@ -145,7 +128,6 @@ export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): 
     label,
     torAddress,
     versionInstalled,
-    versionLatest: '0.0.0',
     status: ServerStatus.UNKNOWN,
     statusAt: new Date().toISOString(),
     privkey: deriveKeys(mnemonic, id).privkey,
@@ -177,3 +159,4 @@ export enum ServerStatus {
   NEEDS_CONFIG = 'NEEDS_CONFIG',
   RUNNING = 'RUNNING',
 }
+

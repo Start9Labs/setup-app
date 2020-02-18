@@ -3,8 +3,9 @@ import { NavController, LoadingController, AlertController } from '@ionic/angula
 import { ActivatedRoute } from '@angular/router'
 import { AppInstalled, AppConfigSpec, AppStatus, AppModel } from 'src/app/models/app-model'
 import { ServerService } from 'src/app/services/server.service'
-import { BehaviorSubject } from 'rxjs'
 import { pauseFor } from 'src/app/util/misc.util'
+import { ServerAppModel } from 'src/app/models/server-app-model'
+import { PropertySubject, peekProperties } from 'src/app/util/property-subject.util'
 
 @Component({
   selector: 'app-config',
@@ -14,17 +15,18 @@ import { pauseFor } from 'src/app/util/misc.util'
 export class AppConfigPage {
   loading = true
   error = ''
-  app$: BehaviorSubject<AppInstalled>
+  app: PropertySubject<AppInstalled>
   appId: string
   spec: AppConfigSpec
   config: object
   edited = false
   serverId: string
+  appModel: AppModel
 
   constructor (
     private readonly navCtrl: NavController,
     private readonly route: ActivatedRoute,
-    private readonly appModel: AppModel,
+    private readonly serverAppModel: ServerAppModel,
     private readonly serverService: ServerService,
     private readonly loadingCtrl: LoadingController,
     private readonly alertCtrl: AlertController,
@@ -34,8 +36,9 @@ export class AppConfigPage {
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
     this.appId = this.route.snapshot.paramMap.get('appId') as string
-    this.app$ = this.appModel.watch(this.serverId, this.appId)
-    const app = this.app$.value
+    this.appModel = this.serverAppModel.get(this.serverId)
+    this.app = this.appModel.watchAppProperties(this.appId)
+    const app = peekProperties(this.app)
     if (app.status === AppStatus.RECOVERABLE) {
       await this.presentAlertRecoverable()
     } else {
@@ -69,7 +72,7 @@ export class AppConfigPage {
   }
 
   async save () {
-    const app = this.app$.value
+    const app = peekProperties(this.app)
     const loader = await this.loadingCtrl.create({
       message: 'Saving config...',
       spinner: 'lines',
@@ -90,7 +93,7 @@ export class AppConfigPage {
         await this.serverService.startApp(this.serverId, app)
       // if not RUNNING beforehand, set status to STOPPED
       } else {
-        this.appModel.update(this.serverId, this.appId, { status: AppStatus.STOPPED, statusAt: new Date().toISOString() })
+        this.appModel.updateApp({ id: this.appId, status: AppStatus.STOPPED, statusAt: new Date().toISOString() })
       }
 
       await this.navigateBack()
@@ -102,7 +105,7 @@ export class AppConfigPage {
   }
 
   async presentAlertRecoverable () {
-    const app = this.app$.value
+    const app = peekProperties(this.app)
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Keep existing data?',
@@ -128,7 +131,7 @@ export class AppConfigPage {
   }
 
   async presentAlertConfirmWipeData () {
-    const app = this.app$.value
+    const app = peekProperties(this.app)
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Confirm',
@@ -176,7 +179,7 @@ export class AppConfigPage {
   }
 
   async wipeAppData () {
-    const app = this.app$.value
+    const app = peekProperties(this.app)
     const loader = await this.loadingCtrl.create({
       message: 'Wiping Data. This could take a while...',
       spinner: 'lines',

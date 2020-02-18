@@ -5,7 +5,7 @@
         <ion-icon name="arrow-back"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>{{ (app$ | async)?.title }}</ion-title>
+    <ion-title>{{ app['title'] | async }}</ion-title>
     <ion-buttons *ngIf="config" slot="end">
       <ion-button (click)="save()" color="primary">
         <b>Save</b>
@@ -23,15 +23,15 @@
   <ion-spinner *ngIf="loading" class="center" name="lines" color="warning"></ion-spinner>
 
   <ion-item-group *ngIf="!loading && config" class="ion-text-wrap">
-    <div *ngIf="['NEEDS_CONFIG', 'RECOVERABLE'].includes((app$ | async)?.status) && !edited">
+    <div *ngIf="['NEEDS_CONFIG', 'RECOVERABLE'].includes(app['status'] | async) && !edited">
       <ion-item-divider>
         <ion-text>Initial Config</ion-text>
       </ion-item-divider>
       <ion-item>
         <ion-text color="warning">
           <p>
-            To use the {{ (app$ | async)?.status === 'NEEDS_CONFIG' ? 'default' : 'existing' }} configuration for
-            {{ (app$ | async)?.title }},
+            To use the {{ (app['status'] | async) === 'NEEDS_CONFIG' ? 'default' : 'existing' }} configuration for
+            {{ app['title'] | async }},
             click "SAVE" now.
             <br />
             <br />

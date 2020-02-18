@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core'
 import { Method } from '../types/enums'
-import { AppInstalled, AppAvailablePreview, AppAvailableFull, AppStatus, AppConfigSpec, AppModel, Rules } from '../models/app-model'
-import { S9Notification, SSHFingerprint, ServerStatus } from '../models/server-model'
+import { AppInstalled, AppAvailablePreview, AppAvailableFull, AppStatus, AppConfigSpec, Rules } from '../models/app-model'
+import { S9Notification, SSHFingerprint, ServerStatus, ServerModel } from '../models/server-model'
 import { Lan, ApiAppAvailablePreview, ApiAppAvailableFull, ApiAppInstalled, ApiServer, ApiAppVersionInfo } from '../types/api-types'
 import { S9BuilderWith } from './setup.service'
 import * as configUtil from '../util/config.util'
 import { pauseFor } from '../util/misc.util'
 import { HttpNativeService } from './http-native.service'
+import { ServerAppModel } from '../models/server-app-model'
 
 @Injectable({
   providedIn: 'root',
@@ -14,11 +15,18 @@ import { HttpNativeService } from './http-native.service'
 export class ServerService {
   constructor (
     private readonly httpService: HttpNativeService,
-    private readonly appModel: AppModel,
+    private readonly appModel: ServerAppModel,
+    private readonly serverModel: ServerModel,
   ) { }
 
   async getServer (serverId: string): Promise<ApiServer> {
     return this.httpService.authServerRequest<Lan.GetServerRes>(serverId, '', { method: Method.get })
+  }
+
+  async getVersionLatest (serverId: string): Promise<Lan.GetVersionLatestRes> {
+    console.log(`Getting version lated for serverId ${serverId}`)
+    const server = this.serverModel.peekServer(serverId)
+    return this.httpService.serverRequest<Lan.GetVersionLatestRes>(server, '/versionLatest', { method: Method.get }, false)
   }
 
   async getServerSpecs (serverId: string): Promise<Lan.GetServerSpecsRes> {
@@ -104,35 +112,35 @@ export class ServerService {
       version,
     }
     const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(serverId, `/apps/${appId}/install`, { method: Method.post, data })
-    await this.appModel.create(serverId, installed)
+    await this.appModel.get(serverId).createApp(installed)
     return installed
   }
 
   async uninstallApp (serverId: string, appId: string): Promise<void> {
-    await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(serverId, `/apps/${appId}/uninstall`, { method: Method.post })
-    await this.appModel.remove(serverId, appId)
+    await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(serverId, `/apps/${appId}/uninstall`, { method: Method.post, timeout: 30 })
+    await this.appModel.get(serverId).removeApp(appId)
   }
 
   async startApp (serverId: string, app: AppInstalled): Promise<void> {
-    await this.httpService.authServerRequest<Lan.PostStartAppRes>(serverId, `/apps/${app.id}/start`, { method: Method.post })
-    this.appModel.update(serverId, app.id, { status: AppStatus.RUNNING, statusAt: new Date().toISOString() })
+    await this.httpService.authServerRequest<Lan.PostStartAppRes>(serverId, `/apps/${app.id}/start`, { method: Method.post, timeout: 30 })
+    this.appModel.get(serverId).updateApp({ id: app.id, status: AppStatus.RUNNING, statusAt: new Date().toISOString() })
   }
 
   async stopApp (serverId: string, app: AppInstalled): Promise<void> {
-    await this.httpService.authServerRequest<Lan.PostStopAppRes>(serverId, `/apps/${app.id}/stop`, { method: Method.post })
-    this.appModel.update(serverId, app.id, { status: AppStatus.STOPPED, statusAt: new Date().toISOString() })
+    await this.httpService.authServerRequest<Lan.PostStopAppRes>(serverId, `/apps/${app.id}/stop`, { method: Method.post, timeout: 30 })
+    this.appModel.get(serverId).updateApp({ id: app.id, status: AppStatus.STOPPED, statusAt: new Date().toISOString() })
   }
 
   async updateAppConfig (serverId: string, app: AppInstalled, config: object): Promise<void> {
     const data: Lan.PostUpdateAppConfigReq = {
       config,
     }
-    await this.httpService.authServerRequest<Lan.PostUpdateAppConfigRes>(serverId, `/apps/${app.id}/config`, { method: Method.patch, data })
+    await this.httpService.authServerRequest<Lan.PostUpdateAppConfigRes>(serverId, `/apps/${app.id}/config`, { method: Method.patch, data, timeout: 30 })
   }
 
   async wipeAppData (serverId: string, app: AppInstalled): Promise<void> {
-    await this.httpService.authServerRequest<Lan.PostWipeAppDataRes>(serverId, `/apps/${app.id}/wipe`, { method: Method.post })
-    this.appModel.update(serverId, app.id, { status: AppStatus.NEEDS_CONFIG, statusAt: new Date().toISOString() })
+    await this.httpService.authServerRequest<Lan.PostWipeAppDataRes>(serverId, `/apps/${app.id}/wipe`, { method: Method.post, timeout: 30 })
+    this.appModel.get(serverId).updateApp({ id: app.id, status: AppStatus.NEEDS_CONFIG, statusAt: new Date().toISOString() })
   }
 
   async getSSHKeys (serverId: string): Promise<SSHFingerprint[]> {
@@ -146,7 +154,7 @@ export class ServerService {
     return this.httpService.authServerRequest<Lan.PostAddSSHKeyRes>(serverId, `/sshKeys`, { method: Method.post, data })
   }
 
-  async getWifi (serverId: string, timeout = 60): Promise<Lan.GetWifiRes> {
+  async getWifi (serverId: string, timeout?: number): Promise<Lan.GetWifiRes> {
     return this.httpService.authServerRequest<Lan.GetWifiRes>(serverId, `/wifi`, { method: Method.get, timeout })
   }
 
@@ -163,7 +171,7 @@ export class ServerService {
   }
 
   async deleteWifi (serverId: string, ssid: string): Promise<void> {
-    await this.httpService.authServerRequest<Lan.DeleteWifiRes>(serverId, `/wifi/${ssid}`, { method: Method.delete })
+    await this.httpService.authServerRequest<Lan.DeleteWifiRes>(serverId, encodeURI(`/wifi/${ssid}`), { method: Method.delete })
   }
 
   async deleteSSHKey (serverId: string, sshKey: string): Promise<void> {
@@ -171,11 +179,11 @@ export class ServerService {
   }
 
   async restartServer (serverId: string): Promise<void> {
-    await this.httpService.authServerRequest<Lan.PostRestartServerRes>(serverId, '/restart', { method: Method.post })
+    await this.httpService.authServerRequest<Lan.PostRestartServerRes>(serverId, '/restart', { method: Method.post, timeout: 30 })
   }
 
   async shutdownServer (serverId: string): Promise<void> {
-    await this.httpService.authServerRequest<Lan.PostShutdownServerRes>(serverId, '/shutdown', { method: Method.post })
+    await this.httpService.authServerRequest<Lan.PostShutdownServerRes>(serverId, '/shutdown', { method: Method.post, timeout: 30 })
   }
 }
 
@@ -188,11 +196,15 @@ export class ServerService {
 export class XServerService {
 
   constructor (
-    private readonly appModel: AppModel,
+    private readonly appModel: ServerAppModel,
   ) { }
 
   async getServer (serverId: string | S9BuilderWith<'zeroconf' | 'privkey' | 'versionInstalled' | 'torAddress'>): Promise<ApiServer> {
     return mockGetServer()
+  }
+
+  async getVersionLatest (serverId: string): Promise<Lan.GetVersionLatestRes> {
+    return mockGetVersionLatest()
   }
 
   async getServerSpecs (serverId: string): Promise<Lan.GetServerSpecsRes> {
@@ -268,13 +280,13 @@ export class XServerService {
 
   async installApp (serverId: string, appId: string, version: string): Promise<AppInstalled> {
     const installed = await mockInstallApp()
-    await this.appModel.create(serverId, installed)
+    await this.appModel.get(serverId).createApp(installed)
     return installed
   }
 
   async uninstallApp (serverId: string, appId: string): Promise<void> {
     await mockUninstallApp()
-    await this.appModel.remove(serverId, appId)
+    await this.appModel.get(serverId).removeApp(appId)
   }
 
   async startApp (serverId: string, app: AppInstalled): Promise<void> {
@@ -336,6 +348,11 @@ export class XServerService {
 async function mockGetServer (): Promise<Lan.GetServerRes> {
   await pauseFor(1000)
   return mockApiServer
+}
+
+async function mockGetVersionLatest (): Promise<Lan.GetVersionLatestRes> {
+  await pauseFor(1000)
+  return mockVersionLatest
 }
 
 // @TODO move-to-test-folders
@@ -504,18 +521,11 @@ async function mockShutdownServer (): Promise<Lan.PostShutdownServerRes> {
 // @TODO move-to-test-folders
 const mockApiServer: Lan.GetServerRes = {
   versionInstalled: '0.1.0',
-  versionLatest: '0.1.0',
   status: ServerStatus.RUNNING,
-  notifications: [
-    // {
-    //   id: '123e4567-e89b-12d3-a456-426655440000',
-    //   appId: 'bitcoind',
-    //   createdAt: '2019-12-26T14:20:30.872Z',
-    //   code: '101',
-    //   title: 'Install Complete',
-    //   message: 'Installation of bitcoind has successfully completed.',
-    // },
-  ],
+}
+
+const mockVersionLatest: Lan.GetVersionLatestRes = {
+  versionLatest: '0.1.1',
 }
 
 const mockApiServerMetrics: Lan.GetServerMetricsRes = {
@@ -650,7 +660,6 @@ const mockApiAppAvailableVersionInfo: ApiAppVersionInfo = {
 const mockApiAppsInstalled: ApiAppInstalled[] = [
   {
     id: 'bitcoind',
-    versionLatest: '0.19.0',
     versionInstalled: '0.18.1',
     title: 'Bitcoin Core',
     torAddress: 'sample-bitcoin-tor-address.onion',
@@ -660,7 +669,6 @@ const mockApiAppsInstalled: ApiAppInstalled[] = [
   },
   {
     id: 'cups',
-    versionLatest: '0.1.0',
     versionInstalled: '0.1.0',
     title: 'Cups Messenger',
     torAddress: 'sample-cups-tor-address.onion',
