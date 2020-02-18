@@ -526,6 +526,7 @@ const mockApiServer: Lan.GetServerRes = {
 
 const mockVersionLatest: Lan.GetVersionLatestRes = {
   versionLatest: '0.1.2',
+  canUpdate: true,
 }
 
 const mockApiServerMetrics: Lan.GetServerMetricsRes = {
