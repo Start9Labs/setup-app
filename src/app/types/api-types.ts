@@ -67,7 +67,7 @@ export module Lan {
   export type GetServerReq = { [k: string]: never }
   export type GetServerRes = ApiServer
   export type GetVersionLatestReq = { [k: string]: never }
-  export type GetVersionLatestRes = { versionLatest: string }
+  export type GetVersionLatestRes = { versionLatest: string, canUpdate: boolean }
   export type GetServerSpecsReq = { [k: string]: never }
   export type GetServerSpecsRes = ServerSpecs
   export type GetServerMetricsReq = { [k: string]: never }

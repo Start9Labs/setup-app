@@ -55,7 +55,7 @@ export class ServerShowPage {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
     this.server = this.serverModel.watchServerProperties(this.serverId)
     // @COMPAT 0.1.1
-    this.versionLatestSubscription = this.server.versionLatest?.subscribe((versionLatest) => {
+    this.versionLatestSubscription = this.server.versionLatest.subscribe((versionLatest) => {
       this.versionLatest = versionLatest
     })
     // --end

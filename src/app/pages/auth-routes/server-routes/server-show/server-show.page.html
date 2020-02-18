@@ -44,7 +44,7 @@
   </ion-button>
 
   <ion-button
-    *ngIf="versionLatest && (server['status'] | async) === 'RUNNING' && compareVersions((server['versionInstalled'] | async), versionLatest) === -1"
+    *ngIf="!(loading$ | async) && versionLatest && (server['status'] | async) === 'RUNNING' && compareVersions((server['versionInstalled'] | async), versionLatest) === -1"
     style="margin: 16px;" expand="block" fill="outline" color="success" (click)="presentAlertUpdate(server)">
     Update MeshOS to {{ versionLatest }}
   </ion-button>
