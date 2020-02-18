@@ -134,8 +134,7 @@ export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): 
     privkey: deriveKeys(mnemonic, id).privkey,
     badge: 0,
     notifications: [],
-    versionLatest: undefined,
-
+    versionLatest: undefined, // @COMPAT 0.1.1
   }
 }
 
