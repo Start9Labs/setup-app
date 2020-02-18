@@ -44,7 +44,6 @@ export class HttpNativeService {
   async request<T> (url: string, options: HttpNativeOptions): Promise<T> {
     this.http.setDataSerializer('json')
     this.http.setHeader('*', 'app-version', version)
-    this.http.setHeader('*', 'User-Agent', `start9-companion/${version}`)
     if (options.method === Method.post && !options.data) {
       options.data = { }
     }
