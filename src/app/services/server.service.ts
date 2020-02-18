@@ -520,12 +520,12 @@ async function mockShutdownServer (): Promise<Lan.PostShutdownServerRes> {
 
 // @TODO move-to-test-folders
 const mockApiServer: Lan.GetServerRes = {
-  versionInstalled: '0.1.0',
+  versionInstalled: '0.1.1',
   status: ServerStatus.RUNNING,
 }
 
 const mockVersionLatest: Lan.GetVersionLatestRes = {
-  versionLatest: '0.1.1',
+  versionLatest: '0.1.2',
 }
 
 const mockApiServerMetrics: Lan.GetServerMetricsRes = {

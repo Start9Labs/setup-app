@@ -210,6 +210,7 @@ export function toS9Server (builder: Required<S9ServerBuilder>): S9Server {
     ...builder,
     badge: 0,
     notifications: [],
+    versionLatest: undefined, // @COMPAT 0.1.1
   }
 }
 

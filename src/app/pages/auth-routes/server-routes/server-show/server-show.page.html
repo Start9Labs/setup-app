@@ -38,7 +38,7 @@
     </ion-item>
   </ion-item-group>
 
-  <ion-button *ngIf="!versionLatest" style="margin: 16px;" expand="block" fill="outline" (click)="getVersionLatest(server)">
+  <ion-button *ngIf="!(loading$ | async) && !versionLatest" style="margin: 16px;" expand="block" fill="outline" (click)="getVersionLatest(server)">
     Check for Updates
     <ion-icon slot="end" name="refresh-outline"></ion-icon>
   </ion-button>
