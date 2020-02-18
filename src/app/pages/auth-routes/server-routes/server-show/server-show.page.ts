@@ -58,7 +58,7 @@ export class ServerShowPage {
     this.versionLatestSubscription = this.server.versionLatest?.subscribe((versionLatest) => {
       this.versionLatest = versionLatest
     })
-    // end
+    // --end
     this.serverModel.createServerAppCache(this.serverId)
 
     const appModel = this.serverAppModel.get(this.serverId)

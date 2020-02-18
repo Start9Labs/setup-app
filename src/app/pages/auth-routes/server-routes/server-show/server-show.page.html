@@ -64,7 +64,7 @@
       <ion-avatar slot="start">
         <!-- @COMPAT 0.1.1 -->
         <img *ngIf="compareVersions((server['versionInstalled'] | async), '0.1.2') === -1" [src]="app.observe['iconURL'] | async" alt="icon" />
-        <!-- end. and delete *ngIf below -->
+        <!-- --end. Delete *ngIf below -->
         <img *ngIf="compareVersions((server['versionInstalled'] | async), '0.1.1') === 1" [src]="iconFullUrl$(server, app) | async" alt="icon" />
       </ion-avatar>
       <ion-label>
