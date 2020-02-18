@@ -23,12 +23,26 @@ export interface ApiAppAvailableFull extends ApiAppAvailablePreview {
   versions: string[]
 }
 
-export interface ApiAppInstalled extends ApiAppBase {
+export type ApiAppInstalled = ApiAppInstalled011 | ApiAppInstalled012
+
+export interface ApiAppInstalled011 extends ApiAppBase {
+  versionLatest: string
   torAddress?: string
 }
 
+export interface ApiAppInstalled012 extends ApiAppBase {
+  torAddress?: string
+}
 
-export interface ApiServer {
+export type ApiServer = ApiServer011 | ApiServer012
+
+export interface ApiServer011 {
+  status: ServerStatus
+  versionLatest: string
+  versionInstalled: string
+}
+
+export interface ApiServer012 {
   status: ServerStatus
   versionInstalled: string
 }
@@ -53,7 +67,7 @@ export module Lan {
   export type GetServerReq = { [k: string]: never }
   export type GetServerRes = ApiServer
   export type GetVersionLatestReq = { [k: string]: never }
-  export type GetVersionLatestRes = { versionLatest: string }
+  export type GetVersionLatestRes = { versionLatest: string, canUpdate: boolean }
   export type GetServerSpecsReq = { [k: string]: never }
   export type GetServerSpecsRes = ServerSpecs
   export type GetServerMetricsReq = { [k: string]: never }
