@@ -86,7 +86,7 @@ export interface BaseApp {
   export interface AppAvailablePreview extends BaseApp {
     versionLatest: string
     descriptionShort: string
-    iconUrl: FullyQualifiedUrl
+    iconURL: FullyQualifiedUrl
   }
 
   export interface AppAvailableFull extends AppAvailablePreview {
