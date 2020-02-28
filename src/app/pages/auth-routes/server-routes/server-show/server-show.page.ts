@@ -36,7 +36,7 @@ export class ServerShowPage {
 
   addAppsSubscription: Subscription
   deleteAppsSubscription: Subscription
-  versionLatestSubscription: Subscription | undefined // @COMPAT 0.1.1
+  versionLatestSubscription: Subscription | undefined // @COMPAT 0.1.1 - versionLatest dropped in 0.1.2
 
   constructor (
     private readonly route: ActivatedRoute,
@@ -54,7 +54,7 @@ export class ServerShowPage {
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
     this.server = this.serverModel.watchServerProperties(this.serverId)
-    // @COMPAT 0.1.1
+    // @COMPAT 0.1.1 - versionLatest dropped in 0.1.2
     this.versionLatestSubscription = this.server.versionLatest.subscribe((versionLatest) => {
       this.versionLatest = versionLatest
     })
@@ -83,7 +83,7 @@ export class ServerShowPage {
   ngOnDestroy () {
     this.addAppsSubscription.unsubscribe()
     this.deleteAppsSubscription.unsubscribe()
-    if (this.versionLatestSubscription) { this.versionLatestSubscription.unsubscribe() } // @COMPAT 0.1.1
+    if (this.versionLatestSubscription) { this.versionLatestSubscription.unsubscribe() } // @COMPAT 0.1.1 - versionLatest dropped in 0.1.2
   }
 
   async doRefresh (event: any) {
@@ -101,12 +101,14 @@ export class ServerShowPage {
     }
   }
 
-  public iconFullUrl$ (server: PropertySubject<S9Server>, app: PropertyObservableWithId<AppInstalled>) : Observable<string> {
-    return  combineLatest(
+  iconFullUrl$ (server: PropertySubject<S9Server>, app: PropertyObservableWithId<AppInstalled>) : Observable<string> {
+    const path$ = combineLatest(
       fromPropertyObservable(server), app.observe['iconURL'],
     ).pipe(
       map(([s, relativeUrl]) => s9UrlNoVersion(this.zcd, s, relativeUrl)),
     )
+    path$.subscribe(p => console.log(p))
+    return path$
   }
 
   async presentAction (pittedServer: PropertySubject<S9Server>) {

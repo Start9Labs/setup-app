@@ -12,7 +12,7 @@ import { ServerAppModel } from '../models/server-app-model'
 @Injectable({
   providedIn: 'root',
 })
-export class ServerService {
+export class XServerService {
   constructor (
     private readonly httpService: HttpNativeService,
     private readonly appModel: ServerAppModel,
@@ -201,7 +201,7 @@ export class ServerService {
 @Injectable({
   providedIn: 'root',
 })
-export class XServerService {
+export class ServerService {
 
   constructor (
     private readonly appModel: ServerAppModel,
@@ -538,12 +538,12 @@ async function mockShutdownServer (): Promise<Lan.PostShutdownServerRes> {
 
 // @TODO move-to-test-folders
 const mockApiServer: Lan.GetServerRes = {
-  versionInstalled: '0.1.1',
+  versionInstalled: '0.1.4',
   status: ServerStatus.RUNNING,
 }
 
 const mockVersionLatest: Lan.GetVersionLatestRes = {
-  versionLatest: '0.1.2',
+  versionLatest: '0.1.4',
   canUpdate: true,
 }
 

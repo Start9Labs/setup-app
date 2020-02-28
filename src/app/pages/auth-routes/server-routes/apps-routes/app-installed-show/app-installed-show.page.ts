@@ -5,10 +5,11 @@ import { ActivatedRoute } from '@angular/router'
 import { AppInstalled, AppStatus, AppModel } from 'src/app/models/app-model'
 import { ClipboardService } from 'src/app/services/clipboard.service'
 import { ActionSheetButton } from '@ionic/core'
-import { BehaviorSubject } from 'rxjs'
 import { pauseFor } from 'src/app/util/misc.util'
 import { ServerAppModel } from 'src/app/models/server-app-model'
 import { PropertySubject, peekProperties } from 'src/app/util/property-subject.util'
+import { S9Server, ServerModel } from 'src/app/models/server-model'
+import * as compareVersions from 'compare-versions'
 
 @Component({
   selector: 'app-installed-show',
@@ -19,6 +20,7 @@ export class AppInstalledShowPage {
   loading = true
   error = ''
   app: PropertySubject<AppInstalled>
+  server: S9Server
   appId: string
   serverId: string
   appModel: AppModel
@@ -31,12 +33,14 @@ export class AppInstalledShowPage {
     private readonly clipboardService: ClipboardService,
     private readonly loadingCtrl: LoadingController,
     private readonly serverService: ServerService,
+    private readonly serverModel: ServerModel,
     private readonly serverAppModel: ServerAppModel,
   ) { }
 
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
     this.appId = this.route.snapshot.paramMap.get('appId') as string
+    this.server = this.serverModel.peekServer(this.serverId)
     this.appModel = this.serverAppModel.get(this.serverId)
     this.app = this.appModel.watchAppProperties(this.appId)
 
@@ -103,15 +107,20 @@ export class AppInstalledShowPage {
             this.navigate(['logs'])
           },
         },
-        // @TODO uncomment when AppMgr returns proper response
-        // {
-        //   text: 'View Metrics',
-        //   icon: 'pulse',
-        //   handler: () => {
-        //     this.navigate(['metrics'])
-        //   },
-        // },
       )
+      // @COMPAT < 0.1.4 - App Metrics introduced in 0.1.4
+      if (compareVersions(this.server.versionInstalled, '0.1.4') !== -1) {
+      // --END
+        buttons.push(
+          {
+            text: 'View Metrics',
+            icon: 'pulse',
+            handler: () => {
+              this.navigate(['metrics'])
+            },
+          },
+        )
+      }
     }
 
     buttons.push(

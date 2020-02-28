@@ -10,7 +10,6 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "strictNullChecks": true,
-    "resolveJsonModule": true,
     "importHelpers": true,
     "target": "es2015",
     "skipLibCheck": true,
