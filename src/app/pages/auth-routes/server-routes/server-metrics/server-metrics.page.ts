@@ -41,6 +41,7 @@ export class ServerMetricsPage {
   async startDaemon (): Promise<void> {
     this.going = true
     while (this.going) {
+      pauseFor(250)
       await this.getMetrics()
     }
   }

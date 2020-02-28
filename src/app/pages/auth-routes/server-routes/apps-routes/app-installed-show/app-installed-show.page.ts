@@ -10,6 +10,7 @@ import { ServerAppModel } from 'src/app/models/server-app-model'
 import { PropertySubject, peekProperties } from 'src/app/util/property-subject.util'
 import { S9Server, ServerModel } from 'src/app/models/server-model'
 import * as compareVersions from 'compare-versions'
+import { Observable } from 'rxjs'
 
 @Component({
   selector: 'app-installed-show',
@@ -20,7 +21,7 @@ export class AppInstalledShowPage {
   loading = true
   error = ''
   app: PropertySubject<AppInstalled>
-  server: S9Server
+  versionInstalled$: Observable<string>
   appId: string
   serverId: string
   appModel: AppModel
@@ -40,7 +41,7 @@ export class AppInstalledShowPage {
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
     this.appId = this.route.snapshot.paramMap.get('appId') as string
-    this.server = this.serverModel.peekServer(this.serverId)
+    this.versionInstalled$ = this.serverModel.watchServerProperties(this.serverId).versionInstalled
     this.appModel = this.serverAppModel.get(this.serverId)
     this.app = this.appModel.watchAppProperties(this.appId)
 
@@ -76,7 +77,7 @@ export class AppInstalledShowPage {
     await this.clipboardService.copy(app.torAddress || '')
   }
 
-  async presentAction () {
+  async presentAction (versionInstalled: string) {
     const app = peekProperties(this.app)
     const buttons : ActionSheetButton[] = []
 
@@ -109,7 +110,7 @@ export class AppInstalledShowPage {
         },
       )
       // @COMPAT < 0.1.4 - App Metrics introduced in 0.1.4
-      if (compareVersions(this.server.versionInstalled, '0.1.4') !== -1) {
+      if (compareVersions(versionInstalled, '0.1.4') !== -1) {
       // --END
         buttons.push(
           {
