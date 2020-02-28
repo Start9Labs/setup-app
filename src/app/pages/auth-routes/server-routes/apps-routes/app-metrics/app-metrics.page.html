@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="['/auth', 'servers', serverId, 'apps', 'installed', appId]"></ion-back-button>
     </ion-buttons>
-    <ion-title>{{appTitle$ | async}} Metrics</ion-title>
+    <ion-title>Metrics</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -15,7 +15,7 @@
 
   <ion-spinner *ngIf="loading" class="center" name="lines" color="warning"></ion-spinner>
 
-  <ion-item-group *ngIf="!loading && (metrics | keyvalue)?.length > 0">
+  <ion-item-group *ngIf="!loading && !(metrics | keyvalue)?.length">
     <ion-item>
       <ion-label class="ion-text-wrap">
         <p>
