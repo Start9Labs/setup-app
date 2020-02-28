@@ -65,7 +65,8 @@
         <!-- @COMPAT < 0.1.2 - image path changed to relative in 0.1.2 -->
         <img *ngIf="compareVersions((server['versionInstalled'] | async), '0.1.2') === -1" [src]="app.observe['iconURL'] | async" alt="icon" />
         <!-- --end. Also delete *ngIf below -->
-        <img *ngIf="compareVersions((server['versionInstalled'] | async), '0.1.1') === 1" [src]="iconFullUrl$(server, app) | async" alt="icon" />
+        <!-- @TODO: custom pipe for [src] iconUrl (<-- see, camel case, like everything else) subscription below -->
+        <img *ngIf="compareVersions((server['versionInstalled'] | async), '0.1.1') === 1" [src]="(s9Host$ | async) + (app.observe['iconURL'] | async)" alt="icon" />
       </ion-avatar>
       <ion-label>
         <h2>{{ app.observe['title'] | async }}</h2>
