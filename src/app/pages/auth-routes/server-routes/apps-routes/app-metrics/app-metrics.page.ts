@@ -43,7 +43,6 @@ export class AppMetricsPage {
   async startDaemon (): Promise<void> {
     this.going = true
     while (this.going) {
-      console.log('here')
       await this.getMetrics()
     }
   }

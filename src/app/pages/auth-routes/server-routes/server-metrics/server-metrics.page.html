@@ -24,9 +24,6 @@
       <ion-note *ngIf="metric.value" slot="end" class="metric-note">
         <ion-text style="color: white;">{{ metric.value.value }} {{ metric.value.unit }}</ion-text>
       </ion-note>
-      <ion-note *ngIf="!metric.value" slot="end" class="metric-note">
-        <ion-text color="danger">Error</ion-text>
-      </ion-note>
     </ion-item>
   </ion-item-group>
 

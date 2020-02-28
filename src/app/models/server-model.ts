@@ -100,8 +100,8 @@ export interface ServerSpecs {
 export interface ServerMetrics {
   [key: string]: {
     [key: string]: {
-      value: number
-      unit: string
+      value: string | number | null
+      unit?: string
     }
   }
 }

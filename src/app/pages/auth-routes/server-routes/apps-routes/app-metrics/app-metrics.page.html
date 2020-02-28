@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button [defaultHref]="['/auth', 'servers', serverId]"></ion-back-button>
+      <ion-back-button [defaultHref]="['/auth', 'servers', serverId, 'apps', 'installed', appId]"></ion-back-button>
     </ion-buttons>
     <ion-title>Metrics</ion-title>
   </ion-toolbar>
@@ -23,9 +23,6 @@
       </ion-label>
       <ion-note *ngIf="metric.value" slot="end" class="metric-note">
         <ion-text style="color: white;">{{ metric.value.value }} {{ metric.value.unit }}</ion-text>
-      </ion-note>
-      <ion-note *ngIf="!metric.value" slot="end" class="metric-note">
-        <ion-text color="danger">Error</ion-text>
       </ion-note>
     </ion-item>
   </ion-item-group>
