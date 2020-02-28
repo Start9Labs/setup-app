@@ -21,7 +21,6 @@ export class AppInstalledShowPage {
   loading = true
   error = ''
   app: PropertySubject<AppInstalled>
-  versionInstalled$: Observable<string>
   appId: string
   serverId: string
   appModel: AppModel
@@ -41,7 +40,6 @@ export class AppInstalledShowPage {
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
     this.appId = this.route.snapshot.paramMap.get('appId') as string
-    this.versionInstalled$ = this.serverModel.watchServerProperties(this.serverId).versionInstalled
     this.appModel = this.serverAppModel.get(this.serverId)
     this.app = this.appModel.watchAppProperties(this.appId)
 
@@ -77,7 +75,7 @@ export class AppInstalledShowPage {
     await this.clipboardService.copy(app.torAddress || '')
   }
 
-  async presentAction (versionInstalled: string) {
+  async presentAction () {
     const app = peekProperties(this.app)
     const buttons : ActionSheetButton[] = []
 
@@ -108,20 +106,14 @@ export class AppInstalledShowPage {
             this.navigate(['logs'])
           },
         },
-      )
-      // @COMPAT < 0.1.4 - App Metrics introduced in 0.1.4
-      if (compareVersions(versionInstalled, '0.1.4') !== -1) {
-      // --END
-        buttons.push(
-          {
-            text: 'View Metrics',
-            icon: 'pulse',
-            handler: () => {
-              this.navigate(['metrics'])
-            },
+        {
+          text: 'View Metrics',
+          icon: 'pulse',
+          handler: () => {
+            this.navigate(['metrics'])
           },
-        )
-      }
+        },
+      )
     }
 
     buttons.push(

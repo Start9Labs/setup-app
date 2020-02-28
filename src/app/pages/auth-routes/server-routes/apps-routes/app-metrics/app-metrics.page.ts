@@ -3,6 +3,8 @@ import { ActivatedRoute } from '@angular/router'
 import { AppMetrics } from 'src/app/models/server-model'
 import { ServerService } from 'src/app/services/server.service'
 import { pauseFor } from 'src/app/util/misc.util'
+import { AppModel } from 'src/app/models/app-model'
+import { Observable } from 'rxjs'
 
 @Component({
   selector: 'app-metrics',
@@ -16,15 +18,19 @@ export class AppMetricsPage {
   serverId: string
   appId: string
   metrics: AppMetrics = { }
+  appTitle$: Observable<string>
 
   constructor (
     private readonly route: ActivatedRoute,
     private readonly serverService: ServerService,
+    private readonly appModel: AppModel,
   ) { }
 
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
     this.appId = this.route.snapshot.paramMap.get('appId') as string
+
+    this.appTitle$ = this.appModel.watchAppProperties(this.appId).title
 
     await Promise.all([
       this.getMetrics(),
