@@ -106,7 +106,9 @@ export interface ServerMetrics {
   }
 }
 
-export type AppMetrics = ServerMetrics
+export type AppMetrics = {
+  [key: string]: string
+}
 
 export interface SSHFingerprint {
   alg: string

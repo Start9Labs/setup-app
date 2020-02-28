@@ -107,7 +107,7 @@ export class ServerService {
     return this.httpService.authServerRequest<Lan.GetAppLogsRes>(serverId, `/apps/${appId}/logs`, { method: Method.get, params: params as any })
   }
 
-  async getAppMetrics (serverId: string, appId: string): Promise<Lan.GetServerMetricsRes> {
+  async getAppMetrics (serverId: string, appId: string): Promise<Lan.GetAppMetricsRes> {
     return this.httpService.authServerRequest<Lan.GetAppMetricsRes>(serverId, `apps/${appId}/metrics`, { method: Method.get })
   }
 
@@ -396,7 +396,6 @@ async function mockPostUpdateAgent (): Promise<Lan.PostUpdateAgentRes> {
   await pauseFor(1000)
   return { }
 }
-
 
 // @TODO move-to-test-folders
 async function mockGetAvailableApp (): Promise<Lan.GetAppAvailableRes> {
@@ -784,34 +783,8 @@ const mockApiAppLogs: string[] = [
 ]
 
 const mockApiAppMetrics: Lan.GetAppMetricsRes = {
-  'Group1': {
-    'Metric1': {
-      value: 22.2,
-      unit: 'mi/b',
-    },
-    'Metric2': {
-      value: 50,
-      unit: '%',
-    },
-    'Metric3': {
-      value: 10.1,
-      unit: '%',
-    },
-  },
-  'Group2': {
-    'Hmmmm1': {
-      value: 22.2,
-      unit: 'mi/b',
-    },
-    'Hmmmm2': {
-      value: 50,
-      unit: '%',
-    },
-    'Hmmmm3': {
-      value: 10.1,
-      unit: '%',
-    },
-  },
+    Metric1: 'test value',
+    Metric2: 'test value 2',
 }
 
 const mockApiSSHFingerprints: SSHFingerprint[] = [

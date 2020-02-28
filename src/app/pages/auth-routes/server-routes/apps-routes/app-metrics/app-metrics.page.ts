@@ -54,14 +54,9 @@ export class AppMetricsPage {
   async getMetrics (): Promise<void> {
     try {
       const metrics = await this.serverService.getAppMetrics(this.serverId, this.appId)
-      Object.keys(metrics).forEach(outerKey => {
-        if (!this.metrics[outerKey]) {
-          this.metrics[outerKey] = metrics[outerKey]
-        } else {
-          Object.entries(metrics[outerKey]).forEach(([key, value]) => {
-            this.metrics[outerKey][key] = value
-          })
-        }
+      Object.keys(metrics).forEach(key => {
+        if (typeof metrics[key] !== 'string') { return }
+        this.metrics[key] = metrics[key]
       })
     } catch (e) {
       this.error = e.message

@@ -123,6 +123,7 @@ ion-action-sheet {
 }
 
 ion-alert {
+  --min-width: 80% !important;
   --background: var(--ion-color-light) !important;
   --backdrop-opacity: 0.75 !important;
 }

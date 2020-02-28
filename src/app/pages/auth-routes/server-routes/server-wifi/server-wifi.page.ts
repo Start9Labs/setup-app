@@ -189,7 +189,7 @@ export class ServerWifiPage {
           side: 'start',
           icon: 'close',
           handler: () => {
-            true
+            return true
           },
         },
       ],
