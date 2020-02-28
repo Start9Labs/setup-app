@@ -108,7 +108,7 @@ export class ServerService {
   }
 
   async getAppMetrics (serverId: string, appId: string): Promise<Lan.GetAppMetricsRes> {
-    return this.httpService.authServerRequest<Lan.GetAppMetricsRes>(serverId, `apps/${appId}/metrics`, { method: Method.get })
+    return this.httpService.authServerRequest<Lan.GetAppMetricsRes>(serverId, `/apps/${appId}/metrics`, { method: Method.get })
   }
 
   async installApp (serverId: string, appId: string, version: string): Promise<AppInstalled> {

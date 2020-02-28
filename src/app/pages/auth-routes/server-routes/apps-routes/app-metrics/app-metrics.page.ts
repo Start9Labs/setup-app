@@ -61,8 +61,10 @@ export class AppMetricsPage {
   async getMetrics (): Promise<void> {
     try {
       const metrics = await this.serverService.getAppMetrics(this.serverId, this.appId)
+      if (!metrics) return
+
       Object.keys(metrics).forEach(key => {
-        if (typeof metrics[key] !== 'string') { return }
+        if (typeof metrics[key] !== 'string' && typeof metrics[key] !== 'number') { return }
         this.metrics[key] = metrics[key]
       })
     } catch (e) {

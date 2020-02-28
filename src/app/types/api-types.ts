@@ -85,7 +85,7 @@ export module Lan {
   export type GetAppLogsReq = { after?: string, before?: string, page?: string, perPage?: string }
   export type GetAppLogsRes = string[]
   export type GetAppMetricsReq = { [k: string]: never }
-  export type GetAppMetricsRes = AppMetrics
+  export type GetAppMetricsRes = AppMetrics | null
   export type GetAppsInstalledReq = { [k: string]: never }
   export type GetAppsInstalledRes = ApiAppInstalled[]
   export type PostInstallAppReq = { version: string }
