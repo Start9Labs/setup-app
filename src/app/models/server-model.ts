@@ -93,9 +93,11 @@ export interface S9Notification {
   message: string
 }
 
-export type ServerSpecs = { [key: string]: string | number }
+export interface ServerSpecs {
+  [key: string]: string | number
+}
 
-export type ServerMetrics = {
+export interface ServerMetrics {
   [key: string]: {
     [key: string]: {
       value: number
@@ -103,6 +105,8 @@ export type ServerMetrics = {
     }
   }
 }
+
+export type AppMetrics = ServerMetrics
 
 export interface SSHFingerprint {
   alg: string

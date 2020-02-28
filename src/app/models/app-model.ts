@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs'
 import { MapSubject, Update } from '../util/map-subject.util'
 import { diff, partitionArray } from '../util/misc.util'
-import { PropertySubject, PropertyObservable, PropertyObservableWithId } from '../util/property-subject.util'
+import { PropertySubject, PropertyObservableWithId } from '../util/property-subject.util'
 
 export class AppModel extends MapSubject<AppInstalled> {
   constructor (private readonly serverId: string) { super({ }) }

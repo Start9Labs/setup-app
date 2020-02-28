@@ -1,11 +1,8 @@
 import { Component } from '@angular/core'
 import { ServerModel, S9Notification } from 'src/app/models/server-model'
-import { S9Server } from 'src/app/models/server-model'
 import { ActivatedRoute } from '@angular/router'
 import { ServerService } from 'src/app/services/server.service'
 import { LoadingController } from '@ionic/angular'
-import { Observable } from 'rxjs'
-import { first } from 'rxjs/operators'
 import { pauseFor } from 'src/app/util/misc.util'
 
 @Component({

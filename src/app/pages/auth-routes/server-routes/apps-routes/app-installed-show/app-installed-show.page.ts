@@ -94,14 +94,27 @@ export class AppInstalledShowPage {
       )
     }
 
-    buttons.push(
-      {
-        text: 'View Logs',
-        icon: 'newspaper-outline',
-        handler: () => {
-          this.navigate(['logs'])
+    if (app.status === AppStatus.RUNNING) {
+      buttons.push(
+        {
+          text: 'View Logs',
+          icon: 'newspaper-outline',
+          handler: () => {
+            this.navigate(['logs'])
+          },
         },
-      },
+        // @TODO uncomment when AppMgr returns proper response
+        // {
+        //   text: 'View Metrics',
+        //   icon: 'pulse',
+        //   handler: () => {
+        //     this.navigate(['metrics'])
+        //   },
+        // },
+      )
+    }
+
+    buttons.push(
       {
         text: 'Store Listing',
         icon: 'aperture-outline',

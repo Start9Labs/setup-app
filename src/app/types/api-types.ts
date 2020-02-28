@@ -1,5 +1,5 @@
 import { AppStatus, AppConfigSpec, Rules } from '../models/app-model'
-import { ServerSpecs, S9Notification, ServerMetrics, SSHFingerprint, ServerStatus } from '../models/server-model'
+import { ServerSpecs, S9Notification, ServerMetrics, SSHFingerprint, ServerStatus, AppMetrics } from '../models/server-model'
 
 export type TwoHundredOK = { never?: never } // hack for the unit type
 
@@ -84,6 +84,8 @@ export module Lan {
   export type GetAppConfigRes = ApiAppConfig
   export type GetAppLogsReq = { after?: string, before?: string, page?: string, perPage?: string }
   export type GetAppLogsRes = string[]
+  export type GetAppMetricsReq = { [k: string]: never }
+  export type GetAppMetricsRes = AppMetrics
   export type GetAppsInstalledReq = { [k: string]: never }
   export type GetAppsInstalledRes = ApiAppInstalled[]
   export type PostInstallAppReq = { version: string }
@@ -104,9 +106,9 @@ export module Lan {
   export type DeleteNotificationRes = TwoHundredOK
   export type GetWifiReq = { [k: string]: never }
   export type GetWifiRes = { ssids: string[], current: string }
-  export type PostAddWifiReq = { ssid: string, password: string }
+  export type PostAddWifiReq = { ssid: string, password: string, country: string }
   export type PostAddWifiRes = TwoHundredOK
-  export type PostConnectWifiReq = { [k: string]: never }
+  export type PostConnectWifiReq = { country: string }
   export type PostConnectWifiRes = TwoHundredOK
   export type DeleteWifiReq = { [k: string]: never }
   export type DeleteWifiRes = TwoHundredOK

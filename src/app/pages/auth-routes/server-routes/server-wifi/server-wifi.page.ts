@@ -4,6 +4,7 @@ import { ServerService } from 'src/app/services/server.service'
 import { ActivatedRoute } from '@angular/router'
 import { ActionSheetButton } from '@ionic/core'
 import { pauseFor } from 'src/app/util/misc.util'
+const countries = require('../../../../util/countries.json')
 
 @Component({
   selector: 'server-wifi',
@@ -13,6 +14,8 @@ import { pauseFor } from 'src/app/util/misc.util'
 export class ServerWifiPage {
   savedNetworks: string[] = []
   current: string | null
+  countries = countries
+  countryCode = 'US'
   ssid = ''
   password = ''
   serverId: string
@@ -95,7 +98,7 @@ export class ServerWifiPage {
     await loader.present()
 
     try {
-      await this.serverService.connectWifi(this.serverId, ssid)
+      await this.serverService.connectWifi(this.serverId, ssid, this.countryCode)
       await this.confirmWifi(ssid)
       this.error = ''
     } catch (e) {
@@ -114,7 +117,7 @@ export class ServerWifiPage {
     await loader.present()
 
     try {
-      await this.serverService.addWifi(this.serverId, this.ssid, this.password)
+      await this.serverService.addWifi(this.serverId, this.ssid, this.password, this.countryCode)
       await this.confirmWifi(this.ssid)
       this.ssid = ''
       this.password = ''
@@ -193,5 +196,9 @@ export class ServerWifiPage {
       cssClass: 'notification-toast',
     })
     await toast.present()
+  }
+
+  asIsOrder () {
+    return 1
   }
 }

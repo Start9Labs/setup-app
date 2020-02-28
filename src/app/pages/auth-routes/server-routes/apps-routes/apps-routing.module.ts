@@ -27,6 +27,10 @@ const routes: Routes = [
     path: 'installed/:appId/logs',
     loadChildren: () => import('./app-logs/app-logs.module').then(m => m.AppLogsPageModule),
   },
+  {
+    path: 'installed/:appId/metrics',
+    loadChildren: () => import('./app-metrics/app-metrics.module').then(m => m.AppMetricsPageModule),
+  },
 ]
 
 @NgModule({

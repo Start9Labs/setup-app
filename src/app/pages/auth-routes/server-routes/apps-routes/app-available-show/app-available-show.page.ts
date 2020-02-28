@@ -144,7 +144,7 @@ async presentAlertUpgrade () {
           role: 'cancel',
         },
         {
-          text: 'Downgrade',
+          text: 'Update',
           cssClass: 'alert-success',
           handler: () => {
             this.install()
