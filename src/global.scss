@@ -57,6 +57,10 @@
 
 .fab-button {
   margin: 16px;
+  --background: transparent;
+  --border-color: var(--ion-color-primary);
+  --border-style: solid;
+  --border-width: 2px;
 }
 
 .help-button {
@@ -113,8 +117,15 @@ ion-infinite-scroll ion-infinite-scroll-content {
   --color: var(--ion-color-warning) !important;
 }
 
-ion-alert {
+ion-action-sheet {
   --background: var(--ion-color-light) !important;
+  --backdrop-opacity: 0.75 !important;
+}
+
+ion-alert {
+  --min-width: 80% !important;
+  --background: var(--ion-color-light) !important;
+  --backdrop-opacity: 0.75 !important;
 }
 
 * {

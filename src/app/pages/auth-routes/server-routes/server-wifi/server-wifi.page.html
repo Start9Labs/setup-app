@@ -22,6 +22,15 @@
   <ion-item-group>
     <ion-item-divider>Add Wifi Network</ion-item-divider>
     <ion-item>
+      <ion-label>Select Country</ion-label>
+      <ion-select slot="end" placeholder="Select" [(ngModel)]="countryCode" [selectedText]="countryCode">
+        <ion-select-option *ngFor="let country of countries | keyvalue : asIsOrder" [value]="country.key">
+          {{ country.key }} - {{ country.value }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item-divider></ion-item-divider>
+    <ion-item>
       <ion-input placeholder="Network Name (SSID)" [(ngModel)]="ssid"></ion-input>
     </ion-item>
     <ion-item>
@@ -29,7 +38,7 @@
     </ion-item>
   </ion-item-group>
 
-  <ion-button [disabled]="!ssid" expand="block" fill="outline" (click)="add()" style="margin: 20px 0;">
+  <ion-button [disabled]="!ssid" expand="block" fill="outline" (click)="add()" style="margin: 40px 0;">
     Connect
   </ion-button>
 

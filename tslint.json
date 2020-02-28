@@ -1,5 +1,7 @@
 {
   "rules": {
+    "no-unused-variable": true,
+    "no-unused-expression": true,
     "space-before-function-paren": true,
     "semicolon": [
       true,

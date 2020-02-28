@@ -81,7 +81,7 @@ export interface S9Server extends S9ServerStorable {
   privkey: string // derive from mnemonic + torAddress
   badge: number
   notifications: S9Notification[]
-  versionLatest: string | undefined // @COMPAT 0.1.1
+  versionLatest: string | undefined // @COMPAT 0.1.1 - versionLatest dropped in 0.1.2
 }
 
 export interface S9Notification {
@@ -93,15 +93,21 @@ export interface S9Notification {
   message: string
 }
 
-export type ServerSpecs = { [key: string]: string | number }
+export interface ServerSpecs {
+  [key: string]: string | number
+}
 
-export type ServerMetrics = {
+export interface ServerMetrics {
   [key: string]: {
     [key: string]: {
-      value: number
-      unit: string
+      value: string | number | null
+      unit?: string
     }
   }
+}
+
+export type AppMetrics = {
+  [key: string]: string
 }
 
 export interface SSHFingerprint {
@@ -134,7 +140,7 @@ export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): 
     privkey: deriveKeys(mnemonic, id).privkey,
     badge: 0,
     notifications: [],
-    versionLatest: undefined, // @COMPAT 0.1.1
+    versionLatest: undefined, // @COMPAT 0.1.1 - versionLatest dropped in 0.1.2
   }
 }
 

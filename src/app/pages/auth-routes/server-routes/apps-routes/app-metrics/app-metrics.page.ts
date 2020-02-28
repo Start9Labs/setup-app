@@ -1,28 +1,36 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { ServerMetrics } from 'src/app/models/server-model'
+import { AppMetrics } from 'src/app/models/server-model'
 import { ServerService } from 'src/app/services/server.service'
 import { pauseFor } from 'src/app/util/misc.util'
+import { Observable } from 'rxjs'
+import { ServerAppModel } from 'src/app/models/server-app-model'
 
 @Component({
-  selector: 'server-metrics',
-  templateUrl: './server-metrics.page.html',
-  styleUrls: ['./server-metrics.page.scss'],
+  selector: 'app-metrics',
+  templateUrl: './app-metrics.page.html',
+  styleUrls: ['./app-metrics.page.scss'],
 })
-export class ServerMetricsPage {
+export class AppMetricsPage {
   error = ''
   loading = true
   going = false
   serverId: string
-  metrics: ServerMetrics = { }
+  appId: string
+  metrics: AppMetrics = { }
+  appTitle$: Observable<string>
 
   constructor (
     private readonly route: ActivatedRoute,
     private readonly serverService: ServerService,
+    private readonly serverAppModel: ServerAppModel,
   ) { }
 
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
+    this.appId = this.route.snapshot.paramMap.get('appId') as string
+
+    this.appTitle$ = this.serverAppModel.get(this.serverId).watchAppProperties(this.appId).title
 
     await Promise.all([
       this.getMetrics(),
@@ -52,15 +60,12 @@ export class ServerMetricsPage {
 
   async getMetrics (): Promise<void> {
     try {
-      const metrics = await this.serverService.getServerMetrics(this.serverId)
-      Object.keys(metrics).forEach(outerKey => {
-        if (!this.metrics[outerKey]) {
-          this.metrics[outerKey] = metrics[outerKey]
-        } else {
-          Object.entries(metrics[outerKey]).forEach(([key, value]) => {
-            this.metrics[outerKey][key] = value
-          })
-        }
+      const metrics = await this.serverService.getAppMetrics(this.serverId, this.appId)
+      if (!metrics) return
+
+      Object.keys(metrics).forEach(key => {
+        if (typeof metrics[key] !== 'string' && typeof metrics[key] !== 'number') { return }
+        this.metrics[key] = metrics[key]
       })
     } catch (e) {
       this.error = e.message

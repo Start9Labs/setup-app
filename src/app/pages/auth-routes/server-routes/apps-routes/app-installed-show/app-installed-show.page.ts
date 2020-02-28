@@ -5,10 +5,12 @@ import { ActivatedRoute } from '@angular/router'
 import { AppInstalled, AppStatus, AppModel } from 'src/app/models/app-model'
 import { ClipboardService } from 'src/app/services/clipboard.service'
 import { ActionSheetButton } from '@ionic/core'
-import { BehaviorSubject } from 'rxjs'
 import { pauseFor } from 'src/app/util/misc.util'
 import { ServerAppModel } from 'src/app/models/server-app-model'
 import { PropertySubject, peekProperties } from 'src/app/util/property-subject.util'
+import { S9Server, ServerModel } from 'src/app/models/server-model'
+import * as compareVersions from 'compare-versions'
+import { Observable } from 'rxjs'
 
 @Component({
   selector: 'app-installed-show',
@@ -31,6 +33,7 @@ export class AppInstalledShowPage {
     private readonly clipboardService: ClipboardService,
     private readonly loadingCtrl: LoadingController,
     private readonly serverService: ServerService,
+    private readonly serverModel: ServerModel,
     private readonly serverAppModel: ServerAppModel,
   ) { }
 
@@ -94,14 +97,26 @@ export class AppInstalledShowPage {
       )
     }
 
-    buttons.push(
-      {
-        text: 'View Logs',
-        icon: 'newspaper-outline',
-        handler: () => {
-          this.navigate(['logs'])
+    if (app.status === AppStatus.RUNNING) {
+      buttons.push(
+        {
+          text: 'View Logs',
+          icon: 'newspaper-outline',
+          handler: () => {
+            this.navigate(['logs'])
+          },
         },
-      },
+        {
+          text: 'View Metrics',
+          icon: 'pulse',
+          handler: () => {
+            this.navigate(['metrics'])
+          },
+        },
+      )
+    }
+
+    buttons.push(
       {
         text: 'Store Listing',
         icon: 'aperture-outline',

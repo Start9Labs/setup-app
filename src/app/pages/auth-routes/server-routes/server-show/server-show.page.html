@@ -38,7 +38,7 @@
     </ion-item>
   </ion-item-group>
 
-  <ion-button *ngIf="!(loading$ | async) && !versionLatest" style="margin: 16px;" expand="block" fill="outline" (click)="getVersionLatest(server)">
+  <ion-button *ngIf="!versionLatest" style="margin: 16px;" expand="block" fill="outline" (click)="getVersionLatest(server)">
     Check for Updates
     <ion-icon slot="end" name="refresh-outline"></ion-icon>
   </ion-button>
@@ -62,10 +62,11 @@
 
     <ion-item *ngFor="let app of apps" [routerLink]="['apps', 'installed', app.id]">
       <ion-avatar slot="start">
-        <!-- @COMPAT 0.1.1 -->
+        <!-- @COMPAT < 0.1.2 - image path changed to relative in 0.1.2 -->
         <img *ngIf="compareVersions((server['versionInstalled'] | async), '0.1.2') === -1" [src]="app.observe['iconURL'] | async" alt="icon" />
-        <!-- --end. Delete *ngIf below -->
-        <img *ngIf="compareVersions((server['versionInstalled'] | async), '0.1.1') === 1" [src]="iconFullUrl$(server, app) | async" alt="icon" />
+        <!-- --end. Also delete *ngIf below -->
+        <!-- @TODO: custom pipe for [src] iconUrl (<-- see, camel case, like everything else) subscription below -->
+        <img *ngIf="compareVersions((server['versionInstalled'] | async), '0.1.1') === 1" [src]="(s9Host$ | async) + (app.observe['iconURL'] | async)" alt="icon" />
       </ion-avatar>
       <ion-label>
         <h2>{{ app.observe['title'] | async }}</h2>

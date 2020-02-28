@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { AppInstalled, AppModel } from './app-model'
+import { AppModel } from './app-model'
 
 @Injectable({
   providedIn: 'root',

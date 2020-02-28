@@ -130,8 +130,8 @@ export class AppConfigNestedPage {
     const objectSpec = (this.keyval.value as ValueSpecList).spec as ValueSpecObject
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
-      header: `Create ${this.keyval.key}?`,
-      message: `${this.keyval.key} has multiple fields. You will be able to make edits before saving.`,
+      header: `Create ${this.keyval.value.name}?`,
+      message: `${this.keyval.value.name} has multiple fields. You will be able to make edits before saving.`,
       buttons: [
         {
           text: 'Cancel',

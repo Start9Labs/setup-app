@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button [defaultHref]="['/auth', 'servers', serverId]"></ion-back-button>
+      <ion-back-button [defaultHref]="['/auth', 'servers', serverId, 'apps', 'installed', appId]"></ion-back-button>
     </ion-buttons>
     <ion-title>Metrics</ion-title>
   </ion-toolbar>
@@ -15,14 +15,23 @@
 
   <ion-spinner *ngIf="loading" class="center" name="lines" color="warning"></ion-spinner>
 
-  <ion-item-group *ngFor="let metricGroup of metrics | keyvalue : asIsOrder">
-    <ion-item-divider>{{ metricGroup.key }}</ion-item-divider>
-    <ion-item *ngFor="let metric of metricGroup.value | keyvalue : asIsOrder">
+  <ion-item-group *ngIf="!loading && !(metrics | keyvalue)?.length">
+    <ion-item>
+      <ion-label class="ion-text-wrap">
+        <p>
+          No information for {{appTitle$ | async}}.
+        </p>
+      </ion-label>
+    </ion-item>
+  </ion-item-group>
+
+  <ion-item-group>
+    <ion-item *ngFor="let metric of metrics | keyvalue : asIsOrder">
       <ion-label>
         <ion-text color="medium">{{ metric.key }}</ion-text>
       </ion-label>
       <ion-note *ngIf="metric.value" slot="end" class="metric-note">
-        <ion-text style="color: white;">{{ metric.value.value }} {{ metric.value.unit }}</ion-text>
+        <ion-text style="color: white;">{{ metric.value }}</ion-text>
       </ion-note>
     </ion-item>
   </ion-item-group>

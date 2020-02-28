@@ -84,6 +84,13 @@ export function s9UrlNoVersion (zcd: ZeroconfDaemon, server: S9Server | S9Builde
   return `http://${host}${path}`
 }
 
+export function s9HostNoVersion (zcd: ZeroconfDaemon, serverId: S9Server['id']): string {
+  const zeroconf = zcd.getService(serverId)
+  if (!zeroconf) { throw new Error('S9 Server not found on LAN') }
+  const host = getLanIP(zeroconf)
+  return `http://${host}`
+}
+
 export function getAuthHeader (server: S9Server | S9BuilderWith<'privkey'>): { 'Authorization': string } {
   const now = Math.floor(new Date().valueOf() / 1000)
   const tokenPayload = {

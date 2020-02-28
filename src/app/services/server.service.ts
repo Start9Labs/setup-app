@@ -107,6 +107,10 @@ export class ServerService {
     return this.httpService.authServerRequest<Lan.GetAppLogsRes>(serverId, `/apps/${appId}/logs`, { method: Method.get, params: params as any })
   }
 
+  async getAppMetrics (serverId: string, appId: string): Promise<Lan.GetAppMetricsRes> {
+    return this.httpService.authServerRequest<Lan.GetAppMetricsRes>(serverId, `/apps/${appId}/metrics`, { method: Method.get })
+  }
+
   async installApp (serverId: string, appId: string, version: string): Promise<AppInstalled> {
     const data: Lan.PostInstallAppReq = {
       version,
@@ -158,16 +162,20 @@ export class ServerService {
     return this.httpService.authServerRequest<Lan.GetWifiRes>(serverId, `/wifi`, { method: Method.get, timeout })
   }
 
-  async addWifi (serverId: string, ssid: string, password: string): Promise<void> {
+  async addWifi (serverId: string, ssid: string, password: string, country: string): Promise<void> {
     const data: Lan.PostAddWifiReq = {
       ssid,
       password,
+      country,
     }
     await this.httpService.authServerRequest<Lan.PostAddWifiRes>(serverId, `/wifi`, { method: Method.post, data })
   }
 
-  async connectWifi (serverId: string, ssid: string): Promise<void> {
-    await this.httpService.authServerRequest<Lan.PostConnectWifiRes>(serverId, encodeURI(`/wifi/${ssid}`), { method: Method.post })
+  async connectWifi (serverId: string, ssid: string, country: string): Promise<void> {
+    const params: Lan.PostConnectWifiReq = {
+      country,
+    }
+    await this.httpService.authServerRequest<Lan.PostConnectWifiRes>(serverId, encodeURI(`/wifi/${ssid}`), { method: Method.post, params })
   }
 
   async deleteWifi (serverId: string, ssid: string): Promise<void> {
@@ -255,6 +263,10 @@ export class XServerService {
     return mockGetInstalledApp()
   }
 
+  async getAppMetrics (serverId: string, appId: string): Promise<Lan.GetAppMetricsRes> {
+    return mockGetAppMetrics()
+  }
+
   async getInstalledApps (serverId: string): Promise<AppInstalled[]> {
     return mockGetInstalledApps()
   }
@@ -323,11 +335,11 @@ export class XServerService {
     return mockGetWifi()
   }
 
-  async addWifi (serverId: string, ssid: string, password: string): Promise<void> {
+  async addWifi (serverId: string, ssid: string, password: string, country: string): Promise<void> {
     await mockAddWifi()
   }
 
-  async connectWifi (serverId: string, ssid: string): Promise<void> {
+  async connectWifi (serverId: string, ssid: string, country: string): Promise<void> {
     await mockConnectWifi()
   }
 
@@ -385,7 +397,6 @@ async function mockPostUpdateAgent (): Promise<Lan.PostUpdateAgentRes> {
   return { }
 }
 
-
 // @TODO move-to-test-folders
 async function mockGetAvailableApp (): Promise<Lan.GetAppAvailableRes> {
   await pauseFor(1000)
@@ -420,6 +431,12 @@ async function mockGetInstalledApps (): Promise<Lan.GetAppsInstalledRes> {
 async function mockGetAppLogs (): Promise<Lan.GetAppLogsRes> {
   await pauseFor(1000)
   return mockApiAppLogs
+}
+
+// @TODO move-to-test-folders
+async function mockGetAppMetrics (): Promise<Lan.GetAppMetricsRes> {
+  await pauseFor(1000)
+  return mockApiAppMetrics
 }
 
 // @TODO move-to-test-folders
@@ -520,12 +537,12 @@ async function mockShutdownServer (): Promise<Lan.PostShutdownServerRes> {
 
 // @TODO move-to-test-folders
 const mockApiServer: Lan.GetServerRes = {
-  versionInstalled: '0.1.1',
+  versionInstalled: '0.1.4',
   status: ServerStatus.RUNNING,
 }
 
 const mockVersionLatest: Lan.GetVersionLatestRes = {
-  versionLatest: '0.1.2',
+  versionLatest: '0.1.4',
   canUpdate: true,
 }
 
@@ -764,6 +781,11 @@ const mockApiAppLogs: string[] = [
   '[ng] 114 unchanged chunks',
   '****** FINISH *****',
 ]
+
+const mockApiAppMetrics: Lan.GetAppMetricsRes = {
+    Metric1: 'test value',
+    Metric2: 'test value 2',
+}
 
 const mockApiSSHFingerprints: SSHFingerprint[] = [
   {
