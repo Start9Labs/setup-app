@@ -1,0 +1,19 @@
+{
+  "appId": "com.start9labs.start9companion",
+  "appName": "Start9Companion",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "www",
+  "cordova": {
+    "preferences": {
+      "android-minSdkVersion": "23",
+      "android-targetSdkVersion": "29",
+      "StatusBarStyle": "default",
+      "AutoHideSplashScreen": "false",
+      "FadeSplashScreenDuration": "300",
+      "ShowSplashScreenSpinner": "false",
+      "Orientation": "portrait",
+      "WKWebViewOnly": "true"
+    }
+  }
+}

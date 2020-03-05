@@ -1,16 +1,15 @@
 import { Component } from '@angular/core'
-import { AlertController, NavController, LoadingController, ActionSheetController } from '@ionic/angular'
+import { AlertController, NavController, LoadingController, ActionSheetController, ToastController } from '@ionic/angular'
 import { ServerService } from 'src/app/services/server.service'
 import { ActivatedRoute } from '@angular/router'
 import { AppInstalled, AppStatus, AppModel } from 'src/app/models/app-model'
-import { ClipboardService } from 'src/app/services/clipboard.service'
 import { ActionSheetButton } from '@ionic/core'
 import { pauseFor } from 'src/app/util/misc.util'
 import { ServerAppModel } from 'src/app/models/server-app-model'
 import { PropertySubject, peekProperties } from 'src/app/util/property-subject.util'
-import { S9Server, ServerModel } from 'src/app/models/server-model'
-import * as compareVersions from 'compare-versions'
-import { Observable } from 'rxjs'
+import { Plugins } from '@capacitor/core'
+
+const { Clipboard } = Plugins
 
 @Component({
   selector: 'app-installed-show',
@@ -30,10 +29,9 @@ export class AppInstalledShowPage {
     private readonly actionCtrl: ActionSheetController,
     private readonly route: ActivatedRoute,
     private readonly navCtrl: NavController,
-    private readonly clipboardService: ClipboardService,
     private readonly loadingCtrl: LoadingController,
+    private readonly toastCtrl: ToastController,
     private readonly serverService: ServerService,
-    private readonly serverModel: ServerModel,
     private readonly serverAppModel: ServerAppModel,
   ) { }
 
@@ -72,7 +70,18 @@ export class AppInstalledShowPage {
 
   async copyTor () {
     const app = peekProperties(this.app)
-    await this.clipboardService.copy(app.torAddress || '')
+    let message = ''
+    await Clipboard.write({ url: app.torAddress || '' })
+      .then(() => { message = 'copied to clipboard!' })
+      .catch(() => { message = 'failed to copy' })
+
+    const toast = await this.toastCtrl.create({
+      header: message,
+      position: 'bottom',
+      duration: 1000,
+      cssClass: 'notification-toast',
+    })
+    await toast.present()
   }
 
   async presentAction () {

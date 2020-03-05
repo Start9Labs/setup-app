@@ -19,9 +19,9 @@ export class ZeroconfDaemon {
   ) { }
 
   async start (restart: boolean) {
-    // return this.mock()
+    return this.mock()
 
-    if (this.zeroconfSub || !this.platform.is('cordova')) { return }
+    if (this.zeroconfSub || !this.platform.is('mobile')) { return }
 
     console.log('starting zeroconf daemon')
 
