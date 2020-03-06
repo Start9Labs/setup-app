@@ -98,6 +98,7 @@ export class ObjectConfigComponent {
     const modal = await this.modalCtrl.create({
       backdropDismiss: false,
       component: AppConfigValuePage,
+      presentingElement: await this.modalCtrl.getTop(),
       componentProps: {
         spec: keyval.value,
         value: this.config[keyval.key],
@@ -118,6 +119,7 @@ export class ObjectConfigComponent {
     const modal = await this.modalCtrl.create({
       backdropDismiss: false,
       component: AppConfigNestedPage,
+      presentingElement: await this.modalCtrl.getTop(),
       componentProps: {
         keyval,
         value: this.config[keyval.key],
