@@ -6,8 +6,5 @@
   "webDir": "www",
   "server": {
     "iosScheme": "ionic"
-  },
-  "android": {
-
   }
 }
