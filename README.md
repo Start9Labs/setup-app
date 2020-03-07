@@ -23,6 +23,8 @@ build release apk:
 
 `ionic build --prod --release`
 
+`npx cap copy android`
+
 use jarsigner to sign release apk:
 
 `jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore start9-companion-release-key.keystore android/app/build/outputs/apk/release/app-release-unsigned.apk start9-companion`
