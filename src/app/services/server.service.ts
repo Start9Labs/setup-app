@@ -116,13 +116,13 @@ export class ServerService {
       version,
     }
     const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(serverId, `/apps/${appId}/install`, { method: Method.post, data })
-    await this.appModel.get(serverId).createApp(installed)
+    this.appModel.get(serverId).createApp(installed)
     return installed
   }
 
   async uninstallApp (serverId: string, appId: string): Promise<void> {
     await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(serverId, `/apps/${appId}/uninstall`, { method: Method.post, timeout: 30 })
-    await this.appModel.get(serverId).removeApp(appId)
+    this.appModel.get(serverId).removeApp(appId)
   }
 
   async startApp (serverId: string, app: AppInstalled): Promise<void> {

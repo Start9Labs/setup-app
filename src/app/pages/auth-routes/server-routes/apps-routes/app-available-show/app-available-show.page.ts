@@ -133,7 +133,7 @@ async presentAlertDowngrade () {
     await alert.present()
   }
 
-async presentAlertUpgrade () {
+async presentAlertUpdate () {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Confirm',
