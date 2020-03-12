@@ -3,6 +3,7 @@ import { ServerService } from 'src/app/services/server.service'
 import { AppAvailablePreview } from 'src/app/models/app-model'
 import { ActivatedRoute } from '@angular/router'
 import { pauseFor } from 'src/app/util/misc.util'
+import * as compareVersions from 'compare-versions'
 
 @Component({
   selector: 'app-available-list',
@@ -14,6 +15,7 @@ export class AppAvailableListPage {
   error = ''
   apps: AppAvailablePreview[] = []
   serverId: string
+  compareVersions = compareVersions
 
   constructor (
     private readonly route: ActivatedRoute,

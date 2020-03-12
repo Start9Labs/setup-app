@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular'
 
 import { AppInstalledShowPage } from './app-installed-show.page'
 import { StatusComponentModule } from 'src/app/components/status/status.components.module'
+import { VarDirective } from 'src/app/util/ng-var.directive'
 
 const routes: Routes = [
   {
@@ -23,6 +24,6 @@ const routes: Routes = [
     IonicModule,
     RouterModule.forChild(routes),
   ],
-  declarations: [AppInstalledShowPage],
+  declarations: [AppInstalledShowPage, VarDirective],
 })
 export class AppInstalledShowPageModule { }

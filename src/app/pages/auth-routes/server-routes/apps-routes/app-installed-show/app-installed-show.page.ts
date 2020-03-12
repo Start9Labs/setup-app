@@ -8,6 +8,7 @@ import { pauseFor } from 'src/app/util/misc.util'
 import { ServerAppModel } from 'src/app/models/server-app-model'
 import { PropertySubject, peekProperties } from 'src/app/util/property-subject.util'
 import { Plugins } from '@capacitor/core'
+import * as compareVersions from 'compare-versions'
 
 const { Clipboard } = Plugins
 
@@ -23,6 +24,8 @@ export class AppInstalledShowPage {
   appId: string
   serverId: string
   appModel: AppModel
+  versionLatest: string
+  compareVersions = compareVersions
 
   constructor (
     private readonly alertCtrl: AlertController,
@@ -68,6 +71,65 @@ export class AppInstalledShowPage {
     }
   }
 
+  async getVersionLatest () {
+    const loader = await this.loadingCtrl.create({
+      message: `Checking for updates...`,
+      spinner: 'lines',
+      cssClass: 'loader',
+    })
+    await loader.present()
+
+    try {
+      const { versionLatest } = await this.serverService.getAvailableApp(this.serverId, this.appId)
+      this.versionLatest = versionLatest
+    } catch (e) {
+      this.error = e.message
+    } finally {
+      await loader.dismiss()
+    }
+  }
+
+  async presentAlertUpdate () {
+    const app = peekProperties(this.app)
+
+    const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
+      header: 'Confirm',
+      message: `Are you sure you want to update ${app.title} from ${app.versionInstalled} to ${this.versionLatest}?`,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: 'Update',
+          cssClass: 'alert-success',
+          handler: () => {
+            this.update()
+          },
+        },
+      ],
+    })
+    await alert.present()
+  }
+
+  async update () {
+    const loader = await this.loadingCtrl.create({
+      spinner: 'lines',
+      cssClass: 'loader',
+    })
+    await loader.present()
+
+    try {
+      const installed = await this.serverService.installApp(this.serverId, this.appId, this.versionLatest)
+      this.appModel.updateApp(installed)
+    } catch (e) {
+      this.error = e.message
+    } finally {
+      await loader.dismiss()
+    }
+  }
+
   async copyTor () {
     const app = peekProperties(this.app)
     let message = ''
@@ -86,6 +148,7 @@ export class AppInstalledShowPage {
 
   async presentAction () {
     const app = peekProperties(this.app)
+
     const buttons : ActionSheetButton[] = []
 
     if (([
@@ -155,6 +218,7 @@ export class AppInstalledShowPage {
 
   async stop (): Promise<void> {
     const app = peekProperties(this.app)
+
     const loader = await this.loadingCtrl.create({
       message: `Stopping ${app.title}. This could take a while...`,
       spinner: 'lines',
@@ -163,7 +227,7 @@ export class AppInstalledShowPage {
     await loader.present()
 
     try {
-      await this.serverService.stopApp(this.serverId, app)
+      await this.serverService.stopApp(this.serverId, this.appId)
 
     } catch (e) {
       this.error = e.message
@@ -174,6 +238,7 @@ export class AppInstalledShowPage {
 
   async start (): Promise<void> {
     const app = peekProperties(this.app)
+
     const loader = await this.loadingCtrl.create({
       message: `Starting ${app.title}...`,
       spinner: 'lines',
@@ -182,7 +247,7 @@ export class AppInstalledShowPage {
     await loader.present()
 
     try {
-      await this.serverService.startApp(this.serverId, app)
+      await this.serverService.startApp(this.serverId, this.appId)
     } catch (e) {
       this.error = e.message
     } finally {

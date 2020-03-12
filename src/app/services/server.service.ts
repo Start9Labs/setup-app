@@ -24,7 +24,6 @@ export class ServerService {
   }
 
   async getVersionLatest (serverId: string): Promise<Lan.GetVersionLatestRes> {
-    console.log(`Getting version lated for serverId ${serverId}`)
     const server = this.serverModel.peekServer(serverId)
     return this.httpService.serverRequest<Lan.GetVersionLatestRes>(server, '/versionLatest', { method: Method.get }, false)
   }
@@ -115,24 +114,21 @@ export class ServerService {
     const data: Lan.PostInstallAppReq = {
       version,
     }
-    const installed = await this.httpService.authServerRequest<Lan.PostInstallAppRes>(serverId, `/apps/${appId}/install`, { method: Method.post, data })
-    this.appModel.get(serverId).createApp(installed)
-    return installed
+    return this.httpService.authServerRequest<Lan.PostInstallAppRes>(serverId, `/apps/${appId}/install`, { method: Method.post, data })
   }
 
   async uninstallApp (serverId: string, appId: string): Promise<void> {
     await this.httpService.authServerRequest<Lan.PostUninstallAppRes>(serverId, `/apps/${appId}/uninstall`, { method: Method.post, timeout: 30 })
-    this.appModel.get(serverId).removeApp(appId)
   }
 
-  async startApp (serverId: string, app: AppInstalled): Promise<void> {
-    await this.httpService.authServerRequest<Lan.PostStartAppRes>(serverId, `/apps/${app.id}/start`, { method: Method.post, timeout: 30 })
-    this.appModel.get(serverId).updateApp({ id: app.id, status: AppStatus.RUNNING, statusAt: new Date().toISOString() })
+  async startApp (serverId: string, appId: string): Promise<void> {
+    await this.httpService.authServerRequest<Lan.PostStartAppRes>(serverId, `/apps/${appId}/start`, { method: Method.post, timeout: 30 })
+    this.appModel.get(serverId).updateApp({ id: appId, status: AppStatus.RUNNING, statusAt: new Date().toISOString() })
   }
 
-  async stopApp (serverId: string, app: AppInstalled): Promise<void> {
-    await this.httpService.authServerRequest<Lan.PostStopAppRes>(serverId, `/apps/${app.id}/stop`, { method: Method.post, timeout: 30 })
-    this.appModel.get(serverId).updateApp({ id: app.id, status: AppStatus.STOPPED, statusAt: new Date().toISOString() })
+  async stopApp (serverId: string, appId: string): Promise<void> {
+    await this.httpService.authServerRequest<Lan.PostStopAppRes>(serverId, `/apps/${appId}/stop`, { method: Method.post, timeout: 30 })
+    this.appModel.get(serverId).updateApp({ id: appId, status: AppStatus.STOPPED, statusAt: new Date().toISOString() })
   }
 
   async updateAppConfig (serverId: string, app: AppInstalled, config: object): Promise<void> {
@@ -291,24 +287,21 @@ export class XServerService {
   }
 
   async installApp (serverId: string, appId: string, version: string): Promise<AppInstalled> {
-    const installed = await mockInstallApp()
-    await this.appModel.get(serverId).createApp(installed)
-    return installed
+    return mockInstallApp()
   }
 
   async uninstallApp (serverId: string, appId: string): Promise<void> {
     await mockUninstallApp()
-    await this.appModel.get(serverId).removeApp(appId)
   }
 
-  async startApp (serverId: string, app: AppInstalled): Promise<void> {
+  async startApp (serverId: string, appId: string): Promise<void> {
     await mockStartApp()
-    app.status = AppStatus.RUNNING
-    app.statusAt = new Date().toISOString()
+    this.appModel.get(serverId).updateApp({ id: appId, status: AppStatus.RUNNING, statusAt: new Date().toISOString() })
   }
 
-  async stopApp (serverId: string, app: AppInstalled): Promise<void> {
+  async stopApp (serverId: string, appId: string): Promise<void> {
     await mockStopApp()
+    this.appModel.get(serverId).updateApp({ id: appId, status: AppStatus.STOPPED, statusAt: new Date().toISOString() })
   }
 
   async updateAppConfig (serverId: string, app: AppInstalled, config: object): Promise<void> {
@@ -448,7 +441,7 @@ async function mockGetAppConfig (): Promise<Lan.GetAppConfigRes> {
 // @TODO move-to-test-folders
 async function mockInstallApp (): Promise<Lan.PostInstallAppRes> {
   await pauseFor(1000)
-  return mockApiAppsInstalled[0]
+  return mockApiAppInstalledFresh
 }
 
 // @TODO move-to-test-folders
@@ -629,7 +622,7 @@ const mockApiServerSpecs: Lan.GetServerSpecsRes = {
 const mockApiAppsAvailablePreview: ApiAppAvailablePreview[] = [
   {
     id: 'bitcoind',
-    versionLatest: '0.19.0',
+    versionLatest: '0.19.1',
     versionInstalled: '0.19.0',
     status: AppStatus.UNKNOWN,
     statusAt: new Date().toISOString(),
@@ -697,6 +690,16 @@ const mockApiAppsInstalled: ApiAppInstalled[] = [
     iconURL: 'assets/img/cups.png',
   },
 ]
+
+const mockApiAppInstalledFresh =   {
+  id: 'bitcoind',
+  versionInstalled: '0.19.1',
+  title: 'Bitcoin Core',
+  torAddress: 'sample-bitcoin-tor-address.onion',
+  status: AppStatus.INSTALLING,
+  statusAt: new Date().toISOString(),
+  iconURL: 'assets/img/bitcoin_core.png',
+}
 
 // @TODO move-to-test-folders
 const mockApiAppLogs: string[] = [

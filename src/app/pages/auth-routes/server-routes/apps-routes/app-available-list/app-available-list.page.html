@@ -28,17 +28,26 @@
         </ion-avatar>
         <ion-label>
           <h1>{{ app.title }}</h1>
-          <ion-text *ngIf="app.versionInstalled" color="success">
-            <h2 *ngIf="app.status !== 'INSTALLING'">Installed</h2>
+          <!-- installed -->
+          <ng-container *ngIf="app.versionInstalled">
+            <!-- not actively installing -->
+            <ng-container *ngIf="app.status !== 'INSTALLING'">
+              <h2 *ngIf="compareVersions(app.versionLatest, app.versionInstalled) !== 1">
+                <ion-text color="success">Installed</ion-text>
+              </h2>
+              <h2 *ngIf="compareVersions(app.versionLatest, app.versionInstalled) === 1">
+                <ion-text color="primary">Update Available</ion-text>
+              </h2>
+            </ng-container>
+            <!-- actively installing -->
             <h2 *ngIf="app.status === 'INSTALLING'">
               <ion-text color="primary">Installing...</ion-text>
             </h2>
-          </ion-text>
-          <div *ngIf="!app.versionInstalled">
-            <ion-text *ngIf="app.status !== 'INSTALLING'" color="warning">
-              <h2>Not installed</h2>
-            </ion-text>
-          </div>
+          </ng-container>
+          <!-- not installed -->
+          <h2 *ngIf="!app.versionInstalled">
+            <ion-text color="warning">Not installed</ion-text>
+          </h2>
         </ion-label>
       </ion-item>
       <ion-card-content>
