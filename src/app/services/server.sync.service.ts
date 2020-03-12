@@ -41,7 +41,7 @@ export class SyncNotifier {
           side: 'start',
           icon: 'close',
           handler: () => {
-            true
+            return true
           },
         },
         {

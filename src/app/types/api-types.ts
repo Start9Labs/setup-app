@@ -45,6 +45,7 @@ export interface ApiServer011 {
 export interface ApiServer012 {
   status: ServerStatus
   versionInstalled: string
+  notifications: S9Notification[]
 }
 
 export interface ApiAppConfig {

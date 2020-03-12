@@ -536,9 +536,47 @@ async function mockShutdownServer (): Promise<Lan.PostShutdownServerRes> {
 }
 
 // @TODO move-to-test-folders
+const mockApiNotifications: Lan.GetNotificationsRes = [
+  {
+    id: '123e4567-e89b-12d3-a456-426655440000',
+    appId: 'bitcoind',
+    createdAt: '2019-12-26T14:20:30.872Z',
+    code: '101',
+    title: 'Install Complete',
+    message: 'Installation of bitcoind has completed successfully.',
+  },
+  {
+    id: '123e4567-e89b-12d3-a456-426655440001',
+    appId: 'bitcoind',
+    createdAt: '2019-12-26T14:20:30.872Z',
+    code: '201',
+    title: 'SSH Key Added',
+    message: 'A new SSH key was added. If you did not do this, shit is bad.',
+  },
+  {
+    id: '123e4567-e89b-12d3-a456-426655440002',
+    appId: 'bitcoind',
+    createdAt: '2019-12-26T14:20:30.872Z',
+    code: '002',
+    title: 'SSH Key Removed',
+    message: 'A SSH key was removed.',
+  },
+  {
+    id: '123e4567-e89b-12d3-a456-426655440003',
+    appId: 'bitcoind',
+    createdAt: '2019-12-26T14:20:30.872Z',
+    code: '310',
+    title: 'App Crashed',
+    message: 'Bitcoind has crashed',
+  },
+]
+
+// @TODO move-to-test-folders
 const mockApiServer: Lan.GetServerRes = {
   versionInstalled: '0.1.4',
   status: ServerStatus.RUNNING,
+  notifications: [],
+  // notifications: mockApiNotifications,
 }
 
 const mockVersionLatest: Lan.GetVersionLatestRes = {
@@ -586,42 +624,6 @@ const mockApiServerSpecs: Lan.GetServerSpecsRes = {
   'Ethernet': 'Gigabit',
   'Disk': '512 GB Flash (280 GB available)',
 }
-
-// @TODO move-to-test-folders
-const mockApiNotifications: Lan.GetNotificationsRes = [
-  {
-    id: '123e4567-e89b-12d3-a456-426655440000',
-    appId: 'bitcoind',
-    createdAt: '2019-12-26T14:20:30.872Z',
-    code: '101',
-    title: 'Install Complete',
-    message: 'Installation of bitcoind has completed successfully.',
-  },
-  {
-    id: '123e4567-e89b-12d3-a456-426655440001',
-    appId: 'bitcoind',
-    createdAt: '2019-12-26T14:20:30.872Z',
-    code: '201',
-    title: 'SSH Key Added',
-    message: 'A new SSH key was added. If you did not do this, shit is bad.',
-  },
-  {
-    id: '123e4567-e89b-12d3-a456-426655440002',
-    appId: 'bitcoind',
-    createdAt: '2019-12-26T14:20:30.872Z',
-    code: '002',
-    title: 'SSH Key Removed',
-    message: 'A SSH key was removed.',
-  },
-  {
-    id: '123e4567-e89b-12d3-a456-426655440003',
-    appId: 'bitcoind',
-    createdAt: '2019-12-26T14:20:30.872Z',
-    code: '310',
-    title: 'App Crashed',
-    message: 'Bitcoind has crashed',
-  },
-]
 
 // @TODO move-to-test-folders
 const mockApiAppsAvailablePreview: ApiAppAvailablePreview[] = [
