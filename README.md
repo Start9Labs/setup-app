@@ -4,7 +4,7 @@
 
 **Make sure you have git, node, and npm installed**
 
-`npm i -g ionic cordova`
+`npm i -g @ionic/cli cordova`
 
 `git clone https://github.com/Start9Labs/companion-app.git`
 
