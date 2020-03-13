@@ -15,7 +15,7 @@ export const Wifi = (handler) => ({
 } as ActionSheetButton)
 
 export const ServerSpecs = (handler) => ({
-    text: 'About This Server',
+    text: 'About',
     icon: 'information-circle-outline',
     handler: () => { handler() },
 } as ActionSheetButton)

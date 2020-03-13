@@ -111,9 +111,9 @@ export class ServerShowPage {
 
       if (server.status === ServerStatus.RUNNING) {
         buttons.push(
-          Menu.Wifi(() => this.navigate(['wifi'])),
           Menu.ServerSpecs(() => this.navigate(['specs'])),
           Menu.Metrics(() => this.navigate(['metrics'])),
+          Menu.Wifi(() => this.navigate(['wifi'])),
           Menu.DeveloperOptions(() => this.navigate(['developer-options'])),
           Menu.Restart(() => this.presentAlertRestart(server)),
           Menu.Shutdown(() => this.presentAlertShutdown(server)),

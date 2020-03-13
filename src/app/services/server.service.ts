@@ -375,7 +375,8 @@ async function mockGetServerMetrics (): Promise<Lan.GetServerMetricsRes> {
 // @TODO move-to-test-folders
 async function mockGetNotifications (): Promise<Lan.GetNotificationsRes> {
   await pauseFor(1000)
-  return mockApiNotifications.concat(mockApiNotifications).concat(mockApiNotifications)
+  function cloneAndChange (arr: S9Notification[], letter: string) { return JSON.parse(JSON.stringify(arr)).map(a => { a.id = a.id + letter; return a }) }
+  return mockApiNotifications.concat(cloneAndChange(mockApiNotifications, 'a')).concat(cloneAndChange(mockApiNotifications, 'b'))
 }
 
 // @TODO move-to-test-folders

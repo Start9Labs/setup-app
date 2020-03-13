@@ -24,7 +24,7 @@ export class AppInstalledShowPage {
   appId: string
   serverId: string
   appModel: AppModel
-  versionLatest: string
+  showUpdate = true
   compareVersions = compareVersions
 
   constructor (
@@ -71,7 +71,9 @@ export class AppInstalledShowPage {
     }
   }
 
-  async getVersionLatest () {
+  async checkForUpdates () {
+    const app = peekProperties(this.app)
+
     const loader = await this.loadingCtrl.create({
       message: `Checking for updates...`,
       spinner: 'lines',
@@ -81,7 +83,10 @@ export class AppInstalledShowPage {
 
     try {
       const { versionLatest } = await this.serverService.getAvailableApp(this.serverId, this.appId)
-      this.versionLatest = versionLatest
+      if (this.compareVersions(versionLatest, app.versionInstalled!) === 1) {
+        await this.presentAlertUpdate(app, versionLatest)
+      }
+      this.showUpdate = false
     } catch (e) {
       this.error = e.message
     } finally {
@@ -89,45 +94,26 @@ export class AppInstalledShowPage {
     }
   }
 
-  async presentAlertUpdate () {
-    const app = peekProperties(this.app)
-
+  async presentAlertUpdate (app: AppInstalled, versionLatest: string) {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
-      header: 'Confirm',
-      message: `Are you sure you want to update ${app.title} from ${app.versionInstalled} to ${this.versionLatest}?`,
+      header: 'Update Available',
+      message: `New version ${versionLatest} found for ${app.title}.`,
       buttons: [
         {
           text: 'Cancel',
           role: 'cancel',
         },
         {
-          text: 'Update',
+          text: 'View in Store',
           cssClass: 'alert-success',
           handler: () => {
-            this.update()
+            this.navigate(['/auth', 'servers', this.serverId, 'apps', 'available', this.appId])
           },
         },
       ],
     })
     await alert.present()
-  }
-
-  async update () {
-    const loader = await this.loadingCtrl.create({
-      spinner: 'lines',
-      cssClass: 'loader',
-    })
-    await loader.present()
-
-    try {
-      const installed = await this.serverService.installApp(this.serverId, this.appId, this.versionLatest)
-      this.appModel.updateApp(installed)
-    } catch (e) {
-      this.error = e.message
-    } finally {
-      await loader.dismiss()
-    }
   }
 
   async copyTor () {
@@ -172,14 +158,14 @@ export class AppInstalledShowPage {
     if (app.status === AppStatus.RUNNING) {
       buttons.push(
         {
-          text: 'View Logs',
+          text: 'Logs',
           icon: 'newspaper-outline',
           handler: () => {
             this.navigate(['logs'])
           },
         },
         {
-          text: 'View Metrics',
+          text: 'Metrics',
           icon: 'pulse',
           handler: () => {
             this.navigate(['metrics'])
@@ -190,10 +176,10 @@ export class AppInstalledShowPage {
 
     buttons.push(
       {
-        text: 'Store Listing',
+        text: 'View in Store',
         icon: 'aperture-outline',
         handler: () => {
-          this.navigate(['/auth', 'servers', this.serverId, 'apps', 'available', app.id])
+          this.navigate(['/auth', 'servers', this.serverId, 'apps', 'available', this.appId])
         },
       },
     )
@@ -214,6 +200,10 @@ export class AppInstalledShowPage {
     })
 
     await action.present()
+  }
+
+  async goToStore () {
+
   }
 
   async stop (): Promise<void> {
@@ -257,6 +247,7 @@ export class AppInstalledShowPage {
 
   async presentAlertUninstall () {
     const app = peekProperties(this.app)
+
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Caution',
@@ -280,6 +271,7 @@ export class AppInstalledShowPage {
 
   async uninstall (): Promise<void> {
     const app = peekProperties(this.app)
+
     const loader = await this.loadingCtrl.create({
       message: `Uninstalling ${app.title}`,
       spinner: 'lines',
