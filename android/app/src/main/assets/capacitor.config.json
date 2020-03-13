@@ -1,6 +1,6 @@
 {
   "appId": "com.start9labs.start9companion",
-  "appName": "Start9Companion",
+  "appName": "Start9 Companion",
   "bundledWebRuntime": false,
   "npmClient": "npm",
   "webDir": "www",
