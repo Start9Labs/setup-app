@@ -12,7 +12,7 @@ import { ServerAppModel } from '../models/server-app-model'
 @Injectable({
   providedIn: 'root',
 })
-export class ServerService {
+export class XServerService {
   constructor (
     private readonly httpService: HttpNativeService,
     private readonly appModel: ServerAppModel,
@@ -197,7 +197,7 @@ export class ServerService {
 @Injectable({
   providedIn: 'root',
 })
-export class XServerService {
+export class ServerService {
 
   constructor (
     private readonly appModel: ServerAppModel,

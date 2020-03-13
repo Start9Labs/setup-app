@@ -3,7 +3,7 @@ import { Directive, Input, ViewContainerRef, TemplateRef } from '@angular/core'
 @Directive({
   selector: '[ngVar]',
 })
-export class VarDirective {
+export class NgVarDirective {
   @Input()
   set ngVar (context: any) {
     this.context.$implicit = this.context.ngVar = context
