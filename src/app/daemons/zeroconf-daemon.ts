@@ -19,7 +19,7 @@ export class ZeroconfDaemon {
   ) { }
 
   async start (restart: boolean) {
-    // return this.mock()
+    return this.mock()
 
     if (this.zeroconfSub || !this.platform.is('mobile')) { return }
 

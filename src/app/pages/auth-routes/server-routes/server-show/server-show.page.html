@@ -6,7 +6,7 @@
     <ion-title>{{ server['label'] | async }}</ion-title>
     <ion-buttons slot="end" class="ion-padding-end">
       <ion-button class="notification-button" [routerLink]="['/auth', 'servers', serverId, 'notifications']" color="primary">
-        <ion-badge *ngIf="server['badge'] | async as badge" color="danger">{{ badge }}</ion-badge>
+        <ion-badge *ngIf="server.badge | async as badge" color="danger">{{ badge }}</ion-badge>
         <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
       </ion-button>
       <ion-button (click)="presentAction(server)" color="primary">
@@ -56,7 +56,7 @@
     <ion-item-divider>Apps Installed</ion-item-divider>
 
     <ion-item *ngFor="let app of apps" [routerLink]="['apps', 'installed', app.id]">
-      <ng-container *ngVar="app.observe.iconURL | async">
+      <ng-container *ngVar="app.observe.iconURL | async as iconURL">
         <ion-avatar slot="start">
           <!-- @COMPAT < 0.1.2 - image path changed to relative in 0.1.2 -->
           <img *ngIf="compareVersions(vars.versionInstalled, '0.1.2') === -1" [src]="iconURL" alt="avatar" />

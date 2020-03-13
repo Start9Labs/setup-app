@@ -28,21 +28,21 @@
 
     <ion-item-group>
       <ion-item>
-        <ion-label position="stacked">Status</ion-label>
-        <h2><s9-status [appStatus]="vars.status"></s9-status></h2>
-        <ion-note slot="end">
-          <ng-container *ngIf="vars.status !== 'INSTALLING'">
-            <ion-button *ngIf="['NEEDS_CONFIG', 'RECOVERABLE'].includes(vars.status)" [routerLink]="['config']" fill="outline" color="warning">
-              Config
-            </ion-button>
-            <ion-button *ngIf="vars.status === 'STOPPED'" (click)="start()" fill="outline" color="success">
-              Start
-            </ion-button>
-            <ion-button *ngIf="['RUNNING', 'RESTARTING'].includes(vars.status)" (click)="stop()" fill="outline" color="danger">
-              Stop
-            </ion-button>
-          </ng-container>
-        </ion-note>
+        <ion-label>
+          <p>Status</p>
+          <h2><s9-status [appStatus]="vars.status"></s9-status></h2>
+        </ion-label>
+        <ng-container *ngIf="vars.status !== 'INSTALLING'">
+          <ion-button slot="end" *ngIf="['NEEDS_CONFIG', 'RECOVERABLE'].includes(vars.status)" [routerLink]="['config']" fill="outline" color="warning">
+            Config
+          </ion-button>
+          <ion-button slot="end" *ngIf="vars.status === 'STOPPED'" (click)="start()" fill="outline" color="success">
+            Start
+          </ion-button>
+          <ion-button slot="end" *ngIf="['RUNNING', 'RESTARTING'].includes(vars.status)" (click)="stop()" fill="outline" color="danger">
+            Stop
+          </ion-button>
+        </ng-container>
       </ion-item>
     </ion-item-group>
 
