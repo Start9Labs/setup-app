@@ -281,6 +281,7 @@ export class AppInstalledShowPage {
 
     try {
       await this.serverService.uninstallApp(this.serverId, this.appId)
+      this.appModel.removeApp(this.appId)
       await this.navCtrl.pop()
     } catch (e) {
       this.error = e.message
