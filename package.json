@@ -1,6 +1,6 @@
 {
   "name": "start9-companion",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "author": "Start9 Labs",
   "homepage": "https://start9labs.com",
   "scripts": {
@@ -20,13 +20,11 @@
     "@angular/platform-browser": "~9.0.1",
     "@angular/platform-browser-dynamic": "~9.0.1",
     "@angular/router": "~9.0.1",
-    "@ionic-native/clipboard": "^5.20.0",
+    "@capacitor/android": "^1.5.1",
+    "@capacitor/core": "1.5.1",
+    "@capacitor/ios": "^1.5.1",
     "@ionic-native/core": "^5.20.0",
     "@ionic-native/http": "^5.20.0",
-    "@ionic-native/network": "^5.20.0",
-    "@ionic-native/secure-storage": "^5.20.0",
-    "@ionic-native/splash-screen": "^5.20.0",
-    "@ionic-native/status-bar": "^5.20.0",
     "@ionic-native/zeroconf": "^5.20.0",
     "@ionic/angular": "^5.0.0",
     "@ionic/storage": "^2.2.0",
@@ -34,23 +32,11 @@
     "bitcoinjs-lib": "^5.1.7",
     "buffer": "^5.4.3",
     "compare-versions": "^3.5.1",
-    "cordova-android": "^8.1.0",
-    "cordova-clipboard": "^1.3.0",
-    "cordova-ios": "^5.1.1",
-    "cordova-plugin-add-swift-support": "^2.0.1",
     "cordova-plugin-advanced-http": "^2.4.0",
-    "cordova-plugin-device": "^2.0.2",
     "cordova-plugin-file": "^6.0.2",
-    "cordova-plugin-ionic-keyboard": "^2.2.0",
-    "cordova-plugin-ionic-webview": "^4.1.2",
-    "cordova-plugin-network-information": "^2.0.2",
-    "cordova-plugin-splashscreen": "^5.0.2",
-    "cordova-plugin-statusbar": "^2.4.2",
-    "cordova-plugin-whitelist": "^1.3.3",
     "cordova-plugin-zeroconf": "^1.4.0",
     "core-js": "^3.4.1",
     "crypto-js": "^3.1.9-1",
-    "es6-promise-plugin": "^4.1.0",
     "jsontokens": "3.0.0",
     "rxjs": "~6.5.3",
     "tslib": "^1.10.0",
@@ -66,6 +52,7 @@
     "@angular/compiler": "9.0.1",
     "@angular/compiler-cli": "9.0.1",
     "@angular/language-service": "~9.0.1",
+    "@capacitor/cli": "1.5.1",
     "@ionic/angular-toolkit": "^2.1.2",
     "@ionic/lab": "^3.0.1",
     "@types/crypto-js": "^3.1.43",
@@ -88,24 +75,10 @@
   "description": "Companion app for the Start9 Personal Server",
   "cordova": {
     "plugins": {
-      "cordova-plugin-whitelist": {},
-      "cordova-plugin-statusbar": {},
-      "cordova-plugin-device": {},
-      "cordova-plugin-splashscreen": {},
-      "cordova-plugin-ionic-webview": {
-        "ANDROID_SUPPORT_ANNOTATIONS_VERSION": "27.+"
-      },
-      "cordova-plugin-ionic-keyboard": {},
       "cordova-plugin-zeroconf": {},
-      "cordova-plugin-network-information": {},
-      "cordova-clipboard": {},
       "cordova-plugin-advanced-http": {
         "OKHTTP_VERSION": "3.10.0"
       }
-    },
-    "platforms": [
-      "android",
-      "ios"
-    ]
+    }
   }
 }

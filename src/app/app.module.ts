@@ -7,14 +7,9 @@ import { IonicStorageModule } from '@ionic/storage'
 import { HttpClientModule } from '@angular/common/http'
 import { AppComponent } from './app.component'
 import { AppRoutingModule } from './app-routing.module'
-// native
-import { Clipboard } from '@ionic-native/clipboard/ngx'
-import { Network } from '@ionic-native/network/ngx'
-import { SecureStorage } from '@ionic-native/secure-storage/ngx'
-import { SplashScreen } from '@ionic-native/splash-screen/ngx'
-import { StatusBar } from '@ionic-native/status-bar/ngx'
-import { Zeroconf } from '@ionic-native/zeroconf/ngx'
 import { AuthenticatePageModule } from './modals/authenticate/authenticate.module'
+// native
+import { Zeroconf } from '@ionic-native/zeroconf/ngx'
 import { HTTP } from '@ionic-native/http/ngx'
 
 @NgModule({
@@ -30,12 +25,7 @@ import { HTTP } from '@ionic-native/http/ngx'
   ],
   providers: [
     // native
-    Clipboard,
-    SecureStorage,
-    StatusBar,
-    SplashScreen,
     Zeroconf,
-    Network,
     HTTP,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
   ],

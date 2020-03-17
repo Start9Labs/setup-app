@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="['/auth', 'servers', serverId]"></ion-back-button>
     </ion-buttons>
-    <ion-title>{{ app['title'] | async }}</ion-title>
+    <ion-title>{{ app.title | async }}</ion-title>
     <ion-buttons slot="end" class="ion-padding-end">
       <ion-button (click)="presentAction()" color="primary">
         <ion-icon name="ellipsis-vertical-outline"></ion-icon>
@@ -12,7 +12,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content *ngVar="{ status: app.status | async, versionInstalled: app.versionInstalled | async } as vars">
 
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content pullingIcon="lines" refreshingSpinner="lines"></ion-refresher-content>
@@ -24,64 +24,69 @@
 
   <ion-spinner *ngIf="loading" class="center" name="lines" color="warning"></ion-spinner>
 
-  <div *ngIf="!loading">
+  <ng-container *ngIf="!loading">
 
     <ion-item-group>
       <ion-item>
-        <ion-label position="stacked">Status</ion-label>
-        <h5>
-          <s9-status [appStatus]="app['status'] | async"></s9-status>
-        </h5>
-      </ion-item>
-    </ion-item-group>
-
-    <ion-button *ngIf="['NEEDS_CONFIG', 'RECOVERABLE'].includes(app['status'] | async)" style="margin: 16px 0;"
-      expand="block" fill="outline" color="warning" [routerLink]="['config']">
-      Config
-    </ion-button>
-
-    <ion-button *ngIf="(app['status'] | async) === 'STOPPED'" style="margin: 16px 0;" expand="block" fill="outline"
-      color="success" (click)="start()">
-      Start
-    </ion-button>
-
-    <ion-button *ngIf="['RUNNING', 'RESTARTING'].includes(app['status'] | async)" style="margin: 16px 0;"
-      expand="block" fill="outline" color="danger" (click)="stop()">
-      Stop
-    </ion-button>
-
-    <ion-button *ngIf="(app['status'] | async) === 'DEAD'" style="margin: 16px 0;" expand="block" fill="outline"
-      color="primary" (click)="presentAlertUninstall()">
-      Force Uninstall
-    </ion-button>
-
-    <ion-item-group class="ion-text-wrap" *ngIf="(app['versionInstalled'] | async) && (app['status'] | async) !== 'INSTALLING'">
-      <ion-item-divider></ion-item-divider>
-      <ion-item>
-        <ion-label position="stacked">App ID</ion-label>
-        <ion-text color="medium">
-          <h5>{{ app['id'] | async }}</h5>
-        </ion-text>
-      </ion-item>
-      <ion-item>
-        <ion-label position="stacked">Version</ion-label>
-        <ion-text color="medium">
-          <h5>{{ app['versionInstalled'] | async }}</h5>
-        </ion-text>
-      </ion-item>
-      <ion-item *ngIf="app['torAddress'] | async">
-        <ion-label position="stacked">Tor Address</ion-label>
-        <ion-text style="word-break: break-all;" color="medium">
-          <h5>{{ app['torAddress'] | async }}</h5>
-        </ion-text>
-        <ion-note slot="end">
-          <ion-button (click)="copyTor()" fill="outline" size="small">
-            Copy
+        <ion-label>
+          <p>Status</p>
+          <h2><s9-status [appStatus]="vars.status"></s9-status></h2>
+        </ion-label>
+        <ng-container *ngIf="vars.status !== 'INSTALLING'">
+          <ion-button slot="end" *ngIf="['NEEDS_CONFIG', 'RECOVERABLE'].includes(vars.status)" [routerLink]="['config']" fill="outline" color="warning">
+            Config
           </ion-button>
-        </ion-note>
+          <ion-button slot="end" *ngIf="vars.status === 'STOPPED'" (click)="start()" fill="outline" color="success">
+            Start
+          </ion-button>
+          <ion-button slot="end" *ngIf="['RUNNING', 'RESTARTING'].includes(vars.status)" (click)="stop()" fill="outline" color="danger">
+            Stop
+          </ion-button>
+        </ng-container>
       </ion-item>
     </ion-item-group>
 
-  </div>
+    <ng-container *ngIf="vars.status !== 'INSTALLING'">
+
+      <ion-button *ngIf="showUpdate" style="margin: 16px;" expand="block" fill="outline" (click)="checkForUpdates()">
+        Check for Updates
+        <ion-icon slot="end" name="refresh-outline"></ion-icon>
+      </ion-button>
+
+      <ion-button *ngIf="vars.status === 'DEAD'" style="margin: 16px;" expand="block" fill="outline"
+        color="primary" (click)="presentAlertUninstall()">
+        Force Uninstall
+      </ion-button>
+
+      <ion-item-group class="ion-text-wrap" *ngIf="vars.versionInstalled">
+        <ion-item-divider>About</ion-item-divider>
+        <ion-item>
+          <ion-label position="stacked">App ID</ion-label>
+          <ion-text color="medium">
+            <h5>{{ app.id | async }}</h5>
+          </ion-text>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Version</ion-label>
+          <ion-text color="medium">
+            <h5>{{ vars.versionInstalled }}</h5>
+          </ion-text>
+        </ion-item>
+        <ion-item *ngIf="app.torAddress | async as torAddress">
+          <ion-label position="stacked">Tor Address</ion-label>
+          <ion-text style="word-break: break-all;" color="medium">
+            <h5>{{ torAddress }}</h5>
+          </ion-text>
+          <ion-note slot="end">
+            <ion-button (click)="copyTor()" fill="outline" size="small">
+              Copy
+            </ion-button>
+          </ion-note>
+        </ion-item>
+      </ion-item-group>
+
+    </ng-container>
+
+  </ng-container>
 
 </ion-content>

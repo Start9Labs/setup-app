@@ -1,10 +1,11 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { AppAvailableFull } from 'src/app/models/app-model'
+import { AppAvailableFull, AppModel } from 'src/app/models/app-model'
 import { ServerService } from 'src/app/services/server.service'
 import { NavController, AlertController, LoadingController } from '@ionic/angular'
 import * as compareVersions from 'compare-versions'
 import { pauseFor } from 'src/app/util/misc.util'
+import { ServerAppModel } from 'src/app/models/server-app-model'
 
 @Component({
   selector: 'app-available-show',
@@ -16,6 +17,7 @@ export class AppAvailableShowPage {
   error = ''
   serverId: string
   app: AppAvailableFull = { } as AppAvailableFull
+  appModel: AppModel
   compareVersions = compareVersions
 
   constructor (
@@ -24,11 +26,13 @@ export class AppAvailableShowPage {
     private readonly serverService: ServerService,
     private readonly alertCtrl: AlertController,
     private readonly loadingCtrl: LoadingController,
+    private readonly serverAppModel: ServerAppModel,
   ) { }
 
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
     const appId = this.route.snapshot.paramMap.get('appId') as string
+    this.appModel = this.serverAppModel.get(this.serverId)
 
     try {
       const [app] = await Promise.all([
@@ -133,7 +137,7 @@ async presentAlertDowngrade () {
     await alert.present()
   }
 
-async presentAlertUpgrade () {
+  async presentAlertUpdate () {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Confirm',
@@ -147,7 +151,7 @@ async presentAlertUpgrade () {
           text: 'Update',
           cssClass: 'alert-success',
           handler: () => {
-            this.install()
+            this.install(true)
           },
         },
       ],
@@ -177,7 +181,7 @@ async presentAlertUpgrade () {
     await alert.present()
   }
 
-  async install () {
+  async install (isUpdate = false) {
     const loader = await this.loadingCtrl.create({
       spinner: 'lines',
       cssClass: 'loader',
@@ -185,7 +189,12 @@ async presentAlertUpgrade () {
     await loader.present()
 
     try {
-      await this.serverService.installApp(this.serverId, this.app.id, this.app.versionViewing)
+      const installed = await this.serverService.installApp(this.serverId, this.app.id, this.app.versionViewing)
+      if (isUpdate) {
+        this.appModel.updateApp(installed)
+      } else {
+        this.appModel.createApp(installed)
+      }
       await this.navCtrl.navigateBack(['/auth', 'servers', this.serverId])
     } catch (e) {
       this.error = e.message
@@ -204,6 +213,7 @@ async presentAlertUpgrade () {
 
     try {
       await this.serverService.uninstallApp(this.serverId, this.app.id)
+      this.appModel.removeApp(this.app.id)
       await this.navCtrl.navigateBack(['/auth', 'servers', this.serverId])
     } catch (e) {
       this.error = e.message

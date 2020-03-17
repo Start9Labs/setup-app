@@ -1,7 +1,5 @@
 import { Component } from '@angular/core'
 import { Platform, ModalController } from '@ionic/angular'
-import { SplashScreen } from '@ionic-native/splash-screen/ngx'
-import { StatusBar } from '@ionic-native/status-bar/ngx'
 import { ServerModel } from './models/server-model'
 import { ServerDaemon } from './daemons/server-daemon'
 import { ZeroconfDaemon } from './daemons/zeroconf-daemon'
@@ -11,6 +9,9 @@ import { Router } from '@angular/router'
 import { AuthStatus } from './types/enums'
 import { ServerAppModel } from './models/server-app-model'
 import { AuthenticatePage } from './modals/authenticate/authenticate.page'
+import { Plugins } from '@capacitor/core'
+
+const { SplashScreen } = Plugins
 
 @Component({
   selector: 'app-root',
@@ -22,8 +23,6 @@ export class AppComponent {
 
   constructor (
     private readonly platform: Platform,
-    private readonly splashScreen: SplashScreen,
-    private readonly statusBar: StatusBar,
     private readonly serverModel: ServerModel,
     private readonly appModel: ServerAppModel,
     private readonly zeroconfDaemon: ZeroconfDaemon,
@@ -53,14 +52,10 @@ export class AppComponent {
       this.platform.resume.subscribe(() => {
         this.authService.init()
       })
-      // do Cordova things if Cordova
-      if (platform.is('cordova')) {
-        // style status bar for iOS and Android
-        this.statusBar.styleLightContent()
-        setTimeout(() => {
-          this.splashScreen.hide()
-        }, 300)
-      }
+      // dismiss splash screen
+      setTimeout(() => {
+        SplashScreen.hide()
+      }, 300)
     })
   }
 

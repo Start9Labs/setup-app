@@ -5,9 +5,8 @@
     </ion-buttons>
     <ion-title>{{ server['label'] | async }}</ion-title>
     <ion-buttons slot="end" class="ion-padding-end">
-      <ion-button class="notification-button" [routerLink]="['/auth', 'servers', serverId, 'notifications']"
-        color="primary">
-        <ion-badge *ngIf="server['badge'] | async" color="danger">{{ server['badge'] | async }}</ion-badge>
+      <ion-button class="notification-button" [routerLink]="['/auth', 'servers', serverId, 'notifications']" color="primary">
+        <ion-badge *ngIf="server.badge | async as badge" color="danger">{{ badge }}</ion-badge>
         <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
       </ion-button>
       <ion-button (click)="presentAction(server)" color="primary">
@@ -17,24 +16,20 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content *ngVar="{ status: server.status | async, versionInstalled: server.versionInstalled | async, loading: loading$ | async } as vars">
 
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content pullingIcon="lines" refreshingSpinner="lines"></ion-refresher-content>
   </ion-refresher>
 
-  <ion-item *ngIf="error && !(loading$ | async)">
+  <ion-item *ngIf="error && !vars.loading">
     <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
   </ion-item>
 
   <ion-item-group>
     <ion-item>
-      <ion-label>
-        <h5>Status</h5>
-        <h1>
-          <s9-status [serverStatus]="(server['status'] | async)"></s9-status>
-        </h1>
-      </ion-label>
+      <ion-label position="stacked">Status</ion-label>
+      <h2><s9-status [serverStatus]="vars.status"></s9-status></h2>
     </ion-item>
   </ion-item-group>
 
@@ -44,7 +39,7 @@
   </ion-button>
 
   <ion-button
-    *ngIf="!(loading$ | async) && versionLatest && (server['status'] | async) === 'RUNNING' && compareVersions((server['versionInstalled'] | async), versionLatest) === -1"
+    *ngIf="!vars.loading && versionLatest && vars.status === 'RUNNING' && compareVersions(vars.versionInstalled, versionLatest) === -1"
     style="margin: 16px;" expand="block" fill="outline" color="success" (click)="presentAlertUpdate(server)">
     Update MeshOS to {{ versionLatest }}
   </ion-button>
@@ -61,24 +56,26 @@
     <ion-item-divider>Apps Installed</ion-item-divider>
 
     <ion-item *ngFor="let app of apps" [routerLink]="['apps', 'installed', app.id]">
-      <ion-avatar slot="start">
-        <!-- @COMPAT < 0.1.2 - image path changed to relative in 0.1.2 -->
-        <img *ngIf="compareVersions((server['versionInstalled'] | async), '0.1.2') === -1" [src]="app.observe['iconURL'] | async" alt="icon" />
-        <!-- --end. Also delete *ngIf below -->
-        <!-- @TODO: custom pipe for [src] iconUrl (<-- see, camel case, like everything else) subscription below -->
-        <img *ngIf="compareVersions((server['versionInstalled'] | async), '0.1.1') === 1" [src]="(s9Host$ | async) + (app.observe['iconURL'] | async)" alt="icon" />
-      </ion-avatar>
+      <ng-container *ngVar="app.observe.iconURL | async as iconURL">
+        <ion-avatar slot="start">
+          <!-- @COMPAT < 0.1.2 - image path changed to relative in 0.1.2 -->
+          <img *ngIf="compareVersions(vars.versionInstalled, '0.1.2') === -1" [src]="iconURL" alt="avatar" />
+          <!-- --end. Also delete *ngIf below -->
+          <!-- @TODO: custom pipe for [src] iconUrl (<-- see, camel case, like everything else) subscription below -->
+          <img *ngIf="compareVersions(vars.versionInstalled, '0.1.1') === 1" [src]="(s9Host$ | async) + iconURL" alt="avatar" />
+        </ion-avatar>
+      </ng-container>
       <ion-label>
-        <h2>{{ app.observe['title'] | async }}</h2>
-        <h3>{{ app.observe['versionInstalled'] | async }}</h3>
+        <h2>{{ app.observe.title | async }}</h2>
+        <h3>{{ app.observe.versionInstalled | async }}</h3>
       </ion-label>
       <ion-note slot="end">
-        <s9-status [appStatus]="app.observe['status'] | async"></s9-status>
+        <s9-status [appStatus]="app.observe.status | async"></s9-status>
       </ion-note>
     </ion-item>
   </ion-item-group>
 
-  <div *ngIf="(loading$ | async) && !apps.length" class="sublist-spinner">
+  <div *ngIf="loading && !apps.length" class="sublist-spinner">
     <ion-spinner name="lines" color="warning"></ion-spinner>
   </div>
 

@@ -1,16 +1,16 @@
 import { Component } from '@angular/core'
-import { AlertController, NavController, LoadingController, ActionSheetController } from '@ionic/angular'
+import { AlertController, NavController, LoadingController, ActionSheetController, ToastController } from '@ionic/angular'
 import { ServerService } from 'src/app/services/server.service'
 import { ActivatedRoute } from '@angular/router'
 import { AppInstalled, AppStatus, AppModel } from 'src/app/models/app-model'
-import { ClipboardService } from 'src/app/services/clipboard.service'
 import { ActionSheetButton } from '@ionic/core'
 import { pauseFor } from 'src/app/util/misc.util'
 import { ServerAppModel } from 'src/app/models/server-app-model'
 import { PropertySubject, peekProperties } from 'src/app/util/property-subject.util'
-import { S9Server, ServerModel } from 'src/app/models/server-model'
+import { Plugins } from '@capacitor/core'
 import * as compareVersions from 'compare-versions'
-import { Observable } from 'rxjs'
+
+const { Clipboard } = Plugins
 
 @Component({
   selector: 'app-installed-show',
@@ -24,16 +24,17 @@ export class AppInstalledShowPage {
   appId: string
   serverId: string
   appModel: AppModel
+  showUpdate = true
+  compareVersions = compareVersions
 
   constructor (
     private readonly alertCtrl: AlertController,
     private readonly actionCtrl: ActionSheetController,
     private readonly route: ActivatedRoute,
     private readonly navCtrl: NavController,
-    private readonly clipboardService: ClipboardService,
     private readonly loadingCtrl: LoadingController,
+    private readonly toastCtrl: ToastController,
     private readonly serverService: ServerService,
-    private readonly serverModel: ServerModel,
     private readonly serverAppModel: ServerAppModel,
   ) { }
 
@@ -70,13 +71,70 @@ export class AppInstalledShowPage {
     }
   }
 
+  async checkForUpdates () {
+    const app = peekProperties(this.app)
+
+    const loader = await this.loadingCtrl.create({
+      message: `Checking for updates...`,
+      spinner: 'lines',
+      cssClass: 'loader',
+    })
+    await loader.present()
+
+    try {
+      const { versionLatest } = await this.serverService.getAvailableApp(this.serverId, this.appId)
+      if (this.compareVersions(versionLatest, app.versionInstalled!) === 1) {
+        await this.presentAlertUpdate(app, versionLatest)
+      }
+      this.showUpdate = false
+    } catch (e) {
+      this.error = e.message
+    } finally {
+      await loader.dismiss()
+    }
+  }
+
+  async presentAlertUpdate (app: AppInstalled, versionLatest: string) {
+    const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
+      header: 'Update Available',
+      message: `New version ${versionLatest} found for ${app.title}.`,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: 'View in Store',
+          cssClass: 'alert-success',
+          handler: () => {
+            this.navigate(['/auth', 'servers', this.serverId, 'apps', 'available', this.appId])
+          },
+        },
+      ],
+    })
+    await alert.present()
+  }
+
   async copyTor () {
     const app = peekProperties(this.app)
-    await this.clipboardService.copy(app.torAddress || '')
+    let message = ''
+    await Clipboard.write({ url: app.torAddress || '' })
+      .then(() => { message = 'copied to clipboard!' })
+      .catch(() => { message = 'failed to copy' })
+
+    const toast = await this.toastCtrl.create({
+      header: message,
+      position: 'bottom',
+      duration: 1000,
+      cssClass: 'notification-toast',
+    })
+    await toast.present()
   }
 
   async presentAction () {
     const app = peekProperties(this.app)
+
     const buttons : ActionSheetButton[] = []
 
     if (([
@@ -100,14 +158,14 @@ export class AppInstalledShowPage {
     if (app.status === AppStatus.RUNNING) {
       buttons.push(
         {
-          text: 'View Logs',
+          text: 'Logs',
           icon: 'newspaper-outline',
           handler: () => {
             this.navigate(['logs'])
           },
         },
         {
-          text: 'View Metrics',
+          text: 'Metrics',
           icon: 'pulse',
           handler: () => {
             this.navigate(['metrics'])
@@ -118,10 +176,10 @@ export class AppInstalledShowPage {
 
     buttons.push(
       {
-        text: 'Store Listing',
+        text: 'View in Store',
         icon: 'aperture-outline',
         handler: () => {
-          this.navigate(['/auth', 'servers', this.serverId, 'apps', 'available', app.id])
+          this.navigate(['/auth', 'servers', this.serverId, 'apps', 'available', this.appId])
         },
       },
     )
@@ -144,8 +202,13 @@ export class AppInstalledShowPage {
     await action.present()
   }
 
+  async goToStore () {
+
+  }
+
   async stop (): Promise<void> {
     const app = peekProperties(this.app)
+
     const loader = await this.loadingCtrl.create({
       message: `Stopping ${app.title}. This could take a while...`,
       spinner: 'lines',
@@ -154,7 +217,7 @@ export class AppInstalledShowPage {
     await loader.present()
 
     try {
-      await this.serverService.stopApp(this.serverId, app)
+      await this.serverService.stopApp(this.serverId, this.appId)
 
     } catch (e) {
       this.error = e.message
@@ -165,6 +228,7 @@ export class AppInstalledShowPage {
 
   async start (): Promise<void> {
     const app = peekProperties(this.app)
+
     const loader = await this.loadingCtrl.create({
       message: `Starting ${app.title}...`,
       spinner: 'lines',
@@ -173,7 +237,7 @@ export class AppInstalledShowPage {
     await loader.present()
 
     try {
-      await this.serverService.startApp(this.serverId, app)
+      await this.serverService.startApp(this.serverId, this.appId)
     } catch (e) {
       this.error = e.message
     } finally {
@@ -183,6 +247,7 @@ export class AppInstalledShowPage {
 
   async presentAlertUninstall () {
     const app = peekProperties(this.app)
+
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Caution',
@@ -206,6 +271,7 @@ export class AppInstalledShowPage {
 
   async uninstall (): Promise<void> {
     const app = peekProperties(this.app)
+
     const loader = await this.loadingCtrl.create({
       message: `Uninstalling ${app.title}`,
       spinner: 'lines',

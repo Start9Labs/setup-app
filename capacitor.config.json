@@ -1,0 +1,10 @@
+{
+  "appId": "com.start9labs.start9companion",
+  "appName": "Start9 Companion",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "www",
+  "server": {
+    "iosScheme": "ionic"
+  }
+}

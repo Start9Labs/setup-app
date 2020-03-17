@@ -51,6 +51,7 @@ export class AppConfigNestedPage {
     const modal = await this.modalCtrl.create({
       backdropDismiss: false,
       component: AppConfigNestedPage,
+      presentingElement: await this.modalCtrl.getTop(),
       componentProps: {
         keyval: {
           key: `${this.keyval.key} ${i + 1}`,
@@ -110,6 +111,7 @@ export class AppConfigNestedPage {
     const modal = await this.modalCtrl.create({
       backdropDismiss: false,
       component: AppConfigValuePage,
+      presentingElement: await this.modalCtrl.getTop(),
       componentProps: {
         spec: (this.keyval.value as ValueSpecList).spec,
         value: index !== undefined ? (this.value as any[])[index] : '',

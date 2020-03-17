@@ -1,7 +1,8 @@
 {
   "name": "start9-companion",
   "integrations": {
-    "cordova": {}
+    "cordova": {},
+    "capacitor": {}
   },
   "type": "angular"
 }
