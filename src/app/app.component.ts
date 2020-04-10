@@ -10,6 +10,7 @@ import { AuthStatus } from './types/enums'
 import { ServerAppModel } from './models/server-app-model'
 import { AuthenticatePage } from './modals/authenticate/authenticate.page'
 import { Plugins } from '@capacitor/core'
+import { TorClient } from 'capacitor-tor-client'
 
 const { SplashScreen } = Plugins
 
@@ -20,6 +21,7 @@ const { SplashScreen } = Plugins
 })
 export class AppComponent {
   private firstAuth = true
+  private torClient = new TorClient()
 
   constructor (
     private readonly platform: Platform,
@@ -52,6 +54,8 @@ export class AppComponent {
       this.platform.resume.subscribe(() => {
         this.authService.init()
       })
+      // init Tor process
+      await this.torClient.initTor()
       // dismiss splash screen
       setTimeout(() => {
         SplashScreen.hide()
