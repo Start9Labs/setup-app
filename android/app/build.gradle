@@ -19,9 +19,7 @@ android {
 }
 
 repositories {
-    maven {
-        url  "https://dl.bintray.com/ionic-team/capacitor"
-    }
+    maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/master" }
     flatDir{
         dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
     }
