@@ -9,13 +9,13 @@ import * as compareVersions from 'compare-versions'
 import { ServerService } from 'src/app/services/server.service'
 import { ServerSyncService } from 'src/app/services/server.sync.service'
 import { Subscription, BehaviorSubject, Observable } from 'rxjs'
-import { take, map } from 'rxjs/operators'
+import { take } from 'rxjs/operators'
 import * as Menu from './server-menu-options'
 import { ServerAppModel } from 'src/app/models/server-app-model'
 import { PropertySubject, PropertyObservableWithId, peekProperties, fromPropertyObservable } from 'src/app/util/property-subject.util'
 import { pauseFor } from 'src/app/util/misc.util'
 import { ZeroconfDaemon } from 'src/app/daemons/zeroconf-daemon'
-import { s9HostNoVersion } from 'src/app/services/http-native.service'
+// import { s9HostNoVersion } from 'src/app/services/http-native.service'
 
 @Component({
   selector: 'server-show',
@@ -55,7 +55,7 @@ export class ServerShowPage {
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
     this.server = this.serverModel.watchServerProperties(this.serverId)
-    this.s9Host$ = this.server.id.pipe(map(sId =>  s9HostNoVersion(this.zcd, sId)))
+    // this.s9Host$ = this.server.id.pipe(map(sId =>  s9HostNoVersion(this.zcd, sId)))
     // @COMPAT 0.1.1 - versionLatest dropped in 0.1.2
     this.versionLatestSubscription = this.server.versionLatest.subscribe((versionLatest) => {
       this.versionLatest = versionLatest

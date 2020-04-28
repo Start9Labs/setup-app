@@ -160,13 +160,7 @@ export class ServerSync {
 
     this.updatingCache[server.id].next(true)
 
-    if (!this.zeroconfDaemon.getService(server.id)) {
-      if (this.hasBeenRunningSufficientlyLong(server)) {
-        this.markServerUnreachable(server)
-      }
-    } else {
-      await this.syncServerAttributes(server)
-    }
+    await this.syncServerAttributes(server)
 
     this.updatingCache[server.id].next(false)
     const updatedServer = this.serverModel.peekServer(server.id)
@@ -201,11 +195,6 @@ export class ServerSync {
         break
       }
     }
-  }
-
-  private hasBeenRunningSufficientlyLong (server: S9Server): boolean {
-    return this.initialized_at.valueOf() + this.timeBeforeUnreachable < new Date().valueOf()
-
   }
 
   private markServerUnreachable (server: S9Server): void {

@@ -9,8 +9,8 @@ android {
 
 apply from: "../capacitor-cordova-android-plugins/cordova.variables.gradle"
 dependencies {
-    implementation project(':capacitor-tor-client')
-    implementation "com.squareup.okhttp3:okhttp-urlconnection:3.10.0"
+    implementation project(':capacitor-http')
+    implementation project(':capacitor-tor')
     implementation "org.jmdns:jmdns:3.5.5"
 }
 

@@ -2,12 +2,14 @@ import { Injectable } from '@angular/core'
 import { S9Server, getLanIP, ServerStatus } from '../models/server-model'
 import { Method } from 'src/app/types/enums'
 import { pauseFor } from 'src/app/util/misc.util'
-import * as cryptoUtil from '../util/crypto.util'
 import { AuthService } from './auth.service'
 import { Lan } from '../types/api-types'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
-import { HttpNativeService, getAuthHeader } from './http-native.service'
+import { HttpLanService } from './http-lan.service'
+import { HttpTorService } from './http-tor.service'
+import { HttpService } from './http.service'
+import * as cryptoUtil from '../util/crypto.util'
 
 @Injectable({
   providedIn: 'root',
@@ -18,31 +20,33 @@ export class SetupService {
   public message = ''
 
   constructor (
-    private readonly httpService: HttpNativeService,
+    private readonly http: HttpLanService,
+    private readonly httpRaw: HttpService,
+    private readonly httpTor: HttpTorService,
     private readonly authService: AuthService,
     private readonly zeroconfDaemon: ZeroconfDaemon,
   ) { }
 
   async setup (builder: S9ServerBuilder, productKey: string): Promise<S9Server> {
     // **** Mock ****
-    // return toS9Server(this.mockServer(builder))
+    return toS9Server(this.mockServer(builder))
 
-    for (let i = 0; i < SetupService.setupAttempts; i ++) {
-      builder = await this.discoverAttempt(builder)
-      await pauseFor(SetupService.waitForMS)
-    }
+    // for (let i = 0; i < SetupService.setupAttempts; i ++) {
+    //   builder = await this.discoverAttempt(builder)
+    //   await pauseFor(SetupService.waitForMS)
+    // }
 
-    if (!isDiscovered(builder)) {
-      throw new Error(`Failed ${this.message}`)
-    }
+    // if (!isDiscovered(builder)) {
+    //   throw new Error(`Failed ${this.message}`)
+    // }
 
-    builder = await this.setupAttempt(builder, productKey)
+    // builder = await this.setupAttempt(builder, productKey)
 
-    if (!isFullySetup(builder)) {
-      throw new Error(`Failed ${this.message}`)
-    }
+    // if (!isFullySetup(builder)) {
+    //   throw new Error(`Failed ${this.message}`)
+    // }
 
-    return toS9Server(builder)
+    // return toS9Server(builder)
   }
 
   private async discoverAttempt (builder: S9ServerBuilder): Promise<S9ServerBuilder> {
@@ -105,7 +109,7 @@ export class SetupService {
   async getVersion (builder: S9BuilderWith<'zeroconf'>): Promise<string | undefined> {
     try {
       const host = getLanIP(builder.zeroconf)
-      const { version } = await this.httpService.request<Lan.GetVersionRes>(`http://${host}/version`, { method: Method.get })
+      const { version } = await this.httpRaw.request<Lan.GetVersionRes>({ method: Method.get, url: `http://${host}:5959/version` })
       return version
     } catch (e) {
       return undefined
@@ -116,7 +120,7 @@ export class SetupService {
     const { pubkey } = builder
     try {
       const data: Lan.PostRegisterReq = { pubKey: pubkey, productKey }
-      await this.httpService.serverRequest<Lan.PostRegisterRes>(builder, '/register', { method: Method.post, data })
+      await this.http.request<Lan.PostRegisterRes>(builder, { method: Method.post, url: '/register', data })
       return true
     } catch (e) {
       return false
@@ -125,7 +129,7 @@ export class SetupService {
 
   async getTor (builder: S9BuilderWith<'zeroconf' | 'versionInstalled' | 'pubkey' | 'privkey'>): Promise<string | undefined> {
     try {
-      const { torAddress } = await this.httpService.serverRequest<Lan.GetTorRes>(builder, '/tor', { method: Method.get })
+      const { torAddress } = await this.http.request<Lan.GetTorRes>(builder, { method: Method.get, url: '/tor' })
       return torAddress
     } catch (e) {
       return undefined
@@ -133,7 +137,7 @@ export class SetupService {
   }
 
   async getServer (builder: S9BuilderWith<'zeroconf' | 'versionInstalled' | 'pubkey' | 'privkey' | 'torAddress'>): Promise<Lan.GetServerRes> {
-    return this.httpService.serverRequest<Lan.GetServerRes>(builder, '', { method: Method.get, headers: getAuthHeader(builder) })
+    return this.httpTor.request<Lan.GetServerRes>(builder, { method: Method.get, url: '' })
   }
 
   // @TODO remove
@@ -160,7 +164,6 @@ export class SetupService {
       },
     }
   }
-
 }
 
 export type S9BuilderWith<T extends keyof S9ServerBuilder> = S9ServerBuilder & {

@@ -125,7 +125,7 @@ export function getLanIP (zcs: ZeroconfService): string {
   } else {
     url = `[${ipv6Addresses[0]}]`
   }
-  return url + ':5959'
+  return url
 }
 
 export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): S9Server {

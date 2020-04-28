@@ -10,7 +10,7 @@ import { AuthStatus } from './types/enums'
 import { ServerAppModel } from './models/server-app-model'
 import { AuthenticatePage } from './modals/authenticate/authenticate.page'
 import { Plugins } from '@capacitor/core'
-import { TorClient } from 'capacitor-tor-client'
+import { TorService } from './services/tor.service'
 
 const { SplashScreen } = Plugins
 
@@ -21,7 +21,6 @@ const { SplashScreen } = Plugins
 })
 export class AppComponent {
   private firstAuth = true
-  private torClient = new TorClient()
 
   constructor (
     private readonly platform: Platform,
@@ -31,6 +30,7 @@ export class AppComponent {
     private readonly serverDaemon: ServerDaemon,
     private readonly wifiDaemon: WifiDaemon,
     private readonly authService: AuthService,
+    private readonly torService: TorService,
     private readonly router: Router,
     private readonly modalCtrl: ModalController,
   ) {
@@ -54,12 +54,8 @@ export class AppComponent {
       this.platform.resume.subscribe(() => {
         this.authService.init()
       })
-      // init Tor process
-      await this.torClient.initTor()
       // dismiss splash screen
-      setTimeout(() => {
-        SplashScreen.hide()
-      }, 300)
+      SplashScreen.hide()
     })
   }
 
@@ -67,6 +63,7 @@ export class AppComponent {
     // verified (mnemonic is present and unencrypted)
     if (authStatus === AuthStatus.VERIFIED) {
       if (this.firstAuth) {
+        this.torService.init()
         await this.serverModel.load(this.authService.mnemonic!)
         this.firstAuth = false
         await this.router.navigate(['/auth'])

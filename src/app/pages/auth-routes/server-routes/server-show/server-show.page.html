@@ -60,9 +60,7 @@
         <ion-avatar slot="start">
           <!-- @COMPAT < 0.1.2 - image path changed to relative in 0.1.2 -->
           <img *ngIf="compareVersions(vars.versionInstalled, '0.1.2') === -1" [src]="iconURL" alt="avatar" />
-          <!-- --end. Also delete *ngIf below -->
-          <!-- @TODO: custom pipe for [src] iconUrl (<-- see, camel case, like everything else) subscription below -->
-          <img *ngIf="compareVersions(vars.versionInstalled, '0.1.1') === 1" [src]="(s9Host$ | async) + iconURL" alt="avatar" />
+          <!-- end -->
         </ion-avatar>
       </ng-container>
       <ion-label>

@@ -2,5 +2,8 @@
 include ':capacitor-android'
 project(':capacitor-android').projectDir = new File('../node_modules/@capacitor/android/capacitor')
 
-include ':capacitor-tor-client'
-project(':capacitor-tor-client').projectDir = new File('../node_modules/capacitor-tor-client/android')
+include ':capacitor-http'
+project(':capacitor-http').projectDir = new File('../node_modules/capacitor-http/android')
+
+include ':capacitor-tor'
+project(':capacitor-tor').projectDir = new File('../node_modules/capacitor-tor/android')
