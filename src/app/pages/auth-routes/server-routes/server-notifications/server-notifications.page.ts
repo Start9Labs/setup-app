@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { ServerModel, S9Notification } from 'src/app/models/server-model'
 import { ActivatedRoute } from '@angular/router'
-import { ServerService } from 'src/app/services/server.service'
+import { ApiService } from 'src/app/services/api.service'
 import { LoadingController } from '@ionic/angular'
 import { pauseFor } from 'src/app/util/misc.util'
 
@@ -22,7 +22,7 @@ export class ServerNotificationsPage {
   constructor (
     private readonly route: ActivatedRoute,
     private readonly serverModel: ServerModel,
-    private readonly serverService: ServerService,
+    private readonly apiService: ApiService,
     private readonly loadingCtrl: LoadingController,
   ) { }
 
@@ -55,7 +55,7 @@ export class ServerNotificationsPage {
   async getNotifications (): Promise<S9Notification[]> {
     let notifications: S9Notification[] = []
     try {
-      notifications = await this.serverService.getNotifications(this.serverId, this.page, this.perPage)
+      notifications = await this.apiService.getNotifications(this.serverId, this.page, this.perPage)
       this.needInfinite = notifications.length >= this.perPage
       this.page++
       this.error = ''
@@ -91,7 +91,7 @@ export class ServerNotificationsPage {
     await loader.present()
 
     try {
-      await this.serverService.deleteNotification(this.serverId, notificationId)
+      await this.apiService.deleteNotification(this.serverId, notificationId)
       this.notifications.splice(index, 1)
       this.error = ''
     } catch (e) {

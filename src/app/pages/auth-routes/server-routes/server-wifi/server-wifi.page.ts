@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { LoadingController, ActionSheetController, ToastController } from '@ionic/angular'
-import { ServerService } from 'src/app/services/server.service'
+import { ApiService } from 'src/app/services/api.service'
 import { ActivatedRoute } from '@angular/router'
 import { ActionSheetButton } from '@ionic/core'
 import { pauseFor } from 'src/app/util/misc.util'
@@ -24,7 +24,7 @@ export class ServerWifiPage {
 
   constructor (
     private readonly route: ActivatedRoute,
-    private readonly serverService: ServerService,
+    private readonly apiService: ApiService,
     private readonly loadingCtrl: LoadingController,
     private readonly actionCtrl: ActionSheetController,
     private readonly toastCtrl: ToastController,
@@ -51,7 +51,7 @@ export class ServerWifiPage {
 
   async getWifi (): Promise<void> {
     try {
-      const { ssids, current } = await this.serverService.getWifi(this.serverId)
+      const { ssids, current } = await this.apiService.getWifi(this.serverId)
       this.savedNetworks = ssids
       this.current = current
       this.error = ''
@@ -98,7 +98,7 @@ export class ServerWifiPage {
     await loader.present()
 
     try {
-      await this.serverService.connectWifi(this.serverId, ssid, this.countryCode)
+      await this.apiService.connectWifi(this.serverId, ssid, this.countryCode)
       await this.confirmWifi(ssid)
       this.error = ''
     } catch (e) {
@@ -117,7 +117,7 @@ export class ServerWifiPage {
     await loader.present()
 
     try {
-      await this.serverService.addWifi(this.serverId, this.ssid, this.password, this.countryCode)
+      await this.apiService.addWifi(this.serverId, this.ssid, this.password, this.countryCode)
       await this.confirmWifi(this.ssid)
       this.ssid = ''
       this.password = ''
@@ -138,7 +138,7 @@ export class ServerWifiPage {
     await loader.present()
 
     try {
-      await this.serverService.deleteWifi(this.serverId, ssid)
+      await this.apiService.deleteWifi(this.serverId, ssid)
       this.savedNetworks.splice(index, 1)
       this.error = ''
     } catch (e) {
@@ -156,7 +156,7 @@ export class ServerWifiPage {
     while (attempts < maxAttempts) {
       try {
         const start = new Date().valueOf()
-        const { current, ssids } = await this.serverService.getWifi(this.serverId, timeout / 1000)
+        const { current, ssids } = await this.apiService.getWifi(this.serverId, timeout / 1000)
         const end = new Date().valueOf()
         if (current === ssid) {
           this.savedNetworks = ssids

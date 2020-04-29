@@ -6,15 +6,15 @@ import { S9Server } from 'src/app/models/server-model'
 import { ActionSheetButton } from '@ionic/core'
 import { AppInstalled } from 'src/app/models/app-model'
 import * as compareVersions from 'compare-versions'
-import { ServerService } from 'src/app/services/server.service'
-import { ServerSyncService } from 'src/app/services/server.sync.service'
+import { ApiService } from 'src/app/services/api.service'
+import { ServerSyncService } from 'src/app/services/sync.service'
 import { Subscription, BehaviorSubject, Observable } from 'rxjs'
 import { take } from 'rxjs/operators'
 import * as Menu from './server-menu-options'
 import { ServerAppModel } from 'src/app/models/server-app-model'
 import { PropertySubject, PropertyObservableWithId, peekProperties, fromPropertyObservable } from 'src/app/util/property-subject.util'
 import { pauseFor } from 'src/app/util/misc.util'
-import { ZeroconfDaemon } from 'src/app/daemons/zeroconf-daemon'
+import { ZeroconfDaemon } from 'src/app/services/zeroconf-daemon'
 // import { s9HostNoVersion } from 'src/app/services/http-native.service'
 
 @Component({
@@ -46,7 +46,7 @@ export class ServerShowPage {
     private readonly actionCtrl: ActionSheetController,
     private readonly alertCtrl: AlertController,
     private readonly loadingCtrl: LoadingController,
-    private readonly serverService: ServerService,
+    private readonly apiService: ApiService,
     private readonly sss: ServerSyncService,
     private readonly zcd: ZeroconfDaemon,
     readonly serverAppModel: ServerAppModel,
@@ -138,7 +138,7 @@ export class ServerShowPage {
       await loader.present()
 
       try {
-        const { versionLatest } = await this.serverService.getVersionLatest(server.id)
+        const { versionLatest } = await this.apiService.getVersionLatest(server.id)
         this.versionLatest = versionLatest
       } catch (e) {
         this.error = e.message
@@ -199,7 +199,7 @@ export class ServerShowPage {
     await loader.present()
 
     try {
-      await this.serverService.updateAgent(server.id, this.versionLatest!)
+      await this.apiService.updateAgent(server.id, this.versionLatest!)
       this.serverModel.updateServer(server.id, { status: ServerStatus.UPDATING, statusAt: new Date().toISOString() })
     } catch (e) {
       this.error = e.message
@@ -215,7 +215,7 @@ export class ServerShowPage {
     await loader.present()
 
     try {
-      await this.serverService.restartServer(server.id)
+      await this.apiService.restartServer(server.id)
       await this.navCtrl.pop()
     } catch (e) {
       this.error = e.mesasge
@@ -231,7 +231,7 @@ export class ServerShowPage {
     await loader.present()
 
     try {
-      await this.serverService.shutdownServer(server.id)
+      await this.apiService.shutdownServer(server.id)
       await this.navCtrl.pop()
     } catch (e) {
       this.error = e.mesasge

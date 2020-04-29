@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>
-      Servers
+      Embassies
     </ion-title>
     <ion-buttons slot="end" class="ion-padding-end">
       <ion-button [routerLink]="['/auth', 'settings']" color="primary">
@@ -13,7 +13,7 @@
 
 <ion-content class="ion-padding">
 
-  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+  <ion-refresher *ngIf="servers.length" slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content pullingIcon="lines" refreshingSpinner="lines"></ion-refresher-content>
   </ion-refresher>
 
@@ -30,6 +30,12 @@
   </ion-item-group>
 
   <div *ngIf="servers.length">
+    <ng-container *ngIf="torService.watchProgress() | async as progress">
+      <div *ngIf="torProgress !== 0" @torChange>
+        <ion-progress-bar color="tertiary" [value]="progress" buffer="0"></ion-progress-bar>
+        <p><img class="inline-image" src="assets/img/tor.png" alt="tor" />Establishing Circuit</p>
+      </div>
+    </ng-container>
     <ion-card button *ngFor="let server of servers" style="margin-bottom: 16px;" (click)="show(server.id)">
       <ion-item>
         <ion-avatar slot="start">

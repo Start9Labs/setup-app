@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { ServerMetrics } from 'src/app/models/server-model'
-import { ServerService } from 'src/app/services/server.service'
+import { ApiService } from 'src/app/services/api.service'
 import { pauseFor } from 'src/app/util/misc.util'
 
 @Component({
@@ -18,7 +18,7 @@ export class ServerMetricsPage {
 
   constructor (
     private readonly route: ActivatedRoute,
-    private readonly serverService: ServerService,
+    private readonly apiService: ApiService,
   ) { }
 
   async ngOnInit () {
@@ -52,7 +52,7 @@ export class ServerMetricsPage {
 
   async getMetrics (): Promise<void> {
     try {
-      const metrics = await this.serverService.getServerMetrics(this.serverId)
+      const metrics = await this.apiService.getServerMetrics(this.serverId)
       Object.keys(metrics).forEach(outerKey => {
         if (!this.metrics[outerKey]) {
           this.metrics[outerKey] = metrics[outerKey]

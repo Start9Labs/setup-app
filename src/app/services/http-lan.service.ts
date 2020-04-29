@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { HttpOptions } from 'capacitor-http'
-import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
+import { ZeroconfDaemon } from './zeroconf-daemon'
 import { S9BuilderWith } from './setup.service'
 import { getLanIP } from '../models/server-model'
 import { HttpService } from './http.service'

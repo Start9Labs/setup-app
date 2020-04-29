@@ -1,15 +1,14 @@
 import { Injectable } from '@angular/core'
 import { ToastController, NavController } from '@ionic/angular'
 import { ServerModel, S9Server, ServerStatus } from '../models/server-model'
-import { ServerService } from './server.service'
-import { ZeroconfDaemon } from '../daemons/zeroconf-daemon'
+import { ApiService } from './api.service'
 import { AppStatus } from '../models/app-model'
 import { doForAtLeast, tryAll, pauseFor } from '../util/misc.util'
-import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { ServerAppModel } from '../models/server-app-model'
 import { filter, take, map } from 'rxjs/operators'
 import { BehaviorSubject } from 'rxjs'
 import { isFalse, squash } from '../util/rxjs.util'
+import { TorService, TorConnection } from './tor.service'
 
 @Injectable({
   providedIn: 'root',
@@ -65,16 +64,11 @@ export class ServerSyncService {
   private cached: ServerSync | undefined
 
   constructor (
-    private readonly serverService: ServerService,
+    private readonly apiService: ApiService,
     private readonly serverModel: ServerModel,
-    private readonly zeroconfDaemon: ZeroconfDaemon,
     private readonly serverAppModel: ServerAppModel,
     private readonly syncNotifier: SyncNotifier,
-  ) {
-    this.zeroconfDaemon.watch().subscribe(
-      zeroconfService => this.handleZeroconfUpdate(zeroconfService),
-    )
-  }
+  ) { }
 
   fromCache (): ServerSync {
     return this.cached || this.refreshCache()
@@ -94,23 +88,12 @@ export class ServerSyncService {
 
   private fresh (): ServerSync {
     return new ServerSync(
-      this.serverService,
+      this.apiService,
       this.serverModel,
-      this.zeroconfDaemon,
       this.serverAppModel,
       this.syncNotifier,
       new Date(),
     )
-  }
-
-  private async handleZeroconfUpdate (zeroconfService: ZeroconfService | null): Promise<void> {
-    if (!zeroconfService) { return }
-    try {
-      const server = this.serverModel.peekServer(zeroconfService.name.split('-')[1])
-      this.fromCache().syncServer(server, 250)
-    } catch (e) {
-      console.warn(e.message)
-    }
   }
 }
 
@@ -120,9 +103,8 @@ export class ServerSync {
   timeBeforeUnreachable = 7000
 
   constructor (
-    private readonly serverService: ServerService,
+    private readonly apiService: ApiService,
     private readonly serverModel: ServerModel,
-    private readonly zeroconfDaemon: ZeroconfDaemon,
     private readonly serverAppModel: ServerAppModel,
     private readonly syncNotifier: SyncNotifier,
     readonly initialized_at:  Date,
@@ -171,8 +153,8 @@ export class ServerSync {
 
   async syncServerAttributes (server: S9Server): Promise<void> {
     const [serverRes, appsRes] = await tryAll([
-      this.serverService.getServer(server.id),
-      pauseFor(250).then(() => this.serverService.getInstalledApps(server.id)),
+      this.apiService.getServer(server.id),
+      pauseFor(250).then(() => this.apiService.getInstalledApps(server.id)),
     ])
 
     switch (serverRes.result) {
@@ -206,6 +188,50 @@ export class ServerSync {
     console.log(`syncServer called while server updating. Retrying in ${retryIn} milliseconds`)
     await pauseFor(retryIn)
     return this.syncServer(server, retryIn)
+  }
+}
+
+@Injectable({
+  providedIn: 'root',
+})
+export class SyncService {
+  private going: boolean
+  syncInterval = 5000
+
+  constructor (
+    private readonly torService: TorService,
+    private readonly sss: ServerSyncService,
+  ) { }
+
+  init (): void {
+    this.torService.watchConnection().subscribe(c => this.handleTorConnectionChange(c))
+  }
+
+  handleTorConnectionChange (connection: TorConnection): void {
+    if (connection === TorConnection.connected) {
+      this.start()
+    } else if (connection === TorConnection.disconnected) {
+      this.stop()
+    }
+  }
+
+  async start (): Promise<void> {
+    if (this.going) { return }
+
+    console.log('starting sync daemon')
+
+    this.going = true
+
+    while (this.going) {
+      this.sss.fromCache().syncServers()
+      await pauseFor(this.syncInterval)
+    }
+  }
+
+  stop (): void {
+    console.log('stopping sync daemon')
+    this.going = false
+    this.sss.clearCache()
   }
 }
 

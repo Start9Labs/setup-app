@@ -1,8 +1,8 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { ServerSpecs } from 'src/app/models/server-model'
-import { ServerService } from 'src/app/services/server.service'
-import { ZeroconfDaemon } from 'src/app/daemons/zeroconf-daemon'
+import { ApiService } from 'src/app/services/api.service'
+import { ZeroconfDaemon } from 'src/app/services/zeroconf-daemon'
 import { pauseFor } from 'src/app/util/misc.util'
 import { Plugins } from '@capacitor/core'
 import { ToastController } from '@ionic/angular'
@@ -23,7 +23,7 @@ export class ServerSpecsPage {
 
   constructor (
     private readonly route: ActivatedRoute,
-    private readonly serverService: ServerService,
+    private readonly apiService: ApiService,
     private readonly zeroconfDaemon: ZeroconfDaemon,
     private readonly toastCtrl: ToastController,
   ) { }
@@ -38,7 +38,7 @@ export class ServerSpecsPage {
       }
 
       const [specs] = await Promise.all([
-        this.serverService.getServerSpecs(this.serverId),
+        this.apiService.getServerSpecs(this.serverId),
         pauseFor(600),
       ])
       this.specs = specs

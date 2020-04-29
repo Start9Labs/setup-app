@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { ServerService } from 'src/app/services/server.service'
+import { ApiService } from 'src/app/services/api.service'
 import { IonContent } from '@ionic/angular'
 import { pauseFor } from 'src/app/util/misc.util'
 
@@ -19,7 +19,7 @@ export class AppLogsPage {
 
   constructor (
     private readonly route: ActivatedRoute,
-    private readonly serverService: ServerService,
+    private readonly apiService: ApiService,
   ) { }
 
   async ngOnInit () {
@@ -39,7 +39,7 @@ export class AppLogsPage {
     this.logs = ''
 
     try {
-      const logs = await this.serverService.getAppLogs(this.serverId, this.appId)
+      const logs = await this.apiService.getAppLogs(this.serverId, this.appId)
       this.logs = logs.join('\n\n')
       this.error = ''
       setTimeout(async () => await this.content.scrollToBottom(100), 200)

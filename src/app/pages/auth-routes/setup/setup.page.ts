@@ -3,7 +3,7 @@ import { NavController, LoadingController } from '@ionic/angular'
 import { ServerModel } from 'src/app/models/server-model'
 import { idFromSerial } from 'src/app/models/server-model'
 import { SetupService, fromUserInput } from 'src/app/services/setup.service'
-import { ZeroconfDaemon } from 'src/app/daemons/zeroconf-daemon'
+import { ZeroconfDaemon } from 'src/app/services/zeroconf-daemon'
 import { Subscription } from 'rxjs'
 
 @Component({

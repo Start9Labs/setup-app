@@ -12,7 +12,7 @@ import { HttpTorService } from './http-tor.service'
 @Injectable({
   providedIn: 'root',
 })
-export class XServerService {
+export class XApiService {
   constructor (
     private readonly http: HttpTorService,
     private readonly appModel: ServerAppModel,
@@ -195,7 +195,7 @@ export class XServerService {
 @Injectable({
   providedIn: 'root',
 })
-export class ServerService {
+export class ApiService {
 
   constructor (
     private readonly appModel: ServerAppModel,
