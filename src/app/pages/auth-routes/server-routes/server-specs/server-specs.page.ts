@@ -2,7 +2,6 @@ import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { ServerSpecs } from 'src/app/models/server-model'
 import { ApiService } from 'src/app/services/api.service'
-import { ZeroconfDaemon } from 'src/app/services/zeroconf-daemon'
 import { pauseFor } from 'src/app/util/misc.util'
 import { Plugins } from '@capacitor/core'
 import { ToastController } from '@ionic/angular'
@@ -19,12 +18,10 @@ export class ServerSpecsPage {
   loading = true
   specs: ServerSpecs
   serverId: string
-  lanIP: string
 
   constructor (
     private readonly route: ActivatedRoute,
     private readonly apiService: ApiService,
-    private readonly zeroconfDaemon: ZeroconfDaemon,
     private readonly toastCtrl: ToastController,
   ) { }
 
@@ -32,11 +29,6 @@ export class ServerSpecsPage {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
 
     try {
-      const zeroconf = this.zeroconfDaemon.getService(this.serverId)
-      if (zeroconf) {
-        this.lanIP = zeroconf.ipv4Addresses[0]
-      }
-
       const [specs] = await Promise.all([
         this.apiService.getServerSpecs(this.serverId),
         pauseFor(600),

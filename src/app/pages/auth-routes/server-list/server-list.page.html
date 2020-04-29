@@ -33,7 +33,7 @@
     <ng-container *ngIf="torService.watchProgress() | async as progress">
       <div *ngIf="torProgress !== 0" @torChange>
         <ion-progress-bar color="tertiary" [value]="progress" buffer="0"></ion-progress-bar>
-        <p><img class="inline-image" src="assets/img/tor.png" alt="tor" />Establishing Circuit</p>
+        <p><img class="inline-image" src="assets/img/tor.png" alt="tor" />Establishing Connection</p>
       </div>
     </ng-container>
     <ion-card button *ngFor="let server of servers" style="margin-bottom: 16px;" (click)="show(server.id)">

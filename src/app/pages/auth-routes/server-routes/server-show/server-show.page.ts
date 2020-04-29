@@ -14,8 +14,6 @@ import * as Menu from './server-menu-options'
 import { ServerAppModel } from 'src/app/models/server-app-model'
 import { PropertySubject, PropertyObservableWithId, peekProperties, fromPropertyObservable } from 'src/app/util/property-subject.util'
 import { pauseFor } from 'src/app/util/misc.util'
-import { ZeroconfDaemon } from 'src/app/services/zeroconf-daemon'
-// import { s9HostNoVersion } from 'src/app/services/http-native.service'
 
 @Component({
   selector: 'server-show',
@@ -48,14 +46,12 @@ export class ServerShowPage {
     private readonly loadingCtrl: LoadingController,
     private readonly apiService: ApiService,
     private readonly sss: ServerSyncService,
-    private readonly zcd: ZeroconfDaemon,
     readonly serverAppModel: ServerAppModel,
   ) { }
 
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
     this.server = this.serverModel.watchServerProperties(this.serverId)
-    // this.s9Host$ = this.server.id.pipe(map(sId =>  s9HostNoVersion(this.zcd, sId)))
     // @COMPAT 0.1.1 - versionLatest dropped in 0.1.2
     this.versionLatestSubscription = this.server.versionLatest.subscribe((versionLatest) => {
       this.versionLatest = versionLatest

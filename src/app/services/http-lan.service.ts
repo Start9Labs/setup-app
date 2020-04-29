@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { HttpOptions } from 'capacitor-http'
-import { ZeroconfDaemon } from './zeroconf-daemon'
+import { ZeroconfMonitor } from './zeroconf.service'
 import { S9BuilderWith } from './setup.service'
 import { getLanIP } from '../models/server-model'
 import { HttpService } from './http.service'
@@ -11,7 +11,7 @@ import { HttpService } from './http.service'
 export class HttpLanService {
   constructor (
     private readonly http: HttpService,
-    private readonly zeroconfDaemon: ZeroconfDaemon,
+    private readonly zeroconfMonitor: ZeroconfMonitor,
   ) { }
 
   async request<T> (server: S9BuilderWith<'versionInstalled'>, options: HttpOptions): Promise<T> {
@@ -20,7 +20,7 @@ export class HttpLanService {
   }
 
   getLanUrl (server: S9BuilderWith<'versionInstalled'>, path: string): string {
-    const zcs = this.zeroconfDaemon.getService(server.id)
+    const zcs = this.zeroconfMonitor.getService(server.id)
     if (!zcs) { throw new Error('Embassy not found on LAN') }
     const ip = getLanIP(zcs)
     return `http://${ip}:5959/v${server.versionInstalled.charAt(0)}${path}`

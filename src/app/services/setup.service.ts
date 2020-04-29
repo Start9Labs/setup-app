@@ -5,7 +5,7 @@ import { pauseFor } from 'src/app/util/misc.util'
 import { AuthService } from './auth.service'
 import { Lan } from '../types/api-types'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
-import { ZeroconfDaemon } from './zeroconf-daemon'
+import { ZeroconfMonitor } from './zeroconf.service'
 import { HttpLanService } from './http-lan.service'
 import { HttpTorService } from './http-tor.service'
 import { HttpService } from './http.service'
@@ -24,7 +24,7 @@ export class SetupService {
     private readonly httpRaw: HttpService,
     private readonly httpTor: HttpTorService,
     private readonly authService: AuthService,
-    private readonly zeroconfDaemon: ZeroconfDaemon,
+    private readonly zeroconfMonitor: ZeroconfMonitor,
   ) { }
 
   async setup (builder: S9ServerBuilder, productKey: string): Promise<S9Server> {
@@ -53,7 +53,7 @@ export class SetupService {
     // enable lan
     if (!hasValues(['zeroconf'], builder)) {
       this.message = `discovering server on local network. Please check your Product Key and see "Instructions" below.`
-      builder.zeroconf = this.zeroconfDaemon.getService(builder.id)
+      builder.zeroconf = this.zeroconfMonitor.getService(builder.id)
     }
 
     // agent version

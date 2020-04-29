@@ -119,10 +119,10 @@ export class ServerSync {
       return this.isSyncing$.pipe(filter(s => !s), take(1), map(a => { console.log('returning from sync wait') })).toPromise()
     }
 
-    console.log('syncing servers')
+    console.log('syncing')
     this.isSyncing$.next(true)
     await doForAtLeast(1000, this.serverModel.peekAll().map(server => this.syncServer(server)))
-    console.log('syncing servers complete')
+    console.log('syncing complete')
     this.isSyncing$.next(false)
   }
 
@@ -130,13 +130,13 @@ export class ServerSync {
     if (!this.updatingCache[server.id]) this.updatingCache[server.id] = new BehaviorSubject(false)
 
     const serverUpdating = this.updatingCache[server.id].getValue()
-    console.log(`Server ${server.id} Syncing.`)
+    console.log(`Syncing ${server.id}`)
 
     if (serverUpdating && retryIn) {
       return this.retry(server, retryIn)
     }
     if (serverUpdating) {
-      console.log(`Server ${server.id} already updating.`)
+      console.log(`${server.id} already updating`)
       return this.updatingCache[server.id].pipe(isFalse, take(1), squash).toPromise()
     }
 
@@ -185,7 +185,7 @@ export class ServerSync {
   }
 
   private async retry (server: S9Server, retryIn: number): Promise<void> {
-    console.log(`syncServer called while server updating. Retrying in ${retryIn} milliseconds`)
+    console.log(`sync called while syncing. Retrying in ${retryIn} milliseconds`)
     await pauseFor(retryIn)
     return this.syncServer(server, retryIn)
   }

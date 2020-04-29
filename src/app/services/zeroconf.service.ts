@@ -6,7 +6,7 @@ import { Platform } from '@ionic/angular'
 @Injectable({
   providedIn: 'root',
 })
-export class ZeroconfDaemon {
+export class ZeroconfMonitor {
   private readonly serviceFound$ : BehaviorSubject<ZeroconfService | null> = new BehaviorSubject(null)
   watch (): Observable<ZeroconfService | null> { return this.serviceFound$ }
   services: { [hostname: string]: ZeroconfServiceExt } = { }
@@ -18,7 +18,15 @@ export class ZeroconfDaemon {
     private readonly zeroconf: Zeroconf,
   ) { }
 
-  async start (restart: boolean) {
+  init (): void {
+    this.start(false)
+  }
+
+  getService (serverId: string): ZeroconfService | undefined {
+    return this.services[`start9-${serverId}`]
+  }
+
+  private async start (restart: boolean): Promise<void> {
     return this.mock()
 
     if (this.zeroconfSub || !this.platform.is('mobile')) { return }
@@ -34,7 +42,7 @@ export class ZeroconfDaemon {
     })
   }
 
-  stop () {
+  private stop (): void {
     if (this.zeroconfSub) {
       console.log('stopping zeroconf daemon')
       this.zeroconfSub.unsubscribe()
@@ -42,18 +50,18 @@ export class ZeroconfDaemon {
     }
   }
 
-  reset () {
+  private reset (): void {
     this.stop()
     this.start(true)
   }
 
-  clearAndStop () {
+  private clearAndStop (): void {
     this.stop()
     console.log('clearing all zerconf services')
     this.services = { }
   }
 
-  handleServiceUpdate (result: ZeroconfResult) {
+  private handleServiceUpdate (result: ZeroconfResult): void {
     const { action, service } = result
 
     if (
@@ -74,11 +82,7 @@ export class ZeroconfDaemon {
     }
   }
 
-  getService (serverId: string): ZeroconfService | undefined {
-    return this.services[`start9-${serverId}`]
-  }
-
-  purgeOld (initializedAt: number) {
+  private purgeOld (initializedAt: number): void {
     Object.keys(this.services).forEach(key => {
       if (this.services[key].discoveredAt < initializedAt) {
         console.log(`purging zeroconf service: ${this.services[key].name}`)
@@ -88,7 +92,7 @@ export class ZeroconfDaemon {
   }
 
   // @TODO remove
-  async mock () {
+  mock (): void {
     const result: ZeroconfResult = {
       action: 'resolved',
       service: {
