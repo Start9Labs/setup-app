@@ -17,7 +17,7 @@ export class HttpTorService {
 
   async request<T> (server: string | S9Server | S9BuilderWith<'versionInstalled' | 'privkey' | 'torAddress'>, options: HttpOptions): Promise<T> {
     if (typeof server === 'string') {
-      server = this.serverModel.peekServer(server)
+      server = this.serverModel.peek(server)
     }
     options.headers = Object.assign(options.headers || { }, getAuthHeader(server.privkey))
     options.url = `http://${server.torAddress}:5959/v${server.versionInstalled.charAt(0)}${options.url}`

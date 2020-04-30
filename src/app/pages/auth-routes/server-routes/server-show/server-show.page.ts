@@ -7,7 +7,7 @@ import { ActionSheetButton } from '@ionic/core'
 import { AppInstalled } from 'src/app/models/app-model'
 import * as compareVersions from 'compare-versions'
 import { ApiService } from 'src/app/services/api.service'
-import { ServerSyncService } from 'src/app/services/sync.service'
+import { SyncService } from 'src/app/services/sync.service'
 import { Subscription, BehaviorSubject, Observable } from 'rxjs'
 import { take } from 'rxjs/operators'
 import * as Menu from './server-menu-options'
@@ -45,7 +45,7 @@ export class ServerShowPage {
     private readonly alertCtrl: AlertController,
     private readonly loadingCtrl: LoadingController,
     private readonly apiService: ApiService,
-    private readonly sss: ServerSyncService,
+    private readonly syncService: SyncService,
     readonly serverAppModel: ServerAppModel,
   ) { }
 
@@ -92,7 +92,7 @@ export class ServerShowPage {
   async getServerAndApps (): Promise<void> {
     const server = peekProperties(this.server)
     try {
-      await this.sss.fromCache().syncServer(server)
+      await this.syncService.sync(server.id)
       this.error = ''
     } catch (e) {
       this.error = e.message

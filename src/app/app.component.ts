@@ -9,6 +9,7 @@ import { ServerAppModel } from './models/server-app-model'
 import { AuthenticatePage } from './modals/authenticate/authenticate.page'
 import { Plugins } from '@capacitor/core'
 import { TorService } from './services/tor.service'
+import { ZeroconfMonitor } from './services/zeroconf.service'
 import { SyncService } from './services/sync.service'
 
 const { SplashScreen } = Plugins
@@ -27,6 +28,7 @@ export class AppComponent {
     private readonly authService: AuthService,
     private readonly networkService: NetworkService,
     private readonly torService: TorService,
+    private readonly zeroconfMonitor: ZeroconfMonitor,
     private readonly syncService: SyncService,
     private readonly router: Router,
     private readonly modalCtrl: ModalController,
@@ -38,10 +40,15 @@ export class AppComponent {
     this.platform.ready().then(async () => {
       // init AuthService
       await this.authService.init()
+      if (this.authService.isVerified()) {
+        await this.serverModel.load(this.authService.mnemonic!)
+      }
       // init NetworkService
       this.networkService.init()
       // init TorService
       this.torService.init()
+      // init ZeroconfMonitor
+      this.zeroconfMonitor.init()
       // init SyncService
       this.syncService.init()
       // subscribe to auth status changes
@@ -62,15 +69,14 @@ export class AppComponent {
   }
 
   private async handleAuthChange (authStatus: AuthStatus) {
-    // verified (mnemonic is present and unencrypted)
+    // VERIFIED (mnemonic is present and unencrypted)
     if (authStatus === AuthStatus.VERIFIED) {
-      await this.serverModel.load(this.authService.mnemonic!)
       await this.router.navigate(['/auth'])
-    // missing (no mnemonic)
+    // MISSING (no mnemonic)
     } else if (authStatus === AuthStatus.MISSING) {
       this.clearModels()
       await this.router.navigate(['/unauth'])
-    // unverified (mnemonic is present but encrypted)
+    // UNVERIFIED (mnemonic is present but encrypted)
     } else if (authStatus === AuthStatus.UNVERIFIED) {
       await this.presentModalAuthenticate()
     }

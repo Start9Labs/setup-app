@@ -82,7 +82,7 @@ export class MapSubject<T extends { id: string }> {
     return this.delete$
   }
 
-  peek (id: string): undefined | T {
+  peek (id: string): T {
     return this.subject[id] && peekProperties(this.subject[id])
   }
 

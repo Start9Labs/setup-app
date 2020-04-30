@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { ServerModel, S9Server } from 'src/app/models/server-model'
 import { NavController } from '@ionic/angular'
-import { ServerSyncService } from 'src/app/services/sync.service'
+import { SyncService } from 'src/app/services/sync.service'
 import { Subscription } from 'rxjs'
 import { PropertyObservableWithId } from 'src/app/util/property-subject.util'
 import { TorService } from 'src/app/services/tor.service'
@@ -41,7 +41,7 @@ export class ServerListPage {
   constructor (
     public serverModel: ServerModel,
     public torService: TorService,
-    private readonly sss: ServerSyncService,
+    private readonly syncService: SyncService,
     private readonly navCtrl: NavController,
   ) { }
 
@@ -62,7 +62,7 @@ export class ServerListPage {
   }
 
   async doRefresh (event: any) {
-    await this.sss.fromCache().syncServers()
+    await this.syncService.syncAll()
     event.target.complete()
   }
 

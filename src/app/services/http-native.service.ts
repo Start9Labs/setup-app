@@ -25,7 +25,7 @@
 //     path: string,
 //     options: HttpNativeOptions,
 //   ): Promise<T> {
-//     const server = this.serverModel.peekServer(serverId)
+//     const server = this.serverModel.peek(serverId)
 //     options.headers = Object.assign(options.headers || { }, getAuthHeader(server))
 //     options.timeout = options.timeout || 10
 //     return this.serverRequest(server, path, options)

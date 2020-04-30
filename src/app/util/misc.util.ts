@@ -19,7 +19,7 @@ export function both<T> (arr1: T[], arr2: T[]): T[] {
   return arr1.filter(x => arr2.includes(x))
 }
 
-export async function doForAtLeast (minTime: number, promises: Promise<any>[]): Promise<any[]> {
+export async function doForAtLeast (promises: Promise<any>[], minTime: number): Promise<any[]> {
   const returned = await Promise.all(promises.concat(pauseFor(minTime)))
   returned.pop()
   return returned
@@ -75,7 +75,7 @@ export function deepCloneArray (collection: any) {
   })
 }
 
-export function partitionArray<T> (ts: T[], condition: (t: T) => boolean): [T[],T[]] {
+export function partitionArray<T> (ts: T[], condition: (t: T) => boolean): [T[], T[]] {
   const yes = [] as T[]
   const no = [] as T[]
   ts.forEach(t => {

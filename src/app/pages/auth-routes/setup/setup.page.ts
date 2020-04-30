@@ -15,26 +15,14 @@ export class SetupPage {
   error = ''
   label = ''
   productKey = ''
-  zeroconfSub: Subscription
-  serviceFound = false
 
   constructor (
     private readonly navController: NavController,
     private readonly setupService: SetupService,
     private readonly serverModel: ServerModel,
     private readonly loadingCtrl: LoadingController,
-    private readonly zeroconfMonitor: ZeroconfMonitor,
+    public zeroconfMonitor: ZeroconfMonitor,
   ) { }
-
-  ngOnInit () {
-    this.zeroconfMonitor.init()
-    this.serviceFound = !!Object.entries(this.zeroconfMonitor.services).length
-    this.zeroconfSub = this.zeroconfMonitor.watch().subscribe(service => { this.serviceFound = !!service })
-  }
-
-  ngOnDestroy () {
-    this.zeroconfSub.unsubscribe()
-  }
 
   async submit (): Promise<void> {
     const id = idFromSerial(this.productKey)

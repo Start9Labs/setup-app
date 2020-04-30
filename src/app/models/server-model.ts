@@ -31,12 +31,6 @@ export class ServerModel extends MapSubject<S9Server> {
     return toReturn
   }
 
-  peekServer (serverId: string): S9Server {
-    const toReturn = this.peek(serverId)
-    if (!toReturn) throw new Error(`Tried to peek server. Expected server ${JSON.stringify(serverId)} but not found.`)
-    return toReturn
-  }
-
   removeServer (serverId: string): void {
     this.delete([serverId])
   }
