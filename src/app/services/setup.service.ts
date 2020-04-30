@@ -6,10 +6,9 @@ import { AuthService } from './auth.service'
 import { Lan } from '../types/api-types'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { ZeroconfMonitor } from './zeroconf.service'
-import { HttpLanService } from './http-lan.service'
-import { HttpTorService } from './http-tor.service'
-import { HttpService } from './http.service'
+import { HttpService, getAuthHeader } from './http.service'
 import * as cryptoUtil from '../util/crypto.util'
+import { HttpOptions } from 'capacitor-http'
 
 @Injectable({
   providedIn: 'root',
@@ -20,9 +19,7 @@ export class SetupService {
   public message = ''
 
   constructor (
-    private readonly http: HttpLanService,
-    private readonly httpRaw: HttpService,
-    private readonly httpTor: HttpTorService,
+    private readonly http: HttpService,
     private readonly authService: AuthService,
     private readonly zeroconfMonitor: ZeroconfMonitor,
   ) { }
@@ -108,8 +105,7 @@ export class SetupService {
 
   async getVersion (builder: S9BuilderWith<'zeroconf'>): Promise<string | undefined> {
     try {
-      const host = getLanIP(builder.zeroconf)
-      const { version } = await this.httpRaw.request<Lan.GetVersionRes>({ method: Method.get, url: `http://${host}:5959/version` })
+      const { version } = await this.request<Lan.GetVersionRes>(builder, Method.get, '/version')
       return version
     } catch (e) {
       return undefined
@@ -120,7 +116,7 @@ export class SetupService {
     const { pubkey } = builder
     try {
       const data: Lan.PostRegisterReq = { pubKey: pubkey, productKey }
-      await this.http.request<Lan.PostRegisterRes>(builder, { method: Method.post, url: '/register', data })
+      await this.request<Lan.PostRegisterRes>(builder, Method.post, '/register', data)
       return true
     } catch (e) {
       return false
@@ -129,7 +125,7 @@ export class SetupService {
 
   async getTor (builder: S9BuilderWith<'zeroconf' | 'versionInstalled' | 'pubkey' | 'privkey'>): Promise<string | undefined> {
     try {
-      const { torAddress } = await this.http.request<Lan.GetTorRes>(builder, { method: Method.get, url: '/tor' })
+      const { torAddress } = await this.request<Lan.GetTorRes>(builder, Method.get, '/tor')
       return torAddress
     } catch (e) {
       return undefined
@@ -137,7 +133,21 @@ export class SetupService {
   }
 
   async getServer (builder: S9BuilderWith<'zeroconf' | 'versionInstalled' | 'pubkey' | 'privkey' | 'torAddress'>): Promise<Lan.GetServerRes> {
-    return this.httpTor.request<Lan.GetServerRes>(builder, { method: Method.get, url: '' })
+    return this.request<Lan.GetServerRes>(builder, Method.get, '')
+  }
+
+  async request<T> (builder: S9BuilderWith<'zeroconf'>, method: Method, path: string, data?: any): Promise<T> {
+    const host = getLanIP(builder.zeroconf)
+    const options: HttpOptions = {
+      method,
+      url: `http://${host}:5959${path}`,
+      data,
+    }
+    if (builder.privkey) {
+      options.headers = { 'Authorization': getAuthHeader(builder.privkey) }
+    }
+
+    return this.http.rawRequest<T>(options)
   }
 
   // @TODO remove

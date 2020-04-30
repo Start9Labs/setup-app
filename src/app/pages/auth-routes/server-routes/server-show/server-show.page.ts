@@ -13,7 +13,7 @@ import { take } from 'rxjs/operators'
 import * as Menu from './server-menu-options'
 import { ServerAppModel } from 'src/app/models/server-app-model'
 import { PropertySubject, PropertyObservableWithId, peekProperties, fromPropertyObservable } from 'src/app/util/property-subject.util'
-import { pauseFor } from 'src/app/util/misc.util'
+import { pauseFor, doForAtLeast } from 'src/app/util/misc.util'
 
 @Component({
   selector: 'server-show',
@@ -74,7 +74,7 @@ export class ServerShowPage {
       })
     })
 
-    await Promise.all([this.getServerAndApps(), pauseFor(600)])
+    await this.getServerAndApps()
     this.loading$.next(false)
   }
 
@@ -85,7 +85,7 @@ export class ServerShowPage {
   }
 
   async doRefresh (event: any) {
-    await this.getServerAndApps()
+    await doForAtLeast([this.getServerAndApps()], 600)
     event.target.complete()
   }
 

@@ -4,7 +4,7 @@ import { ServerModel } from 'src/app/models/server-model'
 import { idFromSerial } from 'src/app/models/server-model'
 import { SetupService, fromUserInput } from 'src/app/services/setup.service'
 import { ZeroconfMonitor } from 'src/app/services/zeroconf.service'
-import { Subscription } from 'rxjs'
+import { SyncService } from 'src/app/services/sync.service'
 
 @Component({
   selector: 'setup',
@@ -20,6 +20,7 @@ export class SetupPage {
     private readonly navController: NavController,
     private readonly setupService: SetupService,
     private readonly serverModel: ServerModel,
+    private readonly syncService: SyncService,
     private readonly loadingCtrl: LoadingController,
     public zeroconfMonitor: ZeroconfMonitor,
   ) { }
@@ -38,8 +39,9 @@ export class SetupPage {
     // attempt to acquire all connection info for new server + check status asynchronously
     try {
       const server = await this.setupService.setup(serverData, this.productKey)
-      await this.serverModel.createServer(server)
+      this.serverModel.createServer(server)
       await this.serverModel.saveAll()
+      this.syncService.sync(server.id)
       await this.navController.navigateRoot(['/auth'])
     } catch (e) {
       this.error = `Error: ${e.message}`

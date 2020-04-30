@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs'
 import { PropertyObservableWithId } from 'src/app/util/property-subject.util'
 import { TorService } from 'src/app/services/tor.service'
 import { animate, style, transition, trigger } from '@angular/animations'
+import { doForAtLeast } from 'src/app/util/misc.util'
 
 const torAnimation = trigger(
   'torChange',
@@ -62,7 +63,7 @@ export class ServerListPage {
   }
 
   async doRefresh (event: any) {
-    await this.syncService.syncAll()
+    await doForAtLeast([this.syncService.syncAll()], 600)
     event.target.complete()
   }
 

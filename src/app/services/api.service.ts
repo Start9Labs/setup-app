@@ -7,31 +7,31 @@ import { S9BuilderWith } from './setup.service'
 import * as configUtil from '../util/config.util'
 import { pauseFor } from '../util/misc.util'
 import { ServerAppModel } from '../models/server-app-model'
-import { HttpTorService } from './http-tor.service'
+import { HttpService } from './http.service'
 
 @Injectable({
   providedIn: 'root',
 })
 export class XApiService {
   constructor (
-    private readonly http: HttpTorService,
+    private readonly http: HttpService,
     private readonly appModel: ServerAppModel,
   ) { }
 
   async getServer (serverId: string): Promise<ApiServer> {
-    return this.http.request<Lan.GetServerRes>(serverId, { method: Method.get, url: '' })
+    return this.http.serverRequest<Lan.GetServerRes>(serverId, { method: Method.get, url: '' })
   }
 
   async getVersionLatest (serverId: string): Promise<Lan.GetVersionLatestRes> {
-    return this.http.request<Lan.GetVersionLatestRes>(serverId, { method: Method.get, url: '/versionLatest' })
+    return this.http.serverRequest<Lan.GetVersionLatestRes>(serverId, { method: Method.get, url: '/versionLatest' })
   }
 
   async getServerSpecs (serverId: string): Promise<Lan.GetServerSpecsRes> {
-    return this.http.request<Lan.GetServerSpecsRes>(serverId, { method: Method.get, url: `/specs` })
+    return this.http.serverRequest<Lan.GetServerSpecsRes>(serverId, { method: Method.get, url: `/specs` })
   }
 
   async getServerMetrics (serverId: string): Promise<Lan.GetServerMetricsRes> {
-    return this.http.request<Lan.GetServerMetricsRes>(serverId, { method: Method.get, url: `/metrics` })
+    return this.http.serverRequest<Lan.GetServerMetricsRes>(serverId, { method: Method.get, url: `/metrics` })
   }
 
   async getNotifications (serverId: string, page: number, perPage: number): Promise<S9Notification[]> {
@@ -39,26 +39,26 @@ export class XApiService {
       page: String(page),
       perPage: String(perPage),
     }
-    return this.http.request<Lan.GetNotificationsRes>(serverId, { method: Method.get, url: `/notifications`, params })
+    return this.http.serverRequest<Lan.GetNotificationsRes>(serverId, { method: Method.get, url: `/notifications`, params })
   }
 
   async deleteNotification (serverId: string, id: string): Promise<void> {
-    await this.http.request<Lan.DeleteNotificationRes>(serverId, { method: Method.delete, url: `/notifications/${id}` })
+    await this.http.serverRequest<Lan.DeleteNotificationRes>(serverId, { method: Method.delete, url: `/notifications/${id}` })
   }
 
   async updateAgent (serverId: string, version: string): Promise<void> {
     const data: Lan.PostUpdateAgentReq = {
       version,
     }
-    await this.http.request<Lan.PostUpdateAgentRes>(serverId, { method: Method.post, url: '/update', data })
+    await this.http.serverRequest<Lan.PostUpdateAgentRes>(serverId, { method: Method.post, url: '/update', data })
   }
 
   async getAvailableApps (serverId: string): Promise<AppAvailablePreview[]> {
-    return this.http.request<Lan.GetAppsAvailableRes>(serverId, { method: Method.get, url: '/apps/store' })
+    return this.http.serverRequest<Lan.GetAppsAvailableRes>(serverId, { method: Method.get, url: '/apps/store' })
   }
 
   async getAvailableApp (serverId: string, appId: string): Promise<AppAvailableFull> {
-    return this.http.request<Lan.GetAppAvailableRes>(serverId, { method: Method.get, url: `/apps/${appId}/store` })
+    return this.http.serverRequest<Lan.GetAppAvailableRes>(serverId, { method: Method.get, url: `/apps/${appId}/store` })
       .then(res => {
         return {
           ...res,
@@ -68,7 +68,7 @@ export class XApiService {
   }
 
   async getAvailableAppVersionInfo (serverId: string, appId: string, version: string): Promise<{ releaseNotes: string, versionViewing: string }> {
-    return this.http.request<Lan.GetAppAvailableVersionInfoRes>(serverId, { method: Method.get, url: `/apps/${appId}/store/${version}` })
+    return this.http.serverRequest<Lan.GetAppAvailableVersionInfoRes>(serverId, { method: Method.get, url: `/apps/${appId}/store/${version}` })
       .then(res => {
         return {
           ...res,
@@ -78,11 +78,11 @@ export class XApiService {
   }
 
   async getInstalledApp (serverId: string, appId: string): Promise<AppInstalled> {
-    return this.http.request<Lan.GetAppInstalledRes>(serverId, { method: Method.get, url: `/apps/${appId}/installed` })
+    return this.http.serverRequest<Lan.GetAppInstalledRes>(serverId, { method: Method.get, url: `/apps/${appId}/installed` })
   }
 
   async getInstalledApps (serverId: string): Promise<AppInstalled[]> {
-    return this.http.request<Lan.GetAppsInstalledRes>(serverId, { method: Method.get, url: `/apps/installed` })
+    return this.http.serverRequest<Lan.GetAppsInstalledRes>(serverId, { method: Method.get, url: `/apps/installed` })
   }
 
   async getAppConfig (serverId: string, appId: string): Promise<{
@@ -90,7 +90,7 @@ export class XApiService {
     config: object
     rules: Rules[]
   }> {
-    return this.http.request<Lan.GetAppConfigRes>(serverId, { method: Method.get, url: `/apps/${appId}/config` })
+    return this.http.serverRequest<Lan.GetAppConfigRes>(serverId, { method: Method.get, url: `/apps/${appId}/config` })
       .then(({ spec, config, rules }) => {
         return {
           spec,
@@ -101,31 +101,31 @@ export class XApiService {
   }
 
   async getAppLogs (serverId: string, appId: string, params: Lan.GetAppLogsReq = { }): Promise<string[]> {
-    return this.http.request<Lan.GetAppLogsRes>(serverId, { method: Method.get, url: `/apps/${appId}/logs`, params: params as any })
+    return this.http.serverRequest<Lan.GetAppLogsRes>(serverId, { method: Method.get, url: `/apps/${appId}/logs`, params: params as any })
   }
 
   async getAppMetrics (serverId: string, appId: string): Promise<Lan.GetAppMetricsRes> {
-    return this.http.request<Lan.GetAppMetricsRes>(serverId, { method: Method.get, url: `/apps/${appId}/metrics` })
+    return this.http.serverRequest<Lan.GetAppMetricsRes>(serverId, { method: Method.get, url: `/apps/${appId}/metrics` })
   }
 
   async installApp (serverId: string, appId: string, version: string): Promise<AppInstalled> {
     const data: Lan.PostInstallAppReq = {
       version,
     }
-    return this.http.request<Lan.PostInstallAppRes>(serverId, { method: Method.post, url: `/apps/${appId}/install`, data })
+    return this.http.serverRequest<Lan.PostInstallAppRes>(serverId, { method: Method.post, url: `/apps/${appId}/install`, data })
   }
 
   async uninstallApp (serverId: string, appId: string): Promise<void> {
-    await this.http.request<Lan.PostUninstallAppRes>(serverId, { method: Method.post, url: `/apps/${appId}/uninstall`, readTimeout: 30 })
+    await this.http.serverRequest<Lan.PostUninstallAppRes>(serverId, { method: Method.post, url: `/apps/${appId}/uninstall`, readTimeout: 30 })
   }
 
   async startApp (serverId: string, appId: string): Promise<void> {
-    await this.http.request<Lan.PostStartAppRes>(serverId, { method: Method.post, url: `/apps/${appId}/start`, readTimeout: 30 })
+    await this.http.serverRequest<Lan.PostStartAppRes>(serverId, { method: Method.post, url: `/apps/${appId}/start`, readTimeout: 30 })
     this.appModel.get(serverId).updateApp({ id: appId, status: AppStatus.RUNNING, statusAt: new Date().toISOString() })
   }
 
   async stopApp (serverId: string, appId: string): Promise<void> {
-    await this.http.request<Lan.PostStopAppRes>(serverId, { method: Method.post, url: `/apps/${appId}/stop`, readTimeout: 30 })
+    await this.http.serverRequest<Lan.PostStopAppRes>(serverId, { method: Method.post, url: `/apps/${appId}/stop`, readTimeout: 30 })
     this.appModel.get(serverId).updateApp({ id: appId, status: AppStatus.STOPPED, statusAt: new Date().toISOString() })
   }
 
@@ -133,27 +133,27 @@ export class XApiService {
     const data: Lan.PostUpdateAppConfigReq = {
       config,
     }
-    await this.http.request<Lan.PostUpdateAppConfigRes>(serverId, { method: Method.patch, url: `/apps/${app.id}/config`, data, readTimeout: 30 })
+    await this.http.serverRequest<Lan.PostUpdateAppConfigRes>(serverId, { method: Method.patch, url: `/apps/${app.id}/config`, data, readTimeout: 30 })
   }
 
   async wipeAppData (serverId: string, app: AppInstalled): Promise<void> {
-    await this.http.request<Lan.PostWipeAppDataRes>(serverId, { method: Method.post, url: `/apps/${app.id}/wipe`, readTimeout: 30 })
+    await this.http.serverRequest<Lan.PostWipeAppDataRes>(serverId, { method: Method.post, url: `/apps/${app.id}/wipe`, readTimeout: 30 })
     this.appModel.get(serverId).updateApp({ id: app.id, status: AppStatus.NEEDS_CONFIG, statusAt: new Date().toISOString() })
   }
 
   async getSSHKeys (serverId: string): Promise<SSHFingerprint[]> {
-    return this.http.request<Lan.GetSSHKeysRes>(serverId, { method: Method.get, url: `/sshKeys` })
+    return this.http.serverRequest<Lan.GetSSHKeysRes>(serverId, { method: Method.get, url: `/sshKeys` })
   }
 
   async addSSHKey (serverId: string, sshKey: string): Promise<SSHFingerprint> {
     const data: Lan.PostAddSSHKeyReq = {
       sshKey,
     }
-    return this.http.request<Lan.PostAddSSHKeyRes>(serverId, { method: Method.post, url: `/sshKeys`, data })
+    return this.http.serverRequest<Lan.PostAddSSHKeyRes>(serverId, { method: Method.post, url: `/sshKeys`, data })
   }
 
   async getWifi (serverId: string, timeout?: number): Promise<Lan.GetWifiRes> {
-    return this.http.request<Lan.GetWifiRes>(serverId, { method: Method.get, url: `/wifi`, readTimeout: timeout })
+    return this.http.serverRequest<Lan.GetWifiRes>(serverId, { method: Method.get, url: `/wifi`, readTimeout: timeout })
   }
 
   async addWifi (serverId: string, ssid: string, password: string, country: string): Promise<void> {
@@ -162,30 +162,30 @@ export class XApiService {
       password,
       country,
     }
-    await this.http.request<Lan.PostAddWifiRes>(serverId, { method: Method.post, url: `/wifi`, data })
+    await this.http.serverRequest<Lan.PostAddWifiRes>(serverId, { method: Method.post, url: `/wifi`, data })
   }
 
   async connectWifi (serverId: string, ssid: string, country: string): Promise<void> {
     const params: Lan.PostConnectWifiReq = {
       country,
     }
-    await this.http.request<Lan.PostConnectWifiRes>(serverId, { method: Method.post, url: encodeURI(`/wifi/${ssid}`), params })
+    await this.http.serverRequest<Lan.PostConnectWifiRes>(serverId, { method: Method.post, url: encodeURI(`/wifi/${ssid}`), params })
   }
 
   async deleteWifi (serverId: string, ssid: string): Promise<void> {
-    await this.http.request<Lan.DeleteWifiRes>(serverId, { method: Method.delete, url: encodeURI(`/wifi/${ssid}`) })
+    await this.http.serverRequest<Lan.DeleteWifiRes>(serverId, { method: Method.delete, url: encodeURI(`/wifi/${ssid}`) })
   }
 
   async deleteSSHKey (serverId: string, sshKey: string): Promise<void> {
-    await this.http.request<Lan.DeleteSSHKeyRes>(serverId, { method: Method.delete, url: `/sshKeys/${sshKey}` })
+    await this.http.serverRequest<Lan.DeleteSSHKeyRes>(serverId, { method: Method.delete, url: `/sshKeys/${sshKey}` })
   }
 
   async restartServer (serverId: string): Promise<void> {
-    await this.http.request<Lan.PostRestartServerRes>(serverId, { method: Method.post, url: '/restart', readTimeout: 30 })
+    await this.http.serverRequest<Lan.PostRestartServerRes>(serverId, { method: Method.post, url: '/restart', readTimeout: 30 })
   }
 
   async shutdownServer (serverId: string): Promise<void> {
-    await this.http.request<Lan.PostShutdownServerRes>(serverId, { method: Method.post, url: '/shutdown', readTimeout: 30 })
+    await this.http.serverRequest<Lan.PostShutdownServerRes>(serverId, { method: Method.post, url: '/shutdown', readTimeout: 30 })
   }
 }
 

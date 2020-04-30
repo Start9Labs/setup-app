@@ -3,7 +3,7 @@ import { ToastController, NavController } from '@ionic/angular'
 import { ServerModel, S9Server, ServerStatus } from '../models/server-model'
 import { ApiService } from './api.service'
 import { AppStatus } from '../models/app-model'
-import { tryAll, pauseFor, doForAtLeast } from '../util/misc.util'
+import { tryAll, pauseFor } from '../util/misc.util'
 import { ServerAppModel } from '../models/server-app-model'
 import { TorService, TorConnection } from './tor.service'
 import { ZeroconfMonitor } from './zeroconf.service'
@@ -106,7 +106,7 @@ export class SyncService {
 
   async syncAll (): Promise<void> {
     const servers = this.serverModel.peekAll()
-    doForAtLeast(servers.map(async s => await this.sync(s.id)), 1000)
+    servers.forEach(s => this.sync(s.id))
   }
 }
 
