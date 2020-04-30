@@ -34,7 +34,7 @@ export class TorService {
   }
 
   async start (): Promise<void> {
-    return this.mock()
+    // return this.mock()
 
     if (this.daemon || !this.platform.is('cordova')) { return }
 

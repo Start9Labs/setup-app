@@ -41,7 +41,7 @@ export class ZeroconfMonitor {
   }
 
   private async start (): Promise<void> {
-    return this.mock()
+    // return this.mock()
 
     if (!this.platform.is('cordova')) { return }
 

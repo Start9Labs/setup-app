@@ -1,8 +1,5 @@
 import { Component } from '@angular/core'
-import { S9Server } from 'src/app/models/server-model'
 import { ActivatedRoute } from '@angular/router'
-import { ServerModel } from 'src/app/models/server-model'
-import { Observable } from 'rxjs'
 
 @Component({
   selector: 'dev-options',
