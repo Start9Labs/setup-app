@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Zeroconf, ZeroconfResult, ZeroconfService } from '@ionic-native/zeroconf/ngx'
-import { Subscription, Observable, Subject, BehaviorSubject, ReplaySubject } from 'rxjs'
+import { Subscription, Observable, BehaviorSubject, ReplaySubject } from 'rxjs'
 import { Platform } from '@ionic/angular'
 import { NetworkService } from './network.service'
 import { NetworkStatus } from '@capacitor/core'
@@ -11,8 +11,8 @@ import { NetworkStatus } from '@capacitor/core'
 export class ZeroconfMonitor {
   private readonly serviceFound$ = new ReplaySubject<ZeroconfService>(10)
   private readonly serviceExists$ = new BehaviorSubject<boolean>(false)
-  watchServiceFound (): Observable<ZeroconfService> { return this.serviceFound$ }
-  watchServiceExists (): Observable<boolean> { return this.serviceExists$ }
+  watchServiceFound (): Observable<ZeroconfService> { return this.serviceFound$.asObservable() }
+  watchServiceExists (): Observable<boolean> { return this.serviceExists$.asObservable() }
   services: { [hostname: string]: ZeroconfServiceExt } = { }
   private zeroconfSub: Subscription | undefined
   readonly timeToPurge = 4000
@@ -32,7 +32,6 @@ export class ZeroconfMonitor {
       this.start()
     } else {
       this.stop()
-      this.services = { }
     }
   }
 
@@ -47,7 +46,7 @@ export class ZeroconfMonitor {
 
     if (this.zeroconfSub) { await this.zeroconf.reInit() }
 
-    console.log('starting zeroconf service')
+    console.log('starting zeroconf monitor')
 
     setTimeout(now => this.purgeOld(now), this.timeToPurge, new Date().valueOf())
 
@@ -57,8 +56,9 @@ export class ZeroconfMonitor {
   }
 
   private stop (): void {
+    this.services = { }
     if (!this.zeroconfSub) { return }
-    console.log('stopping zeroconf daemon')
+    console.log('stopping zeroconf monitor')
     this.zeroconfSub.unsubscribe()
     this.zeroconfSub = undefined
   }

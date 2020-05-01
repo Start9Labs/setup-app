@@ -8,6 +8,10 @@ import { ServerAppModel } from '../models/server-app-model'
 import { TorService, TorConnection } from './tor.service'
 import { ZeroconfMonitor } from './zeroconf.service'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
+import * as uuid from 'uuid'
+import { NetworkService } from './network.service'
+import { NetworkStatus } from '@capacitor/core'
+import { Subscription } from 'rxjs'
 
 @Injectable({
   providedIn: 'root',
@@ -69,21 +73,13 @@ export class SyncService {
     private readonly syncNotifier: SyncNotifier,
     private readonly zeroconfMonitor: ZeroconfMonitor,
     private readonly torService: TorService,
+    private readonly networkService: NetworkService,
   ) { }
 
   init (): void {
+    this.networkService.watch().subscribe(n => this.handleNetworkChange(n))
     this.zeroconfMonitor.watchServiceFound().subscribe(s => this.handleZeroconfService(s))
     this.torService.watchConnection().subscribe(c => this.handleTorChange(c))
-  }
-
-  handleZeroconfService (service: ZeroconfService) {
-    this.sync(service.name.split('-')[1])
-  }
-
-  handleTorChange (connection: TorConnection): void {
-    if (connection === TorConnection.connected) {
-      this.syncAll()
-    }
   }
 
   async sync (id: string): Promise<void> {
@@ -101,18 +97,43 @@ export class SyncService {
       )
     }
 
-    await this.embassies[id].start()
+    this.embassies[id].start()
   }
 
   async syncAll (): Promise<void> {
     const servers = this.serverModel.peekAll()
     servers.forEach(s => this.sync(s.id))
   }
+
+  async stopAll (): Promise<void> {
+    Object.values(this.embassies).forEach(daemon => {
+      daemon.stop()
+      daemon.markServerUnreachable()
+    })
+  }
+
+  private handleNetworkChange (network: NetworkStatus) {
+    if (!network.connected) {
+      this.stopAll()
+    }
+  }
+
+  private handleZeroconfService (service: ZeroconfService) {
+    this.sync(service.name.split('-')[1])
+  }
+
+  private handleTorChange (connection: TorConnection): void {
+    if (connection === TorConnection.connected) {
+      this.syncAll()
+    }
+  }
 }
 
 class EmbassyDaemon {
   private readonly syncInterval = 5000
-  syncing = false
+  private forceStop = false
+  private daemonId: string
+  private server: S9Server
 
   constructor (
     private readonly id: string,
@@ -122,60 +143,63 @@ class EmbassyDaemon {
     private readonly syncNotifier: SyncNotifier,
   ) { }
 
-  async start () {
-    if (this.syncing) { return }
+  async start (daemonId = uuid.v4(), recycled = false) {
+    if (this.forceStop || recycled && daemonId !== this.daemonId) { return }
+    this.daemonId = daemonId
 
-    let server = this.serverModel.peek(this.id)
-
-    if (!server) { return }
+    this.server = this.serverModel.peek(this.id)
+    if (!this.server) { return }
 
     console.log(`syncing ${this.id}`)
 
-    this.syncing = true
-    await this.sync(server)
-    this.syncing = false
+    await this.getServerAndApps()
 
-    server = this.serverModel.peek(server.id)
+    this.server = this.serverModel.peek(this.id)
+    if (!this.server) { return }
 
-    this.syncNotifier.handleNotifications(server)
+    this.syncNotifier.handleNotifications(this.server)
 
-    setTimeout(() => this.start(), this.syncInterval)
+    setTimeout(() => this.start(daemonId, true), this.syncInterval)
   }
 
-  private async sync (server: S9Server): Promise<void> {
+  stop (): void {
+    this.forceStop = true
+  }
+
+  markServerUnreachable (): void {
+    this.serverModel.updateServer(this.id, serverUnreachable())
+    this.serverAppModel.get(this.id).updateAppsUniformly(appUnreachable())
+  }
+
+  private async getServerAndApps (): Promise<void> {
     const [serverRes, appsRes] = await tryAll([
-      this.apiService.getServer(server.id),
-      pauseFor(250).then(() => this.apiService.getInstalledApps(server.id)),
+      this.apiService.getServer(this.id),
+      pauseFor(250).then(() => this.apiService.getInstalledApps(this.id)),
     ])
 
     switch (serverRes.result) {
       case 'resolve': {
-        this.serverModel.updateServer(server.id, serverRes.value)
+        this.serverModel.updateServer(this.id, serverRes.value)
         break
       }
       case 'reject': {
-        console.error(`get server request for ${server.id} rejected with ${JSON.stringify(serverRes.value)}`)
-        this.markServerUnreachable(server)
+        console.error(`get server request for ${this.id} rejected with ${JSON.stringify(serverRes.value)}`)
+        this.markServerUnreachable()
         break
       }
     }
 
     switch (appsRes.result) {
       case 'resolve': {
-        this.serverAppModel.get(server.id).syncAppCache(appsRes.value)
+        this.serverAppModel.get(this.id).syncAppCache(appsRes.value)
         break
       }
       case 'reject': {
-        console.error(`get apps request for ${server.id} rejected with ${JSON.stringify(appsRes.value)}`)
-        this.serverAppModel.get(server.id).updateAppsUniformly(appUnreachable())
+        console.error(`get apps request for ${this.id} rejected with ${JSON.stringify(appsRes.value)}`)
+        this.serverAppModel.get(this.id).updateAppsUniformly(appUnreachable())
         break
       }
     }
-  }
-
-  private markServerUnreachable (server: S9Server): void {
-    this.serverModel.updateServer(server.id, serverUnreachable())
-    this.serverAppModel.get(server.id).updateAppsUniformly(appUnreachable())
   }
 }
 

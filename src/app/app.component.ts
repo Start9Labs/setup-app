@@ -43,14 +43,14 @@ export class AppComponent {
       if (this.authService.isVerified()) {
         await this.serverModel.load(this.authService.mnemonic!)
       }
-      // init NetworkService
-      this.networkService.init()
+      // init SyncService
+      this.syncService.init()
       // init TorService
       this.torService.init()
       // init ZeroconfMonitor
       this.zeroconfMonitor.init()
-      // init SyncService
-      this.syncService.init()
+      // init NetworkService
+      this.networkService.init()
       // subscribe to auth status changes
       this.authService.watch().subscribe(authStatus => {
         this.handleAuthChange(authStatus)

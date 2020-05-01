@@ -1,26 +1,25 @@
 import { Injectable } from '@angular/core'
-import { Storage } from '@ionic/storage'
 import * as cryptoUtil from '../util/crypto.util'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { AuthStatus } from '../types/enums'
+
+import { Plugins } from '@capacitor/core'
+const { Storage } = Plugins
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private readonly authState$ = new BehaviorSubject<AuthStatus>(AuthStatus.UNINITIALIZED)
-  watch (): Observable<AuthStatus> { return this.authState$ }
+  watch (): Observable<AuthStatus> { return this.authState$.asObservable() }
   mnemonicEncrypted: cryptoUtil.Hex | null = null
   mnemonic: string[] | undefined
   pinEnabled = false
 
-  constructor (
-    private readonly storage: Storage,
-  ) { }
+  constructor () { }
 
   async init () {
-    // returns null if key does not exist
-    this.mnemonicEncrypted = await this.storage.get('mnemonic') as cryptoUtil.Hex
+    this.mnemonicEncrypted = (await Storage.get({ key: 'mnemonic' })).value as cryptoUtil.Hex | null
 
     if (this.mnemonicEncrypted) {
       try {
@@ -62,12 +61,12 @@ export class AuthService {
     const mnemonicEncrypted = await cryptoUtil.encrypt(JSON.stringify(this.mnemonic), pin)
     this.mnemonicEncrypted = mnemonicEncrypted
 
-    await this.storage.set('mnemonic', mnemonicEncrypted)
+    await Storage.set({ key: 'mnemonic', value: mnemonicEncrypted })
   }
 
   async logout (): Promise<void> {
     this.clearCache()
-    await this.storage.clear()
+    await Storage.clear()
     this.authState$.next(AuthStatus.MISSING)
   }
 

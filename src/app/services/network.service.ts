@@ -11,7 +11,7 @@ const { Network } = Plugins
 })
 export class NetworkService {
   private readonly networkStatus$ = new Subject<NetworkStatus>()
-  watch (): Observable<NetworkStatus> { return this.networkStatus$ }
+  watch (): Observable<NetworkStatus> { return this.networkStatus$.asObservable() }
   private listener: PluginListenerHandle | undefined
 
   constructor (
@@ -38,7 +38,7 @@ export class NetworkService {
     this.networkStatus$.next(await Network.getStatus())
 
     this.listener = Network.addListener('networkStatusChange', (status) => {
-      console.log('Network Status Changed', status)
+      console.log('network status changed', status)
       this.networkStatus$.next(status)
     })
   }

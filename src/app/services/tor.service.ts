@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Tor } from 'capacitor-tor'
-import { Observable, Subject, Subscription, BehaviorSubject } from 'rxjs'
+import { Observable, Subscription, BehaviorSubject } from 'rxjs'
 import { NetworkService } from './network.service'
 import { NetworkStatus } from '@capacitor/core'
 import { Platform } from '@ionic/angular'
@@ -10,10 +10,10 @@ import { Platform } from '@ionic/angular'
 })
 export class TorService {
   private readonly tor = new Tor()
-  private readonly progress$ = new Subject<number>()
+  private readonly progress$ = new BehaviorSubject<number>(0)
   private readonly connection$ = new BehaviorSubject<TorConnection>(TorConnection.uninitialized)
-  watchProgress (): Observable<number> { return this.progress$ }
-  watchConnection (): Observable<TorConnection> { return this.connection$ }
+  watchProgress (): Observable<number> { return this.progress$.asObservable() }
+  watchConnection (): Observable<TorConnection> { return this.connection$.asObservable() }
   private daemon: Subscription | undefined
 
   constructor (
@@ -42,9 +42,11 @@ export class TorService {
 
     this.connection$.next(TorConnection.in_progress)
 
-    this.daemon = this.tor.initTor().subscribe(progress => {
+    this.daemon = this.tor.initTor({ socksPort: 59590 }).subscribe(progress => {
       this.progress$.next(progress)
-      if (progress === 1) { this.connection$.next(TorConnection.connected) }
+      if (progress === 100) {
+        this.connection$.next(TorConnection.connected)
+      }
     })
   }
 
@@ -55,15 +57,19 @@ export class TorService {
     // await this.tor.stopTor()
     this.connection$.next(TorConnection.disconnected)
     this.progress$.next(0)
+    this.daemon = undefined
   }
 
   async mock (): Promise<void> {
     this.connection$.next(TorConnection.in_progress)
-    setTimeout(() => { this.progress$.next(.25) }, 1500)
-    setTimeout(() => { this.progress$.next(.4) }, 2000)
-    setTimeout(() => { this.progress$.next(.6) }, 3000)
-    setTimeout(() => { this.progress$.next(.9) }, 4500)
-    setTimeout(() => { this.progress$.next(1); this.connection$.next(TorConnection.connected) }, 5500)
+    setTimeout(() => { this.progress$.next(25) }, 1500)
+    setTimeout(() => { this.progress$.next(40) }, 2000)
+    setTimeout(() => { this.progress$.next(60) }, 3000)
+    setTimeout(() => { this.progress$.next(90) }, 4500)
+    setTimeout(() => {
+      this.progress$.next(100)
+      this.connection$.next(TorConnection.connected)
+    }, 5500)
   }
 }
 

@@ -105,7 +105,7 @@ export class SetupService {
 
   async getVersion (builder: S9BuilderWith<'zeroconf'>): Promise<string | undefined> {
     try {
-      const { version } = await this.request<Lan.GetVersionRes>(builder, Method.get, '/version')
+      const { version } = await this.request<Lan.GetVersionRes>(builder, Method.GET, '/version')
       return version
     } catch (e) {
       return undefined
@@ -116,7 +116,7 @@ export class SetupService {
     const { pubkey } = builder
     try {
       const data: Lan.PostRegisterReq = { pubKey: pubkey, productKey }
-      await this.request<Lan.PostRegisterRes>(builder, Method.post, '/register', data)
+      await this.request<Lan.PostRegisterRes>(builder, Method.POST, '/register', data)
       return true
     } catch (e) {
       return false
@@ -125,7 +125,7 @@ export class SetupService {
 
   async getTor (builder: S9BuilderWith<'zeroconf' | 'versionInstalled' | 'pubkey' | 'privkey'>): Promise<string | undefined> {
     try {
-      const { torAddress } = await this.request<Lan.GetTorRes>(builder, Method.get, '/tor')
+      const { torAddress } = await this.request<Lan.GetTorRes>(builder, Method.GET, `/tor`)
       return torAddress
     } catch (e) {
       return undefined
@@ -133,11 +133,12 @@ export class SetupService {
   }
 
   async getServer (builder: S9BuilderWith<'zeroconf' | 'versionInstalled' | 'pubkey' | 'privkey' | 'torAddress'>): Promise<Lan.GetServerRes> {
-    return this.request<Lan.GetServerRes>(builder, Method.get, '')
+    return this.request<Lan.GetServerRes>(builder, Method.GET, '')
   }
 
   async request<T> (builder: S9BuilderWith<'zeroconf'>, method: Method, path: string, data?: any): Promise<T> {
     const host = getLanIP(builder.zeroconf)
+    path = builder.versionInstalled ? `/v${builder.versionInstalled.charAt(0)}${path}` : path
     const options: HttpOptions = {
       method,
       url: `http://${host}:5959${path}`,

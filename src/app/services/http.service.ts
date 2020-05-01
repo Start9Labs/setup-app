@@ -34,28 +34,27 @@ export class HttpService {
       host = server.torAddress
       options.proxy = {
         host: 'localhost',
-        port: 9150,
+        port: 59590,
         protocol: 'SOCKS',
       }
     }
 
     options.url = `http://${host}:5959/v${server.versionInstalled.charAt(0)}${options.url}`
 
-    return this.rawRequest(options)
+    return this.rawRequest<T>(options)
   }
 
   async rawRequest<T> (options: HttpOptions): Promise<T> {
     options.headers = Object.assign(options.headers || { }, {
+      'Content-Type': 'application/json',
       'app-version': version,
     })
-    if (options.method === Method.post && !options.data) {
+    if (options.method === Method.POST && !options.data) {
       options.data = { }
     }
 
     try {
-      console.log('** REQUEST **: ', options)
       const res = await HttpPluginNativeImpl.request(options)
-      console.log('** RESPONSE **: ', res)
       return res.data || { }
     } catch (e) {
       console.error(e)

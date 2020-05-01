@@ -17,7 +17,6 @@ export class ServerAppModel {
   create (serverId: string): void {
     if (!this.lightCache[serverId]) {
       this.lightCache[serverId] = new AppModel(serverId)
-      console.log('light cache made')
     }
   }
 
