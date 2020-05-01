@@ -17,7 +17,7 @@ export class HttpService {
     private readonly serverModel: ServerModel,
   ) { }
 
-  async serverRequest<T> (server: string | S9Server | S9BuilderWith<'versionInstalled' | 'privkey' | 'torAddress'>, options: HttpOptions): Promise<T> {
+  async serverRequest<T> (server: string | S9Server | S9BuilderWith<'versionInstalled' | 'privkey' | 'torAddress'>, options: HttpOptions, withVersion = true): Promise<T> {
     if (typeof server === 'string') {
       server = this.serverModel.peek(server)
     }
@@ -31,7 +31,7 @@ export class HttpService {
     if (zcs) {
       host = getLanIP(zcs)
     } else {
-      host = server.torAddress
+      host = server.torAddress.trim() // @COMPAT Ambassador <= 1.3.0 retuned torAddress with trailing \n
       options.proxy = {
         host: 'localhost',
         port: 59590,
@@ -39,7 +39,9 @@ export class HttpService {
       }
     }
 
-    options.url = `http://${host}:5959/v${server.versionInstalled.charAt(0)}${options.url}`
+    const version = withVersion ? `/v${server.versionInstalled.charAt(0)}` : ''
+
+    options.url = `http://${host}:5959${version}${options.url}`
 
     return this.rawRequest<T>(options)
   }
@@ -54,7 +56,9 @@ export class HttpService {
     }
 
     try {
+      console.log('** REQ **', options)
       const res = await HttpPluginNativeImpl.request(options)
+      console.log('** RES **', res)
       return res.data || { }
     } catch (e) {
       console.error(e)

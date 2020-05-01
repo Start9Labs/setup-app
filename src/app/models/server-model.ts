@@ -60,8 +60,6 @@ export class ServerModel extends MapSubject<S9Server> {
   }
 }
 
-type S9ServerStore = S9ServerStorable[]
-
 export interface S9ServerStorable {
   id: string
   label: string
@@ -143,7 +141,7 @@ export function toStorableServer (ss: S9Server): S9ServerStorable {
   return {
     id,
     label,
-    torAddress,
+    torAddress: torAddress.trim(), // @COMPAT Ambassador <= 1.3.0 retuned torAddress with trailing \n
     versionInstalled,
   }
 }

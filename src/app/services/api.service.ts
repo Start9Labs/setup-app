@@ -23,7 +23,7 @@ export class ApiService {
   }
 
   async getVersionLatest (serverId: string): Promise<Lan.GetVersionLatestRes> {
-    return this.http.serverRequest<Lan.GetVersionLatestRes>(serverId, { method: Method.GET, url: '/versionLatest' })
+    return this.http.serverRequest<Lan.GetVersionLatestRes>(serverId, { method: Method.GET, url: '/versionLatest' }, false)
   }
 
   async getServerSpecs (serverId: string): Promise<Lan.GetServerSpecsRes> {

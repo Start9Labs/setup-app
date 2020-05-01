@@ -28,36 +28,29 @@ export class TorService {
   handleNetworkChange (network: NetworkStatus): void {
     if (network.connected) {
       this.start()
-    } else {
-      this.stop()
     }
   }
 
   async start (): Promise<void> {
     // return this.mock()
 
-    if (this.daemon || !this.platform.is('cordova')) { return }
+    if (!this.platform.is('cordova')) { return }
+
+    // @TODO it's not enough to check for this.daemon. We also need to make sure Tor is still connected
+    if (this.daemon) {
+      this.connection$.next(TorConnection.connected)
+      return
+    }
 
     console.log('starting Tor')
 
-    this.connection$.next(TorConnection.in_progress)
-
     this.daemon = this.tor.initTor({ socksPort: 59590 }).subscribe(progress => {
+      this.connection$.next(TorConnection.in_progress)
       this.progress$.next(progress)
       if (progress === 100) {
         this.connection$.next(TorConnection.connected)
       }
     })
-  }
-
-  async stop (): Promise<void> {
-    if (!this.daemon) { return }
-
-    console.log('stopping Tor')
-    // await this.tor.stopTor()
-    this.connection$.next(TorConnection.disconnected)
-    this.progress$.next(0)
-    this.daemon = undefined
   }
 
   async mock (): Promise<void> {
