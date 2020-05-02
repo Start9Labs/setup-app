@@ -17,7 +17,7 @@
         <h3>Instructions</h3>
         <br />
         <p>
-          Enter a bip39-compliant mnemonic seed, separated with spaces.
+          Enter a valid bip39 mnemonic seed, separated with spaces.
         </p>
         <br />
         <p>
@@ -25,25 +25,25 @@
         </p>
         <br />
         <p>
-          Although it will work, please <b>DO NOT</b> re-use a mnemonic seed that is currently being used for financial purposes.
+          Please <b>DO NOT</b> re-use a mnemonic seed that is currently being used for financial purposes.
         </p>
       </ion-label>
     </ion-item>
   </ion-item-group>
 
-  <ion-item-group>
-    <ion-item-divider></ion-item-divider>
-    <ion-item class="naked-item">
-      <ion-textarea autoGrow rows="4" [(ngModel)]="mnemonic" placeholder="Enter mnemonic seed"></ion-textarea>
+  <form (submit)="connect()">
+    <ion-item-group>
+      <ion-item-divider></ion-item-divider>
+      <ion-item class="naked-item">
+        <ion-textarea autoGrow rows="4" [(ngModel)]="mnemonic" name="mnemonic" placeholder="Enter mnemonic seed"></ion-textarea>
+      </ion-item>
+    </ion-item-group>
+    <ion-item *ngIf="error" style="margin-top: 16px;">
+      <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
     </ion-item>
-  </ion-item-group>
-
-  <ion-item *ngIf="error" style="margin-top: 16px;">
-    <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
-  </ion-item>
-
-  <ion-button [disabled]="!mnemonic" style="margin-top: 30px" expand="block" fill="outline" (click)="login()">
-    Continue
-  </ion-button>
+    <ion-button type="submit" [disabled]="!mnemonic" style="margin-top: 30px" expand="block" fill="outline">
+      Continue
+    </ion-button>
+  </form>
 
 </ion-content>

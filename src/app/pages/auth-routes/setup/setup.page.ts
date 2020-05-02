@@ -30,7 +30,7 @@ export class SetupPage {
     const serverData = fromUserInput(id, this.label)
 
     const loader = await this.loadingCtrl.create({
-      message: 'Setting up server. This could take a while...',
+      message: 'Claiming Embassy. This could take a while...',
       spinner: 'lines',
       cssClass: 'loader',
     })

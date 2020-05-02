@@ -49,13 +49,13 @@ export class SetupService {
   private async discoverAttempt (builder: S9ServerBuilder): Promise<S9ServerBuilder> {
     // enable lan
     if (!hasValues(['zeroconf'], builder)) {
-      this.message = `discovering server on local network. Please check your Product Key and see "Instructions" below.`
+      this.message = `discovering Embassy on local network. Please check your Product Key and see "Instructions" below.`
       builder.zeroconf = this.zeroconfMonitor.getService(builder.id)
     }
 
     // agent version
     if (hasValues(['zeroconf'], builder) && !hasValues(['versionInstalled'], builder)) {
-      this.message = `communicating with server`
+      this.message = `communicating with Embassy`
       builder.versionInstalled = await this.getVersion(builder)
     }
 
@@ -82,7 +82,7 @@ export class SetupService {
 
     // tor acquisition
     if (hasValues(['pubkey', 'privkey'], builder) && builder.registered && !hasValues(['torAddress'], builder)) {
-      this.message = `getting server tor address`
+      this.message = `getting Embassy tor address`
       builder.torAddress = await this.getTor(builder)
     }
 
@@ -92,7 +92,7 @@ export class SetupService {
       builder.registered &&
       builder.status !== ServerStatus.RUNNING
     ) {
-      this.message = `getting server information`
+      this.message = `getting Embassy information`
       await this.getServer(builder)
         .then(serverRes => {
           builder = { ...builder, ...serverRes }
