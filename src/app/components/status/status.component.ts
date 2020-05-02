@@ -13,8 +13,6 @@ export class StatusComponent {
   color: string
   display: string
 
-  constructor () { }
-
   ngOnChanges () {
     if (this.serverStatus) {
       this.handleServerStatus()

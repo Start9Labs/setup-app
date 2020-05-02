@@ -24,7 +24,7 @@
     <ion-card *ngFor="let app of apps" style="margin-bottom: 16px;" [routerLink]="[app.id]">
       <ion-item>
         <ion-avatar slot="start">
-          <img [src]="app.iconURL" alt="icon" />
+          <img [src]="getIcon(app.id)" alt="icon" />
         </ion-avatar>
         <ion-label>
           <h1>{{ app.title }}</h1>

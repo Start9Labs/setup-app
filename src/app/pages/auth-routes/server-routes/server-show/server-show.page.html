@@ -56,11 +56,9 @@
     <ion-item-divider>Apps Installed</ion-item-divider>
 
     <ion-item *ngFor="let app of apps" [routerLink]="['apps', 'installed', app.id]">
-      <ng-container *ngVar="app.observe.iconURL | async as iconURL">
+      <ng-container *ngVar="app.observe.iconUrl | async as iconUrl">
         <ion-avatar slot="start">
-          <!-- @COMPAT < 0.1.2 - image path changed to relative in 0.1.2 -->
-          <img *ngIf="compareVersions(vars.versionInstalled, '0.1.2') === -1" [src]="iconURL" alt="avatar" />
-          <!-- end -->
+          <img [src]="getIcon(app.id)" alt="avatar" />
         </ion-avatar>
       </ng-container>
       <ion-label>

@@ -31,7 +31,7 @@ export interface ApiAppInstalled011 extends ApiAppBase {
 }
 
 export interface ApiAppInstalled012 extends ApiAppBase {
-  torAddress?: string
+  torAddress: string
 }
 
 export type ApiServer = ApiServer011 | ApiServer012

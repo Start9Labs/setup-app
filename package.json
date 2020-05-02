@@ -1,5 +1,5 @@
 {
-  "name": "start9-companion",
+  "name": "consulate",
   "version": "1.4.0",
   "author": "Start9 Labs",
   "homepage": "https://start9labs.com",
@@ -69,7 +69,7 @@
     "tslint": "^6.1.2",
     "typescript": "^3.8.0"
   },
-  "description": "Companion app for the Start9 Personal Server",
+  "description": "Embassy companion and mobile shell for Ambassador UI",
   "cordova": {
     "plugins": {
       "cordova-plugin-zeroconf": {}

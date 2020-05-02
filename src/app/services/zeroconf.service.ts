@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 import { Zeroconf, ZeroconfResult, ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { Subscription, Observable, BehaviorSubject, ReplaySubject } from 'rxjs'
 import { Platform } from '@ionic/angular'
-import { NetworkService } from './network.service'
+import { NetworkMonitor } from './network.service'
 import { NetworkStatus } from '@capacitor/core'
 
 @Injectable({
@@ -20,11 +20,11 @@ export class ZeroconfMonitor {
   constructor (
     private readonly platform: Platform,
     private readonly zeroconf: Zeroconf,
-    private readonly networkService: NetworkService,
+    private readonly networkMonitor: NetworkMonitor,
   ) { }
 
   init (): void {
-    this.networkService.watch().subscribe(n => this.handleNetworkChange(n))
+    this.networkMonitor.watchConnection().subscribe(n => this.handleNetworkChange(n))
   }
 
   handleNetworkChange (network: NetworkStatus): void {

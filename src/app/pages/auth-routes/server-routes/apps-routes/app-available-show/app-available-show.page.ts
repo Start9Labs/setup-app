@@ -4,7 +4,7 @@ import { AppAvailableFull, AppModel } from 'src/app/models/app-model'
 import { ApiService } from 'src/app/services/api.service'
 import { NavController, AlertController, LoadingController } from '@ionic/angular'
 import * as compareVersions from 'compare-versions'
-import { pauseFor } from 'src/app/util/misc.util'
+import { pauseFor, getIcon } from 'src/app/util/misc.util'
 import { ServerAppModel } from 'src/app/models/server-app-model'
 
 @Component({
@@ -19,6 +19,7 @@ export class AppAvailableShowPage {
   app: AppAvailableFull = { } as AppAvailableFull
   appModel: AppModel
   compareVersions = compareVersions
+  getIcon = getIcon
 
   constructor (
     private readonly navCtrl: NavController,

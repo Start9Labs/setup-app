@@ -1,6 +1,11 @@
 export type Omit<ObjectType, KeysType extends keyof ObjectType> = Pick<ObjectType, Exclude<keyof ObjectType, KeysType>>
 
 export type PromiseRes<T> = { result: 'resolve', value: T } | { result: 'reject', value: Error }
+
+export function getIcon (appId: string) {
+  return `assets/img/${appId}.png`
+}
+
 export async function tryAll ( promises: Promise<any>[] ): Promise<PromiseRes<any>[]> {
   return Promise.all(promises.map(
     p => p

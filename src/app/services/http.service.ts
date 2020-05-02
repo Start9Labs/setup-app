@@ -5,6 +5,8 @@ import { Method } from '../types/enums'
 import { TokenSigner } from 'jsontokens'
 import { S9BuilderWith } from './setup.service'
 import { S9Server, ServerModel, getLanIP } from '../models/server-model'
+import { TorService, TorConnection } from './tor.service'
+import { NetworkMonitor } from './network.service'
 import * as uuid from 'uuid'
 const version = require('../../../package.json').version
 
@@ -15,6 +17,8 @@ export class HttpService {
   constructor (
     private readonly zeroconfMonitor: ZeroconfMonitor,
     private readonly serverModel: ServerModel,
+    private readonly torService: TorService,
+    private readonly networkMonitor: NetworkMonitor,
   ) { }
 
   async serverRequest<T> (server: string | S9Server | S9BuilderWith<'versionInstalled' | 'privkey' | 'torAddress'>, options: HttpOptions, withVersion = true): Promise<T> {
@@ -27,11 +31,18 @@ export class HttpService {
 
     const zcs = this.zeroconfMonitor.getService(server.id)
 
+    if (!(await this.networkMonitor.peekConnection()).connected) {
+      throw new Error('Internet disconnected')
+    }
+
     let host: string
     if (zcs) {
       host = getLanIP(zcs)
     } else {
-      host = server.torAddress.trim() // @COMPAT Ambassador <= 1.3.0 retuned torAddress with trailing \n
+      if (this.torService.peekConnection() !== TorConnection.connected) {
+        throw new Error('Tor disconnected')
+      }
+      host = server.torAddress.trim() // @COMPAT Ambassador <= 1.3.0 retuned torAddress with trailing "\n"
       options.proxy = {
         host: 'localhost',
         port: 59590,
@@ -58,7 +69,6 @@ export class HttpService {
     try {
       console.log('** REQ **', options)
       const res = await HttpPluginNativeImpl.request(options)
-      console.log('** RES **', res)
       return res.data || { }
     } catch (e) {
       console.error(e)

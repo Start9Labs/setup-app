@@ -9,6 +9,8 @@ import { TorService, TorConnection } from './tor.service'
 import { ZeroconfMonitor } from './zeroconf.service'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import * as uuid from 'uuid'
+import { NetworkMonitor } from './network.service'
+import { NetworkStatus } from '@capacitor/core'
 
 @Injectable({
   providedIn: 'root',
@@ -70,11 +72,13 @@ export class SyncService {
     private readonly syncNotifier: SyncNotifier,
     private readonly zeroconfMonitor: ZeroconfMonitor,
     private readonly torService: TorService,
+    private readonly networkMonitor: NetworkMonitor,
   ) { }
 
   init (): void {
-    this.zeroconfMonitor.watchServiceFound().subscribe(s => this.handleZeroconfService(s))
-    this.torService.watchConnection().subscribe(c => this.handleTorChange(c))
+    this.networkMonitor.watchConnection().subscribe(n => this.handleNetworkUpdate(n))
+    this.zeroconfMonitor.watchServiceFound().subscribe(s => this.handleZeroconfUpdate(s))
+    this.torService.watchConnection().subscribe(c => this.handleTorUpdate(c))
   }
 
   async sync (id: string): Promise<void> {
@@ -100,11 +104,25 @@ export class SyncService {
     servers.forEach(s => this.sync(s.id))
   }
 
-  private handleZeroconfService (service: ZeroconfService) {
+  private async stopAll (): Promise<void> {
+    Object.values(this.embassies).forEach(daemon => {
+      daemon.stop()
+      daemon.markServerUnreachable()
+    })
+    this.embassies = { }
+  }
+
+  private handleNetworkUpdate (network: NetworkStatus) {
+    if (!network.connected) {
+      this.stopAll()
+    }
+  }
+
+  private handleZeroconfUpdate (service: ZeroconfService) {
     this.sync(service.name.split('-')[1])
   }
 
-  private handleTorChange (connection: TorConnection): void {
+  private handleTorUpdate (connection: TorConnection): void {
     if (connection === TorConnection.connected) {
       this.syncAll()
     }

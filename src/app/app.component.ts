@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { Platform, ModalController } from '@ionic/angular'
 import { ServerModel } from './models/server-model'
-import { NetworkService } from './services/network.service'
+import { NetworkMonitor } from './services/network.service'
 import { AuthService } from './services/auth.service'
 import { Router } from '@angular/router'
 import { AuthStatus } from './types/enums'
@@ -26,7 +26,7 @@ export class AppComponent {
     private readonly serverModel: ServerModel,
     private readonly appModel: ServerAppModel,
     private readonly authService: AuthService,
-    private readonly networkService: NetworkService,
+    private readonly networkMonitor: NetworkMonitor,
     private readonly torService: TorService,
     private readonly zeroconfMonitor: ZeroconfMonitor,
     private readonly syncService: SyncService,
@@ -49,8 +49,8 @@ export class AppComponent {
       this.torService.init()
       // init ZeroconfMonitor
       this.zeroconfMonitor.init()
-      // init NetworkService
-      this.networkService.init()
+      // init NetworkMonitor
+      this.networkMonitor.init()
       // subscribe to auth status changes
       this.authService.watch().subscribe(authStatus => {
         this.handleAuthChange(authStatus)

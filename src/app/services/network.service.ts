@@ -9,9 +9,10 @@ const { Network } = Plugins
 @Injectable({
   providedIn: 'root',
 })
-export class NetworkService {
+export class NetworkMonitor {
   private readonly networkStatus$ = new Subject<NetworkStatus>()
-  watch (): Observable<NetworkStatus> { return this.networkStatus$.asObservable() }
+  watchConnection (): Observable<NetworkStatus> { return this.networkStatus$.asObservable() }
+  peekConnection (): Promise<NetworkStatus> { return Network.getStatus() }
   private listener: PluginListenerHandle | undefined
 
   constructor (

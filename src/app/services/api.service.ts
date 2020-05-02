@@ -628,7 +628,6 @@ const mockApiAppsAvailablePreview: ApiAppAvailablePreview[] = [
     statusAt: new Date().toISOString(),
     title: 'Bitcoin Core',
     descriptionShort: 'Bitcoin is an innovative payment network and new kind of money.',
-    // server specific
     iconURL: 'assets/img/bitcoin_core.png',
   },
   {
@@ -639,19 +638,17 @@ const mockApiAppsAvailablePreview: ApiAppAvailablePreview[] = [
     statusAt: new Date().toISOString(),
     title: 'Cups Messenger',
     descriptionShort: 'P2P encrypted messaging over Tor.',
-    // server specific
     iconURL: 'assets/img/cups.png',
   },
   {
-    id: 'uptime',
+    id: 'bitwarden',
     versionLatest: '0.1.0',
     versionInstalled: null,
     status: AppStatus.UNKNOWN,
     statusAt: new Date().toISOString(),
-    title: 'Uptime Friends',
-    descriptionShort: `Perform automatic health checks for your and your friend's servers.`,
-    // server specific
-    iconURL: 'assets/img/uptime.png',
+    title: 'Bitwarden',
+    descriptionShort: `Self-hosted password manager`,
+    iconURL: 'assets/img/bitwarden.png',
   },
 ]
 
@@ -691,7 +688,7 @@ const mockApiAppsInstalled: ApiAppInstalled[] = [
   },
 ]
 
-const mockApiAppInstalledFresh =   {
+const mockApiAppInstalledFresh: ApiAppInstalled = {
   id: 'bitcoind',
   versionInstalled: '0.19.1',
   title: 'Bitcoin Core',

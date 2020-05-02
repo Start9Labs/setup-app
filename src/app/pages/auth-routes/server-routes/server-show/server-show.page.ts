@@ -13,7 +13,7 @@ import { take } from 'rxjs/operators'
 import * as Menu from './server-menu-options'
 import { ServerAppModel } from 'src/app/models/server-app-model'
 import { PropertySubject, PropertyObservableWithId, peekProperties, fromPropertyObservable } from 'src/app/util/property-subject.util'
-import { pauseFor, doForAtLeast } from 'src/app/util/misc.util'
+import { doForAtLeast, getIcon } from 'src/app/util/misc.util'
 
 @Component({
   selector: 'server-show',
@@ -36,6 +36,7 @@ export class ServerShowPage {
   addAppsSubscription: Subscription
   deleteAppsSubscription: Subscription
   versionLatestSubscription: Subscription | undefined // @COMPAT 0.1.1 - versionLatest dropped in 0.1.2
+  getIcon = getIcon
 
   constructor (
     private readonly route: ActivatedRoute,
