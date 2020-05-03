@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core'
+import { Storage } from '@ionic/storage'
 import { ServerAppModel } from './server-app-model'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { deriveKeys } from '../util/crypto.util'
@@ -7,15 +8,13 @@ import { MapSubject } from '../util/map-subject.util'
 import { PropertySubject, PropertyObservableWithId } from '../util/property-subject.util'
 import * as CryptoJS from 'crypto-js'
 
-import { Plugins } from '@capacitor/core'
-const { Storage } = Plugins
-
 @Injectable({
   providedIn: 'root',
 })
 export class ServerModel extends MapSubject<S9Server> {
   constructor (
     private readonly serverAppModel: ServerAppModel,
+    private readonly storage: Storage,
   ) { super({ }) }
 
   watchServerAdds (): Observable<PropertyObservableWithId<S9Server>[]> {
@@ -50,13 +49,13 @@ export class ServerModel extends MapSubject<S9Server> {
   }
 
   async load (mnemonic: string[]): Promise<void> {
-    const fromStorage: S9ServerStorable[] = JSON.parse((await Storage.get({ key: 'servers' })).value || '[]')
+    const fromStorage: S9ServerStorable[] = await this.storage.get('servers') || []
     const mapped = fromStorage.map(s => fromStorableServer(s, mnemonic))
     this.add(mapped)
   }
 
   async saveAll (): Promise<void> {
-    await Storage.set({ key: 'servers', value: JSON.stringify(this.peekAll().map(toStorableServer)) })
+    await this.storage.set('servers', this.peekAll().map(toStorableServer))
   }
 }
 

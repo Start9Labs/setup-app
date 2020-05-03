@@ -64,7 +64,9 @@ export class AppComponent {
         this.authService.init()
       })
       // dismiss splash screen
-      SplashScreen.hide()
+      setTimeout(() => {
+        SplashScreen.hide()
+      }, 300)
     })
   }
 
