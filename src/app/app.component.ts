@@ -7,11 +7,11 @@ import { Router } from '@angular/router'
 import { AuthStatus } from './types/enums'
 import { ServerAppModel } from './models/server-app-model'
 import { AuthenticatePage } from './modals/authenticate/authenticate.page'
-import { Plugins } from '@capacitor/core'
 import { TorService } from './services/tor.service'
 import { ZeroconfMonitor } from './services/zeroconf.service'
 import { SyncService } from './services/sync.service'
 
+import { Plugins } from '@capacitor/core'
 const { SplashScreen } = Plugins
 
 @Component({
@@ -38,6 +38,8 @@ export class AppComponent {
     document.body.classList.toggle('dark', true)
     // wait for platform reday
     this.platform.ready().then(async () => {
+      // init NetworkMonitor
+      await this.networkMonitor.init()
       // init AuthService
       await this.authService.init()
       if (this.authService.isVerified()) {
@@ -49,8 +51,6 @@ export class AppComponent {
       this.torService.init()
       // init ZeroconfMonitor
       this.zeroconfMonitor.init()
-      // init NetworkMonitor
-      this.networkMonitor.init()
       // subscribe to auth status changes
       this.authService.watch().subscribe(authStatus => {
         this.handleAuthChange(authStatus)
@@ -89,7 +89,7 @@ export class AppComponent {
     this.appModel.clearCache()
   }
 
-  async presentModalAuthenticate () {
+  private async presentModalAuthenticate () {
     const modal = await this.modalCtrl.create({
       backdropDismiss: false,
       component: AuthenticatePage,

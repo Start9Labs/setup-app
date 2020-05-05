@@ -11,6 +11,8 @@ import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import * as uuid from 'uuid'
 import { NetworkMonitor } from './network.service'
 import { NetworkStatus } from '@capacitor/core'
+import { AuthService } from './auth.service'
+import { AuthStatus } from '../types/enums'
 
 @Injectable({
   providedIn: 'root',
@@ -73,12 +75,14 @@ export class SyncService {
     private readonly zeroconfMonitor: ZeroconfMonitor,
     private readonly torService: TorService,
     private readonly networkMonitor: NetworkMonitor,
+    private readonly authService: AuthService,
   ) { }
 
   init (): void {
-    this.networkMonitor.watchConnection().subscribe(n => this.handleNetworkUpdate(n))
-    this.zeroconfMonitor.watchServiceFound().subscribe(s => this.handleZeroconfUpdate(s))
-    this.torService.watchConnection().subscribe(c => this.handleTorUpdate(c))
+    this.authService.watch().subscribe(status => this.handleAuthChange(status))
+    this.networkMonitor.watchConnection().subscribe(n => this.handleNetworkChange(n))
+    this.zeroconfMonitor.watchServiceFound().subscribe(s => this.handleZeroconfDiscovered(s))
+    this.torService.watchConnection().subscribe(c => this.handleTorConnected(c))
   }
 
   async sync (id: string): Promise<void> {
@@ -104,7 +108,7 @@ export class SyncService {
     servers.forEach(s => this.sync(s.id))
   }
 
-  private async stopAll (): Promise<void> {
+  async stopAll (): Promise<void> {
     Object.values(this.embassies).forEach(daemon => {
       daemon.stop()
       daemon.markServerUnreachable()
@@ -112,17 +116,23 @@ export class SyncService {
     this.embassies = { }
   }
 
-  private handleNetworkUpdate (network: NetworkStatus) {
+  private handleAuthChange (status: AuthStatus): void {
+    if (status === AuthStatus.MISSING) {
+      this.stopAll()
+    }
+  }
+
+  private handleNetworkChange (network: NetworkStatus): void {
     if (!network.connected) {
       this.stopAll()
     }
   }
 
-  private handleZeroconfUpdate (service: ZeroconfService) {
+  private handleZeroconfDiscovered (service: ZeroconfService): void {
     this.sync(service.name.split('-')[1])
   }
 
-  private handleTorUpdate (connection: TorConnection): void {
+  private handleTorConnected (connection: TorConnection): void {
     if (connection === TorConnection.connected) {
       this.syncAll()
     }

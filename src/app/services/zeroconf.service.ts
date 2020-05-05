@@ -4,6 +4,7 @@ import { Subscription, Observable, BehaviorSubject, ReplaySubject } from 'rxjs'
 import { Platform } from '@ionic/angular'
 import { NetworkMonitor } from './network.service'
 import { NetworkStatus } from '@capacitor/core'
+import { AuthService } from './auth.service'
 
 @Injectable({
   providedIn: 'root',
@@ -13,9 +14,11 @@ export class ZeroconfMonitor {
   private readonly serviceExists$ = new BehaviorSubject<boolean>(false)
   watchServiceFound (): Observable<ZeroconfService> { return this.serviceFound$.asObservable() }
   watchServiceExists (): Observable<boolean> { return this.serviceExists$.asObservable() }
-  services: { [hostname: string]: ZeroconfServiceExt } = { }
+  services: { [hostname: string]: ZeroconfService } = { }
+  requests: { [ip: string]: {
+    [uuid: string]: (err: Error) => void
+  } } = { }
   private zeroconfSub: Subscription | undefined
-  readonly timeToPurge = 4000
 
   constructor (
     private readonly platform: Platform,
@@ -27,28 +30,38 @@ export class ZeroconfMonitor {
     this.networkMonitor.watchConnection().subscribe(n => this.handleNetworkChange(n))
   }
 
-  handleNetworkChange (network: NetworkStatus): void {
-    if (network.connectionType === 'wifi') {
-      this.start()
-    } else {
-      this.stop()
-    }
-  }
-
   getService (serverId: string): ZeroconfService | undefined {
     return this.services[`start9-${serverId}`]
   }
 
+  addRequest (ip: string, id: string, rej: (err: Error) => void) {
+    if (!this.requests[ip]) {
+      this.requests[ip] = { }
+    }
+    this.requests[ip][id] = rej
+  }
+
+  removeRequest (ip: string, id: string) {
+    const request = this.requests[ip]
+    if (request) {
+      delete this.requests[ip][id]
+    }
+  }
+
+  private handleNetworkChange (network: NetworkStatus): void {
+    this.stop()
+    if (network.connectionType === 'wifi') {
+      this.start()
+    }
+  }
+
   private async start (): Promise<void> {
     // return this.mock()
-
     if (!this.platform.is('cordova')) { return }
-
-    if (this.zeroconfSub) { await this.zeroconf.reInit() }
 
     console.log('starting zeroconf monitor')
 
-    setTimeout(now => this.purgeOld(now), this.timeToPurge, new Date().valueOf())
+    await this.zeroconf.reInit()
 
     this.zeroconfSub = this.zeroconf.watch('_http._tcp.', 'local.').subscribe(result => {
       this.handleServiceUpdate(result)
@@ -56,9 +69,11 @@ export class ZeroconfMonitor {
   }
 
   private stop (): void {
-    this.services = { }
     if (!this.zeroconfSub) { return }
     console.log('stopping zeroconf monitor')
+    for (let service of Object.values(this.services)) {
+      this.removeService(service)
+    }
     this.zeroconfSub.unsubscribe()
     this.zeroconfSub = undefined
   }
@@ -66,35 +81,52 @@ export class ZeroconfMonitor {
   private handleServiceUpdate (result: ZeroconfResult): void {
     const { action, service } = result
 
+    // don't care about non-Start9 stuff
     if (!service.name.startsWith('start9-')) { return }
 
     if (action === 'resolved' && service.ipv4Addresses[0]) {
-      // if exists with same IP, update discoveredAt
-      if (this.services[service.name] && service.ipv4Addresses[0] === this.services[service.name].ipv4Addresses[0]) {
-        console.log(`rediscovered zeroconf service: ${service.name}`)
-        this.services[service.name].discoveredAt = new Date().valueOf()
+      // if exists and IPs changed, update it
+      if (this.services[service.name] && service.ipv4Addresses[0] !== this.services[service.name].ipv4Addresses[0]) {
+        console.log(`IP changed for zerconf service: ${service.name}`)
+        this.removeService(service)
+        this.addService(service)
       // if not exists, add it
       } else {
-        console.log(`discovered zeroconf service: ${service.name}`)
-        this.services[service.name] = { ...service, discoveredAt: new Date().valueOf() }
-        this.serviceFound$.next(service)
-        this.serviceExists$.next(true)
+        this.addService(service)
       }
-    }
-
-    if (action === 'removed') {
-      delete this.services[service.name]
-      this.serviceExists$.next(Object.keys(this.services).length === 0)
+    } else if (action === 'removed') {
+      this.removeService(service)
     }
   }
 
-  private purgeOld (initializedAt: number): void {
-    Object.keys(this.services).forEach(key => {
-      if (this.services[key].discoveredAt < initializedAt) {
-        console.log(`purging zeroconf service: ${this.services[key].name}`)
-        delete this.services[key]
-      }
+  private addService (service: ZeroconfService): void {
+    console.log(`discovered zeroconf service: ${service.name}`)
+    // add service and broadcast existence
+    this.services[service.name] = service
+    this.serviceFound$.next(service)
+    // if first service, broadcast serviceExists$ with true
+    if (Object.keys(this.services).length === 1) {
+      this.serviceExists$.next(true)
+    }
+  }
+
+  private removeService (service: ZeroconfService): void {
+    console.log(`removing zeroconf service: ${service.name}`)
+    // remove service
+    delete this.services[service.name]
+
+    console.log(`removed zeroconf service: ${service.name}`)
+    // reject outstanding requests
+    const ip = service.ipv4Addresses[0]
+    Object.values(this.requests[ip] || { }).forEach(reject => {
+      reject(new Error('lost connection'))
     })
+    // delete the ip from requests
+    delete this.requests[ip]
+    // if no services remain, broadcast serviceExists$ with false
+    if (!Object.keys(this.services).length) {
+      this.serviceExists$.next(false)
+    }
   }
 
   // @TODO remove
@@ -116,5 +148,3 @@ export class ZeroconfMonitor {
     this.handleServiceUpdate(result)
   }
 }
-
-export type ZeroconfServiceExt = ZeroconfService & { discoveredAt: number }

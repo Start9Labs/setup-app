@@ -22,6 +22,7 @@ npm-debug.log*
 /.vscode
 /.gradle
 /dist
+/out-tsc
 /node_modules
 /www
 

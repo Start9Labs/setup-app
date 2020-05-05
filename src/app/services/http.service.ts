@@ -31,9 +31,6 @@ export class HttpService {
 
     const zcs = this.zeroconfMonitor.getService(server.id)
 
-    if (!(await this.networkMonitor.peekConnection()).connected) {
-      throw new Error('Internet disconnected')
-    }
 
     let host: string
     if (zcs) {
@@ -54,7 +51,25 @@ export class HttpService {
 
     options.url = `http://${host}:5959${version}${options.url}`
 
-    return this.rawRequest<T>(options)
+    const request = this.rawRequest<T>(options)
+    if (zcs) {
+      return new Promise(async (res, rej) => {
+        const id = uuid.v4()
+        this.zeroconfMonitor.addRequest(host, id, rej)
+        if (!this.zeroconfMonitor.getService((server as S9Server).id)) {
+          rej(new Error('Embassy not found on LAN'))
+        }
+        try {
+          const response = await request
+          res(response)
+        } catch (e) {
+          rej(e)
+        }
+        this.zeroconfMonitor.removeRequest(host, id)
+      })
+    } else {
+      return request
+    }
   }
 
   async rawRequest<T> (options: HttpOptions): Promise<T> {
@@ -66,8 +81,11 @@ export class HttpService {
       options.data = { }
     }
 
+    if (!(await this.networkMonitor.peekConnection()).connected) {
+      throw new Error('Internet disconnected')
+    }
+
     try {
-      console.log('** REQ **', options)
       const res = await HttpPluginNativeImpl.request(options)
       return res.data || { }
     } catch (e) {
