@@ -27,7 +27,7 @@ export class ServerAppModel {
     }
   }
 
-  clearCache () {
+  clearCache (): void {
     Object.keys(this.lightCache).forEach(serverId => {
       this.remove(serverId)
     })

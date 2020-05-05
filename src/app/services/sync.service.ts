@@ -111,7 +111,6 @@ export class SyncService {
   async stopAll (): Promise<void> {
     Object.values(this.embassies).forEach(daemon => {
       daemon.stop()
-      daemon.markServerUnreachable()
     })
     this.embassies = { }
   }
@@ -154,7 +153,7 @@ class EmbassyDaemon {
   ) { }
 
   async start (daemonId = uuid.v4(), recycled = false) {
-    if (this.forceStop || recycled && daemonId !== this.daemonId) { return }
+    if (this.forceStop || (recycled && daemonId !== this.daemonId)) { return }
     this.daemonId = daemonId
 
     this.server = this.serverModel.peek(this.id)
@@ -176,11 +175,6 @@ class EmbassyDaemon {
     this.forceStop = true
   }
 
-  markServerUnreachable (): void {
-    this.serverModel.updateServer(this.id, serverUnreachable())
-    this.serverAppModel.get(this.id).updateAppsUniformly(appUnreachable())
-  }
-
   private async getServerAndApps (): Promise<void> {
     const [serverRes, appsRes] = await tryAll([
       this.apiService.getServer(this.id),
@@ -194,7 +188,7 @@ class EmbassyDaemon {
       }
       case 'reject': {
         console.error(`get server request for ${this.id} rejected with ${JSON.stringify(serverRes.value)}`)
-        this.markServerUnreachable()
+        this.serverModel.markServerUnreachable(this.id)
         break
       }
     }
@@ -206,12 +200,9 @@ class EmbassyDaemon {
       }
       case 'reject': {
         console.error(`get apps request for ${this.id} rejected with ${JSON.stringify(appsRes.value)}`)
-        this.serverAppModel.get(this.id).updateAppsUniformly(appUnreachable())
+        this.serverAppModel.get(this.id).markAppsUnreachable()
         break
       }
     }
   }
 }
-
-const serverUnreachable = () =>  ({ status: ServerStatus.UNREACHABLE, statusAt: new Date().toISOString() })
-const appUnreachable = () =>  ({ status: AppStatus.UNREACHABLE, statusAt: new Date().toISOString() })

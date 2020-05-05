@@ -1,23 +1,26 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs'
 import { take, map } from 'rxjs/operators'
 import { PropertySubject, initPropertySubject, completePropertyObservable, peekProperties, PropertyObservableWithId, asPropertyObservable } from './property-subject.util'
+import { NgZone } from '@angular/core'
 
 export type Update<T extends { id: string }> = Partial<T> & {
   id: string
 }
 
 export class MapSubject<T extends { id: string }> {
-  private add$: Subject<PropertyObservableWithId<T>[]>
-  protected update$: Subject<Update<T>[]>
-  private delete$: Subject<string[]>
+  private add$: Subject<PropertyObservableWithId<T>[]> = new Subject()
+  protected update$: Subject<Update<T>[]> = new Subject()
+  private delete$: Subject<string[]> = new Subject()
 
   subject: { [id: string]: PropertySubject<T> }
 
-  constructor (tMap: { [id: string]: T}) {
-    this.add$ = new Subject()
-    this.update$ = new Subject()
-    this.update$.subscribe(s => this.update(s))
-    this.delete$ = new Subject()
+  constructor (
+    tMap: { [id: string]: T },
+    zone: NgZone = new NgZone({ shouldCoalesceEventChangeDetection: true }),
+  ) {
+    this.update$.subscribe(s => {
+      zone.run(() => this.update(s))
+    })
     this.subject = Object.entries(tMap).reduce((acc, [id, t]) => {
       acc[id] = initPropertySubject(t)
       return acc

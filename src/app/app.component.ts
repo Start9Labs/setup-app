@@ -42,6 +42,7 @@ export class AppComponent {
       await this.networkMonitor.init()
       // init AuthService
       await this.authService.init()
+      // if verified, load data
       if (this.authService.isVerified()) {
         await this.serverModel.load(this.authService.mnemonic!)
       }

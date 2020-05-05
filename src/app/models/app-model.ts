@@ -57,6 +57,10 @@ export class AppModel extends MapSubject<AppInstalled> {
     this.upsertApps(upToDateApps)
   }
 
+  markAppsUnreachable (): void {
+    this.updateAppsUniformly(appUnreachable())
+  }
+
   updateAppsUniformly (uniformUpdate: Partial<AppInstalled>) {
     this.updateApp(Object.keys(this.subject).map(appId => ({
       ...uniformUpdate, id: appId,
@@ -70,6 +74,8 @@ export class AppModel extends MapSubject<AppInstalled> {
     this.delete(appsToDelete)
   }
 }
+
+const appUnreachable = () =>  ({ status: AppStatus.UNREACHABLE, statusAt: new Date().toISOString() })
 
 type FullyQualifiedUrl = string
 type RelativeUrl = string

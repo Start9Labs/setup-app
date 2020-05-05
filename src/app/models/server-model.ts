@@ -3,19 +3,30 @@ import { Storage } from '@ionic/storage'
 import { ServerAppModel } from './server-app-model'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { deriveKeys } from '../util/crypto.util'
-import { Observable } from 'rxjs'
+import { Observable, Subscription } from 'rxjs'
 import { MapSubject } from '../util/map-subject.util'
 import { PropertySubject, PropertyObservableWithId } from '../util/property-subject.util'
 import * as CryptoJS from 'crypto-js'
+import { NetworkMonitor } from '../services/network.service'
+import { NetworkStatus } from '@capacitor/core'
 
 @Injectable({
   providedIn: 'root',
 })
 export class ServerModel extends MapSubject<S9Server> {
+  networkSub: Subscription | undefined
+
   constructor (
     private readonly serverAppModel: ServerAppModel,
     private readonly storage: Storage,
+    private readonly networkMonitor: NetworkMonitor,
   ) { super({ }) }
+
+  watchNetwork (): void {
+    if (!this.networkSub) {
+      this.networkSub = this.networkMonitor.watchConnection().subscribe(c => this.handleNetworkUpdate(c))
+    }
+  }
 
   watchServerAdds (): Observable<PropertyObservableWithId<S9Server>[]> {
     return this.watchAdd()
@@ -42,22 +53,37 @@ export class ServerModel extends MapSubject<S9Server> {
   createServer (server: S9Server): void {
     this.createServerAppCache(server.id)
     this.add([server])
+    this.watchNetwork()
   }
 
   createServerAppCache (sid: string): void {
     this.serverAppModel.create(sid)
   }
 
+  markServerUnreachable (sid: string): void {
+    this.updateServer(sid, serverUnreachable())
+    this.serverAppModel.get(sid).markAppsUnreachable()
+  }
+
   async load (mnemonic: string[]): Promise<void> {
     const fromStorage: S9ServerStorable[] = await this.storage.get('servers') || []
     const mapped = fromStorage.map(s => fromStorableServer(s, mnemonic))
     this.add(mapped)
+    this.watchNetwork()
   }
 
   async saveAll (): Promise<void> {
     await this.storage.set('servers', this.peekAll().map(toStorableServer))
   }
+
+  private handleNetworkUpdate (network: NetworkStatus): void {
+    if (!network.connected) {
+      Object.keys(this.subject).forEach(id => this.markServerUnreachable(id))
+    }
+  }
 }
+
+const serverUnreachable = () =>  ({ status: ServerStatus.UNREACHABLE, statusAt: new Date().toISOString() })
 
 export interface S9ServerStorable {
   id: string

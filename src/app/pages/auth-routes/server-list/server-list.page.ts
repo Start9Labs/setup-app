@@ -47,7 +47,7 @@ export class ServerListPage {
     public torService: TorService,
     private readonly syncService: SyncService,
     private readonly navCtrl: NavController,
-    private zone: NgZone,
+    private readonly zone: NgZone,
   ) { }
 
   ngOnInit () {
