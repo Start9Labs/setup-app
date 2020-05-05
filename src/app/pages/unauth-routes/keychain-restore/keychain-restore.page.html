@@ -31,19 +31,17 @@
     </ion-item>
   </ion-item-group>
 
-  <form (submit)="login()">
-    <ion-item-group>
-      <ion-item-divider></ion-item-divider>
-      <ion-item class="naked-item">
-        <ion-textarea autoGrow rows="4" [(ngModel)]="mnemonic" name="mnemonic" placeholder="Enter mnemonic seed"></ion-textarea>
-      </ion-item>
-    </ion-item-group>
-    <ion-item *ngIf="error" style="margin-top: 16px;">
-      <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
+  <ion-item-group>
+    <ion-item-divider></ion-item-divider>
+    <ion-item class="naked-item">
+      <ion-textarea autoGrow rows="4" [(ngModel)]="mnemonic" name="mnemonic" placeholder="Enter mnemonic seed"></ion-textarea>
     </ion-item>
-    <ion-button type="submit" [disabled]="!mnemonic" style="margin-top: 30px" expand="block" fill="outline">
-      Continue
-    </ion-button>
-  </form>
+  </ion-item-group>
+  <ion-item *ngIf="error" style="margin-top: 16px;">
+    <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
+  </ion-item>
+  <ion-button type="submit" [disabled]="!mnemonic" style="margin-top: 30px" expand="block" fill="outline" (click)="login()">
+    Continue
+  </ion-button>
 
 </ion-content>

@@ -3,6 +3,7 @@ import { Storage } from '@ionic/storage'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { AuthStatus } from '../types/enums'
 import * as cryptoUtil from '../util/crypto.util'
+import { NavController } from '@ionic/angular'
 
 @Injectable({
   providedIn: 'root',
@@ -15,6 +16,7 @@ export class AuthService {
   pinEnabled = false
 
   constructor (
+    private readonly navCtrl: NavController,
     private readonly storage: Storage,
   ) { }
 
@@ -68,6 +70,7 @@ export class AuthService {
     this.clearCache()
     await this.storage.clear()
     this.authState$.next(AuthStatus.MISSING)
+    await this.navCtrl.navigateRoot(['/unauth'])
   }
 
   async changePin (pin: string): Promise<void> {

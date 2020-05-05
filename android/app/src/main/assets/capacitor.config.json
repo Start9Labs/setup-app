@@ -1,6 +1,6 @@
 {
   "appId": "com.start9labs.start9companion",
-  "appName": "Consulate",
+  "appName": "Embassy",
   "bundledWebRuntime": false,
   "npmClient": "npm",
   "webDir": "www",

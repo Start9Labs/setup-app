@@ -7,20 +7,18 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="ion-padding-top">
 
   <ion-item-group>
-    <ion-item-divider>Security</ion-item-divider>
     <ion-item button (click)="presentAlertWarnMnemonic()">
       <ion-label>View Mnemonic</ion-label>
     </ion-item>
     <ion-item [routerLink]="['pin']">
       <ion-label>Pin Lock</ion-label>
     </ion-item>
-  </ion-item-group>
 
-  <ion-item-group>
-    <ion-item-divider>More</ion-item-divider>
+    <ion-item-divider></ion-item-divider>
+
     <ion-item button detail="false" [href]="platform.is('ios') ? 'itms-apps://apps.apple.com/app/start9-companion-app/id1496204174' : 'market://details?id=com.start9labs.start9companion'" target="_system">
       <ion-icon slot="start" color="danger" name="heart"></ion-icon>
       <ion-label>Rate This App</ion-label>

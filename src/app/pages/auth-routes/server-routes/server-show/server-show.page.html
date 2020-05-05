@@ -41,19 +41,19 @@
   <ion-button
     *ngIf="!vars.loading && versionLatest && vars.status === 'RUNNING' && compareVersions(vars.versionInstalled, versionLatest) === -1"
     style="margin: 16px;" expand="block" fill="outline" color="success" (click)="presentAlertUpdate(server)">
-    Update MeshOS to {{ versionLatest }}
+    Update Ambassador to {{ versionLatest }}
   </ion-button>
 
   <ion-item-group>
-    <ion-item-divider>Discover</ion-item-divider>
+    <ion-item-divider></ion-item-divider>
 
     <ion-item [routerLink]="['apps', 'available']" detail="false">
       <ion-icon slot="start" size="large" name="apps-outline" color="primary"></ion-icon>
-      <ion-label><ion-text color="primary">Sovereign App Store</ion-text></ion-label>
+      <ion-label><ion-text color="primary">Discover Apps</ion-text></ion-label>
       <ion-icon slot="end" name="arrow-forward-outline" color="primary"></ion-icon>
     </ion-item>
 
-    <ion-item-divider>Apps Installed</ion-item-divider>
+    <ion-item-divider></ion-item-divider>
 
     <ion-item *ngFor="let app of apps" [routerLink]="['apps', 'installed', app.id]">
       <ng-container *ngVar="app.observe.iconUrl | async as iconUrl">

@@ -3,16 +3,14 @@ import { Platform, ModalController } from '@ionic/angular'
 import { ServerModel } from './models/server-model'
 import { NetworkMonitor } from './services/network.service'
 import { AuthService } from './services/auth.service'
-import { Router } from '@angular/router'
 import { AuthStatus } from './types/enums'
-import { ServerAppModel } from './models/server-app-model'
 import { AuthenticatePage } from './modals/authenticate/authenticate.page'
 import { TorService } from './services/tor.service'
 import { ZeroconfMonitor } from './services/zeroconf.service'
 import { SyncService } from './services/sync.service'
 
-import { Plugins } from '@capacitor/core'
-const { SplashScreen } = Plugins
+import { Plugins, StatusBarStyle } from '@capacitor/core'
+const { SplashScreen, StatusBar } = Plugins
 
 @Component({
   selector: 'app-root',
@@ -24,17 +22,14 @@ export class AppComponent {
   constructor (
     private readonly platform: Platform,
     private readonly serverModel: ServerModel,
-    private readonly appModel: ServerAppModel,
     private readonly authService: AuthService,
     private readonly networkMonitor: NetworkMonitor,
     private readonly torService: TorService,
     private readonly zeroconfMonitor: ZeroconfMonitor,
     private readonly syncService: SyncService,
-    private readonly router: Router,
     private readonly modalCtrl: ModalController,
   ) {
     // set dark theme.
-    // @TODO there should be a way to make this the default.
     document.body.classList.toggle('dark', true)
     // wait for platform reday
     this.platform.ready().then(async () => {
@@ -64,7 +59,11 @@ export class AppComponent {
       this.platform.resume.subscribe(() => {
         this.authService.init()
       })
-      // dismiss splash screen
+      // set StatusBar style
+      StatusBar.setStyle({
+        style: StatusBarStyle.Dark,
+      })
+      // dismiss SplashScreen
       setTimeout(() => {
         SplashScreen.hide()
       }, 300)
@@ -72,23 +71,15 @@ export class AppComponent {
   }
 
   private async handleAuthChange (authStatus: AuthStatus) {
-    // VERIFIED (mnemonic is present and unencrypted)
-    if (authStatus === AuthStatus.VERIFIED) {
-      await this.router.navigate(['/auth'])
-    // MISSING (no mnemonic)
-    } else if (authStatus === AuthStatus.MISSING) {
-      this.clearModels()
-      await this.router.navigate(['/unauth'])
-    // UNVERIFIED (mnemonic is present but encrypted)
-    } else if (authStatus === AuthStatus.UNVERIFIED) {
+    if (authStatus === AuthStatus.UNVERIFIED) {
       await this.presentModalAuthenticate()
     }
   }
 
-  private clearModels () {
-    this.serverModel.clear()
-    this.appModel.clearCache()
-  }
+  // private clearModels () {
+  //   this.serverModel.clear()
+  //   this.serverAppModel.clearCache()
+  // }
 
   private async presentModalAuthenticate () {
     const modal = await this.modalCtrl.create({

@@ -12,7 +12,7 @@ import { HttpService } from './http.service'
 @Injectable({
   providedIn: 'root',
 })
-export class ApiService {
+export class XApiService {
   constructor (
     private readonly http: HttpService,
     private readonly appModel: ServerAppModel,
@@ -93,6 +93,9 @@ export class ApiService {
   }> {
     return this.http.serverRequest<Lan.GetAppConfigRes>(serverId, { method: Method.GET, url: `/apps/${appId}/config` })
       .then(({ spec, config, rules }) => {
+        console.log('SPEC', spec)
+        console.log('CONFIG', config)
+        console.log('RULES', rules)
         return {
           spec,
           config: configUtil.mapSpecToConfigObject({ type: 'object', spec }, config || { }),
@@ -196,7 +199,7 @@ export class ApiService {
 @Injectable({
   providedIn: 'root',
 })
-export class XApiService {
+export class ApiService {
 
   constructor (
     private readonly appModel: ServerAppModel,

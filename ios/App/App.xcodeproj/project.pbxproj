@@ -21,7 +21,7 @@
 		2FAD9762203C412B000D30F8 /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = config.xml; sourceTree = "<group>"; };
 		33DB02392411CC5F00A31D79 /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
 		50379B222058CBB4000EE86E /* capacitor.config.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = capacitor.config.json; sourceTree = "<group>"; };
-		504EC3041FED79650016851F /* Start9Companion.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Start9Companion.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		504EC3041FED79650016851F /* Start9Companion.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Start9Companion.app; path = Start9Embassy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		504EC3071FED79650016851F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		504EC30C1FED79650016851F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		504EC30E1FED79650016851F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -360,7 +360,9 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" \"-DDEBUG\"";
 				PRODUCT_BUNDLE_IDENTIFIER = com.start9labs.start9companion;
-				PRODUCT_NAME = Consulate;
+				PRODUCT_NAME = Start9Embassy;
+        DISPLAY_NAME = Embassy;
+        SHORT_VERSION_STRING = 1.4.0;
 				PROVISIONING_PROFILE_SPECIFIER = Production;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG USE_PUSH";
 				SWIFT_VERSION = 4.2;
@@ -382,7 +384,9 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.start9labs.start9companion;
-				PRODUCT_NAME = Consulate;
+				PRODUCT_NAME = Start9Embassy;
+        DISPLAY_NAME = Embassy;
+        SHORT_VERSION_STRING = 1.4.0;
 				PROVISIONING_PROFILE_SPECIFIER = Production;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
 				SWIFT_VERSION = 4.2;

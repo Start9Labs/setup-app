@@ -4,7 +4,6 @@ import { Subscription, Observable, BehaviorSubject, ReplaySubject } from 'rxjs'
 import { Platform } from '@ionic/angular'
 import { NetworkMonitor } from './network.service'
 import { NetworkStatus } from '@capacitor/core'
-import { AuthService } from './auth.service'
 
 @Injectable({
   providedIn: 'root',
@@ -56,7 +55,9 @@ export class ZeroconfMonitor {
   }
 
   private async start (): Promise<void> {
-    // return this.mock()
+    // ** MOCKS **
+    return this.mock()
+
     if (!this.platform.is('cordova')) { return }
 
     console.log('starting zeroconf monitor')

@@ -8,14 +8,11 @@
 
 <ion-content class="ion-padding-top">
 
-  <ion-item *ngIf="error" style="margin-bottom: 16px;">
-    <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
-  </ion-item>
-
   <ion-item-group>
     <ion-item>
       <ion-input maxLength="4" type="tel" placeholder="Enter pin" [(ngModel)]="pin" (ngModelChange)="handleInput()"></ion-input>
     </ion-item>
+    <p style="padding-left: 20px;" *ngIf="error"><ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text></p>
   </ion-item-group>
 
   <ion-item-group>

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core'
-import * as cryptoUtil from '../../../util/crypto.util'
 import { AuthService } from 'src/app/services/auth.service'
+import { NavController } from '@ionic/angular'
+import * as cryptoUtil from '../../../util/crypto.util'
 
 @Component({
   selector: 'app-keychain-create',
@@ -11,6 +12,7 @@ export class KeychainCreatePage {
   mnemonic: string[]
 
   constructor (
+    private readonly navCtrl: NavController,
     private readonly authService: AuthService,
   ) { }
 
@@ -20,6 +22,7 @@ export class KeychainCreatePage {
 
   async login () {
     await this.authService.login(this.mnemonic)
+    await this.navCtrl.navigateRoot(['/auth'])
   }
 
 }

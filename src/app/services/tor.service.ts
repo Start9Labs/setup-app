@@ -37,21 +37,10 @@ export class TorService {
   }
 
   async start (): Promise<void> {
-    // return this.mock()
+    // ** MOCKS **
+    return this.mock()
 
     if (!this.platform.is('cordova')) { return }
-
-    // @TODO delete this entire block once capacitor-tor is updated
-    // if (!this.initialized) {
-    //   console.log('starting Tor')
-    //   this.connection$.next(TorConnection.in_progress)
-    //   this.tor.initTor({ socksPort: 59590 }).subscribe(progress => {
-    //     this.handleConnecting(progress)
-    //   })
-    //   this.initialized = true
-    // } else {
-    //   this.connection$.next(TorConnection.connected)
-    // }
 
     if (!(await this.tor.running()).running) {
       console.log('starting Tor')
