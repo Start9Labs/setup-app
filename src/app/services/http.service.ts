@@ -51,25 +51,7 @@ export class HttpService {
 
     options.url = `http://${host}:5959${version}${options.url}`
 
-    const request = this.rawRequest<T>(options)
-    if (zcs) {
-      return new Promise(async (res, rej) => {
-        const id = uuid.v4()
-        this.zeroconfMonitor.addRequest(host, id, rej)
-        if (!this.zeroconfMonitor.getService((server as S9Server).id)) {
-          rej(new Error('Embassy not found on LAN'))
-        }
-        try {
-          const response = await request
-          res(response)
-        } catch (e) {
-          rej(e)
-        }
-        this.zeroconfMonitor.removeRequest(host, id)
-      })
-    } else {
-      return request
-    }
+    return this.rawRequest<T>(options)
   }
 
   async rawRequest<T> (options: HttpOptions): Promise<T> {
@@ -81,7 +63,7 @@ export class HttpService {
       options.data = { }
     }
 
-    if (!(await this.networkMonitor.peekConnection()).connected) {
+    if (!(this.networkMonitor.peekConnection()).connected) {
       throw new Error('Internet disconnected')
     }
 

@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core'
 import { AppModel } from './app-model'
+import { AuthStatus } from '../types/enums'
+import { AuthService } from '../services/auth.service'
 
 @Injectable({
   providedIn: 'root',
@@ -7,7 +9,11 @@ import { AppModel } from './app-model'
 export class ServerAppModel {
   lightCache: { [serverId: string]: AppModel } = { }
 
-  constructor () { }
+  constructor (
+    private readonly authService: AuthService,
+  ) {
+    this.authService.watch().subscribe(status => this.handleAuthChange(status))
+  }
 
   get (serverId: string): AppModel {
     this.create(serverId)
@@ -20,16 +26,22 @@ export class ServerAppModel {
     }
   }
 
-  remove (serverId: string): void {
+  private remove (serverId: string): void {
     if (this.lightCache[serverId]) {
       this.lightCache[serverId].clear()
       delete this.lightCache[serverId]
     }
   }
 
-  clearCache (): void {
+  private clearCache (): void {
     Object.keys(this.lightCache).forEach(serverId => {
       this.remove(serverId)
     })
+  }
+
+  private handleAuthChange (status: AuthStatus): void {
+    if (status === AuthStatus.MISSING) {
+      this.clearCache()
+    }
   }
 }

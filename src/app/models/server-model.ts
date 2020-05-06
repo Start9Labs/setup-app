@@ -9,6 +9,8 @@ import { PropertySubject, PropertyObservableWithId } from '../util/property-subj
 import * as CryptoJS from 'crypto-js'
 import { NetworkMonitor } from '../services/network.service'
 import { NetworkStatus } from '@capacitor/core'
+import { AuthService } from '../services/auth.service'
+import { AuthStatus } from '../types/enums'
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +22,11 @@ export class ServerModel extends MapSubject<S9Server> {
     private readonly serverAppModel: ServerAppModel,
     private readonly storage: Storage,
     private readonly networkMonitor: NetworkMonitor,
-  ) { super({ }) }
+    private readonly authService: AuthService,
+  ) {
+    super({ })
+    this.authService.watch().subscribe(status => this.handleAuthChange(status))
+  }
 
   watchNetwork (): void {
     if (!this.networkSub) {
@@ -79,6 +85,12 @@ export class ServerModel extends MapSubject<S9Server> {
   private handleNetworkUpdate (network: NetworkStatus): void {
     if (!network.connected) {
       Object.keys(this.subject).forEach(id => this.markServerUnreachable(id))
+    }
+  }
+
+  private handleAuthChange (status: AuthStatus): void {
+    if (status === AuthStatus.MISSING) {
+      this.clear()
     }
   }
 }

@@ -12,7 +12,7 @@ const mutex = new Mutex()
 export class NetworkMonitor {
   private readonly networkStatus$ = new BehaviorSubject<NetworkStatus>({ connected: false, connectionType: 'none' })
   watchConnection (): Observable<NetworkStatus> { return this.networkStatus$.asObservable() }
-  peekConnection (): Promise<NetworkStatus> { return Network.getStatus() }
+  peekConnection (): NetworkStatus { return this.networkStatus$.getValue() }
   private listener: PluginListenerHandle | undefined
   private previous: string | undefined
 

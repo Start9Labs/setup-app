@@ -40,14 +40,12 @@ export class TorService {
     // ** MOCKS **
     // return this.mock()
 
-    if (!this.platform.is('cordova')) { return }
+    if (!this.platform.is('ios') && !this.platform.is('android')) { return }
 
     if (!(await this.tor.running()).running) {
       console.log('starting Tor')
       this.connection$.next(TorConnection.in_progress)
-      this.tor.start({ socksPort: 59590 }).subscribe(progress => {
-        this.handleConnecting(progress)
-      })
+      this.tor.start({ socksPort: 59590 }).subscribe(progress => this.handleConnecting(progress))
     } else {
       console.log('reconnecting Tor')
       this.connection$.next(TorConnection.reconnecting)
@@ -62,10 +60,7 @@ export class TorService {
 
   private handleConnecting (progress: number) {
     this.progress$.next(progress)
-    if (progress === 100) {
-      this.connection$.next(TorConnection.connected)
-      this.progress$.next(0)
-    }
+    if (progress === 100) { this.connection$.next(TorConnection.connected) }
   }
 
   async mock (): Promise<void> {

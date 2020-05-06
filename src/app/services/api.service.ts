@@ -91,17 +91,18 @@ export class ApiService {
     config: object
     rules: Rules[]
   }> {
-    return this.http.serverRequest<Lan.GetAppConfigRes>(serverId, { method: Method.GET, url: `/apps/${appId}/config` })
-      .then(({ spec, config, rules }) => {
-        console.log('SPEC', spec)
-        console.log('CONFIG', config)
-        console.log('RULES', rules)
-        return {
-          spec,
-          config: configUtil.mapSpecToConfigObject({ type: 'object', spec }, config || { }),
-          rules,
-        }
-      })
+    let res = await this.http.serverRequest<Lan.GetAppConfigRes | string>(serverId, { method: Method.GET, url: `/apps/${appId}/config` })
+    // @COMPAT Ambasssador <= 0.1.3
+    if (typeof res === 'string') {
+      res = JSON.parse(res) as Lan.GetAppConfigRes
+    }
+    const { spec, config, rules } = res
+    // END
+    return {
+      spec,
+      config: configUtil.mapSpecToConfigObject({ type: 'object', spec }, config || { }),
+      rules,
+    }
   }
 
   async getAppLogs (serverId: string, appId: string, params: Lan.GetAppLogsReq = { }): Promise<string[]> {
@@ -109,7 +110,13 @@ export class ApiService {
   }
 
   async getAppMetrics (serverId: string, appId: string): Promise<Lan.GetAppMetricsRes> {
-    return this.http.serverRequest<Lan.GetAppMetricsRes>(serverId, { method: Method.GET, url: `/apps/${appId}/metrics` })
+    let res = await this.http.serverRequest<Lan.GetAppMetricsRes | string>(serverId, { method: Method.GET, url: `/apps/${appId}/metrics` })
+    // @COMPAT Ambasssador <= 0.1.3
+    if (typeof res === 'string') {
+      res = JSON.parse(res) as Lan.GetAppMetricsRes
+    }
+    // END
+    return res
   }
 
   async installApp (serverId: string, appId: string, version: string): Promise<AppInstalled> {

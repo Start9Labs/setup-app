@@ -76,11 +76,6 @@ export class AppComponent {
     }
   }
 
-  // private clearModels () {
-  //   this.serverModel.clear()
-  //   this.serverAppModel.clearCache()
-  // }
-
   private async presentModalAuthenticate () {
     const modal = await this.modalCtrl.create({
       backdropDismiss: false,

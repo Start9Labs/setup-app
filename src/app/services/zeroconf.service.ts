@@ -14,9 +14,6 @@ export class ZeroconfMonitor {
   watchServiceFound (): Observable<ZeroconfService> { return this.serviceFound$.asObservable() }
   watchServiceExists (): Observable<boolean> { return this.serviceExists$.asObservable() }
   services: { [hostname: string]: ZeroconfService } = { }
-  requests: { [ip: string]: {
-    [uuid: string]: (err: Error) => void
-  } } = { }
   private zeroconfSub: Subscription | undefined
 
   constructor (
@@ -33,20 +30,6 @@ export class ZeroconfMonitor {
     return this.services[`start9-${serverId}`]
   }
 
-  addRequest (ip: string, id: string, rej: (err: Error) => void) {
-    if (!this.requests[ip]) {
-      this.requests[ip] = { }
-    }
-    this.requests[ip][id] = rej
-  }
-
-  removeRequest (ip: string, id: string) {
-    const request = this.requests[ip]
-    if (request) {
-      delete this.requests[ip][id]
-    }
-  }
-
   private handleNetworkChange (network: NetworkStatus): void {
     this.stop()
     if (network.connectionType === 'wifi') {
@@ -58,7 +41,7 @@ export class ZeroconfMonitor {
     // ** MOCKS **
     // return this.mock()
 
-    if (!this.platform.is('cordova')) { return }
+    if (!this.platform.is('ios') && !this.platform.is('android')) { return }
 
     console.log('starting zeroconf monitor')
 
@@ -115,15 +98,6 @@ export class ZeroconfMonitor {
     console.log(`removing zeroconf service: ${service.name}`)
     // remove service
     delete this.services[service.name]
-
-    console.log(`removed zeroconf service: ${service.name}`)
-    // reject outstanding requests
-    const ip = service.ipv4Addresses[0]
-    Object.values(this.requests[ip] || { }).forEach(reject => {
-      reject(new Error('lost connection'))
-    })
-    // delete the ip from requests
-    delete this.requests[ip]
     // if no services remain, broadcast serviceExists$ with false
     if (!Object.keys(this.services).length) {
       this.serviceExists$.next(false)
