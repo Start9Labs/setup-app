@@ -15,7 +15,6 @@ export class StatusComponent {
 
   ngOnChanges () {
     if (this.serverStatus) {
-      console.log('** CHANGES **', this.serverStatus)
       this.handleServerStatus()
     } else if (this.appStatus) {
       this.handleAppStatus()

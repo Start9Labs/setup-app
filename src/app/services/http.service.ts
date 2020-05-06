@@ -87,7 +87,6 @@ export class HttpService {
 
     try {
       const res = await HttpPluginNativeImpl.request(options)
-      console.log('** RES **', res)
       return res.data || { }
     } catch (e) {
       console.error(e)

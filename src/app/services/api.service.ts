@@ -12,7 +12,7 @@ import { HttpService } from './http.service'
 @Injectable({
   providedIn: 'root',
 })
-export class XApiService {
+export class ApiService {
   constructor (
     private readonly http: HttpService,
     private readonly appModel: ServerAppModel,
@@ -199,7 +199,7 @@ export class XApiService {
 @Injectable({
   providedIn: 'root',
 })
-export class ApiService {
+export class XApiService {
 
   constructor (
     private readonly appModel: ServerAppModel,
