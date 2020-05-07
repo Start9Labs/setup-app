@@ -13,10 +13,13 @@ export class UnauthGuard implements CanActivate {
   ) { }
 
   canActivate (): boolean {
+    console.log('UNAUTH GUARD')
     if (this.authService.isVerified()) {
+      console.log('denied')
       this.router.navigateByUrl('/auth')
       return false
     } else {
+      console.log('allowed')
       return true
     }
   }

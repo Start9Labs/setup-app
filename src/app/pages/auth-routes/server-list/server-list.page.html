@@ -30,10 +30,10 @@
   </ion-item-group>
 
   <ng-container *ngIf="servers.length">
-    <!-- <div *ngIf="torStatus === 'in_progress'">
+    <div *ngIf="torStatus === 'in_progress'">
       <ion-progress-bar color="tertiary" [value]="progress"></ion-progress-bar>
       <p><img class="inline-image" src="assets/img/tor.png" alt="tor" />Establishing Connection</p>
-    </div> -->
+    </div>
     <ion-card button *ngFor="let server of servers" style="margin-bottom: 16px;" (click)="show(server.id)">
       <ion-item>
         <ion-avatar slot="start">

@@ -64,6 +64,7 @@ export class TorService {
   }
 
   async mock (): Promise<void> {
+    console.log('starting Tor')
     this.connection$.next(TorConnection.in_progress)
     setTimeout(() => { this.progress$.next(25) }, 1500)
     setTimeout(() => { this.progress$.next(40) }, 2000)

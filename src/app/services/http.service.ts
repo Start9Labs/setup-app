@@ -21,7 +21,7 @@ export class HttpService {
     private readonly networkMonitor: NetworkMonitor,
   ) { }
 
-  async serverRequest<T> (server: string | S9Server | S9BuilderWith<'versionInstalled' | 'privkey' | 'torAddress' | 'connectionType'>, options: HttpOptions, withVersion = true): Promise<T> {
+  async serverRequest<T> (server: string | S9Server | S9BuilderWith<'versionInstalled' | 'privkey' | 'torAddress'>, options: HttpOptions, withVersion = true): Promise<T> {
     if (typeof server === 'string') {
       server = this.serverModel.peek(server)
     }

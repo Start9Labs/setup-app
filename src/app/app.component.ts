@@ -8,8 +8,10 @@ import { AuthenticatePage } from './modals/authenticate/authenticate.page'
 import { TorService } from './services/tor.service'
 import { ZeroconfMonitor } from './services/zeroconf.service'
 import { SyncService } from './services/sync.service'
+import { Storage } from '@ionic/storage'
 
 import { Plugins, StatusBarStyle } from '@capacitor/core'
+import { Router } from '@angular/router'
 const { SplashScreen, StatusBar } = Plugins
 
 @Component({
@@ -28,11 +30,14 @@ export class AppComponent {
     private readonly zeroconfMonitor: ZeroconfMonitor,
     private readonly syncService: SyncService,
     private readonly modalCtrl: ModalController,
+    private readonly router: Router,
+    private readonly storage: Storage,
   ) {
     // set dark theme.
     document.body.classList.toggle('dark', true)
     // wait for platform reday
     this.platform.ready().then(async () => {
+      await this.storage.ready()
       // init NetworkMonitor
       await this.networkMonitor.init()
       // init AuthService
@@ -63,6 +68,7 @@ export class AppComponent {
       StatusBar.setStyle({
         style: StatusBarStyle.Dark,
       })
+      this.router.initialNavigation()
       // dismiss SplashScreen
       setTimeout(() => {
         SplashScreen.hide()
