@@ -58,7 +58,7 @@ export class AppModel extends MapSubject<AppInstalled> {
   }
 
   markAppsUnreachable (): void {
-    this.updateAppsUniformly(appUnreachable())
+    this.updateAppsUniformly({ status: AppStatus.UNREACHABLE })
   }
 
   updateAppsUniformly (uniformUpdate: Partial<AppInstalled>) {
@@ -75,8 +75,6 @@ export class AppModel extends MapSubject<AppInstalled> {
   }
 }
 
-const appUnreachable = () =>  ({ status: AppStatus.UNREACHABLE, statusAt: new Date().toISOString() })
-
 type FullyQualifiedUrl = string
 type RelativeUrl = string
 
@@ -84,7 +82,6 @@ export interface BaseApp {
     id: string
     title: string
     status: AppStatus | null
-    statusAt: string
     versionInstalled: string | null
     iconURL: string
   }

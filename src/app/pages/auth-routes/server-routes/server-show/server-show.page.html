@@ -16,7 +16,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content *ngVar="{ status: server.status | async, versionInstalled: server.versionInstalled | async, loading: loading$ | async } as vars">
+<ion-content *ngVar="{ status: server.status | async, connectionType: server.connectionType | async, versionInstalled: server.versionInstalled | async, loading: loading$ | async } as vars">
 
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content pullingIcon="lines" refreshingSpinner="lines"></ion-refresher-content>
@@ -28,12 +28,15 @@
 
   <ion-item-group>
     <ion-item>
-      <ion-label position="stacked">Status</ion-label>
-      <h2><s9-status [serverStatus]="vars.status"></s9-status></h2>
+      <ion-label>
+        <h1>
+          <s9-status [serverStatus]="vars.status" [connectionType]="vars.connectionType"></s9-status>
+        </h1>
+      </ion-label>
     </ion-item>
   </ion-item-group>
 
-  <ion-button *ngIf="!versionLatest" style="margin: 16px;" expand="block" fill="outline" (click)="getVersionLatest(server)">
+  <ion-button *ngIf="!versionLatest" style="margin: 30px 16px;" expand="block" fill="outline" color="warning" (click)="getVersionLatest(server)">
     Check for Updates
     <ion-icon slot="end" name="refresh-outline"></ion-icon>
   </ion-button>
@@ -45,11 +48,10 @@
   </ion-button>
 
   <ion-item-group>
-    <ion-item-divider></ion-item-divider>
 
     <ion-item [routerLink]="['apps', 'available']" detail="false">
       <ion-icon slot="start" size="large" name="apps-outline" color="primary"></ion-icon>
-      <ion-label><ion-text color="primary">Discover Apps</ion-text></ion-label>
+      <ion-label><ion-text color="primary">Get Apps</ion-text></ion-label>
       <ion-icon slot="end" name="arrow-forward-outline" color="primary"></ion-icon>
     </ion-item>
 
@@ -64,10 +66,8 @@
       <ion-label>
         <h2>{{ app.observe.title | async }}</h2>
         <h3>{{ app.observe.versionInstalled | async }}</h3>
+        <s9-status [appStatus]="app.observe.status | async" size="small"></s9-status>
       </ion-label>
-      <ion-note slot="end">
-        <s9-status [appStatus]="app.observe.status | async"></s9-status>
-      </ion-note>
     </ion-item>
   </ion-item-group>
 

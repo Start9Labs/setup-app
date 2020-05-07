@@ -4,7 +4,7 @@ import { ZeroconfMonitor } from './zeroconf.service'
 import { Method } from '../types/enums'
 import { TokenSigner } from 'jsontokens'
 import { S9BuilderWith } from './setup.service'
-import { S9Server, ServerModel, getLanIP } from '../models/server-model'
+import { S9Server, ServerModel, getLanIP, EmbassyConnection } from '../models/server-model'
 import { TorService, TorConnection } from './tor.service'
 import { NetworkMonitor } from './network.service'
 import * as uuid from 'uuid'
@@ -21,7 +21,7 @@ export class HttpService {
     private readonly networkMonitor: NetworkMonitor,
   ) { }
 
-  async serverRequest<T> (server: string | S9Server | S9BuilderWith<'versionInstalled' | 'privkey' | 'torAddress'>, options: HttpOptions, withVersion = true): Promise<T> {
+  async serverRequest<T> (server: string | S9Server | S9BuilderWith<'versionInstalled' | 'privkey' | 'torAddress' | 'connectionType'>, options: HttpOptions, withVersion = true): Promise<T> {
     if (typeof server === 'string') {
       server = this.serverModel.peek(server)
     }
@@ -31,11 +31,14 @@ export class HttpService {
 
     const zcs = this.zeroconfMonitor.getService(server.id)
 
-
     let host: string
+    let connectionType: EmbassyConnection
+
     if (zcs) {
+      connectionType = EmbassyConnection.LAN
       host = getLanIP(zcs)
     } else {
+      connectionType = EmbassyConnection.TOR
       if (this.torService.peekConnection() !== TorConnection.connected) {
         throw new Error('Tor disconnected')
       }
@@ -47,11 +50,17 @@ export class HttpService {
       }
     }
 
-    const version = withVersion ? `/v${server.versionInstalled.charAt(0)}` : ''
+    const ambassadorVersion = withVersion ? `/v${server.versionInstalled.charAt(0)}` : ''
+    options.url = `http://${host}:5959${ambassadorVersion}${options.url}`
 
-    options.url = `http://${host}:5959${version}${options.url}`
+    const res = await this.rawRequest<T>(options)
 
-    return this.rawRequest<T>(options)
+    if (connectionType !== server.connectionType) {
+      console.log(connectionType, server.connectionType)
+      this.serverModel.updateServer(server.id, { connectionType })
+    }
+
+    return res
   }
 
   async rawRequest<T> (options: HttpOptions): Promise<T> {

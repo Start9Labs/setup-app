@@ -93,7 +93,7 @@ export class AppConfigPage {
         await this.apiService.startApp(this.serverId, this.appId)
       // if not RUNNING beforehand, set status to STOPPED
       } else {
-        this.appModel.updateApp({ id: this.appId, status: AppStatus.STOPPED, statusAt: new Date().toISOString() })
+        this.appModel.updateApp({ id: this.appId, status: AppStatus.STOPPED })
       }
 
       await this.navigateBack()

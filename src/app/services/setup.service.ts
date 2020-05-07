@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core'
-import { S9Server, getLanIP, ServerStatus } from '../models/server-model'
+import { S9Server, getLanIP, ServerStatus, EmbassyConnection } from '../models/server-model'
 import { Method } from 'src/app/types/enums'
 import { AuthService } from './auth.service'
-import { Lan } from '../types/api-types'
+import { ReqRes } from '../types/api-types'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { ZeroconfMonitor } from './zeroconf.service'
 import { HttpService, getAuthHeader } from './http.service'
@@ -105,7 +105,7 @@ export class SetupService {
 
   async getVersion (builder: S9BuilderWith<'zeroconf'>): Promise<string | undefined> {
     try {
-      const { version } = await this.request<Lan.GetVersionRes>(builder, Method.GET, '/version')
+      const { version } = await this.request<ReqRes.GetVersionRes>(builder, Method.GET, '/version')
       return version
     } catch (e) {
       return undefined
@@ -115,8 +115,8 @@ export class SetupService {
   async registerPubkey (builder: S9BuilderWith<'zeroconf' | 'versionInstalled' | 'pubkey' | 'privkey'>, productKey: string): Promise<boolean> {
     const { pubkey } = builder
     try {
-      const data: Lan.PostRegisterReq = { pubKey: pubkey, productKey }
-      await this.request<Lan.PostRegisterRes>(builder, Method.POST, '/register', data)
+      const data: ReqRes.PostRegisterReq = { pubKey: pubkey, productKey }
+      await this.request<ReqRes.PostRegisterRes>(builder, Method.POST, '/register', data)
       return true
     } catch (e) {
       return false
@@ -125,15 +125,15 @@ export class SetupService {
 
   async getTor (builder: S9BuilderWith<'zeroconf' | 'versionInstalled' | 'pubkey' | 'privkey'>): Promise<string | undefined> {
     try {
-      const { torAddress } = await this.request<Lan.GetTorRes>(builder, Method.GET, `/tor`)
+      const { torAddress } = await this.request<ReqRes.GetTorRes>(builder, Method.GET, `/tor`)
       return torAddress
     } catch (e) {
       return undefined
     }
   }
 
-  async getServer (builder: S9BuilderWith<'zeroconf' | 'versionInstalled' | 'pubkey' | 'privkey' | 'torAddress'>): Promise<Lan.GetServerRes> {
-    return this.request<Lan.GetServerRes>(builder, Method.GET, '')
+  async getServer (builder: S9BuilderWith<'zeroconf' | 'versionInstalled' | 'pubkey' | 'privkey' | 'torAddress'>): Promise<ReqRes.GetServerRes> {
+    return this.request<ReqRes.GetServerRes>(builder, Method.GET, '')
   }
 
   async request<T> (builder: S9BuilderWith<'zeroconf'>, method: Method, path: string, data?: any): Promise<T> {
@@ -159,7 +159,6 @@ export class SetupService {
       torAddress: 'agent-tor-address-isaverylongaddresssothaticantestwrapping.onion',
       versionInstalled: '0.1.0',
       status: ServerStatus.RUNNING,
-      statusAt: new Date().toISOString(),
       privkey: 'testprivkey',
       pubkey: 'testpubkey',
       registered: true,
@@ -173,6 +172,7 @@ export class SetupService {
         port: 5959,
         txtRecord: { },
       },
+      connectionType: EmbassyConnection.LAN,
     }
   }
 }
@@ -186,7 +186,6 @@ export interface S9ServerBuilder {
   label: string
 
   status: ServerStatus
-  statusAt: string
   versionInstalled?: string
 
   privkey?: string
@@ -195,6 +194,8 @@ export interface S9ServerBuilder {
 
   torAddress?: string
   zeroconf?: ZeroconfService
+
+  connectionType?: EmbassyConnection
 }
 
 export function hasValues<T extends keyof S9ServerBuilder> (t: T[], s: S9ServerBuilder): s is S9BuilderWith<T> {
@@ -214,8 +215,8 @@ export function fromUserInput (id: string, label: string): S9ServerBuilder {
     id,
     label,
     status: ServerStatus.UNKNOWN,
-    statusAt: new Date().toISOString(),
     registered: false,
+    connectionType: EmbassyConnection.NONE,
   }
 }
 
@@ -225,6 +226,7 @@ export function toS9Server (builder: Required<S9ServerBuilder>): S9Server {
     badge: 0,
     notifications: [],
     versionLatest: undefined, // @COMPAT 0.1.1 - versionLatest dropped in 0.1.2
+    connectionType: EmbassyConnection.LAN,
   }
 }
 
@@ -239,11 +241,11 @@ const defaultBuilder: Required<S9ServerBuilder> = {
   id:               undefined as any,
   label:            undefined as any,
   status:           undefined as any,
-  statusAt:         undefined as any,
   versionInstalled: undefined as any,
   privkey:          undefined as any,
   pubkey:           undefined as any,
   registered:       undefined as any,
   torAddress:       undefined as any,
   zeroconf:         undefined as any,
+  connectionType:   undefined as any,
 }

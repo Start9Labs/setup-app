@@ -38,8 +38,8 @@ export class ServerListPage {
   addServersSubscription: Subscription
   deleteServersSubscription: Subscription
   progressSub: Subscription
-  connectionSub: Subscription
-  connection: TorConnection
+  torStatusSub: Subscription
+  torStatus: TorConnection
   progress: number
 
   constructor (
@@ -53,9 +53,9 @@ export class ServerListPage {
   ngOnInit () {
     this.servers = this.serverModel.watchAll()
 
-    this.connectionSub = this.torService.watchConnection().subscribe(c => {
+    this.torStatusSub = this.torService.watchConnection().subscribe(c => {
       this.zone.run(() => {
-        this.connection = c
+        this.torStatus = c
       })
     })
 
@@ -78,7 +78,7 @@ export class ServerListPage {
   }
 
   ngOnDestroy () {
-    this.connectionSub.unsubscribe()
+    this.torStatusSub.unsubscribe()
     this.progressSub.unsubscribe()
     this.addServersSubscription.unsubscribe()
     this.deleteServersSubscription.unsubscribe()

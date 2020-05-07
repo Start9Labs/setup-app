@@ -30,10 +30,10 @@
   </ion-item-group>
 
   <ng-container *ngIf="servers.length">
-    <div *ngIf="connection === 'in_progress'">
+    <!-- <div *ngIf="torStatus === 'in_progress'">
       <ion-progress-bar color="tertiary" [value]="progress"></ion-progress-bar>
       <p><img class="inline-image" src="assets/img/tor.png" alt="tor" />Establishing Connection</p>
-    </div>
+    </div> -->
     <ion-card button *ngFor="let server of servers" style="margin-bottom: 16px;" (click)="show(server.id)">
       <ion-item>
         <ion-avatar slot="start">
@@ -41,9 +41,7 @@
         </ion-avatar>
         <ion-label>
           <h1>{{ server.observe['label'] | async }}</h1>
-          <h3>
-            <s9-status [serverStatus]="server.observe['status'] | async"></s9-status>
-          </h3>
+          <s9-status [serverStatus]="server.observe['status'] | async" [connectionType]="server.observe['connectionType'] | async" size="small"></s9-status>
         </ion-label>
         <ion-badge slot="end" *ngIf="server.observe['badge'] | async as badge" color="danger">{{ badge }}</ion-badge>
       </ion-item>

@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core'
 import { AppStatus } from 'src/app/models/app-model'
-import { ServerStatus } from 'src/app/models/server-model'
+import { ServerStatus, EmbassyConnection } from 'src/app/models/server-model'
 
 @Component({
   selector: 's9-status',
@@ -10,14 +10,25 @@ import { ServerStatus } from 'src/app/models/server-model'
 export class StatusComponent {
   @Input() appStatus?: AppStatus
   @Input() serverStatus?: ServerStatus
+  @Input() connectionType = EmbassyConnection.NONE
+  @Input() size: 'small' | 'large' = 'large'
   color: string
   display: string
+  icon: string
 
   ngOnChanges () {
     if (this.serverStatus) {
       this.handleServerStatus()
     } else if (this.appStatus) {
       this.handleAppStatus()
+    }
+
+    console.log(this.connectionType)
+
+    if (this.connectionType === EmbassyConnection.LAN) {
+      this.icon = 'assets/img/home.png'
+    } else if (this.connectionType === EmbassyConnection.TOR) {
+      this.icon = 'assets/img/tor.png'
     }
   }
 
@@ -81,7 +92,7 @@ export class StatusComponent {
         break
       case AppStatus.INSTALLING:
         this.display = 'Installing...'
-        this.color = 'warning'
+        this.color = 'primary'
         break
       case AppStatus.DEAD:
         this.display = 'Corrupted'

@@ -29,8 +29,7 @@
     <ion-item-group>
       <ion-item>
         <ion-label>
-          <p>Status</p>
-          <h2><s9-status [appStatus]="vars.status"></s9-status></h2>
+          <s9-status [appStatus]="vars.status"></s9-status>
         </ion-label>
         <ng-container *ngIf="vars.status !== 'INSTALLING'">
           <ion-button slot="end" *ngIf="['NEEDS_CONFIG', 'RECOVERABLE'].includes(vars.status)" [routerLink]="['config']" fill="outline" color="warning">
@@ -48,18 +47,16 @@
 
     <ng-container *ngIf="vars.status !== 'INSTALLING'">
 
-      <ion-button *ngIf="showUpdate" style="margin: 16px;" expand="block" fill="outline" (click)="checkForUpdates()">
+      <ion-button *ngIf="showUpdate" style="margin: 30px 16px;" expand="block" fill="outline" color="warning" (click)="checkForUpdates()">
         Check for Updates
         <ion-icon slot="end" name="refresh-outline"></ion-icon>
       </ion-button>
 
-      <ion-button *ngIf="vars.status === 'DEAD'" style="margin: 16px;" expand="block" fill="outline"
-        color="primary" (click)="presentAlertUninstall()">
+      <ion-button *ngIf="vars.status === 'DEAD'" style="margin: 30px 16px;" expand="block" fill="outline" color="warning" (click)="presentAlertUninstall()">
         Force Uninstall
       </ion-button>
 
       <ion-item-group class="ion-text-wrap" *ngIf="vars.versionInstalled">
-        <ion-item-divider>About</ion-item-divider>
         <ion-item>
           <ion-label position="stacked">App ID</ion-label>
           <ion-text color="medium">

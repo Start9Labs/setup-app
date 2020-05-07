@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core'
 import { Method } from '../types/enums'
 import { AppInstalled, AppAvailablePreview, AppAvailableFull, AppStatus, AppConfigSpec, Rules } from '../models/app-model'
-import { S9Notification, SSHFingerprint, ServerStatus } from '../models/server-model'
-import { Lan, ApiAppAvailablePreview, ApiAppAvailableFull, ApiAppInstalled, ApiServer, ApiAppVersionInfo } from '../types/api-types'
+import { S9Notification, SSHFingerprint, ServerStatus, ServerModel, EmbassyConnection } from '../models/server-model'
+import { ReqRes, ApiAppAvailablePreview, ApiAppAvailableFull, ApiAppInstalled, ApiServer, ApiAppVersionInfo } from '../types/api-types'
 import { S9BuilderWith } from './setup.service'
 import * as configUtil from '../util/config.util'
 import { pauseFor } from '../util/misc.util'
@@ -19,46 +19,46 @@ export class ApiService {
   ) { }
 
   async getServer (serverId: string): Promise<ApiServer> {
-    return this.http.serverRequest<Lan.GetServerRes>(serverId, { method: Method.GET, url: '' })
+    return this.http.serverRequest<ReqRes.GetServerRes>(serverId, { method: Method.GET, url: '' })
   }
 
-  async getVersionLatest (serverId: string): Promise<Lan.GetVersionLatestRes> {
-    return this.http.serverRequest<Lan.GetVersionLatestRes>(serverId, { method: Method.GET, url: '/versionLatest' }, false)
+  async getVersionLatest (serverId: string): Promise<ReqRes.GetVersionLatestRes> {
+    return this.http.serverRequest<ReqRes.GetVersionLatestRes>(serverId, { method: Method.GET, url: '/versionLatest' }, false)
   }
 
-  async getServerSpecs (serverId: string): Promise<Lan.GetServerSpecsRes> {
-    return this.http.serverRequest<Lan.GetServerSpecsRes>(serverId, { method: Method.GET, url: `/specs` })
+  async getServerSpecs (serverId: string): Promise<ReqRes.GetServerSpecsRes> {
+    return this.http.serverRequest<ReqRes.GetServerSpecsRes>(serverId, { method: Method.GET, url: `/specs` })
   }
 
-  async getServerMetrics (serverId: string): Promise<Lan.GetServerMetricsRes> {
-    return this.http.serverRequest<Lan.GetServerMetricsRes>(serverId, { method: Method.GET, url: `/metrics` })
+  async getServerMetrics (serverId: string): Promise<ReqRes.GetServerMetricsRes> {
+    return this.http.serverRequest<ReqRes.GetServerMetricsRes>(serverId, { method: Method.GET, url: `/metrics` })
   }
 
   async getNotifications (serverId: string, page: number, perPage: number): Promise<S9Notification[]> {
-    const params: Lan.GetNotificationsReq = {
+    const params: ReqRes.GetNotificationsReq = {
       page: String(page),
       perPage: String(perPage),
     }
-    return this.http.serverRequest<Lan.GetNotificationsRes>(serverId, { method: Method.GET, url: `/notifications`, params })
+    return this.http.serverRequest<ReqRes.GetNotificationsRes>(serverId, { method: Method.GET, url: `/notifications`, params })
   }
 
   async deleteNotification (serverId: string, id: string): Promise<void> {
-    await this.http.serverRequest<Lan.DeleteNotificationRes>(serverId, { method: Method.DELETE, url: `/notifications/${id}` })
+    await this.http.serverRequest<ReqRes.DeleteNotificationRes>(serverId, { method: Method.DELETE, url: `/notifications/${id}` })
   }
 
   async updateAgent (serverId: string, version: string): Promise<void> {
-    const data: Lan.PostUpdateAgentReq = {
+    const data: ReqRes.PostUpdateAgentReq = {
       version,
     }
-    await this.http.serverRequest<Lan.PostUpdateAgentRes>(serverId, { method: Method.POST, url: '/update', data })
+    await this.http.serverRequest<ReqRes.PostUpdateAgentRes>(serverId, { method: Method.POST, url: '/update', data })
   }
 
   async getAvailableApps (serverId: string): Promise<AppAvailablePreview[]> {
-    return this.http.serverRequest<Lan.GetAppsAvailableRes>(serverId, { method: Method.GET, url: '/apps/store' })
+    return this.http.serverRequest<ReqRes.GetAppsAvailableRes>(serverId, { method: Method.GET, url: '/apps/store' })
   }
 
   async getAvailableApp (serverId: string, appId: string): Promise<AppAvailableFull> {
-    return this.http.serverRequest<Lan.GetAppAvailableRes>(serverId, { method: Method.GET, url: `/apps/${appId}/store` })
+    return this.http.serverRequest<ReqRes.GetAppAvailableRes>(serverId, { method: Method.GET, url: `/apps/${appId}/store` })
       .then(res => {
         return {
           ...res,
@@ -68,7 +68,7 @@ export class ApiService {
   }
 
   async getAvailableAppVersionInfo (serverId: string, appId: string, version: string): Promise<{ releaseNotes: string, versionViewing: string }> {
-    return this.http.serverRequest<Lan.GetAppAvailableVersionInfoRes>(serverId, { method: Method.GET, url: `/apps/${appId}/store/${version}` })
+    return this.http.serverRequest<ReqRes.GetAppAvailableVersionInfoRes>(serverId, { method: Method.GET, url: `/apps/${appId}/store/${version}` })
       .then(res => {
         return {
           ...res,
@@ -78,11 +78,11 @@ export class ApiService {
   }
 
   async getInstalledApp (serverId: string, appId: string): Promise<AppInstalled> {
-    return this.http.serverRequest<Lan.GetAppInstalledRes>(serverId, { method: Method.GET, url: `/apps/${appId}/installed` })
+    return this.http.serverRequest<ReqRes.GetAppInstalledRes>(serverId, { method: Method.GET, url: `/apps/${appId}/installed` })
   }
 
   async getInstalledApps (serverId: string): Promise<AppInstalled[]> {
-    const res = this.http.serverRequest<Lan.GetAppsInstalledRes>(serverId, { method: Method.GET, url: `/apps/installed` })
+    const res = this.http.serverRequest<ReqRes.GetAppsInstalledRes>(serverId, { method: Method.GET, url: `/apps/installed` })
     return res
   }
 
@@ -91,10 +91,10 @@ export class ApiService {
     config: object
     rules: Rules[]
   }> {
-    let res = await this.http.serverRequest<Lan.GetAppConfigRes | string>(serverId, { method: Method.GET, url: `/apps/${appId}/config` })
+    let res = await this.http.serverRequest<ReqRes.GetAppConfigRes | string>(serverId, { method: Method.GET, url: `/apps/${appId}/config` })
     // @COMPAT Ambasssador <= 0.1.3
     if (typeof res === 'string') {
-      res = JSON.parse(res) as Lan.GetAppConfigRes
+      res = JSON.parse(res) as ReqRes.GetAppConfigRes
     }
     const { spec, config, rules } = res
     // END
@@ -105,98 +105,98 @@ export class ApiService {
     }
   }
 
-  async getAppLogs (serverId: string, appId: string, params: Lan.GetAppLogsReq = { }): Promise<string[]> {
-    return this.http.serverRequest<Lan.GetAppLogsRes>(serverId, { method: Method.GET, url: `/apps/${appId}/logs`, params: params as any })
+  async getAppLogs (serverId: string, appId: string, params: ReqRes.GetAppLogsReq = { }): Promise<string[]> {
+    return this.http.serverRequest<ReqRes.GetAppLogsRes>(serverId, { method: Method.GET, url: `/apps/${appId}/logs`, params: params as any })
   }
 
-  async getAppMetrics (serverId: string, appId: string): Promise<Lan.GetAppMetricsRes> {
-    let res = await this.http.serverRequest<Lan.GetAppMetricsRes | string>(serverId, { method: Method.GET, url: `/apps/${appId}/metrics` })
+  async getAppMetrics (serverId: string, appId: string): Promise<ReqRes.GetAppMetricsRes> {
+    let res = await this.http.serverRequest<ReqRes.GetAppMetricsRes | string>(serverId, { method: Method.GET, url: `/apps/${appId}/metrics` })
     // @COMPAT Ambasssador <= 0.1.3
     if (typeof res === 'string') {
-      res = JSON.parse(res) as Lan.GetAppMetricsRes
+      res = JSON.parse(res) as ReqRes.GetAppMetricsRes
     }
     // END
     return res
   }
 
   async installApp (serverId: string, appId: string, version: string): Promise<AppInstalled> {
-    const data: Lan.PostInstallAppReq = {
+    const data: ReqRes.PostInstallAppReq = {
       version,
     }
-    return this.http.serverRequest<Lan.PostInstallAppRes>(serverId, { method: Method.POST, url: `/apps/${appId}/install`, data })
+    return this.http.serverRequest<ReqRes.PostInstallAppRes>(serverId, { method: Method.POST, url: `/apps/${appId}/install`, data })
   }
 
   async uninstallApp (serverId: string, appId: string): Promise<void> {
-    await this.http.serverRequest<Lan.PostUninstallAppRes>(serverId, { method: Method.POST, url: `/apps/${appId}/uninstall`, readTimeout: 30 })
+    await this.http.serverRequest<ReqRes.PostUninstallAppRes>(serverId, { method: Method.POST, url: `/apps/${appId}/uninstall`, readTimeout: 30 })
   }
 
   async startApp (serverId: string, appId: string): Promise<void> {
-    await this.http.serverRequest<Lan.PostStartAppRes>(serverId, { method: Method.POST, url: `/apps/${appId}/start`, readTimeout: 30 })
-    this.appModel.get(serverId).updateApp({ id: appId, status: AppStatus.RUNNING, statusAt: new Date().toISOString() })
+    await this.http.serverRequest<ReqRes.PostStartAppRes>(serverId, { method: Method.POST, url: `/apps/${appId}/start`, readTimeout: 30 })
+    this.appModel.get(serverId).updateApp({ id: appId, status: AppStatus.RUNNING })
   }
 
   async stopApp (serverId: string, appId: string): Promise<void> {
-    await this.http.serverRequest<Lan.PostStopAppRes>(serverId, { method: Method.POST, url: `/apps/${appId}/stop`, readTimeout: 30 })
-    this.appModel.get(serverId).updateApp({ id: appId, status: AppStatus.STOPPED, statusAt: new Date().toISOString() })
+    await this.http.serverRequest<ReqRes.PostStopAppRes>(serverId, { method: Method.POST, url: `/apps/${appId}/stop`, readTimeout: 30 })
+    this.appModel.get(serverId).updateApp({ id: appId, status: AppStatus.STOPPED })
   }
 
   async updateAppConfig (serverId: string, app: AppInstalled, config: object): Promise<void> {
-    const data: Lan.PostUpdateAppConfigReq = {
+    const data: ReqRes.PostUpdateAppConfigReq = {
       config,
     }
-    await this.http.serverRequest<Lan.PostUpdateAppConfigRes>(serverId, { method: Method.PATCH, url: `/apps/${app.id}/config`, data, readTimeout: 30 })
+    await this.http.serverRequest<ReqRes.PostUpdateAppConfigRes>(serverId, { method: Method.PATCH, url: `/apps/${app.id}/config`, data, readTimeout: 30 })
   }
 
   async wipeAppData (serverId: string, app: AppInstalled): Promise<void> {
-    await this.http.serverRequest<Lan.PostWipeAppDataRes>(serverId, { method: Method.POST, url: `/apps/${app.id}/wipe`, readTimeout: 30 })
-    this.appModel.get(serverId).updateApp({ id: app.id, status: AppStatus.NEEDS_CONFIG, statusAt: new Date().toISOString() })
+    await this.http.serverRequest<ReqRes.PostWipeAppDataRes>(serverId, { method: Method.POST, url: `/apps/${app.id}/wipe`, readTimeout: 30 })
+    this.appModel.get(serverId).updateApp({ id: app.id, status: AppStatus.NEEDS_CONFIG })
   }
 
   async getSSHKeys (serverId: string): Promise<SSHFingerprint[]> {
-    return this.http.serverRequest<Lan.GetSSHKeysRes>(serverId, { method: Method.GET, url: `/sshKeys` })
+    return this.http.serverRequest<ReqRes.GetSSHKeysRes>(serverId, { method: Method.GET, url: `/sshKeys` })
   }
 
   async addSSHKey (serverId: string, sshKey: string): Promise<SSHFingerprint> {
-    const data: Lan.PostAddSSHKeyReq = {
+    const data: ReqRes.PostAddSSHKeyReq = {
       sshKey,
     }
-    return this.http.serverRequest<Lan.PostAddSSHKeyRes>(serverId, { method: Method.POST, url: `/sshKeys`, data })
+    return this.http.serverRequest<ReqRes.PostAddSSHKeyRes>(serverId, { method: Method.POST, url: `/sshKeys`, data })
   }
 
-  async getWifi (serverId: string, timeout?: number): Promise<Lan.GetWifiRes> {
-    return this.http.serverRequest<Lan.GetWifiRes>(serverId, { method: Method.GET, url: `/wifi`, readTimeout: timeout })
+  async getWifi (serverId: string, timeout?: number): Promise<ReqRes.GetWifiRes> {
+    return this.http.serverRequest<ReqRes.GetWifiRes>(serverId, { method: Method.GET, url: `/wifi`, readTimeout: timeout })
   }
 
   async addWifi (serverId: string, ssid: string, password: string, country: string): Promise<void> {
-    const data: Lan.PostAddWifiReq = {
+    const data: ReqRes.PostAddWifiReq = {
       ssid,
       password,
       country,
     }
-    await this.http.serverRequest<Lan.PostAddWifiRes>(serverId, { method: Method.POST, url: `/wifi`, data })
+    await this.http.serverRequest<ReqRes.PostAddWifiRes>(serverId, { method: Method.POST, url: `/wifi`, data })
   }
 
   async connectWifi (serverId: string, ssid: string, country: string): Promise<void> {
-    const params: Lan.PostConnectWifiReq = {
+    const params: ReqRes.PostConnectWifiReq = {
       country,
     }
-    await this.http.serverRequest<Lan.PostConnectWifiRes>(serverId, { method: Method.POST, url: encodeURI(`/wifi/${ssid}`), params })
+    await this.http.serverRequest<ReqRes.PostConnectWifiRes>(serverId, { method: Method.POST, url: encodeURI(`/wifi/${ssid}`), params })
   }
 
   async deleteWifi (serverId: string, ssid: string): Promise<void> {
-    await this.http.serverRequest<Lan.DeleteWifiRes>(serverId, { method: Method.DELETE, url: encodeURI(`/wifi/${ssid}`) })
+    await this.http.serverRequest<ReqRes.DeleteWifiRes>(serverId, { method: Method.DELETE, url: encodeURI(`/wifi/${ssid}`) })
   }
 
   async deleteSSHKey (serverId: string, sshKey: string): Promise<void> {
-    await this.http.serverRequest<Lan.DeleteSSHKeyRes>(serverId, { method: Method.DELETE, url: `/sshKeys/${sshKey}` })
+    await this.http.serverRequest<ReqRes.DeleteSSHKeyRes>(serverId, { method: Method.DELETE, url: `/sshKeys/${sshKey}` })
   }
 
   async restartServer (serverId: string): Promise<void> {
-    await this.http.serverRequest<Lan.PostRestartServerRes>(serverId, { method: Method.POST, url: '/restart', readTimeout: 30 })
+    await this.http.serverRequest<ReqRes.PostRestartServerRes>(serverId, { method: Method.POST, url: '/restart', readTimeout: 30 })
   }
 
   async shutdownServer (serverId: string): Promise<void> {
-    await this.http.serverRequest<Lan.PostShutdownServerRes>(serverId, { method: Method.POST, url: '/shutdown', readTimeout: 30 })
+    await this.http.serverRequest<ReqRes.PostShutdownServerRes>(serverId, { method: Method.POST, url: '/shutdown', readTimeout: 30 })
   }
 }
 
@@ -209,42 +209,53 @@ export class ApiService {
 export class XApiService {
 
   constructor (
+    private readonly serverModel: ServerModel,
     private readonly appModel: ServerAppModel,
   ) { }
 
-  async getServer (serverId: string | S9BuilderWith<'zeroconf' | 'privkey' | 'versionInstalled' | 'torAddress'>): Promise<ApiServer> {
-    return mockGetServer()
+  async getServer (serverId: string): Promise<ApiServer> {
+    const res = await mockGetServer()
+    this.setConnection(serverId)
+    return res
   }
 
-  async getVersionLatest (serverId: string): Promise<Lan.GetVersionLatestRes> {
+  async getVersionLatest (serverId: string): Promise<ReqRes.GetVersionLatestRes> {
+    this.setConnection(serverId)
     return mockGetVersionLatest()
   }
 
-  async getServerSpecs (serverId: string): Promise<Lan.GetServerSpecsRes> {
+  async getServerSpecs (serverId: string): Promise<ReqRes.GetServerSpecsRes> {
+    this.setConnection(serverId)
     return mockGetServerSpecs()
   }
 
-  async getServerMetrics (serverId: string): Promise<Lan.GetServerMetricsRes> {
+  async getServerMetrics (serverId: string): Promise<ReqRes.GetServerMetricsRes> {
+    this.setConnection(serverId)
     return mockGetServerMetrics()
   }
 
   async getNotifications (serverId: string, page: number, perPage: number): Promise<S9Notification[]> {
+    this.setConnection(serverId)
     return mockGetNotifications()
   }
 
   async deleteNotification (serverId: string, id: string): Promise<void> {
+    this.setConnection(serverId)
     await mockDeleteNotification()
   }
 
   async updateAgent (serverId: string, thing: any): Promise<void> {
+    this.setConnection(serverId)
     await mockPostUpdateAgent()
   }
 
   async getAvailableApps (serverId: string): Promise<AppAvailablePreview[]> {
+    this.setConnection(serverId)
     return mockGetAvailableApps()
   }
 
   async getAvailableApp (serverId: string, appId: string): Promise<AppAvailableFull> {
+    this.setConnection(serverId)
     return mockGetAvailableApp()
       .then(res => {
         return {
@@ -255,6 +266,7 @@ export class XApiService {
   }
 
   async getAvailableAppVersionInfo (serverId: string, appId: string, version: string): Promise<{ releaseNotes: string, versionViewing: string }> {
+    this.setConnection(serverId)
     return mockGetAvailableAppVersionInfo()
       .then(res => {
         return {
@@ -265,15 +277,19 @@ export class XApiService {
   }
 
   async getInstalledApp (serverId: string, appId: string): Promise<AppInstalled> {
+    this.setConnection(serverId)
     return mockGetInstalledApp()
   }
 
-  async getAppMetrics (serverId: string, appId: string): Promise<Lan.GetAppMetricsRes> {
+  async getAppMetrics (serverId: string, appId: string): Promise<ReqRes.GetAppMetricsRes> {
+    this.setConnection(serverId)
     return mockGetAppMetrics()
   }
 
   async getInstalledApps (serverId: string): Promise<AppInstalled[]> {
-    return mockGetInstalledApps()
+    const res = await mockGetInstalledApps()
+    this.setConnection(serverId)
+    return res
   }
 
   async getAppConfig (serverId: string, appId: string): Promise<{
@@ -281,6 +297,7 @@ export class XApiService {
     config: object
     rules: Rules[]
   }> {
+    this.setConnection(serverId)
     return mockGetAppConfig()
       .then(({ spec, config, rules }) => {
         return {
@@ -291,195 +308,215 @@ export class XApiService {
       })
   }
 
-  async getAppLogs (serverId: string, appId: string, params: Lan.GetAppLogsReq = { }): Promise<string[]> {
+  async getAppLogs (serverId: string, appId: string, params: ReqRes.GetAppLogsReq = { }): Promise<string[]> {
+    this.setConnection(serverId)
     return mockGetAppLogs()
   }
 
   async installApp (serverId: string, appId: string, version: string): Promise<AppInstalled> {
+    this.setConnection(serverId)
     return mockInstallApp()
   }
 
   async uninstallApp (serverId: string, appId: string): Promise<void> {
+    this.setConnection(serverId)
     await mockUninstallApp()
   }
 
   async startApp (serverId: string, appId: string): Promise<void> {
+    this.setConnection(serverId)
     await mockStartApp()
-    this.appModel.get(serverId).updateApp({ id: appId, status: AppStatus.RUNNING, statusAt: new Date().toISOString() })
+    this.appModel.get(serverId).updateApp({ id: appId, status: AppStatus.RUNNING })
   }
 
   async stopApp (serverId: string, appId: string): Promise<void> {
+    this.setConnection(serverId)
     await mockStopApp()
-    this.appModel.get(serverId).updateApp({ id: appId, status: AppStatus.STOPPED, statusAt: new Date().toISOString() })
+    this.appModel.get(serverId).updateApp({ id: appId, status: AppStatus.STOPPED })
   }
 
   async updateAppConfig (serverId: string, app: AppInstalled, config: object): Promise<void> {
+    this.setConnection(serverId)
     await mockUpdateAppConfig()
   }
 
   async wipeAppData (serverId: string, app: AppInstalled): Promise<void> {
+    this.setConnection(serverId)
     await mockWipeAppData()
   }
 
   async getSSHKeys (serverId: string): Promise<SSHFingerprint[]> {
+    this.setConnection(serverId)
     return mockGetSSHKeys()
   }
 
   async addSSHKey (serverId: string, sshKey: string): Promise<SSHFingerprint> {
+    this.setConnection(serverId)
     return mockAddSSHKey()
   }
 
   async deleteSSHKey (serverId: string, sshKey: string): Promise<void> {
+    this.setConnection(serverId)
     await mockDeleteSSHKey()
   }
 
-  async getWifi (serverId: string, timeout = 60): Promise<Lan.GetWifiRes> {
+  async getWifi (serverId: string, timeout = 60): Promise<ReqRes.GetWifiRes> {
+    this.setConnection(serverId)
     return mockGetWifi()
   }
 
   async addWifi (serverId: string, ssid: string, password: string, country: string): Promise<void> {
+    this.setConnection(serverId)
     await mockAddWifi()
   }
 
   async connectWifi (serverId: string, ssid: string, country: string): Promise<void> {
+    this.setConnection(serverId)
     await mockConnectWifi()
   }
 
   async deleteWifi (serverId: string, ssid: string): Promise<void> {
+    this.setConnection(serverId)
     await mockDeleteWifi()
   }
 
   async restartServer (serverId: string): Promise<void> {
+    this.setConnection(serverId)
     await mockRestartServer()
   }
 
   async shutdownServer (serverId: string): Promise<void> {
+    this.setConnection(serverId)
     await mockShutdownServer()
+  }
+
+  setConnection (serverId: string) {
+    this.serverModel.updateServer(serverId, { connectionType: EmbassyConnection.LAN })
   }
 }
 
 // @TODO move-to-test-folders
-async function mockGetServer (): Promise<Lan.GetServerRes> {
+async function mockGetServer (): Promise<ReqRes.GetServerRes> {
   await pauseFor(1000)
   return mockApiServer
 }
 
-async function mockGetVersionLatest (): Promise<Lan.GetVersionLatestRes> {
+async function mockGetVersionLatest (): Promise<ReqRes.GetVersionLatestRes> {
   await pauseFor(1000)
   return mockVersionLatest
 }
 
 // @TODO move-to-test-folders
-async function mockGetServerSpecs (): Promise<Lan.GetServerSpecsRes> {
+async function mockGetServerSpecs (): Promise<ReqRes.GetServerSpecsRes> {
   await pauseFor(1000)
   return mockApiServerSpecs
 }
 
 // @TODO move-to-test-folders
-async function mockGetServerMetrics (): Promise<Lan.GetServerMetricsRes> {
+async function mockGetServerMetrics (): Promise<ReqRes.GetServerMetricsRes> {
   await pauseFor(1000)
   return mockApiServerMetrics
 }
 
 // @TODO move-to-test-folders
-async function mockGetNotifications (): Promise<Lan.GetNotificationsRes> {
+async function mockGetNotifications (): Promise<ReqRes.GetNotificationsRes> {
   await pauseFor(1000)
   function cloneAndChange (arr: S9Notification[], letter: string) { return JSON.parse(JSON.stringify(arr)).map(a => { a.id = a.id + letter; return a }) }
   return mockApiNotifications.concat(cloneAndChange(mockApiNotifications, 'a')).concat(cloneAndChange(mockApiNotifications, 'b'))
 }
 
 // @TODO move-to-test-folders
-async function mockDeleteNotification (): Promise<Lan.DeleteNotificationRes> {
+async function mockDeleteNotification (): Promise<ReqRes.DeleteNotificationRes> {
   await pauseFor(1000)
   return { }
 }
 
 // @TODO move-to-test-folders
-async function mockPostUpdateAgent (): Promise<Lan.PostUpdateAgentRes> {
+async function mockPostUpdateAgent (): Promise<ReqRes.PostUpdateAgentRes> {
   await pauseFor(1000)
   return { }
 }
 
 // @TODO move-to-test-folders
-async function mockGetAvailableApp (): Promise<Lan.GetAppAvailableRes> {
+async function mockGetAvailableApp (): Promise<ReqRes.GetAppAvailableRes> {
   await pauseFor(1000)
   return mockApiAppAvailableFull
 }
 
 // @TODO move-to-test-folders
-async function mockGetAvailableApps (): Promise<Lan.GetAppsAvailableRes> {
+async function mockGetAvailableApps (): Promise<ReqRes.GetAppsAvailableRes> {
   await pauseFor(1000)
   return mockApiAppsAvailablePreview
 }
 
 // @TODO move-to-test-folders
-async function mockGetAvailableAppVersionInfo (): Promise<Lan.GetAppAvailableVersionInfoRes> {
+async function mockGetAvailableAppVersionInfo (): Promise<ReqRes.GetAppAvailableVersionInfoRes> {
   await pauseFor(1000)
   return mockApiAppAvailableVersionInfo
 }
 
 // @TODO move-to-test-folders
-async function mockGetInstalledApp (): Promise<Lan.GetAppInstalledRes> {
+async function mockGetInstalledApp (): Promise<ReqRes.GetAppInstalledRes> {
   await pauseFor(1000)
   return mockApiAppsInstalled[0]
 }
 
 // @TODO move-to-test-folders
-async function mockGetInstalledApps (): Promise<Lan.GetAppsInstalledRes> {
+async function mockGetInstalledApps (): Promise<ReqRes.GetAppsInstalledRes> {
   await pauseFor(1000)
   return mockApiAppsInstalled
 }
 
 // @TODO move-to-test-folders
-async function mockGetAppLogs (): Promise<Lan.GetAppLogsRes> {
+async function mockGetAppLogs (): Promise<ReqRes.GetAppLogsRes> {
   await pauseFor(1000)
   return mockApiAppLogs
 }
 
 // @TODO move-to-test-folders
-async function mockGetAppMetrics (): Promise<Lan.GetAppMetricsRes> {
+async function mockGetAppMetrics (): Promise<ReqRes.GetAppMetricsRes> {
   await pauseFor(1000)
   return mockApiAppMetrics
 }
 
 // @TODO move-to-test-folders
-async function mockGetAppConfig (): Promise<Lan.GetAppConfigRes> {
+async function mockGetAppConfig (): Promise<ReqRes.GetAppConfigRes> {
   await pauseFor(1000)
   return mockApiAppConfig
 }
 
 // @TODO move-to-test-folders
-async function mockInstallApp (): Promise<Lan.PostInstallAppRes> {
+async function mockInstallApp (): Promise<ReqRes.PostInstallAppRes> {
   await pauseFor(1000)
   return mockApiAppInstalledFresh
 }
 
 // @TODO move-to-test-folders
-async function mockUninstallApp (): Promise<Lan.PostUninstallAppRes> {
+async function mockUninstallApp (): Promise<ReqRes.PostUninstallAppRes> {
   await pauseFor(1000)
   return { }
 }
 
 // @TODO move-to-test-folders
-async function mockStartApp (): Promise<Lan.PostStartAppRes> {
+async function mockStartApp (): Promise<ReqRes.PostStartAppRes> {
   await pauseFor(1000)
   return { }
 }
 
 // @TODO move-to-test-folders
-async function mockStopApp (): Promise<Lan.PostStopAppRes> {
+async function mockStopApp (): Promise<ReqRes.PostStopAppRes> {
   await pauseFor(1000)
   return { }
 }
 
 // @TODO move-to-test-folders
-async function mockUpdateAppConfig (): Promise<Lan.PostUpdateAppConfigRes> {
+async function mockUpdateAppConfig (): Promise<ReqRes.PostUpdateAppConfigRes> {
   await pauseFor(1000)
   return { }
 }
 
 // @TODO move-to-test-folders
-async function mockWipeAppData (): Promise<Lan.PostWipeAppDataRes> {
+async function mockWipeAppData (): Promise<ReqRes.PostWipeAppDataRes> {
   await pauseFor(1000)
   return { }
 }
@@ -497,49 +534,49 @@ async function mockAddSSHKey (): Promise<SSHFingerprint> {
 }
 
 // @TODO move-to-test-folders
-async function mockDeleteSSHKey (): Promise<Lan.DeleteSSHKeyRes> {
+async function mockDeleteSSHKey (): Promise<ReqRes.DeleteSSHKeyRes> {
   await pauseFor(1000)
   return { }
 }
 
 // @TODO move-to-test-folders
-async function mockGetWifi (): Promise<Lan.GetWifiRes> {
+async function mockGetWifi (): Promise<ReqRes.GetWifiRes> {
   await pauseFor(1000)
   return {
-    ssids: ['Goosers', 'Atlantic City'],
+    ssids: ['Goosers', 'AtReqRestic City'],
     current: 'Goosers',
   }
 }
 
-async function mockAddWifi (): Promise<Lan.PostAddWifiRes> {
+async function mockAddWifi (): Promise<ReqRes.PostAddWifiRes> {
   await pauseFor(1000)
   return { }
 }
 
-async function mockConnectWifi (): Promise<Lan.PostConnectWifiRes> {
+async function mockConnectWifi (): Promise<ReqRes.PostConnectWifiRes> {
   await pauseFor(1000)
   return { }
 }
 
-async function mockDeleteWifi (): Promise<Lan.DeleteWifiRes> {
-  await pauseFor(1000)
-  return { }
-}
-
-// @TODO move-to-test-folders
-async function mockRestartServer (): Promise<Lan.PostRestartServerRes> {
+async function mockDeleteWifi (): Promise<ReqRes.DeleteWifiRes> {
   await pauseFor(1000)
   return { }
 }
 
 // @TODO move-to-test-folders
-async function mockShutdownServer (): Promise<Lan.PostShutdownServerRes> {
+async function mockRestartServer (): Promise<ReqRes.PostRestartServerRes> {
   await pauseFor(1000)
   return { }
 }
 
 // @TODO move-to-test-folders
-const mockApiNotifications: Lan.GetNotificationsRes = [
+async function mockShutdownServer (): Promise<ReqRes.PostShutdownServerRes> {
+  await pauseFor(1000)
+  return { }
+}
+
+// @TODO move-to-test-folders
+const mockApiNotifications: ReqRes.GetNotificationsRes = [
   {
     id: '123e4567-e89b-12d3-a456-426655440000',
     appId: 'bitcoind',
@@ -575,19 +612,19 @@ const mockApiNotifications: Lan.GetNotificationsRes = [
 ]
 
 // @TODO move-to-test-folders
-const mockApiServer: Lan.GetServerRes = {
+const mockApiServer: ReqRes.GetServerRes = {
   versionInstalled: '0.1.4',
   status: ServerStatus.RUNNING,
   notifications: [],
   // notifications: mockApiNotifications,
 }
 
-const mockVersionLatest: Lan.GetVersionLatestRes = {
+const mockVersionLatest: ReqRes.GetVersionLatestRes = {
   versionLatest: '0.1.4',
   canUpdate: true,
 }
 
-const mockApiServerMetrics: Lan.GetServerMetricsRes = {
+const mockApiServerMetrics: ReqRes.GetServerMetricsRes = {
   'Group1': {
     'Metric1': {
       value: 22.2,
@@ -618,7 +655,7 @@ const mockApiServerMetrics: Lan.GetServerMetricsRes = {
   },
 }
 
-const mockApiServerSpecs: Lan.GetServerSpecsRes = {
+const mockApiServerSpecs: ReqRes.GetServerSpecsRes = {
   'Model': 'S0',
   'Tor Address': 'nfsnjkcnaskjnlkasnfa.onion',
   'CPU': 'Broadcom BCM2711, Quad core Cortex-A72 (ARM v8) 64-bit SoC @ 1.5GHz',
@@ -635,7 +672,6 @@ const mockApiAppsAvailablePreview: ApiAppAvailablePreview[] = [
     versionLatest: '0.19.1',
     versionInstalled: '0.19.0',
     status: AppStatus.UNKNOWN,
-    statusAt: new Date().toISOString(),
     title: 'Bitcoin Core',
     descriptionShort: 'Bitcoin is an innovative payment network and new kind of money.',
     iconURL: 'assets/img/bitcoin_core.png',
@@ -645,7 +681,6 @@ const mockApiAppsAvailablePreview: ApiAppAvailablePreview[] = [
     versionLatest: '0.1.0',
     versionInstalled: '0.1.0',
     status: AppStatus.UNKNOWN,
-    statusAt: new Date().toISOString(),
     title: 'Cups Messenger',
     descriptionShort: 'P2P encrypted messaging over Tor.',
     iconURL: 'assets/img/cups.png',
@@ -655,7 +690,6 @@ const mockApiAppsAvailablePreview: ApiAppAvailablePreview[] = [
     versionLatest: '0.1.0',
     versionInstalled: null,
     status: AppStatus.UNKNOWN,
-    statusAt: new Date().toISOString(),
     title: 'Bitwarden',
     descriptionShort: `Self-hosted password manager`,
     iconURL: 'assets/img/bitwarden.png',
@@ -684,7 +718,6 @@ const mockApiAppsInstalled: ApiAppInstalled[] = [
     title: 'Bitcoin Core',
     torAddress: 'sample-bitcoin-tor-address.onion',
     status: AppStatus.RUNNING,
-    statusAt: new Date().toISOString(),
     iconURL: 'assets/img/bitcoin_core.png',
   },
   {
@@ -693,7 +726,6 @@ const mockApiAppsInstalled: ApiAppInstalled[] = [
     title: 'Cups Messenger',
     torAddress: 'sample-cups-tor-address.onion',
     status: AppStatus.NEEDS_CONFIG,
-    statusAt: new Date().toISOString(),
     iconURL: 'assets/img/cups.png',
   },
 ]
@@ -704,7 +736,6 @@ const mockApiAppInstalledFresh: ApiAppInstalled = {
   title: 'Bitcoin Core',
   torAddress: 'sample-bitcoin-tor-address.onion',
   status: AppStatus.INSTALLING,
-  statusAt: new Date().toISOString(),
   iconURL: 'assets/img/bitcoin_core.png',
 }
 
@@ -794,7 +825,7 @@ const mockApiAppLogs: string[] = [
   '****** FINISH *****',
 ]
 
-const mockApiAppMetrics: Lan.GetAppMetricsRes = {
+const mockApiAppMetrics: ReqRes.GetAppMetricsRes = {
     Metric1: 'test value',
     Metric2: 'test value 2',
 }
@@ -812,7 +843,7 @@ const mockApiSSHFingerprints: SSHFingerprint[] = [
   },
 ]
 
-const mockApiAppConfig: Lan.GetAppConfigRes = {
+const mockApiAppConfig: ReqRes.GetAppConfigRes = {
   // config spec
   spec: {
     randomEnum: {

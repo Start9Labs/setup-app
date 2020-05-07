@@ -44,7 +44,7 @@ export class ServerModel extends MapSubject<S9Server> {
 
   watchServerProperties (serverId: string) : PropertySubject<S9Server> {
     const toReturn = this.watch(serverId)
-    if (!toReturn) throw new Error(`Tried to watch server. Expected server ${JSON.stringify(serverId)} but not found.`)
+    if (!toReturn) throw new Error(`Expected Embassy ${JSON.stringify(serverId)} but not found.`)
     return toReturn
   }
 
@@ -67,7 +67,7 @@ export class ServerModel extends MapSubject<S9Server> {
   }
 
   markServerUnreachable (sid: string): void {
-    this.updateServer(sid, serverUnreachable())
+    this.updateServer(sid, { status: ServerStatus.UNREACHABLE, connectionType: EmbassyConnection.NONE })
     this.serverAppModel.get(sid).markAppsUnreachable()
   }
 
@@ -95,8 +95,6 @@ export class ServerModel extends MapSubject<S9Server> {
   }
 }
 
-const serverUnreachable = () =>  ({ status: ServerStatus.UNREACHABLE, statusAt: new Date().toISOString() })
-
 export interface S9ServerStorable {
   id: string
   label: string
@@ -106,11 +104,11 @@ export interface S9ServerStorable {
 
 export interface S9Server extends S9ServerStorable {
   status: ServerStatus
-  statusAt: string
   privkey: string // derive from mnemonic + torAddress
   badge: number
   notifications: S9Notification[]
   versionLatest: string | undefined // @COMPAT 0.1.1 - versionLatest dropped in 0.1.2
+  connectionType: EmbassyConnection
 }
 
 export interface S9Notification {
@@ -165,11 +163,11 @@ export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): 
     torAddress,
     versionInstalled,
     status: ServerStatus.UNKNOWN,
-    statusAt: new Date().toISOString(),
     privkey: deriveKeys(mnemonic, id).privkey,
     badge: 0,
     notifications: [],
     versionLatest: undefined, // @COMPAT 0.1.1 - versionLatest dropped in 0.1.2
+    connectionType: EmbassyConnection.NONE,
   }
 }
 
@@ -186,6 +184,12 @@ export function toStorableServer (ss: S9Server): S9ServerStorable {
 export function idFromSerial (serialNo: string): string {
   // sha256 hash is big endian
   return CryptoJS.SHA256(serialNo).toString(CryptoJS.enc.Hex).substr(0, 8)
+}
+
+export enum EmbassyConnection {
+  NONE = 'NONE',
+  LAN = 'LAN',
+  TOR = 'TOR',
 }
 
 export enum ServerStatus {

@@ -197,7 +197,7 @@ export class ServerShowPage {
 
     try {
       await this.apiService.updateAgent(server.id, this.versionLatest!)
-      this.serverModel.updateServer(server.id, { status: ServerStatus.UPDATING, statusAt: new Date().toISOString() })
+      this.serverModel.updateServer(server.id, { status: ServerStatus.UPDATING })
     } catch (e) {
       this.error = e.message
     } finally {
