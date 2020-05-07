@@ -9,6 +9,7 @@ import { Platform } from '@ionic/angular'
   providedIn: 'root',
 })
 export class TorService {
+  static readonly PORT: 59590
   private readonly tor = new Tor()
   private readonly progress$ = new BehaviorSubject<number>(0)
   private readonly connection$ = new BehaviorSubject<TorConnection>(TorConnection.uninitialized)
@@ -45,7 +46,14 @@ export class TorService {
     if (!(await this.tor.running()).running) {
       console.log('starting Tor')
       this.connection$.next(TorConnection.in_progress)
-      this.tor.start({ socksPort: 59590 }).subscribe(progress => this.handleConnecting(progress))
+
+      this.tor.start({ socksPort: 59590, initTimeout: 15000 }).subscribe({
+        next: (progress: number) => this.handleConnecting(progress),
+        error: (err: string) => {
+          this.connection$.next(TorConnection.disconnected)
+          throw new Error(`Error connecting to Tor: ${err}`)
+        },
+      })
     } else {
       console.log('reconnecting Tor')
       this.connection$.next(TorConnection.reconnecting)

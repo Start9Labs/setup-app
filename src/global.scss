@@ -113,6 +113,10 @@ ion-badge {
   font-weight: bold;
 }
 
+ion-item-divider {
+  --background: transparent;
+}
+
 ion-infinite-scroll ion-infinite-scroll-content {
   --color: var(--ion-color-warning) !important;
 }

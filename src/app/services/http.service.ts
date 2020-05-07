@@ -45,7 +45,7 @@ export class HttpService {
       host = server.torAddress.trim() // @COMPAT Ambassador <= 1.3.0 retuned torAddress with trailing "\n"
       options.proxy = {
         host: 'localhost',
-        port: 59590,
+        port: TorService.PORT,
         protocol: 'SOCKS',
       }
     }
@@ -56,7 +56,6 @@ export class HttpService {
     const res = await this.rawRequest<T>(options)
 
     if (connectionType !== server.connectionType) {
-      console.log(connectionType, server.connectionType)
       this.serverModel.updateServer(server.id, { connectionType })
     }
 

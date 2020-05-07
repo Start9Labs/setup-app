@@ -23,8 +23,6 @@ export class StatusComponent {
       this.handleAppStatus()
     }
 
-    console.log(this.connectionType)
-
     if (this.connectionType === EmbassyConnection.LAN) {
       this.icon = 'assets/img/home.png'
     } else if (this.connectionType === EmbassyConnection.TOR) {

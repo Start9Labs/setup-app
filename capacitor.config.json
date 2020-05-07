@@ -9,5 +9,8 @@
     "SplashScreen": {
       "launchAutoHide": false
     }
+  },
+  "server": {
+    "iosScheme": "ionic"
   }
 }

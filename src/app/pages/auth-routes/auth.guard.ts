@@ -13,13 +13,10 @@ export class AuthGuard implements CanActivate {
   ) { }
 
   canActivate (): boolean {
-    console.log('AUTH GUARD')
     if (this.authService.isMissing()) {
-      console.log('Denied')
       this.router.navigateByUrl('/unauth')
       return false
     } else {
-      console.log('Allowed')
       return true
     }
   }

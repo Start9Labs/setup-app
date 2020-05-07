@@ -23,8 +23,6 @@ export class AuthService {
   async init () {
     this.mnemonicEncrypted = await this.storage.get('mnemonic') as cryptoUtil.Hex
 
-    console.log('MNEMONIC ENCRYPTED', this.mnemonicEncrypted)
-
     if (this.mnemonicEncrypted) {
       try {
         await this.authenticate('')
