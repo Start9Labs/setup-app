@@ -40,10 +40,10 @@ export class AppComponent {
 
     // await platform ready
     this.platform.ready().then(async () => {
-      // await storage ready
-      await this.storage.ready()
       // init NetworkMonitor
       await this.networkMonitor.init()
+      // await storage ready
+      await this.storage.ready()
       // init AuthService
       await this.authService.init()
       // init ServerModel
@@ -57,12 +57,18 @@ export class AppComponent {
       } else {
         await this.router.navigate(['/unauth'])
       }
+      // set StatusBar style
+      await StatusBar.setStyle({
+        style: StatusBarStyle.Dark,
+      })
+      // dismiss SplashScreen
+      await SplashScreen.hide()
+      // init TorService
+      this.torService.init()
       // init SyncService
       this.syncService.init()
       // init ZeroconfMonitor
       this.zeroconfMonitor.init()
-      // init TorService
-      this.torService.init()
       // subscribe to auth status changes
       this.authService.watch().subscribe(authStatus => {
         this.handleAuthChange(authStatus)
@@ -75,12 +81,6 @@ export class AppComponent {
       this.platform.resume.subscribe(() => {
         this.authService.init()
       })
-      // set StatusBar style
-      await StatusBar.setStyle({
-        style: StatusBarStyle.Dark,
-      })
-      // dismiss SplashScreen
-      await SplashScreen.hide()
     })
   }
 

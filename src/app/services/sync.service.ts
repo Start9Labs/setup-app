@@ -99,15 +99,15 @@ export class SyncService {
       )
     }
 
-    this.embassies[id].start()
+    await this.embassies[id].start()
   }
 
   async syncAll (): Promise<void> {
     const servers = this.serverModel.peekAll()
-    servers.forEach(s => this.sync(s.id))
+    await Promise.all(servers.map(s => this.sync(s.id)))
   }
 
-  async stopAll (): Promise<void> {
+  private stopAll (): void {
     Object.values(this.embassies).forEach(daemon => {
       daemon.stop()
     })
