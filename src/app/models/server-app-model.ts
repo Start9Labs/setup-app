@@ -11,7 +11,9 @@ export class ServerAppModel {
 
   constructor (
     private readonly authService: AuthService,
-  ) {
+  ) { }
+
+  init () {
     this.authService.watch().subscribe(status => this.handleAuthChange(status))
   }
 

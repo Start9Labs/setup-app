@@ -199,6 +199,6 @@ export class ServerWifiPage {
   }
 
   asIsOrder () {
-    return 1
+    return 0
   }
 }

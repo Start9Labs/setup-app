@@ -25,6 +25,9 @@ export class ServerModel extends MapSubject<S9Server> {
     private readonly authService: AuthService,
   ) {
     super({ })
+  }
+
+  init () {
     this.authService.watch().subscribe(status => this.handleAuthChange(status))
   }
 

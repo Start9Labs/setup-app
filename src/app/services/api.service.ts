@@ -542,7 +542,7 @@ async function mockDeleteSSHKey (): Promise<ReqRes.DeleteSSHKeyRes> {
 async function mockGetWifi (): Promise<ReqRes.GetWifiRes> {
   await pauseFor(1000)
   return {
-    ssids: ['Goosers', 'AtReqRestic City'],
+    ssids: ['Goosers', 'Atlantic City'],
     current: 'Goosers',
   }
 }

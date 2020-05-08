@@ -12,6 +12,7 @@ import { Storage } from '@ionic/storage'
 
 import { Plugins, StatusBarStyle } from '@capacitor/core'
 import { Router } from '@angular/router'
+import { ServerAppModel } from './models/server-app-model'
 const { SplashScreen, StatusBar } = Plugins
 
 @Component({
@@ -24,6 +25,7 @@ export class AppComponent {
   constructor (
     private readonly platform: Platform,
     private readonly serverModel: ServerModel,
+    private readonly serverAppModel: ServerAppModel,
     private readonly authService: AuthService,
     private readonly networkMonitor: NetworkMonitor,
     private readonly torService: TorService,
@@ -33,25 +35,34 @@ export class AppComponent {
     private readonly router: Router,
     private readonly storage: Storage,
   ) {
-    // set dark theme.
+    // set dark theme
     document.body.classList.toggle('dark', true)
-    // wait for platform reday
+
+    // await platform ready
     this.platform.ready().then(async () => {
+      // await storage ready
       await this.storage.ready()
       // init NetworkMonitor
       await this.networkMonitor.init()
       // init AuthService
       await this.authService.init()
+      // init ServerModel
+      this.serverModel.init()
+      // init ServerAppModel
+      this.serverAppModel.init()
       // if verified, load data
       if (this.authService.isVerified()) {
         await this.serverModel.load(this.authService.mnemonic!)
+        await this.router.navigate(['/auth'])
+      } else {
+        await this.router.navigate(['/unauth'])
       }
       // init SyncService
       this.syncService.init()
-      // init TorService
-      this.torService.init()
       // init ZeroconfMonitor
       this.zeroconfMonitor.init()
+      // init TorService
+      this.torService.init()
       // subscribe to auth status changes
       this.authService.watch().subscribe(authStatus => {
         this.handleAuthChange(authStatus)
@@ -65,14 +76,11 @@ export class AppComponent {
         this.authService.init()
       })
       // set StatusBar style
-      StatusBar.setStyle({
+      await StatusBar.setStyle({
         style: StatusBarStyle.Dark,
       })
-      this.router.initialNavigation()
       // dismiss SplashScreen
-      setTimeout(() => {
-        SplashScreen.hide()
-      }, 300)
+      await SplashScreen.hide()
     })
   }
 

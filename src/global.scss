@@ -41,20 +41,6 @@
   }
 }
 
-.alert-primary {
-  color: var(--ion-color-primary) !important;
-  & ion-icon {
-    color: var(--ion-color-primary) !important;
-  }
-}
-
-.alert-warning {
-  color: var(--ion-color-warning) !important;
-  & ion-icon {
-    color: var(--ion-color-warning) !important;
-  }
-}
-
 .fab-button {
   margin: 24px;
   --background: transparent;
@@ -122,14 +108,11 @@ ion-infinite-scroll ion-infinite-scroll-content {
 }
 
 ion-action-sheet {
-  --background: var(--ion-color-light) !important;
-  --backdrop-opacity: 0.75 !important;
+  --backdrop-opacity: 0.8 !important;
 }
 
 ion-alert {
-  --min-width: 80% !important;
-  --background: var(--ion-color-light) !important;
-  --backdrop-opacity: 0.75 !important;
+  --backdrop-opacity: 0.8 !important;
 }
 
 * {

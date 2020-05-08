@@ -16,6 +16,7 @@ export class TorService {
   watchProgress (): Observable<number> { return this.progress$.asObservable() }
   watchConnection (): Observable<TorConnection> { return this.connection$.asObservable() }
   peekConnection (): TorConnection { return this.connection$.getValue() }
+  started: Subscription
 
   constructor (
     private readonly platform: Platform,
@@ -43,11 +44,11 @@ export class TorService {
 
     if (!this.platform.is('ios') && !this.platform.is('android')) { return }
 
-    if (!(await this.tor.running()).running) {
+    if (!this.started) {
       console.log('starting Tor')
       this.connection$.next(TorConnection.in_progress)
 
-      this.tor.start({ socksPort: TorService.PORT, initTimeout: 15000 }).subscribe({
+      this.started = this.tor.start({ socksPort: TorService.PORT, initTimeout: 15000 }).subscribe({
         next: (progress: number) => this.handleConnecting(progress),
         error: (err: string) => {
           this.connection$.next(TorConnection.disconnected)
