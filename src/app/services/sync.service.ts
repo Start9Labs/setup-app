@@ -162,6 +162,8 @@ class EmbassyDaemon {
 
     await this.getServerAndApps()
 
+    await this.serverModel.saveAll()
+
     this.server = this.serverModel.peek(this.id)
     if (!this.server) { return }
 
