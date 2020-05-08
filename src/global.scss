@@ -42,7 +42,7 @@
 }
 
 .fab-button {
-  margin: 24px;
+  margin: 20px;
   --background: transparent;
   --border-color: var(--ion-color-primary);
   --border-style: solid;
@@ -108,11 +108,11 @@ ion-infinite-scroll ion-infinite-scroll-content {
 }
 
 ion-action-sheet {
-  --backdrop-opacity: 0.8 !important;
+  --backdrop-opacity: 0.75 !important;
 }
 
 ion-alert {
-  --backdrop-opacity: 0.8 !important;
+  --backdrop-opacity: 0.75 !important;
 }
 
 * {

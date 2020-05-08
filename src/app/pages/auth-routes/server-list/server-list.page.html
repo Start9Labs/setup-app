@@ -30,7 +30,7 @@
   </ion-item-group>
 
   <ng-container *ngIf="servers.length">
-    <div *ngIf="torStatus === 'in_progress'">
+    <div *ngIf="torStatus === 'in_progress'" [@torChange]>
       <ion-progress-bar color="tertiary" [value]="progress"></ion-progress-bar>
       <p><img class="inline-image" src="assets/img/tor.png" alt="tor" />Establishing Connection</p>
     </div>

@@ -42,6 +42,8 @@ export class AppComponent {
     this.platform.ready().then(async () => {
       // init NetworkMonitor
       await this.networkMonitor.init()
+      // init TorService
+      this.torService.init()
       // await storage ready
       await this.storage.ready()
       // init AuthService
@@ -53,18 +55,14 @@ export class AppComponent {
       // if verified, load data
       if (this.authService.isVerified()) {
         await this.serverModel.load(this.authService.mnemonic!)
-        await this.router.navigate(['/auth'])
+        this.router.navigate(['/auth'])
       } else {
-        await this.router.navigate(['/unauth'])
+        this.router.navigate(['/unauth'])
       }
       // set StatusBar style
-      await StatusBar.setStyle({
+      StatusBar.setStyle({
         style: StatusBarStyle.Dark,
       })
-      // dismiss SplashScreen
-      await SplashScreen.hide()
-      // init TorService
-      this.torService.init()
       // init SyncService
       this.syncService.init()
       // init ZeroconfMonitor
@@ -81,6 +79,8 @@ export class AppComponent {
       this.platform.resume.subscribe(() => {
         this.authService.init()
       })
+      // dismiss SplashScreen
+      await SplashScreen.hide()
     })
   }
 

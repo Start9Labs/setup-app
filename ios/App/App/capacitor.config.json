@@ -7,10 +7,5 @@
   "cordova": {},
   "server": {
     "iosScheme": "ionic"
-  },
-  "plugins": {
-    "SplashScreen": {
-      "launchAutoHide": false
-    }
   }
 }

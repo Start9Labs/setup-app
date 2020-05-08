@@ -5,33 +5,33 @@ import { SyncService } from 'src/app/services/sync.service'
 import { Subscription } from 'rxjs'
 import { PropertyObservableWithId } from 'src/app/util/property-subject.util'
 import { TorService, TorConnection } from 'src/app/services/tor.service'
-// import { animate, style, transition, trigger } from '@angular/animations'
+import { animate, style, transition, trigger } from '@angular/animations'
 import { doForAtLeast } from 'src/app/util/misc.util'
 
-// const torAnimation = trigger(
-//   'torChange',
-//   [
-//     transition(
-//       ':enter',
-//       [
-//         style({ transform: 'translateY(-100%)' }),
-//         animate('.2s ease-in', style({ transform: 'translateY(0%)' })),
-//       ],
-//     ),
-//     transition(
-//       ':leave',
-//       [
-//         animate('.2s ease-out', style({ transform: 'translateY(-100%)' })),
-//       ],
-//     ),
-//   ],
-// )
+const torAnimation = trigger(
+  'torChange',
+  [
+    transition(
+      ':enter',
+      [
+        style({ transform: 'translateY(-100%)' }),
+        animate('.2s ease-in', style({ transform: 'translateY(0%)' })),
+      ],
+    ),
+    transition(
+      ':leave',
+      [
+        animate('.2s ease-out', style({ transform: 'translateY(-100%)' })),
+      ],
+    ),
+  ],
+)
 
 @Component({
   selector: 'page-server-list',
   templateUrl: './server-list.page.html',
   styleUrls: ['./server-list.page.scss'],
-  // animations: [torAnimation],
+  animations: [torAnimation],
 })
 export class ServerListPage {
   servers: PropertyObservableWithId<S9Server>[] = []
