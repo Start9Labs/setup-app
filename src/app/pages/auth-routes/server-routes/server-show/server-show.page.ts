@@ -238,8 +238,8 @@ export class ServerShowPage {
   }
 
   async forget (server: S9Server) {
-    await this.serverModel.removeServer(server.id)
-    await this.serverModel.saveAll()
+    this.serverModel.removeServer(server.id)
+    this.serverModel.saveAll()
     await this.navCtrl.navigateRoot(['/auth'])
   }
 

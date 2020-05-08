@@ -198,7 +198,7 @@ export class ServerWifiPage {
     await toast.present()
   }
 
-  asIsOrder () {
-    return 0
+  asIsOrder (a: any, b: any) {
+    return 1
   }
 }

@@ -73,7 +73,7 @@ export class AppMetricsPage {
     }
   }
 
-  asIsOrder () {
+  asIsOrder (a: any, b: any) {
     return 1
   }
 }
