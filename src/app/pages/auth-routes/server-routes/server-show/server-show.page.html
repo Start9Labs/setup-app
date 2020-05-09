@@ -22,7 +22,7 @@
     <ion-refresher-content pullingIcon="lines" refreshingSpinner="lines"></ion-refresher-content>
   </ion-refresher>
 
-  <ion-item *ngIf="error && !vars.loading">
+  <ion-item *ngIf="error">
     <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
   </ion-item>
 
@@ -36,16 +36,18 @@
     </ion-item>
   </ion-item-group>
 
-  <ion-button *ngIf="!versionLatest" style="margin: 0 16px 30px 16px;" expand="block" fill="outline" color="warning" (click)="getVersionLatest(server)">
-    Check for Updates
-    <ion-icon slot="end" name="refresh-outline"></ion-icon>
-  </ion-button>
-
-  <ion-button
-    *ngIf="!vars.loading && versionLatest && vars.status === 'RUNNING' && compareVersions(vars.versionInstalled, versionLatest) === -1"
-    style="margin: 0 16px 30px 16px;" expand="block" fill="outline" color="success" (click)="presentAlertUpdate(server)">
-    Update Ambassador to {{ versionLatest }}
-  </ion-button>
+  <div *ngIf="vars.status === 'RUNNING'" style="margin: 0 16px 30px 16px;">
+    <ion-button *ngIf="!versionLatest" expand="block" fill="outline" color="warning" (click)="getVersionLatest(server)">
+      Check for Updates
+      <ion-icon slot="end" name="refresh-outline"></ion-icon>
+    </ion-button>
+  
+    <ion-button
+      *ngIf="versionLatest && !updatingFreeze && compareVersions(vars.versionInstalled, versionLatest) === -1"
+      expand="block" fill="outline" color="success" (click)="presentAlertUpdate(server)">
+      Update Ambassador to {{ versionLatest }}
+    </ion-button>
+  </div>
 
   <ion-item-group>
 

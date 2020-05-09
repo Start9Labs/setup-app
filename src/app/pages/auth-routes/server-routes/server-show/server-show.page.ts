@@ -37,6 +37,7 @@ export class ServerShowPage {
   deleteAppsSubscription: Subscription
   versionLatestSubscription: Subscription | undefined // @COMPAT 0.1.1 - versionLatest dropped in 0.1.2
   getIcon = getIcon
+  updatingFreeze = false
 
   constructor (
     private readonly route: ActivatedRoute,
@@ -198,6 +199,8 @@ export class ServerShowPage {
     try {
       await this.apiService.updateAgent(server.id, this.versionLatest!)
       this.serverModel.updateServer(server.id, { status: ServerStatus.UPDATING })
+      this.updatingFreeze = true
+      setTimeout(() => this.updatingFreeze = false, 4000)
     } catch (e) {
       this.error = e.message
     } finally {
