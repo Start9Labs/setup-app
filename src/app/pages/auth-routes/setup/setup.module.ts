@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms'
 import { IonicModule } from '@ionic/angular'
 import { RouterModule, Routes } from '@angular/router'
 import { SetupPage } from './setup.page'
+import { NgVarDirectiveModule } from 'src/app/directives/ngvar.directive.module'
 
 const routes: Routes = [
   {
@@ -18,6 +19,7 @@ const routes: Routes = [
     FormsModule,
     IonicModule,
     RouterModule.forChild(routes),
+    NgVarDirectiveModule,
   ],
   declarations: [SetupPage],
 })

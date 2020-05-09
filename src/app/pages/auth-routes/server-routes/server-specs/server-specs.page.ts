@@ -1,8 +1,7 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { ServerSpecs } from 'src/app/models/server-model'
-import { ServerService } from 'src/app/services/server.service'
-import { ZeroconfDaemon } from 'src/app/daemons/zeroconf-daemon'
+import { ApiService } from 'src/app/services/api.service'
 import { pauseFor } from 'src/app/util/misc.util'
 import { Plugins } from '@capacitor/core'
 import { ToastController } from '@ionic/angular'
@@ -19,12 +18,10 @@ export class ServerSpecsPage {
   loading = true
   specs: ServerSpecs
   serverId: string
-  lanIP: string
 
   constructor (
     private readonly route: ActivatedRoute,
-    private readonly serverService: ServerService,
-    private readonly zeroconfDaemon: ZeroconfDaemon,
+    private readonly apiService: ApiService,
     private readonly toastCtrl: ToastController,
   ) { }
 
@@ -32,13 +29,8 @@ export class ServerSpecsPage {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
 
     try {
-      const zeroconf = this.zeroconfDaemon.getService(this.serverId)
-      if (zeroconf) {
-        this.lanIP = zeroconf.ipv4Addresses[0]
-      }
-
       const [specs] = await Promise.all([
-        this.serverService.getServerSpecs(this.serverId),
+        this.apiService.getServerSpecs(this.serverId),
         pauseFor(600),
       ])
       this.specs = specs
@@ -51,7 +43,8 @@ export class ServerSpecsPage {
 
   async copyTor () {
     let message = ''
-    await Clipboard.write({ url: this.specs['Tor Address'] as string || '' })
+    console.log(this.specs)
+    await Clipboard.write({ url: (this.specs['Tor Address'] as string).trim() || '' })
       .then(() => { message = 'copied to clipboard!' })
       .catch(() => { message = 'failed to copy' })
 
@@ -64,7 +57,7 @@ export class ServerSpecsPage {
       await toast.present()
   }
 
-  asIsOrder () {
+  asIsOrder (a: any, b: any) {
     return 1
   }
 }

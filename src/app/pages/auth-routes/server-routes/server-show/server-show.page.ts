@@ -6,16 +6,14 @@ import { S9Server } from 'src/app/models/server-model'
 import { ActionSheetButton } from '@ionic/core'
 import { AppInstalled } from 'src/app/models/app-model'
 import * as compareVersions from 'compare-versions'
-import { ServerService } from 'src/app/services/server.service'
-import { ServerSyncService } from 'src/app/services/server.sync.service'
+import { ApiService } from 'src/app/services/api.service'
+import { SyncService } from 'src/app/services/sync.service'
 import { Subscription, BehaviorSubject, Observable } from 'rxjs'
-import { take, map } from 'rxjs/operators'
+import { take } from 'rxjs/operators'
 import * as Menu from './server-menu-options'
 import { ServerAppModel } from 'src/app/models/server-app-model'
 import { PropertySubject, PropertyObservableWithId, peekProperties, fromPropertyObservable } from 'src/app/util/property-subject.util'
-import { pauseFor } from 'src/app/util/misc.util'
-import { ZeroconfDaemon } from 'src/app/daemons/zeroconf-daemon'
-import { s9HostNoVersion } from 'src/app/services/http-native.service'
+import { doForAtLeast, getIcon } from 'src/app/util/misc.util'
 
 @Component({
   selector: 'server-show',
@@ -38,6 +36,8 @@ export class ServerShowPage {
   addAppsSubscription: Subscription
   deleteAppsSubscription: Subscription
   versionLatestSubscription: Subscription | undefined // @COMPAT 0.1.1 - versionLatest dropped in 0.1.2
+  getIcon = getIcon
+  updatingFreeze = false
 
   constructor (
     private readonly route: ActivatedRoute,
@@ -46,16 +46,14 @@ export class ServerShowPage {
     private readonly actionCtrl: ActionSheetController,
     private readonly alertCtrl: AlertController,
     private readonly loadingCtrl: LoadingController,
-    private readonly serverService: ServerService,
-    private readonly sss: ServerSyncService,
-    private readonly zcd: ZeroconfDaemon,
+    private readonly apiService: ApiService,
+    private readonly syncService: SyncService,
     readonly serverAppModel: ServerAppModel,
   ) { }
 
   async ngOnInit () {
     this.serverId = this.route.snapshot.paramMap.get('serverId') as string
     this.server = this.serverModel.watchServerProperties(this.serverId)
-    this.s9Host$ = this.server.id.pipe(map(sId =>  s9HostNoVersion(this.zcd, sId)))
     // @COMPAT 0.1.1 - versionLatest dropped in 0.1.2
     this.versionLatestSubscription = this.server.versionLatest.subscribe((versionLatest) => {
       this.versionLatest = versionLatest
@@ -78,7 +76,7 @@ export class ServerShowPage {
       })
     })
 
-    await Promise.all([this.getServerAndApps(), pauseFor(600)])
+    await this.getServerAndApps()
     this.loading$.next(false)
   }
 
@@ -89,14 +87,14 @@ export class ServerShowPage {
   }
 
   async doRefresh (event: any) {
-    await this.getServerAndApps()
+    await doForAtLeast([this.getServerAndApps()], 600)
     event.target.complete()
   }
 
   async getServerAndApps (): Promise<void> {
     const server = peekProperties(this.server)
     try {
-      await this.sss.fromCache().syncServer(server)
+      await this.syncService.sync(server.id)
       this.error = ''
     } catch (e) {
       this.error = e.message
@@ -138,7 +136,7 @@ export class ServerShowPage {
       await loader.present()
 
       try {
-        const { versionLatest } = await this.serverService.getVersionLatest(server.id)
+        const { versionLatest } = await this.apiService.getVersionLatest(server.id)
         this.versionLatest = versionLatest
       } catch (e) {
         this.error = e.message
@@ -199,8 +197,10 @@ export class ServerShowPage {
     await loader.present()
 
     try {
-      await this.serverService.updateAgent(server.id, this.versionLatest!)
-      this.serverModel.updateServer(server.id, { status: ServerStatus.UPDATING, statusAt: new Date().toISOString() })
+      await this.apiService.updateAgent(server.id, this.versionLatest!)
+      this.serverModel.updateServer(server.id, { status: ServerStatus.UPDATING })
+      this.updatingFreeze = true
+      setTimeout(() => this.updatingFreeze = false, 4000)
     } catch (e) {
       this.error = e.message
     } finally {
@@ -215,7 +215,7 @@ export class ServerShowPage {
     await loader.present()
 
     try {
-      await this.serverService.restartServer(server.id)
+      await this.apiService.restartServer(server.id)
       await this.navCtrl.pop()
     } catch (e) {
       this.error = e.mesasge
@@ -231,7 +231,7 @@ export class ServerShowPage {
     await loader.present()
 
     try {
-      await this.serverService.shutdownServer(server.id)
+      await this.apiService.shutdownServer(server.id)
       await this.navCtrl.pop()
     } catch (e) {
       this.error = e.mesasge
@@ -241,8 +241,8 @@ export class ServerShowPage {
   }
 
   async forget (server: S9Server) {
-    await this.serverModel.removeServer(server.id)
-    await this.serverModel.saveAll()
+    this.serverModel.removeServer(server.id)
+    this.serverModel.saveAll()
     await this.navCtrl.navigateRoot(['/auth'])
   }
 

@@ -240,8 +240,6 @@ export function getDefaultDescription (spec: ValueSpec): string | undefined {
         toReturn = spec.default
       } else if (typeof spec.default === 'object') {
         toReturn = 'random'
-      } else {
-        'none'
       }
       break
     case 'number':

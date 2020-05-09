@@ -4,6 +4,7 @@ import { Routes, RouterModule } from '@angular/router'
 import { IonicModule } from '@ionic/angular'
 import { ServerListPage } from './server-list.page'
 import { StatusComponentModule } from 'src/app/components/status/status.components.module'
+import { NgVarDirectiveModule } from 'src/app/directives/ngvar.directive.module'
 
 const routes: Routes = [
   {
@@ -18,6 +19,7 @@ const routes: Routes = [
     StatusComponentModule,
     IonicModule,
     RouterModule.forChild(routes),
+    NgVarDirectiveModule,
   ],
   declarations: [ServerListPage],
 })

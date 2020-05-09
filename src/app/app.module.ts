@@ -1,6 +1,7 @@
 // general
 import { NgModule } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser'
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { RouteReuseStrategy } from '@angular/router'
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular'
 import { IonicStorageModule } from '@ionic/storage'
@@ -10,7 +11,6 @@ import { AppRoutingModule } from './app-routing.module'
 import { AuthenticatePageModule } from './modals/authenticate/authenticate.module'
 // native
 import { Zeroconf } from '@ionic-native/zeroconf/ngx'
-import { HTTP } from '@ionic-native/http/ngx'
 
 @NgModule({
   declarations: [AppComponent],
@@ -19,6 +19,7 @@ import { HTTP } from '@ionic-native/http/ngx'
     AuthenticatePageModule,
     HttpClientModule,
     BrowserModule,
+    BrowserAnimationsModule,
     IonicModule.forRoot(),
     AppRoutingModule,
     IonicStorageModule.forRoot(),
@@ -26,7 +27,6 @@ import { HTTP } from '@ionic-native/http/ngx'
   providers: [
     // native
     Zeroconf,
-    HTTP,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
   ],
   bootstrap: [AppComponent],

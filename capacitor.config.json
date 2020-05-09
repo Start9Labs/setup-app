@@ -1,9 +1,10 @@
 {
   "appId": "com.start9labs.start9companion",
-  "appName": "Start9 Companion",
+  "appName": "Embassy",
   "bundledWebRuntime": false,
   "npmClient": "npm",
   "webDir": "www",
+  "cordova": {},
   "server": {
     "iosScheme": "ionic"
   }

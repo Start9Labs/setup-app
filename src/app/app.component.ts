@@ -1,17 +1,19 @@
 import { Component } from '@angular/core'
 import { Platform, ModalController } from '@ionic/angular'
 import { ServerModel } from './models/server-model'
-import { ServerDaemon } from './daemons/server-daemon'
-import { ZeroconfDaemon } from './daemons/zeroconf-daemon'
-import { WifiDaemon } from './daemons/wifi-daemon'
+import { NetworkMonitor } from './services/network.service'
 import { AuthService } from './services/auth.service'
-import { Router } from '@angular/router'
 import { AuthStatus } from './types/enums'
-import { ServerAppModel } from './models/server-app-model'
 import { AuthenticatePage } from './modals/authenticate/authenticate.page'
-import { Plugins } from '@capacitor/core'
+import { TorService } from './services/tor.service'
+import { ZeroconfMonitor } from './services/zeroconf.service'
+import { SyncService } from './services/sync.service'
+import { Storage } from '@ionic/storage'
 
-const { SplashScreen } = Plugins
+import { Plugins, StatusBarStyle } from '@capacitor/core'
+import { Router } from '@angular/router'
+import { ServerAppModel } from './models/server-app-model'
+const { SplashScreen, StatusBar } = Plugins
 
 @Component({
   selector: 'app-root',
@@ -19,26 +21,52 @@ const { SplashScreen } = Plugins
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
-  private firstAuth = true
 
   constructor (
     private readonly platform: Platform,
     private readonly serverModel: ServerModel,
-    private readonly appModel: ServerAppModel,
-    private readonly zeroconfDaemon: ZeroconfDaemon,
-    private readonly serverDaemon: ServerDaemon,
-    private readonly wifiDaemon: WifiDaemon,
+    private readonly serverAppModel: ServerAppModel,
     private readonly authService: AuthService,
-    private readonly router: Router,
+    private readonly networkMonitor: NetworkMonitor,
+    private readonly torService: TorService,
+    private readonly zeroconfMonitor: ZeroconfMonitor,
+    private readonly syncService: SyncService,
     private readonly modalCtrl: ModalController,
+    private readonly router: Router,
+    private readonly storage: Storage,
   ) {
-    // set dark theme.
-    // @TODO there should be a way to make this the default.
+    // set dark theme
     document.body.classList.toggle('dark', true)
-    // wait for platform reday
+
+    // await platform ready
     this.platform.ready().then(async () => {
-      // init auth service
+      // init NetworkMonitor
+      await this.networkMonitor.init()
+      // init TorService
+      this.torService.init()
+      // await storage ready
+      await this.storage.ready()
+      // init AuthService
       await this.authService.init()
+      // init ServerModel
+      this.serverModel.init()
+      // init ServerAppModel
+      this.serverAppModel.init()
+      // if verified, load data
+      if (this.authService.isVerified()) {
+        await this.serverModel.load(this.authService.mnemonic!)
+        this.router.navigate(['/auth'])
+      } else {
+        this.router.navigate(['/unauth'])
+      }
+      // set StatusBar style
+      StatusBar.setStyle({
+        style: StatusBarStyle.Dark,
+      })
+      // init SyncService
+      this.syncService.init()
+      // init ZeroconfMonitor
+      this.zeroconfMonitor.init()
       // subscribe to auth status changes
       this.authService.watch().subscribe(authStatus => {
         this.handleAuthChange(authStatus)
@@ -46,65 +74,27 @@ export class AppComponent {
       // subscribe to app pause event
       this.platform.pause.subscribe(() => {
         this.authService.uninit()
-        this.stopDaemons()
       })
       // sunscribe to app resume event
       this.platform.resume.subscribe(() => {
         this.authService.init()
       })
-      // dismiss splash screen
-      setTimeout(() => {
-        SplashScreen.hide()
-      }, 300)
+      // dismiss SplashScreen
+      await SplashScreen.hide()
     })
   }
 
   private async handleAuthChange (authStatus: AuthStatus) {
-    // verified (mnemonic is present and unencrypted)
-    if (authStatus === AuthStatus.VERIFIED) {
-      if (this.firstAuth) {
-        await this.serverModel.load(this.authService.mnemonic!)
-        this.firstAuth = false
-        await this.router.navigate(['/auth'])
-        this.startDaemons()
-      } else {
-        this.startDaemons(true)
-      }
-    // missing (no mnemonic)
-    } else if (authStatus === AuthStatus.MISSING) {
-      this.clearModels()
-      this.stopDaemons()
-      this.firstAuth = true
-      await this.router.navigate(['/unauth'])
-    // unverified (mnemonic is present but encrypted)
-    } else if (authStatus === AuthStatus.UNVERIFIED) {
+    if (authStatus === AuthStatus.UNVERIFIED) {
       await this.presentModalAuthenticate()
     }
   }
 
-  private startDaemons (restart = false) {
-    this.zeroconfDaemon.start(restart)
-    this.wifiDaemon.start()
-    setTimeout(() => this.serverDaemon.start(), this.zeroconfDaemon.timeToPurge + 1000)
-  }
-
-  private stopDaemons () {
-    this.serverDaemon.stop()
-    this.wifiDaemon.stop()
-    this.zeroconfDaemon.stop()
-  }
-
-  private clearModels () {
-    this.serverModel.clear()
-    this.appModel.clearCache()
-  }
-
-  async presentModalAuthenticate () {
+  private async presentModalAuthenticate () {
     const modal = await this.modalCtrl.create({
       backdropDismiss: false,
       component: AuthenticatePage,
     })
-
     await modal.present()
   }
 }

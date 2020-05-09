@@ -5,6 +5,11 @@ import { UnauthGuard } from './pages/unauth-routes/unauth.guard'
 
 const routes: Routes = [
   {
+    path: '',
+    redirectTo: 'auth',
+    pathMatch: 'full',
+  },
+  {
     path: 'auth',
     canActivate: [AuthGuard],
     loadChildren: () => import('./pages/auth-routes/auth-routing.module').then(m => m.AuthRoutingModule),

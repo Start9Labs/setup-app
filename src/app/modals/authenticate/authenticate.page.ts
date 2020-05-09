@@ -45,7 +45,7 @@ export class AuthenticatePage {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Wait!',
-      message: 'Are you sure you want to wipe the keychain on this device? All servers will be forgotten. You will need your mnemonic seed to regain access to your servers.',
+      message: 'Are you sure you want to wipe the keychain on this device? All Embassies will be forgotten. You will need your mnemonic seed to regain access to your Embassies.',
       buttons: [
         {
           text: 'Cancel',

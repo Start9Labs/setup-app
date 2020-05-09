@@ -1,10 +1,10 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { AppAvailableFull, AppModel } from 'src/app/models/app-model'
-import { ServerService } from 'src/app/services/server.service'
+import { ApiService } from 'src/app/services/api.service'
 import { NavController, AlertController, LoadingController } from '@ionic/angular'
 import * as compareVersions from 'compare-versions'
-import { pauseFor } from 'src/app/util/misc.util'
+import { pauseFor, getIcon } from 'src/app/util/misc.util'
 import { ServerAppModel } from 'src/app/models/server-app-model'
 
 @Component({
@@ -19,11 +19,12 @@ export class AppAvailableShowPage {
   app: AppAvailableFull = { } as AppAvailableFull
   appModel: AppModel
   compareVersions = compareVersions
+  getIcon = getIcon
 
   constructor (
     private readonly navCtrl: NavController,
     private readonly route: ActivatedRoute,
-    private readonly serverService: ServerService,
+    private readonly apiService: ApiService,
     private readonly alertCtrl: AlertController,
     private readonly loadingCtrl: LoadingController,
     private readonly serverAppModel: ServerAppModel,
@@ -36,7 +37,7 @@ export class AppAvailableShowPage {
 
     try {
       const [app] = await Promise.all([
-        this.serverService.getAvailableApp(this.serverId, appId),
+        this.apiService.getAvailableApp(this.serverId, appId),
         pauseFor(600),
       ])
       this.app = app
@@ -84,7 +85,7 @@ export class AppAvailableShowPage {
     await loader.present()
 
     try {
-      const info = await this.serverService.getAvailableAppVersionInfo(this.serverId, this.app.id, version)
+      const info = await this.apiService.getAvailableAppVersionInfo(this.serverId, this.app.id, version)
       Object.assign(this.app, info)
     } catch (e) {
       this.error = e.message
@@ -189,7 +190,7 @@ async presentAlertDowngrade () {
     await loader.present()
 
     try {
-      const installed = await this.serverService.installApp(this.serverId, this.app.id, this.app.versionViewing)
+      const installed = await this.apiService.installApp(this.serverId, this.app.id, this.app.versionViewing)
       if (isUpdate) {
         this.appModel.updateApp(installed)
       } else {
@@ -212,7 +213,7 @@ async presentAlertDowngrade () {
     await loader.present()
 
     try {
-      await this.serverService.uninstallApp(this.serverId, this.app.id)
+      await this.apiService.uninstallApp(this.serverId, this.app.id)
       this.appModel.removeApp(this.app.id)
       await this.navCtrl.navigateBack(['/auth', 'servers', this.serverId])
     } catch (e) {

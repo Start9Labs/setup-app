@@ -7,7 +7,6 @@ interface ApiAppBase {
   id: string
   title: string
   status: AppStatus | null
-  statusAt: string
   versionInstalled: string | null
   iconURL: string
 }
@@ -31,7 +30,7 @@ export interface ApiAppInstalled011 extends ApiAppBase {
 }
 
 export interface ApiAppInstalled012 extends ApiAppBase {
-  torAddress?: string
+  torAddress: string
 }
 
 export type ApiServer = ApiServer011 | ApiServer012
@@ -58,7 +57,7 @@ export interface ApiAppVersionInfo {
   releaseNotes: string
 }
 
-export module Lan {
+export module ReqRes {
   export type GetVersionReq = { [k: string]: never }
   export type GetVersionRes = { version: string }
   export type GetTorReq = { [k: string]: never }

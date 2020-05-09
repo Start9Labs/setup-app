@@ -41,22 +41,8 @@
   }
 }
 
-.alert-primary {
-  color: var(--ion-color-primary) !important;
-  & ion-icon {
-    color: var(--ion-color-primary) !important;
-  }
-}
-
-.alert-warning {
-  color: var(--ion-color-warning) !important;
-  & ion-icon {
-    color: var(--ion-color-warning) !important;
-  }
-}
-
 .fab-button {
-  margin: 16px;
+  margin: 20px;
   --background: transparent;
   --border-color: var(--ion-color-primary);
   --border-style: solid;
@@ -113,18 +99,19 @@ ion-badge {
   font-weight: bold;
 }
 
+ion-item-divider {
+  --background: transparent;
+}
+
 ion-infinite-scroll ion-infinite-scroll-content {
   --color: var(--ion-color-warning) !important;
 }
 
 ion-action-sheet {
-  --background: var(--ion-color-light) !important;
   --backdrop-opacity: 0.75 !important;
 }
 
 ion-alert {
-  --min-width: 80% !important;
-  --background: var(--ion-color-light) !important;
   --backdrop-opacity: 0.75 !important;
 }
 

@@ -1,8 +1,8 @@
 import { Component } from '@angular/core'
-import { ServerService } from 'src/app/services/server.service'
+import { ApiService } from 'src/app/services/api.service'
 import { AppAvailablePreview } from 'src/app/models/app-model'
 import { ActivatedRoute } from '@angular/router'
-import { pauseFor } from 'src/app/util/misc.util'
+import { pauseFor, getIcon } from 'src/app/util/misc.util'
 import * as compareVersions from 'compare-versions'
 
 @Component({
@@ -16,10 +16,11 @@ export class AppAvailableListPage {
   apps: AppAvailablePreview[] = []
   serverId: string
   compareVersions = compareVersions
+  getIcon = getIcon
 
   constructor (
     private readonly route: ActivatedRoute,
-    private readonly serverService: ServerService,
+    private readonly apiService: ApiService,
   ) { }
 
   async ngOnInit () {
@@ -41,7 +42,7 @@ export class AppAvailableListPage {
 
   async getApps (): Promise<void> {
     try {
-      this.apps = await this.serverService.getAvailableApps(this.serverId)
+      this.apps = await this.apiService.getAvailableApps(this.serverId)
     } catch (e) {
       this.error = e.message
     } finally {

@@ -22,7 +22,11 @@ npm-debug.log*
 /.vscode
 /.gradle
 /dist
+/out-tsc
 /node_modules
 /www
 
 start9-companion-release-key.keystore
+
+resources/android
+resources/ios

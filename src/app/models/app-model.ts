@@ -57,6 +57,10 @@ export class AppModel extends MapSubject<AppInstalled> {
     this.upsertApps(upToDateApps)
   }
 
+  markAppsUnreachable (): void {
+    this.updateAppsUniformly({ status: AppStatus.UNREACHABLE })
+  }
+
   updateAppsUniformly (uniformUpdate: Partial<AppInstalled>) {
     this.updateApp(Object.keys(this.subject).map(appId => ({
       ...uniformUpdate, id: appId,
@@ -78,7 +82,6 @@ export interface BaseApp {
     id: string
     title: string
     status: AppStatus | null
-    statusAt: string
     versionInstalled: string | null
     iconURL: string
   }

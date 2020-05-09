@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>
-      Servers
+      Embassies
     </ion-title>
     <ion-buttons slot="end" class="ion-padding-end">
       <ion-button [routerLink]="['/auth', 'settings']" color="primary">
@@ -13,7 +13,7 @@
 
 <ion-content class="ion-padding">
 
-  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+  <ion-refresher *ngIf="servers.length" slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content pullingIcon="lines" refreshingSpinner="lines"></ion-refresher-content>
   </ion-refresher>
 
@@ -29,7 +29,11 @@
     </ion-item>
   </ion-item-group>
 
-  <div *ngIf="servers.length">
+  <ng-container *ngIf="servers.length">
+    <div *ngIf="torStatus === 'in_progress'" [@torChange]>
+      <ion-progress-bar color="tertiary" [value]="progress"></ion-progress-bar>
+      <p><img class="inline-image" src="assets/img/tor.png" alt="tor" />Establishing Connection</p>
+    </div>
     <ion-card button *ngFor="let server of servers" style="margin-bottom: 16px;" (click)="show(server.id)">
       <ion-item>
         <ion-avatar slot="start">
@@ -37,18 +41,16 @@
         </ion-avatar>
         <ion-label>
           <h1>{{ server.observe['label'] | async }}</h1>
-          <h3>
-            <s9-status [serverStatus]="server.observe['status'] | async"></s9-status>
-          </h3>
+          <s9-status [serverStatus]="server.observe['status'] | async" [connectionType]="server.observe['connectionType'] | async" size="small"></s9-status>
         </ion-label>
         <ion-badge slot="end" *ngIf="server.observe['badge'] | async as badge" color="danger">{{ badge }}</ion-badge>
       </ion-item>
     </ion-card>
-  </div>
+  </ng-container>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button [routerLink]="['/auth', 'setup']" class="fab-button">
-      <ion-icon name="add"></ion-icon>
+      <ion-icon name="add" color="primary"></ion-icon>
     </ion-fab-button>
   </ion-fab>
 

@@ -1,1 +1,10 @@
-<ion-text [color]="color">{{ display }}</ion-text>
+<h1 *ngIf="size === 'large'">
+  <ion-text [color]="color">{{ display }}</ion-text>
+  <img *ngIf="icon" class="icon-large" [src]="icon" alt="type" />
+</h1>
+
+
+<h3 *ngIf="size === 'small'">
+  <ion-text [color]="color">{{ display }}</ion-text>
+  <img *ngIf="icon" class="icon-small" [src]="icon" alt="type" />
+</h3>

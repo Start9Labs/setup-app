@@ -3,19 +3,39 @@ import { Storage } from '@ionic/storage'
 import { ServerAppModel } from './server-app-model'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { deriveKeys } from '../util/crypto.util'
-import * as CryptoJS from 'crypto-js'
-import { Observable } from 'rxjs'
+import { Observable, Subscription } from 'rxjs'
 import { MapSubject } from '../util/map-subject.util'
 import { PropertySubject, PropertyObservableWithId } from '../util/property-subject.util'
+import * as CryptoJS from 'crypto-js'
+import { NetworkMonitor } from '../services/network.service'
+import { NetworkStatus } from '@capacitor/core'
+import { AuthService } from '../services/auth.service'
+import { AuthStatus } from '../types/enums'
 
 @Injectable({
   providedIn: 'root',
 })
 export class ServerModel extends MapSubject<S9Server> {
+  networkSub: Subscription | undefined
+
   constructor (
-    private readonly storage: Storage,
     private readonly serverAppModel: ServerAppModel,
-  ) { super({ }) }
+    private readonly storage: Storage,
+    private readonly networkMonitor: NetworkMonitor,
+    private readonly authService: AuthService,
+  ) {
+    super({ })
+  }
+
+  init () {
+    this.authService.watch().subscribe(status => this.handleAuthChange(status))
+  }
+
+  watchNetwork (): void {
+    if (!this.networkSub) {
+      this.networkSub = this.networkMonitor.watchConnection().subscribe(c => this.handleNetworkUpdate(c))
+    }
+  }
 
   watchServerAdds (): Observable<PropertyObservableWithId<S9Server>[]> {
     return this.watchAdd()
@@ -27,13 +47,7 @@ export class ServerModel extends MapSubject<S9Server> {
 
   watchServerProperties (serverId: string) : PropertySubject<S9Server> {
     const toReturn = this.watch(serverId)
-    if (!toReturn) throw new Error(`Tried to watch server. Expected server ${JSON.stringify(serverId)} but not found.`)
-    return toReturn
-  }
-
-  peekServer (serverId: string): S9Server {
-    const toReturn = this.peek(serverId)
-    if (!toReturn) throw new Error(`Tried to peek server. Expected server ${JSON.stringify(serverId)} but not found.`)
+    if (!toReturn) throw new Error(`Expected Embassy ${JSON.stringify(serverId)} but not found.`)
     return toReturn
   }
 
@@ -46,27 +60,43 @@ export class ServerModel extends MapSubject<S9Server> {
   }
 
   createServer (server: S9Server): void {
-    console.log(`adding server`, server)
     this.createServerAppCache(server.id)
     this.add([server])
+    this.watchNetwork()
   }
 
   createServerAppCache (sid: string): void {
     this.serverAppModel.create(sid)
   }
 
+  markServerUnreachable (sid: string): void {
+    this.updateServer(sid, { status: ServerStatus.UNREACHABLE, connectionType: EmbassyConnection.NONE })
+    this.serverAppModel.get(sid).markAppsUnreachable()
+  }
+
   async load (mnemonic: string[]): Promise<void> {
-    const fromStorage: S9ServerStore = await this.storage.get('servers') || []
+    const fromStorage: S9ServerStorable[] = await this.storage.get('servers') || []
     const mapped = fromStorage.map(s => fromStorableServer(s, mnemonic))
     this.add(mapped)
+    this.watchNetwork()
   }
 
   async saveAll (): Promise<void> {
     await this.storage.set('servers', this.peekAll().map(toStorableServer))
   }
-}
 
-type S9ServerStore = S9ServerStorable[]
+  private handleNetworkUpdate (network: NetworkStatus): void {
+    if (!network.connected) {
+      Object.keys(this.subject).forEach(id => this.markServerUnreachable(id))
+    }
+  }
+
+  private handleAuthChange (status: AuthStatus): void {
+    if (status === AuthStatus.MISSING) {
+      this.clear()
+    }
+  }
+}
 
 export interface S9ServerStorable {
   id: string
@@ -77,11 +107,11 @@ export interface S9ServerStorable {
 
 export interface S9Server extends S9ServerStorable {
   status: ServerStatus
-  statusAt: string
   privkey: string // derive from mnemonic + torAddress
   badge: number
   notifications: S9Notification[]
   versionLatest: string | undefined // @COMPAT 0.1.1 - versionLatest dropped in 0.1.2
+  connectionType: EmbassyConnection
 }
 
 export interface S9Notification {
@@ -125,7 +155,7 @@ export function getLanIP (zcs: ZeroconfService): string {
   } else {
     url = `[${ipv6Addresses[0]}]`
   }
-  return url + ':5959'
+  return url
 }
 
 export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): S9Server {
@@ -136,21 +166,20 @@ export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): 
     torAddress,
     versionInstalled,
     status: ServerStatus.UNKNOWN,
-    statusAt: new Date().toISOString(),
     privkey: deriveKeys(mnemonic, id).privkey,
     badge: 0,
     notifications: [],
     versionLatest: undefined, // @COMPAT 0.1.1 - versionLatest dropped in 0.1.2
+    connectionType: EmbassyConnection.NONE,
   }
 }
 
 export function toStorableServer (ss: S9Server): S9ServerStorable {
   const { label, torAddress, id, versionInstalled } = ss
-
   return {
     id,
     label,
-    torAddress,
+    torAddress: torAddress.trim(), // @COMPAT Ambassador <= 1.3.0 retuned torAddress with trailing \n
     versionInstalled,
   }
 }
@@ -158,6 +187,12 @@ export function toStorableServer (ss: S9Server): S9ServerStorable {
 export function idFromSerial (serialNo: string): string {
   // sha256 hash is big endian
   return CryptoJS.SHA256(serialNo).toString(CryptoJS.enc.Hex).substr(0, 8)
+}
+
+export enum EmbassyConnection {
+  NONE = 'NONE',
+  LAN = 'LAN',
+  TOR = 'TOR',
 }
 
 export enum ServerStatus {

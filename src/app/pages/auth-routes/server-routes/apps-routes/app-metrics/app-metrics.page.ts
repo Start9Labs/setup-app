@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { AppMetrics } from 'src/app/models/server-model'
-import { ServerService } from 'src/app/services/server.service'
+import { ApiService } from 'src/app/services/api.service'
 import { pauseFor } from 'src/app/util/misc.util'
 import { Observable } from 'rxjs'
 import { ServerAppModel } from 'src/app/models/server-app-model'
@@ -22,7 +22,7 @@ export class AppMetricsPage {
 
   constructor (
     private readonly route: ActivatedRoute,
-    private readonly serverService: ServerService,
+    private readonly apiService: ApiService,
     private readonly serverAppModel: ServerAppModel,
   ) { }
 
@@ -60,7 +60,7 @@ export class AppMetricsPage {
 
   async getMetrics (): Promise<void> {
     try {
-      const metrics = await this.serverService.getAppMetrics(this.serverId, this.appId)
+      const metrics = await this.apiService.getAppMetrics(this.serverId, this.appId)
       if (!metrics) return
 
       Object.keys(metrics).forEach(key => {
@@ -73,7 +73,7 @@ export class AppMetricsPage {
     }
   }
 
-  asIsOrder () {
+  asIsOrder (a: any, b: any) {
     return 1
   }
 }

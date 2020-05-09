@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { NavController, LoadingController, AlertController } from '@ionic/angular'
 import { ActivatedRoute } from '@angular/router'
 import { AppInstalled, AppConfigSpec, AppStatus, AppModel } from 'src/app/models/app-model'
-import { ServerService } from 'src/app/services/server.service'
+import { ApiService } from 'src/app/services/api.service'
 import { pauseFor } from 'src/app/util/misc.util'
 import { ServerAppModel } from 'src/app/models/server-app-model'
 import { PropertySubject, peekProperties } from 'src/app/util/property-subject.util'
@@ -27,7 +27,7 @@ export class AppConfigPage {
     private readonly navCtrl: NavController,
     private readonly route: ActivatedRoute,
     private readonly serverAppModel: ServerAppModel,
-    private readonly serverService: ServerService,
+    private readonly apiService: ApiService,
     private readonly loadingCtrl: LoadingController,
     private readonly alertCtrl: AlertController,
   ) {
@@ -53,7 +53,7 @@ export class AppConfigPage {
   async getConfig (initialLoad = false) {
     this.loading = true
     try {
-      const { spec, config } = await this.serverService.getAppConfig(this.serverId, this.appId)
+      const { spec, config } = await this.apiService.getAppConfig(this.serverId, this.appId)
       this.spec = spec
       this.config = config
     } catch (e) {
@@ -82,18 +82,18 @@ export class AppConfigPage {
 
     try {
       // save config
-      await this.serverService.updateAppConfig(this.serverId, app, this.config)
+      await this.apiService.updateAppConfig(this.serverId, app, this.config)
 
       // if status was RUNNING beforehand, restart the app
       if (app.status === AppStatus.RUNNING) {
         loader.message = `Restarting ${app.title}. This could take a while...`
         // stop app
-        await this.serverService.stopApp(this.serverId, this.appId)
+        await this.apiService.stopApp(this.serverId, this.appId)
         // start app
-        await this.serverService.startApp(this.serverId, this.appId)
+        await this.apiService.startApp(this.serverId, this.appId)
       // if not RUNNING beforehand, set status to STOPPED
       } else {
-        this.appModel.updateApp({ id: this.appId, status: AppStatus.STOPPED, statusAt: new Date().toISOString() })
+        this.appModel.updateApp({ id: this.appId, status: AppStatus.STOPPED })
       }
 
       await this.navigateBack()
@@ -188,7 +188,7 @@ export class AppConfigPage {
     await loader.present()
 
     try {
-      await this.serverService.wipeAppData(this.serverId, app)
+      await this.apiService.wipeAppData(this.serverId, app)
       await this.getConfig()
     } catch (e) {
       this.error = e.message

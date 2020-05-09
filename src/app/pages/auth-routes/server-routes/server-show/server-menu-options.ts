@@ -73,7 +73,7 @@ export const EditFriendlyNameAlert: (s: S9Server, h: (a?: any) => any) => AlertO
 export const UpdateAlert: (s: S9Server, version: string, h: () => any) => AlertOptions = (server, version, handler) => ({
     backdropDismiss: false,
     header: 'Confirm',
-    message: `Update MeshOS to ${version}?`,
+    message: `Update Ambassador to ${version}?`,
     buttons: [
       CancelButton, {
         text: 'Update',
@@ -111,7 +111,7 @@ export const ShutdownAlert: (s: S9Server, h: () => any) => AlertOptions = (serve
 export const ForgetAlert: (s: S9Server, h: () => any) => AlertOptions = (server, handler) => ({
     backdropDismiss: false,
     header: 'Caution',
-    message: `Are you sure you want to forget ${server.label} on this device? You can add it back later. The server itself will not be affected.`,
+    message: `Are you sure you want to forget ${server.label} on this device? You can add it back later. The Embassy itself will not be affected.`,
     buttons: [
       CancelButton, {
         text: 'Forget Server',

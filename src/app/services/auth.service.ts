@@ -1,25 +1,26 @@
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
-import * as cryptoUtil from '../util/crypto.util'
 import { BehaviorSubject, Observable } from 'rxjs'
 import { AuthStatus } from '../types/enums'
+import * as cryptoUtil from '../util/crypto.util'
+import { NavController } from '@ionic/angular'
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private readonly authState$ = new BehaviorSubject<AuthStatus>(AuthStatus.UNINITIALIZED)
-  watch (): Observable<AuthStatus> { return this.authState$ }
+  watch (): Observable<AuthStatus> { return this.authState$.asObservable() }
   mnemonicEncrypted: cryptoUtil.Hex | null = null
   mnemonic: string[] | undefined
   pinEnabled = false
 
   constructor (
+    private readonly navCtrl: NavController,
     private readonly storage: Storage,
   ) { }
 
   async init () {
-    // returns null if key does not exist
     this.mnemonicEncrypted = await this.storage.get('mnemonic') as cryptoUtil.Hex
 
     if (this.mnemonicEncrypted) {
@@ -69,6 +70,7 @@ export class AuthService {
     this.clearCache()
     await this.storage.clear()
     this.authState$.next(AuthStatus.MISSING)
+    await this.navCtrl.navigateRoot(['/unauth'])
   }
 
   async changePin (pin: string): Promise<void> {

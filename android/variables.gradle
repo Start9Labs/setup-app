@@ -1,0 +1,18 @@
+ext {
+    applicationId = 'com.start9labs.start9companion'
+    minSdkVersion = 23
+    compileSdkVersion = 28
+    targetSdkVersion = 28
+    androidxAppCompatVersion = '1.1.0'
+    androidxCoreVersion =  '1.2.0'
+    androidxMaterialVersion =  '1.1.0-rc02'
+    androidxBrowserVersion =  '1.2.0'
+    androidxLocalbroadcastmanagerVersion =  '1.0.0'
+    playServicesLocationVersion =  '17.0.0'
+    junitVersion =  '4.12'
+    androidxJunitVersion =  '1.1.1'
+    androidxEspressoCoreVersion =  '3.2.0'
+    cordovaAndroidVersion =  '7.0.0'
+    versionCode = 10400
+    versionName = '1.4.0'
+}

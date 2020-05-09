@@ -1,6 +1,11 @@
 export type Omit<ObjectType, KeysType extends keyof ObjectType> = Pick<ObjectType, Exclude<keyof ObjectType, KeysType>>
 
 export type PromiseRes<T> = { result: 'resolve', value: T } | { result: 'reject', value: Error }
+
+export function getIcon (appId: string) {
+  return `assets/img/${appId}.png`
+}
+
 export async function tryAll ( promises: Promise<any>[] ): Promise<PromiseRes<any>[]> {
   return Promise.all(promises.map(
     p => p
@@ -19,7 +24,7 @@ export function both<T> (arr1: T[], arr2: T[]): T[] {
   return arr1.filter(x => arr2.includes(x))
 }
 
-export async function doForAtLeast (minTime: number, promises: Promise<any>[]): Promise<any[]> {
+export async function doForAtLeast (promises: Promise<any>[], minTime: number): Promise<any[]> {
   const returned = await Promise.all(promises.concat(pauseFor(minTime)))
   returned.pop()
   return returned
@@ -75,7 +80,7 @@ export function deepCloneArray (collection: any) {
   })
 }
 
-export function partitionArray<T> (ts: T[], condition: (t: T) => boolean): [T[],T[]] {
+export function partitionArray<T> (ts: T[], condition: (t: T) => boolean): [T[], T[]] {
   const yes = [] as T[]
   const no = [] as T[]
   ts.forEach(t => {

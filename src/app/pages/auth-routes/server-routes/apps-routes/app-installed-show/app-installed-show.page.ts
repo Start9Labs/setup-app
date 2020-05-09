@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { AlertController, NavController, LoadingController, ActionSheetController, ToastController } from '@ionic/angular'
-import { ServerService } from 'src/app/services/server.service'
+import { ApiService } from 'src/app/services/api.service'
 import { ActivatedRoute } from '@angular/router'
 import { AppInstalled, AppStatus, AppModel } from 'src/app/models/app-model'
 import { ActionSheetButton } from '@ionic/core'
@@ -34,7 +34,7 @@ export class AppInstalledShowPage {
     private readonly navCtrl: NavController,
     private readonly loadingCtrl: LoadingController,
     private readonly toastCtrl: ToastController,
-    private readonly serverService: ServerService,
+    private readonly apiService: ApiService,
     private readonly serverAppModel: ServerAppModel,
   ) { }
 
@@ -62,7 +62,7 @@ export class AppInstalledShowPage {
 
   async getApp (): Promise<void> {
     try {
-      const appRes = await this.serverService.getInstalledApp(this.serverId, this.appId)
+      const appRes = await this.apiService.getInstalledApp(this.serverId, this.appId)
       this.app = this.app || this.appModel.watchAppProperties(this.appId)
       this.appModel.updateApp({ id: this.appId, ...appRes})
       this.error = ''
@@ -82,7 +82,7 @@ export class AppInstalledShowPage {
     await loader.present()
 
     try {
-      const { versionLatest } = await this.serverService.getAvailableApp(this.serverId, this.appId)
+      const { versionLatest } = await this.apiService.getAvailableApp(this.serverId, this.appId)
       if (this.compareVersions(versionLatest, app.versionInstalled!) === 1) {
         await this.presentAlertUpdate(app, versionLatest)
       }
@@ -217,7 +217,7 @@ export class AppInstalledShowPage {
     await loader.present()
 
     try {
-      await this.serverService.stopApp(this.serverId, this.appId)
+      await this.apiService.stopApp(this.serverId, this.appId)
 
     } catch (e) {
       this.error = e.message
@@ -237,7 +237,7 @@ export class AppInstalledShowPage {
     await loader.present()
 
     try {
-      await this.serverService.startApp(this.serverId, this.appId)
+      await this.apiService.startApp(this.serverId, this.appId)
     } catch (e) {
       this.error = e.message
     } finally {
@@ -280,7 +280,7 @@ export class AppInstalledShowPage {
     await loader.present()
 
     try {
-      await this.serverService.uninstallApp(this.serverId, this.appId)
+      await this.apiService.uninstallApp(this.serverId, this.appId)
       this.appModel.removeApp(this.appId)
       await this.navCtrl.pop()
     } catch (e) {

@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { SSHFingerprint } from 'src/app/models/server-model'
 import { ActivatedRoute } from '@angular/router'
 import { AlertController, LoadingController } from '@ionic/angular'
-import { ServerService } from 'src/app/services/server.service'
+import { ApiService } from 'src/app/services/api.service'
 import { pauseFor } from 'src/app/util/misc.util'
 
 @Component({
@@ -20,7 +20,7 @@ export class DevSSHKeysPage {
     private readonly route: ActivatedRoute,
     private readonly loadingCtrl: LoadingController,
     private readonly alertCtrl: AlertController,
-    private readonly serverService: ServerService,
+    private readonly apiService: ApiService,
   ) { }
 
   async ngOnInit () {
@@ -44,7 +44,7 @@ export class DevSSHKeysPage {
 
   async getSSHKeys () {
     try {
-      this.fingerprints = await this.serverService.getSSHKeys(this.serverId)
+      this.fingerprints = await this.apiService.getSSHKeys(this.serverId)
       this.error = ''
     } catch (e) {
       this.error = e.message
@@ -91,7 +91,7 @@ export class DevSSHKeysPage {
     await loader.present()
 
     try {
-      const fingerprint = await this.serverService.addSSHKey(this.serverId, key)
+      const fingerprint = await this.apiService.addSSHKey(this.serverId, key)
       this.fingerprints.unshift(fingerprint)
       this.error = ''
     } catch (e) {
@@ -110,7 +110,7 @@ export class DevSSHKeysPage {
     await loader.present()
 
     try {
-      await this.serverService.deleteSSHKey(this.serverId, fingerprint.hash)
+      await this.apiService.deleteSSHKey(this.serverId, fingerprint.hash)
       this.fingerprints.splice(index, 1)
       this.error = ''
     } catch (e) {

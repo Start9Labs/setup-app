@@ -145,7 +145,7 @@ export class ObjectConfigComponent {
     this.editedChange.emit(true)
   }
 
-  asIsOrder () {
+  asIsOrder (a: any, b: any) {
     return 1
   }
 }
