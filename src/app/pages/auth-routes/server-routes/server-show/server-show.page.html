@@ -36,18 +36,18 @@
     </ion-item>
   </ion-item-group>
 
-  <div *ngIf="vars.status === 'RUNNING'" style="margin: 0 16px 30px 16px;">
-    <ion-button *ngIf="!versionLatest" expand="block" fill="outline" color="warning" (click)="getVersionLatest(server)">
+  <ng-container *ngIf="vars.status === 'RUNNING'">
+    <ion-button *ngIf="!versionLatest" style="margin: 0 16px 30px 16px;" expand="block" fill="outline" color="warning" (click)="getVersionLatest(server)">
       Check for Updates
       <ion-icon slot="end" name="refresh-outline"></ion-icon>
     </ion-button>
   
     <ion-button
       *ngIf="versionLatest && !updatingFreeze && compareVersions(vars.versionInstalled, versionLatest) === -1"
-      expand="block" fill="outline" color="success" (click)="presentAlertUpdate(server)">
+      style="margin: 0 16px 30px 16px;" expand="block" fill="outline" color="success" (click)="presentAlertUpdate(server)">
       Update Ambassador to {{ versionLatest }}
     </ion-button>
-  </div>
+  </ng-container>
 
   <ion-item-group>
 
