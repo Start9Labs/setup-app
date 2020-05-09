@@ -17,14 +17,10 @@
 ## Building
 https://capacitor.ionicframework.com/docs/basics/building-your-app/
 
-## Android deployment
+## Production Deployment
 
-build release apk:
+`ionic build --prod`
 
-`ionic build --prod --release`
-
-`npx cap copy android`
+`npx cap sync`
 
 Follow instructions here: `https://www.joshmorony.com/deploying-capacitor-applications-to-android-development-distribution/`
-
-Upload to Google Play Developer Console.
