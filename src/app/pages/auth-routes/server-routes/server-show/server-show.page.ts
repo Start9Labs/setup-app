@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { ServerModel, ServerStatus } from 'src/app/models/server-model'
+import { ServerModel, ServerStatus, EmbassyConnection } from 'src/app/models/server-model'
 import { NavController, AlertController, ActionSheetController, LoadingController } from '@ionic/angular'
 import { S9Server } from 'src/app/models/server-model'
 import { ActionSheetButton } from '@ionic/core'
@@ -36,8 +36,10 @@ export class ServerShowPage {
   addAppsSubscription: Subscription
   deleteAppsSubscription: Subscription
   versionLatestSubscription: Subscription | undefined // @COMPAT 0.1.1 - versionLatest dropped in 0.1.2
+  statusSub: Subscription
   getIcon = getIcon
   updatingFreeze = false
+  updating = false
 
   constructor (
     private readonly route: ActivatedRoute,
@@ -65,6 +67,14 @@ export class ServerShowPage {
 
     this.apps = appModel.watchAll()
 
+    this.statusSub = this.server.status.subscribe(status => {
+      if (status === ServerStatus.UPDATING) {
+        this.updating = true
+      } else {
+        if (!this.updatingFreeze) { this.updating = false }
+      }
+    })
+
     this.addAppsSubscription = appModel.watchAppAdds().subscribe(newAppObservables => {
       this.apps.push(...newAppObservables)
     })
@@ -83,6 +93,7 @@ export class ServerShowPage {
   ngOnDestroy () {
     this.addAppsSubscription.unsubscribe()
     this.deleteAppsSubscription.unsubscribe()
+    this.statusSub.unsubscribe()
     if (this.versionLatestSubscription) { this.versionLatestSubscription.unsubscribe() } // @COMPAT 0.1.1 - versionLatest dropped in 0.1.2
   }
 
@@ -199,8 +210,10 @@ export class ServerShowPage {
     try {
       await this.apiService.updateAgent(server.id, this.versionLatest!)
       this.serverModel.updateServer(server.id, { status: ServerStatus.UPDATING })
+      // hides the "Update Ambassador to..." button for this intance of the component
       this.updatingFreeze = true
-      setTimeout(() => this.updatingFreeze = false, 4000)
+      this.updating = true
+      setTimeout(() => this.updatingFreeze = false, 8000)
     } catch (e) {
       this.error = e.message
     } finally {

@@ -48,7 +48,7 @@ export class TorService {
       console.log('starting Tor')
       this.connection$.next(TorConnection.in_progress)
 
-      this.started = this.tor.start({ socksPort: TorService.PORT, initTimeout: 15000 }).subscribe({
+      this.started = this.tor.start({ socksPort: TorService.PORT, initTimeout: 20000 }).subscribe({
         next: (progress: number) => this.handleConnecting(progress),
         error: (err: string) => {
           this.connection$.next(TorConnection.disconnected)
