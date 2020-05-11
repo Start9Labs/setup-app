@@ -1,10 +1,11 @@
-import { Component } from '@angular/core'
+import { Component, NgZone } from '@angular/core'
 import { NavController, LoadingController } from '@ionic/angular'
 import { ServerModel } from 'src/app/models/server-model'
 import { idFromSerial } from 'src/app/models/server-model'
 import { SetupService, fromUserInput } from 'src/app/services/setup.service'
 import { ZeroconfMonitor } from 'src/app/services/zeroconf.service'
 import { SyncService } from 'src/app/services/sync.service'
+import { Subscription } from 'rxjs'
 
 @Component({
   selector: 'setup',
@@ -15,6 +16,8 @@ export class SetupPage {
   error = ''
   label = ''
   productKey = ''
+  existsSub: Subscription
+  serviceExists = false
 
   constructor (
     private readonly navController: NavController,
@@ -22,8 +25,19 @@ export class SetupPage {
     private readonly serverModel: ServerModel,
     private readonly syncService: SyncService,
     private readonly loadingCtrl: LoadingController,
-    public zeroconfMonitor: ZeroconfMonitor,
+    private readonly zeroconfMonitor: ZeroconfMonitor,
+    private readonly zone: NgZone,
   ) { }
+
+  ngOnInit () {
+    this.existsSub = this.zeroconfMonitor.watchServiceExists().subscribe(e => {
+      this.zone.run(() => { this.serviceExists = e })
+    })
+  }
+
+  ngOnDestroy () {
+    this.existsSub.unsubscribe()
+  }
 
   async submit (): Promise<void> {
     const id = idFromSerial(this.productKey)
