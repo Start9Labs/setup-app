@@ -16,7 +16,7 @@ export class TorService {
   watchProgress (): Observable<number> { return this.progress$.asObservable() }
   watchConnection (): Observable<TorConnection> { return this.connection$.asObservable() }
   peekConnection (): TorConnection { return this.connection$.getValue() }
-  started: Subscription
+  networkSub: Subscription
 
   constructor (
     private readonly platform: Platform,
@@ -24,46 +24,69 @@ export class TorService {
   ) { }
 
   init (): void {
-    this.networkMonitor.watchConnection().subscribe(n => this.handleNetworkChange(n))
+    this.networkSub = this.networkSub || this.networkMonitor.watchConnection().subscribe(n => this.handleNetworkChange(n))
   }
 
-  handleNetworkChange (network: NetworkStatus): void {
+  private async handleNetworkChange (network: NetworkStatus): Promise<void> {
+    // if connected to Internet, connect or reconnect to Tor
     if (network.connected) {
-      this.start()
-    } else {
-      // if connected, disconnect
-      if (this.connection$.getValue() === TorConnection.connected) {
-        this.connection$.next(TorConnection.disconnected)
+      if (await this.tor.isRunning()) {
+        this.reconnect()
+      } else {
+        this.start()
       }
     }
   }
 
-  async start (): Promise<void> {
+  private async start (): Promise<void> {
     // ** MOCKS **
     // return this.mock()
 
     if (!this.platform.is('ios') && !this.platform.is('android')) { return }
+    if (await this.tor.isRunning()) { return }
 
-    if (!this.started) {
-      console.log('starting Tor')
-      this.connection$.next(TorConnection.in_progress)
+    console.log('starting Tor')
 
-      this.started = this.tor.start({ socksPort: TorService.PORT, initTimeout: 20000 }).subscribe({
-        next: (progress: number) => this.handleConnecting(progress),
-        error: (err: string) => {
-          this.connection$.next(TorConnection.disconnected)
-          throw new Error(`Error connecting to Tor: ${err}`)
-        },
-      })
-    } else {
-      console.log('reconnecting Tor')
-      this.connection$.next(TorConnection.reconnecting)
-      try {
-        await this.tor.reconnect()
-        this.connection$.next(TorConnection.connected)
-      } catch (e) {
+    this.connection$.next(TorConnection.in_progress)
+
+    this.tor.start({ socksPort: TorService.PORT, initTimeout: 40000 }).subscribe({
+      next: (progress: number) => this.handleConnecting(progress),
+      error: (err: string) => {
         this.connection$.next(TorConnection.disconnected)
+        throw new Error(`Error connecting to Tor: ${err}`)
+      },
+    })
+  }
+
+  private async stop (): Promise<void> {
+    if (!this.platform.is('ios') && !this.platform.is('android')) { return }
+
+    if (await this.tor.isRunning()) {
+      console.log('stopping Tor')
+      try {
+        await this.tor.stop()
+        this.connection$.next(TorConnection.disconnected)
+      } catch (e) {
+        console.log(`Tor stop failed: ${e}`)
       }
+    }
+  }
+
+  private async restart (): Promise<void> {
+    console.log('restarting Tor')
+    await this.stop()
+    this.start()
+  }
+
+  private async reconnect (): Promise<void> {
+    if (!this.platform.is('ios') && !this.platform.is('android')) { return }
+
+    console.log('reconnecting Tor')
+    try {
+      await this.tor.reconnect()
+    } catch (e) {
+      console.log(`Tor reconnect failed: ${e}`)
+      await this.restart()
     }
   }
 
@@ -72,7 +95,7 @@ export class TorService {
     if (progress === 100) { this.connection$.next(TorConnection.connected) }
   }
 
-  async mock (): Promise<void> {
+  private mock (): void {
     console.log('starting Tor')
     this.connection$.next(TorConnection.in_progress)
     setTimeout(() => { this.progress$.next(25) }, 1500)

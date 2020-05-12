@@ -12,6 +12,7 @@ import { NetworkMonitor } from './network.service'
 import { NetworkStatus } from '@capacitor/core'
 import { AuthService } from './auth.service'
 import { AuthStatus } from '../types/enums'
+import { Subscription } from 'rxjs'
 
 @Injectable({
   providedIn: 'root',
@@ -65,6 +66,10 @@ export class SyncNotifier {
 })
 export class SyncService {
   embassies: { [id: string]: EmbassyDaemon } = { }
+  authSub: Subscription
+  networkSub: Subscription
+  zeroconfSub: Subscription
+  torSub: Subscription
 
   constructor (
     private readonly apiService: ApiService,
@@ -78,10 +83,10 @@ export class SyncService {
   ) { }
 
   init (): void {
-    this.authService.watch().subscribe(status => this.handleAuthChange(status))
-    this.networkMonitor.watchConnection().subscribe(n => this.handleNetworkChange(n))
-    this.zeroconfMonitor.watchServiceFound().subscribe(s => this.handleZeroconfDiscovered(s))
-    this.torService.watchConnection().subscribe(c => this.handleTorConnected(c))
+    this.authSub = this.authSub || this.authService.watch().subscribe(status => this.handleAuthChange(status))
+    this.networkSub = this.networkSub || this.networkMonitor.watchConnection().subscribe(n => this.handleNetworkChange(n))
+    this.zeroconfSub = this.zeroconfSub || this.zeroconfMonitor.watchServiceFound().subscribe(s => this.handleZeroconfDiscovered(s))
+    this.torSub = this.torSub || this.torService.watchConnection().subscribe(c => this.handleTorConnected(c))
   }
 
   async sync (id: string): Promise<void> {

@@ -14,7 +14,8 @@ export class ZeroconfMonitor {
   watchServiceFound (): Observable<ZeroconfService> { return this.serviceFound$.asObservable() }
   watchServiceExists (): Observable<boolean> { return this.serviceExists$.asObservable() }
   services: { [hostname: string]: ZeroconfService } = { }
-  private zeroconfSub: Subscription | undefined
+  private zeroconfSub: Subscription
+  private networkSub: Subscription
 
   constructor (
     private readonly platform: Platform,
@@ -23,7 +24,7 @@ export class ZeroconfMonitor {
   ) { }
 
   init (): void {
-    this.networkMonitor.watchConnection().subscribe(n => this.handleNetworkChange(n))
+    this.networkSub = this.networkSub || this.networkMonitor.watchConnection().subscribe(n => this.handleNetworkChange(n))
   }
 
   getService (serverId: string): ZeroconfService | undefined {
@@ -59,7 +60,6 @@ export class ZeroconfMonitor {
       this.removeService(service)
     }
     this.zeroconfSub.unsubscribe()
-    this.zeroconfSub = undefined
   }
 
   private handleServiceUpdate (result: ZeroconfResult): void {

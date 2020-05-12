@@ -8,11 +8,11 @@ import { AuthenticatePage } from './modals/authenticate/authenticate.page'
 import { TorService } from './services/tor.service'
 import { ZeroconfMonitor } from './services/zeroconf.service'
 import { SyncService } from './services/sync.service'
+import { Router } from '@angular/router'
+import { ServerAppModel } from './models/server-app-model'
 import { Storage } from '@ionic/storage'
 
 import { Plugins, StatusBarStyle } from '@capacitor/core'
-import { Router } from '@angular/router'
-import { ServerAppModel } from './models/server-app-model'
 const { SplashScreen, StatusBar } = Plugins
 
 @Component({
@@ -38,59 +38,61 @@ export class AppComponent {
     // set dark theme
     document.body.classList.toggle('dark', true)
 
-    // await platform ready
     this.platform.ready().then(async () => {
-      // init NetworkMonitor
-      await this.networkMonitor.init()
-      // init TorService
-      this.torService.init()
-      // await storage ready
+      // storage ready
       await this.storage.ready()
-      // init AuthService
-      await this.authService.init()
-      // init ServerModel
-      this.serverModel.init()
-      // init ServerAppModel
-      this.serverAppModel.init()
-      // if verified, load data
+      // start services
+      await this.startServices()
+      // initial loading and navigation based on auth
       if (this.authService.isVerified()) {
         await this.serverModel.load(this.authService.mnemonic!)
         this.router.navigate(['/auth'])
       } else {
         this.router.navigate(['/unauth'])
       }
-      // set StatusBar style
-      StatusBar.setStyle({
-        style: StatusBarStyle.Dark,
-      })
-      // init SyncService
-      this.syncService.init()
-      // init ZeroconfMonitor
-      this.zeroconfMonitor.init()
       // subscribe to auth status changes
       this.authService.watch().subscribe(authStatus => {
         this.handleAuthChange(authStatus)
       })
       // subscribe to app pause event
       this.platform.pause.subscribe(() => {
-        this.authService.uninit()
+        this.stopServices()
       })
       // sunscribe to app resume event
       this.platform.resume.subscribe(() => {
-        this.authService.init()
+        this.startServices()
+      })
+      // set StatusBar style
+      StatusBar.setStyle({
+        style: StatusBarStyle.Dark,
       })
       // dismiss SplashScreen
-      await SplashScreen.hide()
+      SplashScreen.hide()
     })
   }
 
-  private async handleAuthChange (authStatus: AuthStatus) {
+  private async startServices (): Promise<void> {
+    await this.networkMonitor.init()
+    await this.authService.init()
+    this.serverModel.init()
+    this.serverAppModel.init()
+    this.torService.init()
+    this.syncService.init()
+    this.zeroconfMonitor.init()
+  }
+
+  private stopServices (): void {
+    this.authService.uninit()
+    this.networkMonitor.unint()
+  }
+
+  private async handleAuthChange (authStatus: AuthStatus): Promise<void> {
     if (authStatus === AuthStatus.UNVERIFIED) {
       await this.presentModalAuthenticate()
     }
   }
 
-  private async presentModalAuthenticate () {
+  private async presentModalAuthenticate (): Promise<void> {
     const modal = await this.modalCtrl.create({
       backdropDismiss: false,
       component: AuthenticatePage,

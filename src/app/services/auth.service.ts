@@ -35,15 +35,15 @@ export class AuthService {
     }
   }
 
+  uninit (): void {
+    this.clearCache()
+    this.authState$.next(AuthStatus.UNINITIALIZED)
+  }
+
   async authenticate (pin: string): Promise<void> {
     const decrypted = await cryptoUtil.decrypt(this.mnemonicEncrypted!, pin)
     this.mnemonic = JSON.parse(decrypted)
     this.authState$.next(AuthStatus.VERIFIED)
-  }
-
-  uninit (): void {
-    this.clearCache()
-    this.authState$.next(AuthStatus.UNINITIALIZED)
   }
 
   async login (mnemonic: string[]): Promise<void> {

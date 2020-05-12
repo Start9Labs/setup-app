@@ -40,7 +40,7 @@ export class HttpService {
     } else {
       connectionType = EmbassyConnection.TOR
       if (this.torService.peekConnection() !== TorConnection.connected) {
-        throw new Error('Tor disconnected')
+        throw new Error('Tor not connected')
       }
       host = server.torAddress.trim() // @COMPAT Ambassador <= 1.3.0 retuned torAddress with trailing "\n"
       options.proxy = {
@@ -76,7 +76,10 @@ export class HttpService {
     }
 
     try {
+      console.log('* REQ *', options)
       const res = await HttpPluginNativeImpl.request(options)
+      console.log(Object.keys(res.headers))
+      console.log('* RES *', res)
       return res.data || { }
     } catch (e) {
       console.error(e)
