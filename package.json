@@ -1,6 +1,7 @@
 {
   "name": "start9-embassy",
   "version": "1.4.0",
+  "description": "Embassy companion and mobile shell for Ambassador UI",
   "author": "Start9 Labs",
   "homepage": "https://start9labs.com",
   "scripts": {
@@ -59,9 +60,8 @@
     "codelyzer": "^5.2.0",
     "ts-node": "^8.10.1",
     "tslint": "^6.1.2",
-    "typescript": "^3.8.0"
+    "typescript": "3.8.3"
   },
-  "description": "Embassy companion and mobile shell for Ambassador UI",
   "cordova": {
     "plugins": {
       "cordova-plugin-zeroconf": {}

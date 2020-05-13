@@ -61,6 +61,10 @@ export class AppModel extends MapSubject<AppInstalled> {
     this.updateAppsUniformly({ status: AppStatus.UNREACHABLE })
   }
 
+  markAppsUnknown (): void {
+    this.updateAppsUniformly({ status: AppStatus.UNKNOWN })
+  }
+
   updateAppsUniformly (uniformUpdate: Partial<AppInstalled>) {
     this.updateApp(Object.keys(this.subject).map(appId => ({
       ...uniformUpdate, id: appId,

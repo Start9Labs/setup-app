@@ -43,7 +43,6 @@ export class ServerSpecsPage {
 
   async copyTor () {
     let message = ''
-    console.log(this.specs)
     await Clipboard.write({ url: (this.specs['Tor Address'] as string).trim() || '' })
       .then(() => { message = 'copied to clipboard!' })
       .catch(() => { message = 'failed to copy' })

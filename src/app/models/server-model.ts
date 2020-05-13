@@ -74,6 +74,11 @@ export class ServerModel extends MapSubject<S9Server> {
     this.serverAppModel.get(sid).markAppsUnreachable()
   }
 
+  markServerUnknown (sid: string): void {
+    this.updateServer(sid, { status: ServerStatus.UNKNOWN, connectionType: EmbassyConnection.NONE })
+    this.serverAppModel.get(sid).markAppsUnknown()
+  }
+
   async load (mnemonic: string[]): Promise<void> {
     const fromStorage: S9ServerStorable[] = await this.storage.get('servers') || []
     const mapped = fromStorage.map(s => fromStorableServer(s, mnemonic))
@@ -86,7 +91,9 @@ export class ServerModel extends MapSubject<S9Server> {
   }
 
   private handleNetworkUpdate (network: NetworkStatus): void {
-    if (!network.connected) {
+    if (network.connected) {
+      Object.keys(this.subject).forEach(id => this.markServerUnknown(id))
+    } else {
       Object.keys(this.subject).forEach(id => this.markServerUnreachable(id))
     }
   }

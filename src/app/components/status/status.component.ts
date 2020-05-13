@@ -27,6 +27,8 @@ export class StatusComponent {
       this.icon = 'assets/img/home.png'
     } else if (this.connectionType === EmbassyConnection.TOR) {
       this.icon = 'assets/img/tor.png'
+    } else if (this.connectionType === EmbassyConnection.NONE) {
+      this.icon = undefined
     }
   }
 
@@ -60,7 +62,7 @@ export class StatusComponent {
   handleAppStatus () {
     switch (this.appStatus) {
       case AppStatus.UNKNOWN:
-        this.display = 'Unknown'
+        this.display = 'Connecting...'
         this.color = 'dark'
         break
       case AppStatus.REMOVING:

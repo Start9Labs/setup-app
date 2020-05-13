@@ -76,10 +76,7 @@ export class HttpService {
     }
 
     try {
-      console.log('* REQ *', options)
       const res = await HttpPluginNativeImpl.request(options)
-      console.log(Object.keys(res.headers))
-      console.log('* RES *', res)
       return res.data || { }
     } catch (e) {
       console.error(e)

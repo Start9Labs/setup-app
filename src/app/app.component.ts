@@ -82,6 +82,7 @@ export class AppComponent {
   }
 
   private stopServices (): void {
+    this.torService.stop()
     this.authService.uninit()
     this.networkMonitor.unint()
   }

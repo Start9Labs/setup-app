@@ -58,13 +58,14 @@ export class TorService {
     })
   }
 
-  private async stop (): Promise<void> {
+  async stop (): Promise<void> {
     if (!this.platform.is('ios') && !this.platform.is('android')) { return }
 
     if (await this.tor.isRunning()) {
       console.log('stopping Tor')
       try {
         await this.tor.stop()
+        this.progress$.next(0)
         this.connection$.next(TorConnection.disconnected)
       } catch (e) {
         console.log(`Tor stop failed: ${e}`)
