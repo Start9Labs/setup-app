@@ -6,6 +6,7 @@ import { AuthService } from './services/auth.service'
 import { AuthStatus } from './types/enums'
 import { AuthenticatePage } from './modals/authenticate/authenticate.page'
 import { TorService } from './services/tor.service'
+import { Store } from './store'
 import { ZeroconfMonitor } from './services/zeroconf.service'
 import { SyncService } from './services/sync.service'
 import { Router } from '@angular/router'
@@ -34,6 +35,7 @@ export class AppComponent {
     private readonly modalCtrl: ModalController,
     private readonly router: Router,
     private readonly storage: Storage,
+    private readonly store: Store,
   ) {
     // set dark theme
     document.body.classList.toggle('dark', true)
@@ -41,15 +43,18 @@ export class AppComponent {
     this.platform.ready().then(async () => {
       // storage ready
       await this.storage.ready()
-      // start services
-      await this.startServices()
+      // init network and auth
+      await this.initNetworkAndAuth()
       // initial loading and navigation based on auth
       if (this.authService.isVerified()) {
         await this.serverModel.load(this.authService.mnemonic!)
+        await this.store.load()
         this.router.navigate(['/auth'])
       } else {
         this.router.navigate(['/unauth'])
       }
+      // start monitors
+      this.initMonitors()
       // subscribe to auth status changes
       this.authService.watch().subscribe(authStatus => {
         this.handleAuthChange(authStatus)
@@ -59,8 +64,9 @@ export class AppComponent {
         this.stopServices()
       })
       // sunscribe to app resume event
-      this.platform.resume.subscribe(() => {
-        this.startServices()
+      this.platform.resume.subscribe(async () => {
+        await this.initNetworkAndAuth()
+        this.initMonitors()
       })
       // set StatusBar style
       StatusBar.setStyle({
@@ -71,14 +77,18 @@ export class AppComponent {
     })
   }
 
-  private async startServices (): Promise<void> {
+  private async initNetworkAndAuth (): Promise<void> {
     await this.networkMonitor.init()
     await this.authService.init()
-    this.serverModel.init()
-    this.serverAppModel.init()
-    this.torService.init()
-    this.syncService.init()
-    this.zeroconfMonitor.init()
+  }
+
+  private initMonitors (): void {
+    this.store.initMonitors()
+    this.serverModel.initMonitors()
+    this.serverAppModel.initMonitors()
+    this.torService.initMonitors()
+    this.syncService.initMonitors()
+    this.zeroconfMonitor.initMonitors()
   }
 
   private stopServices (): void {

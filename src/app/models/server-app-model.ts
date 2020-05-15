@@ -2,19 +2,21 @@ import { Injectable } from '@angular/core'
 import { AppModel } from './app-model'
 import { AuthStatus } from '../types/enums'
 import { AuthService } from '../services/auth.service'
+import { Subscription } from 'rxjs'
 
 @Injectable({
   providedIn: 'root',
 })
 export class ServerAppModel {
   lightCache: { [serverId: string]: AppModel } = { }
+  authSub: Subscription
 
   constructor (
     private readonly authService: AuthService,
   ) { }
 
-  init () {
-    this.authService.watch().subscribe(status => this.handleAuthChange(status))
+  initMonitors () {
+    this.authSub = this.authSub || this.authService.watch().subscribe(status => this.handleAuthChange(status))
   }
 
   get (serverId: string): AppModel {

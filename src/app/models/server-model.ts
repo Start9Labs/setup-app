@@ -16,7 +16,8 @@ import { AuthStatus } from '../types/enums'
   providedIn: 'root',
 })
 export class ServerModel extends MapSubject<S9Server> {
-  networkSub: Subscription | undefined
+  private authSub: Subscription
+  private networkSub: Subscription
 
   constructor (
     private readonly serverAppModel: ServerAppModel,
@@ -27,14 +28,12 @@ export class ServerModel extends MapSubject<S9Server> {
     super({ })
   }
 
-  init () {
-    this.authService.watch().subscribe(status => this.handleAuthChange(status))
+  initMonitors () {
+    this.authSub = this.authSub || this.authService.watch().subscribe(s => this.handleAuthChange(s))
   }
 
   watchNetwork (): void {
-    if (!this.networkSub) {
-      this.networkSub = this.networkMonitor.watchConnection().subscribe(c => this.handleNetworkUpdate(c))
-    }
+    this.networkSub = this.networkSub || this.networkMonitor.watchConnection().subscribe(c => this.handleNetworkChange(c))
   }
 
   watchServerAdds (): Observable<PropertyObservableWithId<S9Server>[]> {
@@ -90,7 +89,7 @@ export class ServerModel extends MapSubject<S9Server> {
     await this.storage.set('servers', this.peekAll().map(toStorableServer))
   }
 
-  private handleNetworkUpdate (network: NetworkStatus): void {
+  private handleNetworkChange (network: NetworkStatus): void {
     if (network.connected) {
       Object.keys(this.subject).forEach(id => this.markServerUnknown(id))
     } else {

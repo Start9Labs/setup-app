@@ -1,6 +1,8 @@
 import { Component } from '@angular/core'
 import { AlertController, Platform } from '@ionic/angular'
 import { AuthService } from 'src/app/services/auth.service'
+import { Store } from 'src/app/store'
+import { TorService } from 'src/app/services/tor.service'
 
 @Component({
   selector: 'app-settings',
@@ -8,12 +10,31 @@ import { AuthService } from 'src/app/services/auth.service'
   styleUrls: ['./settings.page.scss'],
 })
 export class SettingsPage {
+  torEnabled: boolean
 
   constructor (
     private readonly alertCtrl: AlertController,
     private readonly authService: AuthService,
+    private readonly store: Store,
+    private readonly torService: TorService,
     public platform: Platform,
   ) { }
+
+  ngOnInit () {
+    this.torEnabled = this.store.torEnabled
+  }
+
+  ngOnDestroy () {
+    if (this.torEnabled) {
+      this.torService.start()
+    } else {
+      this.torService.stop()
+    }
+  }
+
+  async handleTorChange () {
+    this.store.toggleTor(this.torEnabled)
+  }
 
   async presentAlertWarnMnemonic () {
     const alert = await this.alertCtrl.create({
@@ -28,8 +49,8 @@ export class SettingsPage {
         {
           text: 'Show',
           cssClass: 'alert-danger',
-          handler: async () => {
-            await this.presentAlertViewMnemonic()
+          handler: () => {
+            this.presentAlertViewMnemonic()
           },
         },
       ],
@@ -60,11 +81,20 @@ export class SettingsPage {
         {
           text: 'Wipe Keychain',
           cssClass: 'alert-danger',
-          handler: async () => {
-            await this.authService.logout()
+          handler: () => {
+            this.authService.logout()
           },
         },
       ],
+    })
+    await alert.present()
+  }
+
+  async presentAlertExplainTor () {
+    const alert = await this.alertCtrl.create({
+      header: 'Tor',
+      message: 'Enabling Tor permits you to communicate with your Embassy privately and securely over the Tor network.',
+      buttons: ['OK'],
     })
     await alert.present()
   }

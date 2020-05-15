@@ -183,7 +183,7 @@ export class AppConfigNestedPage {
         {
           text: 'Delete',
           cssClass: 'alert-danger',
-          handler: async () => {
+          handler: () => {
             (this.value as any[]).splice(index, 1)
             this.edited = true
           },
@@ -206,7 +206,7 @@ export class AppConfigNestedPage {
         {
           text: 'Delete',
           cssClass: 'alert-danger',
-          handler: async () => {
+          handler: () => {
             this.destroy()
           },
         },

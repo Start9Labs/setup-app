@@ -2,7 +2,7 @@
   <!-- string -->
   <ion-item button detail="false" *ngIf="keyval.value.type === 'string'" (click)="presentModalValueEdit(keyval)">
     <ion-button *ngIf="keyval.value.description" class="help-button" fill="clear" size="small" slot="start" (click)="presentDescription(keyval, $event)">
-      <ion-icon size="small" slot="icon-only" name="help-circle"></ion-icon>
+      <ion-icon size="small" slot="icon-only" name="help-circle-outline"></ion-icon>
     </ion-button>
     <ion-label>{{ keyval.value.name }}</ion-label>
     <ion-note slot="end">{{ config[keyval.key] }}</ion-note>
@@ -10,7 +10,7 @@
   <!-- number -->
   <ion-item button detail="false" *ngIf="keyval.value.type === 'number'" (click)="presentModalValueEdit(keyval)">
     <ion-button *ngIf="keyval.value.description" class="help-button" fill="clear" size="small" slot="start" (click)="presentDescription(keyval, $event)">
-      <ion-icon size="small" slot="icon-only" name="help-circle"></ion-icon>
+      <ion-icon size="small" slot="icon-only" name="help-circle-outline"></ion-icon>
     </ion-button>
     <ion-label>{{ keyval.value.name }}</ion-label>
     <ion-note slot="end">{{ config[keyval.key] }}<span *ngIf="config[keyval.key] && keyval.value.units"> {{ keyval.value.units }}</span></ion-note>
@@ -18,7 +18,7 @@
   <!-- boolean -->
   <ion-item *ngIf="keyval.value.type === 'boolean'">
     <ion-button *ngIf="keyval.value.description" class="help-button" fill="clear" size="small" slot="start" (click)="presentDescription(keyval, $event)">
-      <ion-icon size="small" slot="icon-only" name="help-circle"></ion-icon>
+      <ion-icon size="small" slot="icon-only" name="help-circle-outline"></ion-icon>
     </ion-button>
     <ion-label>{{ keyval.value.name }}</ion-label>
     <ion-toggle slot="end" [(ngModel)]="config[keyval.key]" (ngModelChange)="handleBooleanChange(keyval.value)"></ion-toggle>
@@ -26,7 +26,7 @@
   <!-- enum -->
   <ion-item *ngIf="keyval.value.type === 'enum'">
     <ion-button *ngIf="keyval.value.description" class="help-button" fill="clear" size="small" slot="start" (click)="presentDescription(keyval, $event)">
-      <ion-icon size="small" slot="icon-only" name="help-circle"></ion-icon>
+      <ion-icon size="small" slot="icon-only" name="help-circle-outline"></ion-icon>
     </ion-button>
     <ion-label>{{ keyval.value.name }}</ion-label>
     <ion-select slot="end" [interfaceOptions]="setSelectOptions(keyval.value)" placeholder="Select One" [(ngModel)]="config[keyval.key]" [selectedText]="config[keyval.key]" (ngModelChange)="handleEnumChange()">
@@ -43,7 +43,7 @@
     (click)="handleObjectClick(keyval)"
     >
     <ion-button *ngIf="keyval.value.description" class="help-button" fill="clear" size="small" slot="start" (click)="presentDescription(keyval, $event)">
-      <ion-icon size="small" slot="icon-only" name="help-circle"></ion-icon>
+      <ion-icon size="small" slot="icon-only" name="help-circle-outline"></ion-icon>
     </ion-button>
     <ion-label>{{ keyval.value.name }}</ion-label>
     <ion-icon slot="end" *ngIf="config[keyval.key]" name="arrow-forward"></ion-icon>
@@ -51,7 +51,7 @@
   <!-- list -->
   <ion-item button detail="false" *ngIf="keyval.value.type === 'list'" (click)="presentModalConfigNested(keyval)">
     <ion-button *ngIf="keyval.value.description" class="help-button" fill="clear" size="small" slot="start" (click)="presentDescription(keyval, $event)">
-      <ion-icon size="small" slot="icon-only" name="help-circle"></ion-icon>
+      <ion-icon size="small" slot="icon-only" name="help-circle-outline"></ion-icon>
     </ion-button>
     <ion-label>{{ keyval.value.name }}</ion-label>
     <ion-note slot="end">{{ config[keyval.key].length }}</ion-note>
