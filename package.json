@@ -27,7 +27,7 @@
     "@capacitor/ios": "^2.1.0",
     "@ionic-native/core": "^5.25.0",
     "@ionic-native/zeroconf": "^5.25.0",
-    "@ionic/angular": "^5.1.0",
+    "@ionic/angular": "^5.1.1",
     "@ionic/storage": "^2.2.0",
     "async-mutex": "^0.2.2",
     "bip39": "^3.0.0",
@@ -41,7 +41,6 @@
     "crypto-js": "^4.0.0",
     "jsontokens": "^3.0.0",
     "rxjs": "^6.5.0",
-    "tslib": "^1.12.0",
     "uuid": "^8.0.0",
     "zone.js": "^0.10.0"
   },
