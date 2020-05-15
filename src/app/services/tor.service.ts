@@ -17,6 +17,7 @@ export class TorService {
   watchConnection (): Observable<TorConnection> { return this.connection$.asObservable() }
   peekConnection (): TorConnection { return this.connection$.getValue() }
   networkSub: Subscription
+  restarting: boolean = false
 
   constructor (
     private readonly platform: Platform,
@@ -33,7 +34,7 @@ export class TorService {
       if (await this.tor.isRunning()) {
         this.reconnect()
       } else {
-        this.start()
+        await this.start()
       }
     }
   }
@@ -49,7 +50,13 @@ export class TorService {
 
     this.connection$.next(TorConnection.in_progress)
 
-    this.tor.start({ socksPort: TorService.PORT, initTimeout: 40000 }).subscribe({
+    let action: (opt?: { socksPort: number, initTimeout: number}) => Observable<number>
+    if (this.platform.is('ios') && this.restarting) {
+      action = this.tor.restart.bind(this)
+    } else {
+      action = this.tor.start.bind(this)
+    }
+    action({ socksPort: TorService.PORT, initTimeout: 40000 }).subscribe({
       next: (progress: number) => this.handleConnecting(progress),
       error: (err: string) => {
         this.connection$.next(TorConnection.disconnected)
@@ -65,6 +72,7 @@ export class TorService {
       console.log('stopping Tor')
       try {
         await this.tor.stop()
+        this.restarting = true
         this.progress$.next(0)
         this.connection$.next(TorConnection.disconnected)
       } catch (e) {

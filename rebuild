@@ -1,0 +1,4 @@
+npm i
+npx cap update
+ionic build
+npx cap sync
