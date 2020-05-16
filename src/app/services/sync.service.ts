@@ -88,7 +88,7 @@ export class SyncService {
     this.zeroconfSub = this.zeroconfSub || this.zeroconfMonitor.watchServiceFound().subscribe(s => this.handleZeroconfDiscovered(s))
     this.torSub = this.torSub || this.torService.watchConnection().subscribe(c => this.handleTorConnection(c))
     // we pass override = false because we only want to start default sync if not already exists and Tor is not connecting
-    setTimeout(() => this.syncAll(false), 2000)
+    setTimeout(() => this.syncAll(false), 4000)
   }
 
   async sync (id: string, override = true): Promise<void> {
