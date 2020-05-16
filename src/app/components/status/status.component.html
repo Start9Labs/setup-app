@@ -1,10 +1,12 @@
 <h1 *ngIf="size === 'large'">
   <ion-text [color]="color">{{ display }}</ion-text>
+  <ion-spinner *ngIf="showDots" class="dots" name="dots" color="warning"></ion-spinner>
   <img *ngIf="icon" class="icon-large" [src]="icon" alt="type" />
 </h1>
 
 
 <h3 *ngIf="size === 'small'">
   <ion-text [color]="color">{{ display }}</ion-text>
+  <ion-spinner *ngIf="showDots" class="dots dots-small" name="dots" color="warning"></ion-spinner>
   <img *ngIf="icon" class="icon-small" [src]="icon" alt="type" />
 </h3>

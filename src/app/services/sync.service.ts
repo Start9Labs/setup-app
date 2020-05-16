@@ -1,18 +1,18 @@
 import { Injectable } from '@angular/core'
 import { ToastController, NavController } from '@ionic/angular'
-import { ServerModel, S9Server } from '../models/server-model'
+import { ServerModel, S9Server, ServerStatus } from '../models/server-model'
 import { ApiService } from './api.service'
 import { tryAll, pauseFor } from '../util/misc.util'
 import { ServerAppModel } from '../models/server-app-model'
 import { TorService, TorConnection } from './tor.service'
 import { ZeroconfMonitor } from './zeroconf.service'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
-import * as uuid from 'uuid'
 import { NetworkMonitor } from './network.service'
 import { NetworkStatus } from '@capacitor/core'
 import { AuthService } from './auth.service'
 import { AuthStatus } from '../types/enums'
 import { Subscription } from 'rxjs'
+import * as uuid from 'uuid'
 
 @Injectable({
   providedIn: 'root',
@@ -87,16 +87,17 @@ export class SyncService {
     this.networkSub = this.networkSub || this.networkMonitor.watchConnection().subscribe(n => this.handleNetworkChange(n))
     this.zeroconfSub = this.zeroconfSub || this.zeroconfMonitor.watchServiceFound().subscribe(s => this.handleZeroconfDiscovered(s))
     this.torSub = this.torSub || this.torService.watchConnection().subscribe(c => this.handleTorConnection(c))
-    // we pass override = false because we only want to start default sync if not already exists and Tor is not connecting
-    setTimeout(() => this.syncAll(false), 6000)
+    this.handleStatus()
   }
 
-  async sync (id: string, override = true): Promise<void> {
+  async sync (id: string): Promise<void> {
     let server = this.serverModel.peek(id)
 
     if (!server) { return }
-
-    if (this.embassies[id] && !override) { return }
+    if (!this.networkMonitor.peekConnection().connected) {
+      this.serverModel.markServerUnreachable(id)
+      return
+    }
 
     if (!this.embassies[id]) {
       this.embassies[id] = new EmbassyDaemon(
@@ -111,12 +112,9 @@ export class SyncService {
     await this.embassies[id].start()
   }
 
-  async syncAll (override = true): Promise<void> {
-    const tor = this.torService.peekConnection()
-    if (tor === TorConnection.uninitialized || tor === TorConnection.disconnected) {
-      const servers = this.serverModel.peekAll()
-      await Promise.all(servers.map(s => this.sync(s.id, override)))
-    }
+  async syncAll (): Promise<void> {
+    const servers = this.serverModel.peekAll()
+    await Promise.all(servers.map(s => this.sync(s.id)))
   }
 
   private stopAll (): void {
@@ -124,6 +122,23 @@ export class SyncService {
       daemon.stop()
     })
     this.embassies = { }
+  }
+
+  private handleStatus (): void {
+    const servers = this.serverModel.peekAll()
+    servers.forEach(s => { this.serverModel.markServerUnknown(s.id) })
+    setTimeout(() => { this.handleTimeout() }, 8000)
+  }
+
+  private handleTimeout (): void {
+    const servers = this.serverModel.peekAll()
+    const torStatus = this.torService.peekConnection()
+    servers.forEach(s => {
+      const zcs = this.zeroconfMonitor.getService(s.id)
+      if (s.status === ServerStatus.UNKNOWN && !zcs && (torStatus === TorConnection.uninitialized || torStatus === TorConnection.disconnected)) {
+        this.serverModel.markServerUnreachable(s.id)
+      }
+    })
   }
 
   private handleAuthChange (status: AuthStatus): void {
@@ -143,7 +158,7 @@ export class SyncService {
   }
 
   private handleTorConnection (connection: TorConnection): void {
-    if (connection === TorConnection.connected || connection === TorConnection.disconnected) {
+    if (connection === TorConnection.connected) {
       this.syncAll()
     }
   }

@@ -1,12 +1,13 @@
 import { Component, NgZone } from '@angular/core'
 import { ServerModel, S9Server } from 'src/app/models/server-model'
-import { NavController } from '@ionic/angular'
+import { NavController, AlertController } from '@ionic/angular'
 import { SyncService } from 'src/app/services/sync.service'
 import { Subscription } from 'rxjs'
 import { PropertyObservableWithId } from 'src/app/util/property-subject.util'
 import { TorService, TorConnection } from 'src/app/services/tor.service'
 import { animate, style, transition, trigger } from '@angular/animations'
 import { doForAtLeast } from 'src/app/util/misc.util'
+import { Store } from 'src/app/store'
 
 const torAnimation = trigger(
   'torChange',
@@ -43,10 +44,12 @@ export class ServerListPage {
   progress: number
 
   constructor (
-    public serverModel: ServerModel,
-    public torService: TorService,
+    private readonly serverModel: ServerModel,
+    private readonly torService: TorService,
     private readonly syncService: SyncService,
     private readonly navCtrl: NavController,
+    private readonly alertCtrl: AlertController,
+    private readonly store: Store,
     private readonly zone: NgZone,
   ) { }
 
@@ -75,6 +78,15 @@ export class ServerListPage {
         this.servers.splice(i, 1)
       })
     })
+
+    console.log(this.servers, this.servers.length, this.store.torEnabled, this.store.showTorPrompt)
+
+    setTimeout(() => {
+      if (this.servers.length && !this.store.torEnabled && this.store.showTorPrompt) {
+        this.store.showTorPrompt = false
+        this.presentAlertEnableTor()
+      }
+    }, 1000)
   }
 
   ngOnDestroy () {
@@ -91,5 +103,38 @@ export class ServerListPage {
 
   async show (id: string) {
     await this.navCtrl.navigateForward(['/auth', 'servers', id])
+  }
+
+  private async presentAlertEnableTor () {
+    const alert = await this.alertCtrl.create({
+      backdropDismiss: false,
+      header: 'Tor Feature',
+      message: 'Enable Tor in the settings menu to connect privately and securely with your Embassies outside your home network',
+      inputs: [
+        {
+          name: 'checkbox',
+          type: 'checkbox',
+          label: `Don't show again`,
+          value: 'true',
+          checked: false,
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: 'Go to settings',
+          handler: (data: string[]) => {
+            if (data[0]) {
+              this.store.hideTorPrompt()
+            }
+            this.navCtrl.navigateForward(['/auth/settings'])
+          },
+        },
+      ],
+    })
+    await alert.present()
   }
 }

@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core'
 import { HttpPluginNativeImpl, HttpOptions } from 'capacitor-http'
-import { AlertController, NavController } from '@ionic/angular'
 import { ZeroconfMonitor } from './zeroconf.service'
 import { Method } from '../types/enums'
 import { TokenSigner } from 'jsontokens'
@@ -8,7 +7,6 @@ import { S9BuilderWith } from './setup.service'
 import { S9Server, ServerModel, getLanIP, EmbassyConnection } from '../models/server-model'
 import { TorService, TorConnection } from './tor.service'
 import { NetworkMonitor } from './network.service'
-import { Store } from '../store'
 import * as uuid from 'uuid'
 const version = require('../../../package.json').version
 
@@ -17,13 +15,10 @@ const version = require('../../../package.json').version
 })
 export class HttpService {
   constructor (
-    private readonly navCtrl: NavController,
-    private readonly alertCtrl: AlertController,
     private readonly zeroconfMonitor: ZeroconfMonitor,
     private readonly serverModel: ServerModel,
     private readonly torService: TorService,
     private readonly networkMonitor: NetworkMonitor,
-    private readonly store: Store,
   ) { }
 
   async serverRequest<T> (server: string | S9Server | S9BuilderWith<'versionInstalled' | 'privkey' | 'torAddress'>, options: HttpOptions, withVersion = true): Promise<T> {
@@ -45,10 +40,6 @@ export class HttpService {
     } else {
       connectionType = EmbassyConnection.TOR
       if (this.torService.peekConnection() !== TorConnection.connected) {
-        if (!this.store.torEnabled && this.store.showTorPrompt) {
-          this.store.showTorPrompt = false
-          setTimeout(() => { this.presentAlertEnableTor() }, 500)
-        }
         throw new Error('Tor not connected')
       }
       host = server.torAddress.trim() // @COMPAT Ambassador <= 1.3.0 retuned torAddress with trailing "\n"
@@ -98,39 +89,6 @@ export class HttpService {
       }
       throw new Error(message || 'Unknown Error')
     }
-  }
-
-  private async presentAlertEnableTor () {
-    const alert = await this.alertCtrl.create({
-      backdropDismiss: false,
-      header: 'Enable Tor?',
-      message: 'Embassy not found on Local Area Network. Connect remotely by enabling Tor in the settings menu.',
-      inputs: [
-        {
-          name: 'checkbox',
-          type: 'checkbox',
-          label: `Don't show again`,
-          value: 'true',
-          checked: false,
-        },
-      ],
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-        },
-        {
-          text: 'Settings',
-          handler: (data: string[]) => {
-            if (data[0]) {
-              this.store.hideTorPrompt()
-            }
-            this.navCtrl.navigateForward(['/auth/settings'])
-          },
-        },
-      ],
-    })
-    await alert.present()
   }
 }
 

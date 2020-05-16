@@ -84,6 +84,7 @@ export class TorService {
     console.log('reconnecting Tor')
     try {
       await this.tor.reconnect()
+      this.connection$.next(TorConnection.connected)
     } catch (e) {
       console.log(`Tor reconnect failed: ${e}`)
       await this.restart()

@@ -15,6 +15,7 @@ export class StatusComponent {
   color: string
   display: string
   icon: string
+  showDots: boolean
 
   ngOnChanges () {
     if (this.serverStatus) {
@@ -35,71 +36,87 @@ export class StatusComponent {
   handleServerStatus () {
     switch (this.serverStatus) {
       case ServerStatus.UNKNOWN:
-        this.display = 'Connecting...'
+        this.display = 'Connecting'
         this.color = 'dark'
+        this.showDots = true
         break
       case ServerStatus.UNREACHABLE:
         this.display = 'Unreachable'
         this.color = 'danger'
+        this.showDots = false
         break
       case ServerStatus.NEEDS_CONFIG:
         this.display = 'Needs Config'
         this.color = 'warning'
+        this.showDots = false
         break
       case ServerStatus.RUNNING:
         this.display = 'Connected'
         this.color = 'success'
+        this.showDots = false
         break
       case ServerStatus.UPDATING:
-        this.display = 'Updating...'
+        this.display = 'Updating'
         this.color = 'primary'
+        this.showDots = true
         break
       default:
         this.color = 'secondary'
+        this.showDots = false
     }
   }
 
   handleAppStatus () {
     switch (this.appStatus) {
       case AppStatus.UNKNOWN:
-        this.display = 'Connecting...'
+        this.display = 'Connecting'
         this.color = 'dark'
+        this.showDots = true
         break
       case AppStatus.REMOVING:
-        this.display = 'Removing...'
+        this.display = 'Removing'
         this.color = 'danger'
+        this.showDots = true
         break
       case AppStatus.RESTARTING:
-        this.display = 'Restarting...'
+        this.display = 'Restarting'
         this.color = 'warning'
+        this.showDots = true
         break
       case AppStatus.NEEDS_CONFIG:
       case AppStatus.RECOVERABLE:
         this.display = 'Needs Config'
         this.color = 'warning'
+        this.showDots = false
         break
       case AppStatus.RUNNING:
         this.display = 'Running'
         this.color = 'success'
+        this.showDots = false
         break
       case AppStatus.UNREACHABLE:
         this.display = 'Unreachable'
         this.color = 'danger'
+        this.showDots = false
         break
       case AppStatus.STOPPED:
         this.display = 'Stopped'
         this.color = 'danger'
+        this.showDots = false
         break
       case AppStatus.INSTALLING:
-        this.display = 'Installing...'
+        this.display = 'Installing'
         this.color = 'primary'
+        this.showDots = true
         break
       case AppStatus.DEAD:
         this.display = 'Corrupted'
         this.color = 'danger'
+        this.showDots = false
         break
       default:
         this.color = 'secondary'
+        this.showDots = false
     }
   }
 }
