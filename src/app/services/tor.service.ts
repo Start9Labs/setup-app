@@ -52,9 +52,9 @@ export class TorService {
 
     let action: (opt?: { socksPort: number, initTimeout: number}) => Observable<number>
     if (this.platform.is('ios') && this.restarting) {
-      action = this.tor.restart.bind(this)
+      action = this.tor.restart.bind(this.tor)
     } else {
-      action = this.tor.start.bind(this)
+      action = this.tor.start.bind(this.tor)
     }
     action({ socksPort: TorService.PORT, initTimeout: 40000 }).subscribe({
       next: (progress: number) => this.handleConnecting(progress),
