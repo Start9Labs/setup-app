@@ -86,13 +86,17 @@ export class SyncService {
     this.authSub = this.authSub || this.authService.watch().subscribe(status => this.handleAuthChange(status))
     this.networkSub = this.networkSub || this.networkMonitor.watchConnection().subscribe(n => this.handleNetworkChange(n))
     this.zeroconfSub = this.zeroconfSub || this.zeroconfMonitor.watchServiceFound().subscribe(s => this.handleZeroconfDiscovered(s))
-    this.torSub = this.torSub || this.torService.watchConnection().subscribe(c => this.handleTorConnected(c))
+    this.torSub = this.torSub || this.torService.watchConnection().subscribe(c => this.handleTorConnection(c))
+    // we pass override = false because we only want to start default sync if not already exists and Tor is not connecting
+    setTimeout(() => this.syncAll(false), 2000)
   }
 
-  async sync (id: string): Promise<void> {
+  async sync (id: string, override = true): Promise<void> {
     let server = this.serverModel.peek(id)
 
     if (!server) { return }
+
+    if (this.embassies[id] && !override) { return }
 
     if (!this.embassies[id]) {
       this.embassies[id] = new EmbassyDaemon(
@@ -107,9 +111,12 @@ export class SyncService {
     await this.embassies[id].start()
   }
 
-  async syncAll (): Promise<void> {
-    const servers = this.serverModel.peekAll()
-    await Promise.all(servers.map(s => this.sync(s.id)))
+  async syncAll (override = true): Promise<void> {
+    const tor = this.torService.peekConnection()
+    if (tor === TorConnection.uninitialized || tor === TorConnection.disconnected) {
+      const servers = this.serverModel.peekAll()
+      await Promise.all(servers.map(s => this.sync(s.id, override)))
+    }
   }
 
   private stopAll (): void {
@@ -135,8 +142,8 @@ export class SyncService {
     this.sync(service.name.split('-')[1])
   }
 
-  private handleTorConnected (connection: TorConnection): void {
-    if (connection === TorConnection.connected) {
+  private handleTorConnection (connection: TorConnection): void {
+    if (connection === TorConnection.connected || connection === TorConnection.disconnected) {
       this.syncAll()
     }
   }

@@ -46,7 +46,7 @@ export class HttpService {
       connectionType = EmbassyConnection.TOR
       if (this.torService.peekConnection() !== TorConnection.connected) {
         if (!this.store.torEnabled && this.store.showTorPrompt) {
-          this.presentAlertEnableTor()
+          setTimeout(this.presentAlertEnableTor, 500)
         }
         throw new Error('Tor not connected')
       }
