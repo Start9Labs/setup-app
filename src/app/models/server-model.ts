@@ -11,6 +11,7 @@ import { NetworkMonitor } from '../services/network.service'
 import { NetworkStatus } from '@capacitor/core'
 import { AuthService } from '../services/auth.service'
 import { AuthStatus } from '../types/enums'
+import { TorService, TorConnection } from '../services/tor.service'
 
 @Injectable({
   providedIn: 'root',
@@ -18,18 +19,21 @@ import { AuthStatus } from '../types/enums'
 export class ServerModel extends MapSubject<S9Server> {
   private authSub: Subscription
   private networkSub: Subscription
+  private torSub: Subscription
 
   constructor (
     private readonly serverAppModel: ServerAppModel,
     private readonly storage: Storage,
     private readonly networkMonitor: NetworkMonitor,
     private readonly authService: AuthService,
+    private readonly torService: TorService,
   ) {
     super({ })
   }
 
   initMonitors () {
     this.authSub = this.authSub || this.authService.watch().subscribe(s => this.handleAuthChange(s))
+    this.torSub = this.torSub || this.torService.watchConnection().subscribe(c => this.handleTorChange(c))
   }
 
   watchNetwork (): void {
@@ -100,6 +104,16 @@ export class ServerModel extends MapSubject<S9Server> {
   private handleAuthChange (status: AuthStatus): void {
     if (status === AuthStatus.MISSING) {
       this.clear()
+    }
+  }
+
+  private handleTorChange (connection: TorConnection): void {
+    if (connection === TorConnection.connected) {
+      Object.entries(this.subject).forEach(([id, server]) => {
+        if (server.status.getValue() === ServerStatus.UNREACHABLE) {
+          this.markServerUnknown(id)
+        }
+      })
     }
   }
 }

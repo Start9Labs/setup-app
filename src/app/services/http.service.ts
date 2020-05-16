@@ -46,7 +46,8 @@ export class HttpService {
       connectionType = EmbassyConnection.TOR
       if (this.torService.peekConnection() !== TorConnection.connected) {
         if (!this.store.torEnabled && this.store.showTorPrompt) {
-          setTimeout(this.presentAlertEnableTor, 500)
+          this.store.showTorPrompt = false
+          setTimeout(() => { this.presentAlertEnableTor() }, 500)
         }
         throw new Error('Tor not connected')
       }
@@ -99,9 +100,7 @@ export class HttpService {
     }
   }
 
-  async presentAlertEnableTor () {
-    this.store.showTorPrompt = false
-
+  private async presentAlertEnableTor () {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Enable Tor?',
