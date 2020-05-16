@@ -82,7 +82,7 @@ export class SyncService {
     private readonly authService: AuthService,
   ) { }
 
-  init (): void {
+  initMonitors (): void {
     this.authSub = this.authSub || this.authService.watch().subscribe(status => this.handleAuthChange(status))
     this.networkSub = this.networkSub || this.networkMonitor.watchConnection().subscribe(n => this.handleNetworkChange(n))
     this.zeroconfSub = this.zeroconfSub || this.zeroconfMonitor.watchServiceFound().subscribe(s => this.handleZeroconfDiscovered(s))

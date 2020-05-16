@@ -260,8 +260,8 @@ export class AppInstalledShowPage {
         {
           text: 'Uninstall',
           cssClass: 'alert-danger',
-          handler: async () => {
-            await this.uninstall()
+          handler: () => {
+            this.uninstall()
           },
         },
       ],

@@ -4,6 +4,7 @@ import { Observable, BehaviorSubject, Subscription } from 'rxjs'
 import { NetworkMonitor } from './network.service'
 import { NetworkStatus } from '@capacitor/core'
 import { Platform } from '@ionic/angular'
+import { Store } from '../store'
 
 @Injectable({
   providedIn: 'root',
@@ -17,29 +18,19 @@ export class TorService {
   watchConnection (): Observable<TorConnection> { return this.connection$.asObservable() }
   peekConnection (): TorConnection { return this.connection$.getValue() }
   networkSub: Subscription
-  restarting: boolean = false
+  private wasStopped = false
 
   constructor (
     private readonly platform: Platform,
     private readonly networkMonitor: NetworkMonitor,
+    private readonly store: Store,
   ) { }
 
-  init (): void {
+  initMonitors (): void {
     this.networkSub = this.networkSub || this.networkMonitor.watchConnection().subscribe(n => this.handleNetworkChange(n))
   }
 
-  private async handleNetworkChange (network: NetworkStatus): Promise<void> {
-    // if connected to Internet, connect or reconnect to Tor
-    if (network.connected) {
-      if (await this.tor.isRunning()) {
-        this.reconnect()
-      } else {
-        await this.start()
-      }
-    }
-  }
-
-  private async start (): Promise<void> {
+  async start (): Promise<void> {
     // ** MOCKS **
     // return this.mock()
 
@@ -51,7 +42,7 @@ export class TorService {
     this.connection$.next(TorConnection.in_progress)
 
     let action: (opt?: { socksPort: number, initTimeout: number}) => Observable<number>
-    if (this.platform.is('ios') && this.restarting) {
+    if (this.platform.is('ios') && this.wasStopped) {
       action = this.tor.restart.bind(this.tor)
     } else {
       action = this.tor.start.bind(this.tor)
@@ -71,8 +62,8 @@ export class TorService {
     if (await this.tor.isRunning()) {
       console.log('stopping Tor')
       try {
-        await this.tor.stop()
-        this.restarting = true
+        this.tor.stop()
+        this.wasStopped = true
         this.progress$.next(0)
         this.connection$.next(TorConnection.disconnected)
       } catch (e) {
@@ -96,6 +87,19 @@ export class TorService {
     } catch (e) {
       console.log(`Tor reconnect failed: ${e}`)
       await this.restart()
+    }
+  }
+
+  private async handleNetworkChange (network: NetworkStatus): Promise<void> {
+    // if connected to Internet, connect or reconnect to Tor
+    if (network.connected && this.store.torEnabled) {
+      if (this.platform.is('desktop')) { this.start(); return }
+
+      if (await this.tor.isRunning()) {
+        await this.reconnect()
+      } else {
+        await this.start()
+      }
     }
   }
 

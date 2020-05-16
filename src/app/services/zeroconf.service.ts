@@ -23,7 +23,7 @@ export class ZeroconfMonitor {
     private readonly networkMonitor: NetworkMonitor,
   ) { }
 
-  init (): void {
+  initMonitors (): void {
     this.networkSub = this.networkSub || this.networkMonitor.watchConnection().subscribe(n => this.handleNetworkChange(n))
   }
 
