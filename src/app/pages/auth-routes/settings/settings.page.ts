@@ -93,7 +93,7 @@ export class SettingsPage {
   async presentAlertExplainTor () {
     const alert = await this.alertCtrl.create({
       header: 'Tor',
-      message: 'Enabling Tor permits you to communicate with your Embassy privately and securely over the Tor network.',
+      message: 'Enabling Tor allows you to connect privately and securely with your Embassies outside your home network',
       buttons: ['OK'],
     })
     await alert.present()

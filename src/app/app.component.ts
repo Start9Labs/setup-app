@@ -22,6 +22,7 @@ const { SplashScreen, StatusBar } = Plugins
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
+  private firstAuth = true
 
   constructor (
     private readonly platform: Platform,
@@ -47,11 +48,9 @@ export class AppComponent {
       await this.initNetworkAndAuth()
       // initial loading and navigation based on auth
       if (this.authService.isVerified()) {
-        await this.serverModel.load(this.authService.mnemonic!)
-        await this.store.load()
-        this.router.navigate(['/auth'])
-      } else {
-        this.router.navigate(['/unauth'])
+        await this.handleFirstAuth()
+      } else if (this.authService.isMissing()) {
+        await this.handleFirstUnauth()
       }
       // start monitors
       this.initMonitors()
@@ -97,8 +96,27 @@ export class AppComponent {
     this.networkMonitor.unint()
   }
 
-  private async handleAuthChange (authStatus: AuthStatus): Promise<void> {
-    if (authStatus === AuthStatus.UNVERIFIED) {
+  private async handleFirstAuth (): Promise<void> {
+    await this.serverModel.load(this.authService.mnemonic!)
+    await this.store.load()
+    this.router.navigate(['/auth'])
+    this.firstAuth = false
+  }
+
+  private async handleFirstUnauth (): Promise<void> {
+    this.router.navigate(['/unauth'])
+    this.firstAuth = false
+  }
+
+  private async handleAuthChange (status: AuthStatus): Promise<void> {
+    if (this.firstAuth) {
+      if (status === AuthStatus.VERIFIED) {
+        this.handleFirstAuth()
+      } else if (status === AuthStatus.MISSING) {
+        this.router.navigate(['/unauth'])
+      }
+    }
+    if (status === AuthStatus.UNVERIFIED) {
       await this.presentModalAuthenticate()
     }
   }
