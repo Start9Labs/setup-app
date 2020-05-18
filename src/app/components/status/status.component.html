@@ -1,8 +1,8 @@
-<p *ngIf="size === 'small'" style="font-size: 12px; margin: 0 0 4px 0;">
+<h3 *ngIf="size === 'small'" style="margin: 0 0 4px 0;">
   <ion-text [color]="color">{{ display }}</ion-text>
-  <ion-spinner *ngIf="showDots" class="dots dots-small" name="dots" color="warning"></ion-spinner>
-  <img *ngIf="icon" class="icon-small" [src]="icon" alt="type" />
-</p>
+  <ion-spinner *ngIf="showDots" class="dots dots-medium" name="dots" color="warning"></ion-spinner>
+  <img *ngIf="icon" class="icon-medium" [src]="icon" alt="type" />
+</h3>
 
 <h3 *ngIf="size === 'medium'">
   <ion-text [color]="color">{{ display }}</ion-text>

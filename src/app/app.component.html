@@ -1,11 +1,12 @@
 <ion-app>
-  <ion-content><ion-router-outlet id="main-content"></ion-router-outlet></ion-content>
-  <ion-footer class="tor-header ion-no-border" *ngIf="torStatus === 'in_progress'" [@torChange]>
-    <ion-toolbar>
-      <ion-title>
-        <p><img src="assets/img/tor.png" alt="tor" />Establishing Circuit</p>
-        <ion-progress-bar color="tertiary" [value]="progress"></ion-progress-bar>
-      </ion-title>
-    </ion-toolbar>
-  </ion-footer>
+  <ion-router-outlet id="main-content"></ion-router-outlet>
 </ion-app>
+
+<ion-footer class="tor-footer ion-no-border" *ngIf="globalFooterEnabled" [@torChange]>
+  <ion-toolbar>
+    <ion-title>
+      <p><img src="assets/img/tor.png" alt="tor" />Establishing Circuit</p>
+      <ion-progress-bar color="tertiary" [value]="progress"></ion-progress-bar>
+    </ion-title>
+  </ion-toolbar>
+</ion-footer>

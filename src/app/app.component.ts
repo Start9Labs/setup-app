@@ -1,4 +1,4 @@
-import { Component, NgZone } from '@angular/core'
+import { Component, NgZone, HostBinding } from '@angular/core'
 import { Platform, ModalController } from '@ionic/angular'
 import { ServerModel } from './models/server-model'
 import { NetworkMonitor } from './services/network.service'
@@ -44,8 +44,8 @@ const torAnimation = trigger(
 })
 export class AppComponent {
   private firstAuth = true
-  torStatus: TorConnection
   progress: number
+  @HostBinding('class.has-global-footer') globalFooterEnabled = false
 
   constructor (
     private readonly platform: Platform,
@@ -80,7 +80,11 @@ export class AppComponent {
       this.initMonitors()
       this.torService.watchConnection().subscribe(c => {
         this.zone.run(() => {
-          this.torStatus = c
+          if (c === TorConnection.in_progress) {
+            this.globalFooterEnabled = true
+          } else {
+            this.globalFooterEnabled = false
+          }
         })
       })
 

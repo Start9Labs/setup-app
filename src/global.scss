@@ -25,6 +25,31 @@
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
 
+$global-footer-height: 70px;
+
+.tor-footer {
+  height: $global-footer-height;
+  position: fixed;
+  bottom: 0%;
+
+  & ion-toolbar {
+    min-height: 70px;
+  }
+  & p {
+    font-size: 12px;
+  }
+  & img {
+    width: auto; 
+    height: 20px;
+    vertical-align: bottom;
+    padding-right: 16px;
+  }
+}
+
+.has-global-footer ion-app {
+  height: calc(100% - #{$global-footer-height});
+}
+
 .naked-item {
   --padding-start: 0;
   --inner-padding-end: 0;
