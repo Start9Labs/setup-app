@@ -1,9 +1,8 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { ServerModel, ServerStatus, EmbassyConnection } from 'src/app/models/server-model'
+import { ServerModel, ServerStatus } from 'src/app/models/server-model'
 import { NavController, AlertController, ActionSheetController, LoadingController } from '@ionic/angular'
 import { S9Server } from 'src/app/models/server-model'
-import { ActionSheetButton } from '@ionic/core'
 import { AppInstalled } from 'src/app/models/app-model'
 import * as compareVersions from 'compare-versions'
 import { ApiService } from 'src/app/services/api.service'
@@ -40,6 +39,7 @@ export class ServerShowPage {
   getIcon = getIcon
   updatingFreeze = false
   updating = false
+  segmentValue: 'apps' | 'embassy' = 'apps'
 
   constructor (
     private readonly route: ActivatedRoute,
@@ -112,37 +112,8 @@ export class ServerShowPage {
     }
   }
 
-  async presentAction (pittedServer: PropertySubject<S9Server>) {
-    fromPropertyObservable(pittedServer).pipe(take(1)).subscribe(async server => {
-      const buttons: ActionSheetButton[] = [
-        Menu.EditFriendlyName(() => this.presentAlertEditName(server)),
-      ]
-
-      if (server.status === ServerStatus.RUNNING) {
-        buttons.push(
-          Menu.ServerSpecs(() => this.navigate(['specs'])),
-          Menu.Metrics(() => this.navigate(['metrics'])),
-          Menu.Wifi(() => this.navigate(['wifi'])),
-          Menu.DeveloperOptions(() => this.navigate(['developer-options'])),
-          Menu.Restart(() => this.presentAlertRestart(server)),
-          Menu.Shutdown(() => this.presentAlertShutdown(server)),
-        )
-      }
-
-      buttons.push(
-        Menu.Forget(() => this.presentAlertForget(server)),
-      )
-
-      const action = await this.actionCtrl.create({
-        buttons,
-      })
-
-      await action.present()
-    })
-  }
-
-  async getVersionLatest (pittedServer: PropertySubject<S9Server>): Promise<void> {
-    fromPropertyObservable(pittedServer).pipe(take(1)).subscribe(async server => {
+  async getVersionLatest (): Promise<void> {
+    fromPropertyObservable(this.server).pipe(take(1)).subscribe(async server => {
       const loader = await this.loadingCtrl.create(Menu.LoadingSpinner('Checking for updates...'))
       await loader.present()
 
@@ -157,24 +128,27 @@ export class ServerShowPage {
     })
   }
 
-  async presentAlertEditName (server: S9Server) {
-    const alert = await this.alertCtrl.create(
-      Menu.EditFriendlyNameAlert(server, (data: { inputValue: string }) => {
-        const inputValue = data.inputValue
-        if (server.label === inputValue) { return } // return if no change
-        if (!inputValue) {                          // throw error if no server name
-          alert.message = 'Server must have a name'
-          return false
-        }
-        this.serverModel.updateServer(server.id, { label: inputValue })
-        this.serverModel.saveAll()
-      }))
+  async presentAlertEditName () {
+    fromPropertyObservable(this.server).pipe(take(1)).subscribe(async server => {
 
-    await alert.present()
+      const alert = await this.alertCtrl.create(
+        Menu.EditFriendlyNameAlert(server, (data: { inputValue: string }) => {
+          const inputValue = data.inputValue
+          if (server.label === inputValue) { return } // return if no change
+          if (!inputValue) {                          // throw error if no server name
+            alert.message = 'Server must have a name'
+            return false
+          }
+          this.serverModel.updateServer(server.id, { label: inputValue })
+          this.serverModel.saveAll()
+        }))
+
+      await alert.present()
+    })
   }
 
-  async presentAlertUpdate (propertiesSubject: PropertySubject<S9Server>) {
-    fromPropertyObservable(propertiesSubject).pipe(take(1)).subscribe(async server => {
+  async presentAlertUpdate () {
+    fromPropertyObservable(this.server).pipe(take(1)).subscribe(async server => {
       const alert = await this.alertCtrl.create(
         Menu.UpdateAlert(server, this.versionLatest!, () => this.update(server)),
       )
@@ -182,25 +156,31 @@ export class ServerShowPage {
     })
   }
 
-  async presentAlertRestart (server: S9Server) {
-    const alert = await this.alertCtrl.create(
-      Menu.RestartAlert(server, () => this.restart(server)),
-    )
-    await alert.present()
+  async presentAlertRestart () {
+    fromPropertyObservable(this.server).pipe(take(1)).subscribe(async server => {
+      const alert = await this.alertCtrl.create(
+        Menu.RestartAlert(server, () => this.restart(server)),
+      )
+      await alert.present()
+    })
   }
 
-  async presentAlertShutdown (server: S9Server) {
-    const alert = await this.alertCtrl.create(
-      Menu.ShutdownAlert(server, () => this.shutdown(server)),
-    )
-    await alert.present()
+  async presentAlertShutdown () {
+    fromPropertyObservable(this.server).pipe(take(1)).subscribe(async server => {
+      const alert = await this.alertCtrl.create(
+        Menu.ShutdownAlert(server, () => this.shutdown(server)),
+      )
+      await alert.present()
+    })
   }
 
-  async presentAlertForget (server: S9Server) {
-    const alert = await this.alertCtrl.create(
-      Menu.ForgetAlert(server, () => this.forget(server)),
-    )
-    await alert.present()
+  async presentAlertForget () {
+    fromPropertyObservable(this.server).pipe(take(1)).subscribe(async server => {
+      const alert = await this.alertCtrl.create(
+        Menu.ForgetAlert(server, () => this.forget(server)),
+      )
+      await alert.present()
+    })
   }
 
   async update (server: S9Server) {

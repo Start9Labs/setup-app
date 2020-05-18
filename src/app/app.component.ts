@@ -1,28 +1,51 @@
-import { Component } from '@angular/core'
+import { Component, NgZone } from '@angular/core'
 import { Platform, ModalController } from '@ionic/angular'
 import { ServerModel } from './models/server-model'
 import { NetworkMonitor } from './services/network.service'
 import { AuthService } from './services/auth.service'
 import { AuthStatus } from './types/enums'
 import { AuthenticatePage } from './modals/authenticate/authenticate.page'
-import { TorService } from './services/tor.service'
+import { TorService, TorConnection } from './services/tor.service'
 import { Store } from './store'
 import { ZeroconfMonitor } from './services/zeroconf.service'
 import { SyncService } from './services/sync.service'
 import { Router } from '@angular/router'
 import { ServerAppModel } from './models/server-app-model'
 import { Storage } from '@ionic/storage'
+import { animate, style, transition, trigger } from '@angular/animations'
 
 import { Plugins, StatusBarStyle } from '@capacitor/core'
 const { SplashScreen, StatusBar } = Plugins
+
+const torAnimation = trigger(
+  'torChange',
+  [
+    transition(
+      ':enter',
+      [
+        style({ transform: 'translateY(100%)' }),
+        animate('.2s ease-in', style({ transform: 'translateY(0%)' })),
+      ],
+    ),
+    transition(
+      ':leave',
+      [
+        animate('.2s ease-out', style({ transform: 'translateY(100%)' })),
+      ],
+    ),
+  ],
+)
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
+  animations: [torAnimation],
 })
 export class AppComponent {
   private firstAuth = true
+  torStatus: TorConnection
+  progress: number
 
   constructor (
     private readonly platform: Platform,
@@ -37,6 +60,7 @@ export class AppComponent {
     private readonly router: Router,
     private readonly storage: Storage,
     private readonly store: Store,
+    private readonly zone: NgZone,
   ) {
     // set dark theme
     document.body.classList.toggle('dark', true)
@@ -54,6 +78,17 @@ export class AppComponent {
       }
       // start monitors
       this.initMonitors()
+      this.torService.watchConnection().subscribe(c => {
+        this.zone.run(() => {
+          this.torStatus = c
+        })
+      })
+
+      this.torService.watchProgress().subscribe(p => {
+        this.zone.run(() => {
+          this.progress = p / 100
+        })
+      })
       // subscribe to auth status changes
       this.authService.watch().subscribe(authStatus => {
         this.handleAuthChange(authStatus)

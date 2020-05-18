@@ -11,7 +11,7 @@ export class StatusComponent {
   @Input() appStatus?: AppStatus
   @Input() serverStatus?: ServerStatus
   @Input() connectionType = EmbassyConnection.NONE
-  @Input() size: 'small' | 'large' = 'large'
+  @Input() size: 'small' | 'medium' | 'large' = 'large'
   color: string
   display: string
   icon: string

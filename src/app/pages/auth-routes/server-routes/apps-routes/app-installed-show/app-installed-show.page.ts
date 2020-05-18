@@ -26,6 +26,7 @@ export class AppInstalledShowPage {
   appModel: AppModel
   showUpdate = true
   compareVersions = compareVersions
+  AppStatus = AppStatus
 
   constructor (
     private readonly alertCtrl: AlertController,
@@ -130,80 +131,6 @@ export class AppInstalledShowPage {
       cssClass: 'notification-toast',
     })
     await toast.present()
-  }
-
-  async presentAction () {
-    const app = peekProperties(this.app)
-
-    const buttons : ActionSheetButton[] = []
-
-    if (([
-      AppStatus.NEEDS_CONFIG,
-      AppStatus.RECOVERABLE,
-      AppStatus.RUNNING,
-      AppStatus.STOPPED,
-      AppStatus.RESTARTING,
-    ]).includes(app.status!)) {
-      buttons.push(
-        {
-          text: 'App Config',
-          icon: 'construct-outline',
-          handler: () => {
-            this.navigate(['config'])
-          },
-        },
-      )
-    }
-
-    if (app.status === AppStatus.RUNNING) {
-      buttons.push(
-        {
-          text: 'Logs',
-          icon: 'newspaper-outline',
-          handler: () => {
-            this.navigate(['logs'])
-          },
-        },
-        {
-          text: 'Metrics',
-          icon: 'pulse',
-          handler: () => {
-            this.navigate(['metrics'])
-          },
-        },
-      )
-    }
-
-    buttons.push(
-      {
-        text: 'View in Store',
-        icon: 'aperture-outline',
-        handler: () => {
-          this.navigate(['/auth', 'servers', this.serverId, 'apps', 'available', this.appId])
-        },
-      },
-    )
-
-    if (app.versionInstalled && app.status !== AppStatus.INSTALLING) {
-      buttons.push({
-        text: 'Uninstall',
-        cssClass: 'alert-danger',
-        icon: 'trash-outline',
-        handler: () => {
-          this.presentAlertUninstall()
-        },
-      })
-    }
-
-    const action = await this.actionCtrl.create({
-      buttons,
-    })
-
-    await action.present()
-  }
-
-  async goToStore () {
-
   }
 
   async stop (): Promise<void> {

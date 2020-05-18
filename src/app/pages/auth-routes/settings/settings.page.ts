@@ -24,16 +24,13 @@ export class SettingsPage {
     this.torEnabled = this.store.torEnabled
   }
 
-  ngOnDestroy () {
+  async handleTorChange () {
+    await this.store.toggleTor(this.torEnabled)
     if (this.torEnabled) {
       this.torService.start()
     } else {
       this.torService.stop()
     }
-  }
-
-  async handleTorChange () {
-    this.store.toggleTor(this.torEnabled)
   }
 
   async presentAlertWarnMnemonic () {

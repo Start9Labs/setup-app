@@ -1,0 +1,14 @@
+.tor-header {
+  & ion-toolbar {
+    min-height: 70px;
+  }
+  & p {
+    font-size: 12px;
+  }
+  & img {
+    width: auto; 
+    height: 20px;
+    vertical-align: bottom;
+    padding-right: 16px;
+  }
+}

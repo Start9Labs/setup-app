@@ -5,34 +5,13 @@ import { SyncService } from 'src/app/services/sync.service'
 import { Subscription } from 'rxjs'
 import { PropertyObservableWithId } from 'src/app/util/property-subject.util'
 import { TorService, TorConnection } from 'src/app/services/tor.service'
-import { animate, style, transition, trigger } from '@angular/animations'
 import { doForAtLeast } from 'src/app/util/misc.util'
 import { Store } from 'src/app/store'
-
-const torAnimation = trigger(
-  'torChange',
-  [
-    transition(
-      ':enter',
-      [
-        style({ transform: 'translateY(-100%)' }),
-        animate('.2s ease-in', style({ transform: 'translateY(0%)' })),
-      ],
-    ),
-    transition(
-      ':leave',
-      [
-        animate('.2s ease-out', style({ transform: 'translateY(-100%)' })),
-      ],
-    ),
-  ],
-)
 
 @Component({
   selector: 'page-server-list',
   templateUrl: './server-list.page.html',
   styleUrls: ['./server-list.page.scss'],
-  animations: [torAnimation],
 })
 export class ServerListPage {
   servers: PropertyObservableWithId<S9Server>[] = []
@@ -78,8 +57,6 @@ export class ServerListPage {
         this.servers.splice(i, 1)
       })
     })
-
-    console.log(this.servers, this.servers.length, this.store.torEnabled, this.store.showTorPrompt)
 
     setTimeout(() => {
       if (this.servers.length && !this.store.torEnabled && this.store.showTorPrompt) {
