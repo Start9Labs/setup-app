@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs'
-import { take, map } from 'rxjs/operators'
+import { take } from 'rxjs/operators'
 import { PropertySubject, initPropertySubject, completePropertyObservable, peekProperties, PropertyObservableWithId, asPropertyObservable } from './property-subject.util'
 import { NgZone } from '@angular/core'
 

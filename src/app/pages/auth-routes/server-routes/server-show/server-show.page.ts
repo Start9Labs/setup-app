@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { ServerModel, ServerStatus } from 'src/app/models/server-model'
-import { NavController, AlertController, ActionSheetController, LoadingController } from '@ionic/angular'
+import { NavController, AlertController, LoadingController } from '@ionic/angular'
 import { S9Server } from 'src/app/models/server-model'
 import { AppInstalled } from 'src/app/models/app-model'
 import * as compareVersions from 'compare-versions'
@@ -45,7 +45,6 @@ export class ServerShowPage {
     private readonly route: ActivatedRoute,
     private readonly serverModel: ServerModel,
     private readonly navCtrl: NavController,
-    private readonly actionCtrl: ActionSheetController,
     private readonly alertCtrl: AlertController,
     private readonly loadingCtrl: LoadingController,
     private readonly apiService: ApiService,
