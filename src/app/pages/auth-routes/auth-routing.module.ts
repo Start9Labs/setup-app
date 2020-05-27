@@ -24,8 +24,8 @@ const routes: Routes = [
     loadChildren: () => import('./settings/settings.module').then(m => m.SettingsPageModule),
   },
   {
-    path: 'settings/pin',
-    loadChildren: () => import('./pin/pin.module').then(m => m.PinPageModule),
+    path: 'settings/error-logs',
+    loadChildren: () => import('./error-logs/error-logs.module').then(m => m.ErrorLogsPageModule),
   },
 ]
 

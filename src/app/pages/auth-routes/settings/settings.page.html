@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="['/auth', 'servers']"></ion-back-button>
     </ion-buttons>
-    <ion-title>Settings</ion-title>
+    <ion-title (click)="viewErrorLogs()">Settings</ion-title>
   </ion-toolbar>
 </ion-header>
 

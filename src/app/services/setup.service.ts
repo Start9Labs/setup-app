@@ -97,7 +97,9 @@ export class SetupService {
         .then(serverRes => {
           builder = { ...builder, ...serverRes }
         })
-        .catch(console.error)
+        .catch(e => {
+          console.error(e)
+        })
     }
 
     return builder
@@ -108,6 +110,7 @@ export class SetupService {
       const { version } = await this.request<ReqRes.GetVersionRes>(builder, Method.GET, '/version')
       return version
     } catch (e) {
+      console.error(e)
       return undefined
     }
   }
@@ -119,6 +122,7 @@ export class SetupService {
       await this.request<ReqRes.PostRegisterRes>(builder, Method.POST, '/register', data)
       return true
     } catch (e) {
+      console.error(e)
       return false
     }
   }
@@ -128,6 +132,7 @@ export class SetupService {
       const { torAddress } = await this.request<ReqRes.GetTorRes>(builder, Method.GET, `/tor`)
       return torAddress
     } catch (e) {
+      console.error(e)
       return undefined
     }
   }

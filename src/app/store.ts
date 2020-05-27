@@ -13,6 +13,7 @@ export class Store {
   authSub: Subscription
   torEnabled: boolean
   showTorPrompt: boolean
+  errorLogs: string[] = []
 
   constructor (
     private readonly authService: AuthService,

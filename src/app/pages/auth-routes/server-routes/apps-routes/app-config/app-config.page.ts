@@ -57,6 +57,7 @@ export class AppConfigPage {
       this.spec = spec
       this.config = config
     } catch (e) {
+      console.error(e)
       this.error = e.message
     } finally {
       if (!initialLoad) { this.loading = false }
@@ -98,6 +99,7 @@ export class AppConfigPage {
 
       await this.navigateBack()
     } catch (e) {
+      console.error(e)
       this.error = e.message
     } finally {
       await loader.dismiss()
@@ -191,6 +193,7 @@ export class AppConfigPage {
       await this.apiService.wipeAppData(this.serverId, app)
       await this.getConfig()
     } catch (e) {
+      console.error(e)
       this.error = e.message
     } finally {
       await loader.dismiss()

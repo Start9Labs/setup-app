@@ -68,6 +68,7 @@ export class AppMetricsPage {
         this.metrics[key] = metrics[key]
       })
     } catch (e) {
+      console.error(e)
       this.error = e.message
       this.stopDaemon()
     }

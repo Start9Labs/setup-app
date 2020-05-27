@@ -27,6 +27,7 @@ export class AuthService {
       try {
         await this.authenticate('')
       } catch (e) {
+        console.error(e)
         this.pinEnabled = true
         this.authState$.next(AuthStatus.UNVERIFIED)
       }

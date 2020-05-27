@@ -58,6 +58,7 @@ export class SetupPage {
       this.syncService.sync(server.id)
       await this.navController.navigateRoot(['/auth'])
     } catch (e) {
+      console.error(e)
       this.error = `Error: ${e.message}`
     } finally {
       await loader.dismiss()

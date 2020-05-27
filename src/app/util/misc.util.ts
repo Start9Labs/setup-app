@@ -9,8 +9,8 @@ export function getIcon (appId: string) {
 export async function tryAll ( promises: Promise<any>[] ): Promise<PromiseRes<any>[]> {
   return Promise.all(promises.map(
     p => p
-    .then (r =>  ({ result: 'resolve' as 'resolve', value: r }))
-    .catch(e =>  ({ result: 'reject' as 'reject'  , value: e })),
+    .then (r => ({ result: 'resolve' as 'resolve', value: r }))
+    .catch(e => ({ result: 'reject' as 'reject', value: e })),
   ))
 }
 

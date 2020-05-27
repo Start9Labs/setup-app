@@ -42,9 +42,9 @@ export class TorService {
 
     this.tor.start({ socksPort: TorService.PORT, initTimeout: 40000 }).subscribe({
       next: (progress: number) => this.handleConnecting(progress),
-      error: (err: string) => {
+      error: (e: string) => {
+        console.error(e)
         this.connection$.next(TorConnection.disconnected)
-        throw new Error(`Error connecting to Tor: ${err}`)
       },
     })
   }
@@ -59,7 +59,7 @@ export class TorService {
         this.progress$.next(0)
         this.connection$.next(TorConnection.disconnected)
       } catch (e) {
-        console.log(`Tor stop failed: ${e}`)
+        console.error(`Tor stop failed: ${e}`)
       }
     }
   }
@@ -78,7 +78,7 @@ export class TorService {
       await this.tor.reconnect()
       this.connection$.next(TorConnection.connected)
     } catch (e) {
-      console.log(`Tor reconnect failed: ${e}`)
+      console.error(`Tor reconnect failed: ${e}`)
       await this.restart()
     }
   }
@@ -102,7 +102,7 @@ export class TorService {
   }
 
   private mock (): void {
-    console.log('starting Tor')
+    console.error('starting Tor')
     this.connection$.next(TorConnection.in_progress)
     setTimeout(() => { this.progress$.next(25) }, 1500)
     setTimeout(() => { this.progress$.next(40) }, 2000)

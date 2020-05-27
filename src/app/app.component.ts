@@ -66,6 +66,8 @@ export class AppComponent {
     document.body.classList.toggle('dark', true)
 
     this.platform.ready().then(async () => {
+      // monkey patch error logging
+      this.interceptErrors()
       // storage ready
       await this.storage.ready()
       // init network and auth
@@ -107,9 +109,9 @@ export class AppComponent {
         this.initMonitors()
       })
       // set StatusBar style
-      StatusBar.setStyle({
-        style: StatusBarStyle.Dark,
-      })
+      // StatusBar.setStyle({
+      //   style: StatusBarStyle.Dark,
+      // })
       // dismiss SplashScreen
       SplashScreen.hide()
     })
@@ -166,5 +168,28 @@ export class AppComponent {
       component: AuthenticatePage,
     })
     await modal.present()
+  }
+
+  private interceptErrors (): void {
+    const console = window.console
+    if (!console) { return }
+
+    const original = console.error
+    const main = this
+
+    console.error = function () {
+      main.recordErrors.apply(main, arguments)
+      original.apply(console, arguments)
+    }
+  }
+
+  private recordErrors (...messages: any[]) {
+    let serialized = messages.map(message => {
+      if (typeof message === 'object') {
+        return JSON.stringify(message)
+      }
+      return message
+    })
+    this.store.errorLogs.push(...serialized)
   }
 }

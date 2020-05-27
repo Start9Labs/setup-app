@@ -43,11 +43,6 @@ export class HttpService {
         throw new Error('Tor not connected')
       }
       host = server.torAddress.trim() // @COMPAT Ambassador <= 1.3.0 retuned torAddress with trailing "\n"
-      options.proxy = {
-        host: 'localhost',
-        port: TorService.PORT,
-        protocol: 'SOCKS',
-      }
     }
 
     const ambassadorVersion = withVersion ? `/v${server.versionInstalled.charAt(0)}` : ''
@@ -67,12 +62,21 @@ export class HttpService {
       'Content-Type': 'application/json',
       'app-version': version,
     })
+
     if (options.method === Method.POST && !options.data) {
       options.data = { }
     }
 
     if (!(this.networkMonitor.peekConnection()).connected) {
       throw new Error('Internet disconnected')
+    }
+
+    if (options.url.includes('.onion')) {
+      options.proxy = {
+        host: 'localhost',
+        port: TorService.PORT,
+        protocol: 'SOCKS',
+      }
     }
 
     try {
@@ -85,6 +89,7 @@ export class HttpService {
       try {
         message = JSON.parse(e.error).message
       } catch (e) {
+        console.error(e)
         message = e.error
       }
       throw new Error(message || 'Unknown Error')
