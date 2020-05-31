@@ -80,21 +80,6 @@ export class AppComponent {
       }
       // start monitors
       this.initMonitors()
-      this.torService.watchConnection().subscribe(c => {
-        this.zone.run(() => {
-          if (c === TorConnection.in_progress) {
-            this.globalFooterEnabled = true
-          } else {
-            this.globalFooterEnabled = false
-          }
-        })
-      })
-
-      this.torService.watchProgress().subscribe(p => {
-        this.zone.run(() => {
-          this.progress = p / 100
-        })
-      })
       // subscribe to auth status changes
       this.authService.watch().subscribe(authStatus => {
         this.handleAuthChange(authStatus)
@@ -109,11 +94,27 @@ export class AppComponent {
         this.initMonitors()
       })
       // set StatusBar style
-      // StatusBar.setStyle({
-      //   style: StatusBarStyle.Dark,
-      // })
+      StatusBar.setStyle({
+        style: StatusBarStyle.Dark,
+      })
       // dismiss SplashScreen
       SplashScreen.hide()
+      // show Tor footer if loading
+      this.torService.watchConnection().subscribe(c => {
+        this.zone.run(() => {
+          if (c === TorConnection.in_progress) {
+            this.globalFooterEnabled = true
+          } else {
+            this.globalFooterEnabled = false
+          }
+        })
+      })
+      // show loading progress in Tor footer
+      this.torService.watchProgress().subscribe(p => {
+        this.zone.run(() => {
+          this.progress = p / 100
+        })
+      })
     })
   }
 

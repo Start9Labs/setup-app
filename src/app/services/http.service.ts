@@ -89,10 +89,9 @@ export class HttpService {
       try {
         message = JSON.parse(e.error).message
       } catch (e) {
-        console.error(e)
-        message = e.error
+        message = e.error || 'Unknown Error'
       }
-      throw new Error(message || 'Unknown Error')
+      throw new Error(message)
     }
   }
 }
