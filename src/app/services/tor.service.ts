@@ -31,7 +31,7 @@ export class TorService {
 
   async start (): Promise<void> {
     // ** MOCKS **
-    // return this.mock()
+    return this.mock()
 
     if (!this.platform.is('ios') && !this.platform.is('android')) { return }
     if (await this.tor.isRunning()) { return }
@@ -102,7 +102,6 @@ export class TorService {
   }
 
   private mock (): void {
-    console.error('starting Tor')
     this.connection$.next(TorConnection.in_progress)
     setTimeout(() => { this.progress$.next(25) }, 1500)
     setTimeout(() => { this.progress$.next(40) }, 2000)

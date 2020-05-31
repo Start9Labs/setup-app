@@ -141,12 +141,12 @@ export class AppComponent {
   private async handleFirstAuth (): Promise<void> {
     await this.serverModel.load(this.authService.mnemonic!)
     await this.store.load()
-    this.router.navigate(['/auth'])
+    await this.router.navigate(['/auth'])
     this.firstAuth = false
   }
 
   private async handleFirstUnauth (): Promise<void> {
-    this.router.navigate(['/unauth'])
+    await this.router.navigate(['/unauth'])
     this.firstAuth = false
   }
 
@@ -185,9 +185,23 @@ export class AppComponent {
   }
 
   private recordErrors (...messages: any[]) {
+
+    const getCircularReplacer = () => {
+      const seen = new WeakSet()
+      return (key: string, value: string) => {
+        if (typeof value === 'object' && value !== null) {
+          if (seen.has(value)) {
+            return
+          }
+          seen.add(value)
+        }
+        return value
+      }
+    }
+
     let serialized = messages.map(message => {
       if (typeof message === 'object') {
-        return JSON.stringify(message)
+        return JSON.stringify(message, getCircularReplacer())
       }
       return message
     })
