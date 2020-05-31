@@ -31,7 +31,7 @@ export class TorService {
 
   async start (): Promise<void> {
     // ** MOCKS **
-    return this.mock()
+    // return this.mock()
 
     if (!this.platform.is('ios') && !this.platform.is('android')) { return }
     if (await this.tor.isRunning()) { return }
