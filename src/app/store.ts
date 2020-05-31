@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core'
-import { AuthService } from './services/auth.service'
-import { AuthStatus } from './types/enums'
+import { AuthService, AuthStatus } from './services/auth.service'
 import { Subscription } from 'rxjs'
 
 import { Plugins } from '@capacitor/core'

@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core'
 import { HttpPluginNativeImpl, HttpOptions } from 'capacitor-http'
 import { ZeroconfMonitor } from './zeroconf.service'
-import { Method } from '../types/enums'
 import { TokenSigner } from 'jsontokens'
 import { S9BuilderWith } from './setup.service'
 import { S9Server, ServerModel, getLanIP, EmbassyConnection } from '../models/server-model'
@@ -107,4 +106,12 @@ export function getAuthHeader (privkey: string): string {
   const token = new TokenSigner('ES256K', privkey).sign(tokenPayload)
 
   return `Bearer ${token}`
+}
+
+export enum Method {
+  GET = 'GET',
+  POST = 'POST',
+  PUT = 'PUT',
+  PATCH = 'PATCH',
+  DELETE = 'DELETE',
 }

@@ -1,8 +1,7 @@
 import { Component, ViewChild } from '@angular/core'
 import { IonContent, AlertController, ToastController, LoadingController, IonicSafeString } from '@ionic/angular'
 import { Store } from 'src/app/store'
-import { HttpService } from 'src/app/services/http.service'
-import { Method } from 'src/app/types/enums'
+import { HttpService, Method } from 'src/app/services/http.service'
 
 @Component({
   selector: 'error-logs',

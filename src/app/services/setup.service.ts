@@ -1,14 +1,13 @@
 import { Injectable } from '@angular/core'
 import { S9Server, getLanIP, ServerStatus, EmbassyConnection } from '../models/server-model'
-import { Method } from 'src/app/types/enums'
 import { AuthService } from './auth.service'
-import { ReqRes } from '../types/api-types'
+import { ReqRes } from './api.service'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { ZeroconfMonitor } from './zeroconf.service'
-import { HttpService, getAuthHeader } from './http.service'
-import * as cryptoUtil from '../util/crypto.util'
+import { HttpService, getAuthHeader, Method } from './http.service'
 import { HttpOptions } from 'capacitor-http'
 import { pauseFor } from '../util/misc.util'
+import * as cryptoUtil from '../util/crypto.util'
 
 @Injectable({
   providedIn: 'root',
