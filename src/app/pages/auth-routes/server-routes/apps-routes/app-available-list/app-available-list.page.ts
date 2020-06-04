@@ -44,6 +44,7 @@ export class AppAvailableListPage {
     try {
       this.apps = await this.apiService.getAvailableApps(this.serverId)
     } catch (e) {
+      console.error(e)
       this.error = e.message
     } finally {
       this.loading = false

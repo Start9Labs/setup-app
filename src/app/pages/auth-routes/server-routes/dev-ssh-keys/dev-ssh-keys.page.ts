@@ -47,6 +47,7 @@ export class DevSSHKeysPage {
       this.fingerprints = await this.apiService.getSSHKeys(this.serverId)
       this.error = ''
     } catch (e) {
+      console.error(e)
       this.error = e.message
     }
   }
@@ -95,6 +96,7 @@ export class DevSSHKeysPage {
       this.fingerprints.unshift(fingerprint)
       this.error = ''
     } catch (e) {
+      console.error(e)
       this.error = e.message
     } finally {
       await loader.dismiss()
@@ -114,6 +116,7 @@ export class DevSSHKeysPage {
       this.fingerprints.splice(index, 1)
       this.error = ''
     } catch (e) {
+      console.error(e)
       this.error = e.message
     } finally {
       await loader.dismiss()

@@ -87,6 +87,7 @@ export class AppConfigValuePage {
         try {
           range.checkIncludes(Number(this.inputValue))
         } catch (e) {
+          console.error(e)
           this.error = e.message
           return false
         }

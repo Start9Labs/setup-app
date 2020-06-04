@@ -28,6 +28,7 @@ export class KeychainRestorePage {
       await this.authService.login(sanitized.split(new RegExp(/\s/)))
       await this.navCtrl.navigateRoot(['/auth'])
     } catch (e) {
+      console.error(e)
       this.error = e.message
     }
   }

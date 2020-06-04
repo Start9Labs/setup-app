@@ -2,8 +2,7 @@ import { Component, NgZone, HostBinding } from '@angular/core'
 import { Platform, ModalController } from '@ionic/angular'
 import { ServerModel } from './models/server-model'
 import { NetworkMonitor } from './services/network.service'
-import { AuthService } from './services/auth.service'
-import { AuthStatus } from './types/enums'
+import { AuthService, AuthStatus } from './services/auth.service'
 import { AuthenticatePage } from './modals/authenticate/authenticate.page'
 import { TorService, TorConnection } from './services/tor.service'
 import { Store } from './store'
@@ -67,6 +66,8 @@ export class AppComponent {
     document.body.classList.toggle('dark', true)
 
     this.platform.ready().then(async () => {
+      // monkey patch error logging
+      this.interceptErrors()
       // storage ready
       await this.storage.ready()
       // init network and auth
@@ -79,21 +80,6 @@ export class AppComponent {
       }
       // start monitors
       this.initMonitors()
-      this.torService.watchConnection().subscribe(c => {
-        this.zone.run(() => {
-          if (c === TorConnection.in_progress) {
-            this.globalFooterEnabled = true
-          } else {
-            this.globalFooterEnabled = false
-          }
-        })
-      })
-
-      this.torService.watchProgress().subscribe(p => {
-        this.zone.run(() => {
-          this.progress = p / 100
-        })
-      })
       // subscribe to auth status changes
       this.authService.watch().subscribe(authStatus => {
         this.handleAuthChange(authStatus)
@@ -113,6 +99,22 @@ export class AppComponent {
       })
       // dismiss SplashScreen
       SplashScreen.hide()
+      // show Tor footer if loading
+      this.torService.watchConnection().subscribe(c => {
+        this.zone.run(() => {
+          if (c === TorConnection.in_progress) {
+            this.globalFooterEnabled = true
+          } else {
+            this.globalFooterEnabled = false
+          }
+        })
+      })
+      // show loading progress in Tor footer
+      this.torService.watchProgress().subscribe(p => {
+        this.zone.run(() => {
+          this.progress = p / 100
+        })
+      })
     })
   }
 
@@ -139,12 +141,12 @@ export class AppComponent {
   private async handleFirstAuth(): Promise<void> {
     await this.serverModel.load(this.authService.mnemonic!)
     await this.store.load()
-    this.router.navigate(['/auth'])
+    await this.router.navigate(['/auth'])
     this.firstAuth = false
   }
 
   private async handleFirstUnauth(): Promise<void> {
-    this.router.navigate(['/unauth'])
+    await this.router.navigate(['/unauth'])
     this.firstAuth = false
   }
 
@@ -167,5 +169,42 @@ export class AppComponent {
       component: AuthenticatePage,
     })
     await modal.present()
+  }
+
+  private interceptErrors(): void {
+    const console = window.console
+    if (!console) { return }
+
+    const original = console.error
+    const main = this
+
+    console.error = function () {
+      main.recordErrors.apply(main, arguments)
+      original.apply(console, arguments)
+    }
+  }
+
+  private recordErrors(...messages: any[]) {
+
+    const getCircularReplacer = () => {
+      const seen = new WeakSet()
+      return (key: string, value: string) => {
+        if (typeof value === 'object' && value !== null) {
+          if (seen.has(value)) {
+            return
+          }
+          seen.add(value)
+        }
+        return value
+      }
+    }
+
+    let serialized = messages.map(message => {
+      if (typeof message === 'object') {
+        return JSON.stringify(message, getCircularReplacer())
+      }
+      return message
+    })
+    this.store.errorLogs.push(...serialized)
   }
 }

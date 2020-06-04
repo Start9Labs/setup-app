@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { AlertController, Platform } from '@ionic/angular'
+import { AlertController, Platform, NavController } from '@ionic/angular'
 import { AuthService } from 'src/app/services/auth.service'
 import { Store } from 'src/app/store'
 import { TorService } from 'src/app/services/tor.service'
@@ -11,8 +11,10 @@ import { TorService } from 'src/app/services/tor.service'
 })
 export class SettingsPage {
   torEnabled: boolean
+  titleTapCount: number
 
   constructor (
+    private readonly navCtrl: NavController,
     private readonly alertCtrl: AlertController,
     private readonly authService: AuthService,
     private readonly store: Store,
@@ -24,7 +26,11 @@ export class SettingsPage {
     this.torEnabled = this.store.torEnabled
   }
 
-  async handleTorChange () {
+  ionViewWillEnter () {
+    this.titleTapCount = 0
+  }
+
+  async handleTorChange (): Promise<void> {
     await this.store.toggleTor(this.torEnabled)
     if (this.torEnabled) {
       this.torService.start()
@@ -33,7 +39,14 @@ export class SettingsPage {
     }
   }
 
-  async presentAlertWarnMnemonic () {
+  async viewErrorLogs (): Promise<void> {
+    this.titleTapCount++
+    if (this.titleTapCount === 5) {
+      await this.navCtrl.navigateForward(['/auth', 'settings', 'error-logs'])
+    }
+  }
+
+  async presentAlertWarnMnemonic (): Promise<void> {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Caution',
@@ -55,7 +68,7 @@ export class SettingsPage {
     await alert.present()
   }
 
-  async presentAlertViewMnemonic () {
+  async presentAlertViewMnemonic (): Promise<void> {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Mnemonic Seed',
@@ -65,7 +78,7 @@ export class SettingsPage {
     await alert.present()
   }
 
-  async presentAlertWipeKeychain () {
+  async presentAlertWipeKeychain (): Promise<void> {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Wait!',
@@ -87,7 +100,7 @@ export class SettingsPage {
     await alert.present()
   }
 
-  async presentAlertExplainTor () {
+  async presentAlertExplainTor (): Promise<void> {
     const alert = await this.alertCtrl.create({
       header: 'Tor',
       message: 'Enabling Tor allows you to connect privately and securely with your Embassies outside your home network',

@@ -9,8 +9,7 @@ import { PropertySubject, PropertyObservableWithId } from '../util/property-subj
 import * as CryptoJS from 'crypto-js'
 import { NetworkMonitor } from '../services/network.service'
 import { NetworkStatus } from '@capacitor/core'
-import { AuthService } from '../services/auth.service'
-import { AuthStatus } from '../types/enums'
+import { AuthService, AuthStatus } from '../services/auth.service'
 import { TorService, TorConnection } from '../services/tor.service'
 
 @Injectable({

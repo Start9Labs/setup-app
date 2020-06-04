@@ -68,6 +68,7 @@ export class AppInstalledShowPage {
       this.appModel.updateApp({ id: this.appId, ...appRes})
       this.error = ''
     } catch (e) {
+      console.error(e)
       this.error = e.message
     }
   }
@@ -89,6 +90,7 @@ export class AppInstalledShowPage {
       }
       this.showUpdate = false
     } catch (e) {
+      console.error(e)
       this.error = e.message
     } finally {
       await loader.dismiss()
@@ -147,6 +149,7 @@ export class AppInstalledShowPage {
       await this.apiService.stopApp(this.serverId, this.appId)
 
     } catch (e) {
+      console.error(e)
       this.error = e.message
     } finally {
       await loader.dismiss()
@@ -166,6 +169,7 @@ export class AppInstalledShowPage {
     try {
       await this.apiService.startApp(this.serverId, this.appId)
     } catch (e) {
+      console.error(e)
       this.error = e.message
     } finally {
       await loader.dismiss()
@@ -211,6 +215,7 @@ export class AppInstalledShowPage {
       this.appModel.removeApp(this.appId)
       await this.navCtrl.pop()
     } catch (e) {
+      console.error(e)
       this.error = e.message
     } finally {
       await loader.dismiss()

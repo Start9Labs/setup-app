@@ -107,6 +107,7 @@ export class ServerShowPage {
       await this.syncService.sync(server.id)
       this.error = ''
     } catch (e) {
+      console.error(e)
       this.error = e.message
     }
   }
@@ -120,6 +121,7 @@ export class ServerShowPage {
         const { versionLatest } = await this.apiService.getVersionLatest(server.id)
         this.versionLatest = versionLatest
       } catch (e) {
+        console.error(e)
         this.error = e.message
       } finally {
         await loader.dismiss()
@@ -194,6 +196,7 @@ export class ServerShowPage {
       this.updating = true
       setTimeout(() => this.updatingFreeze = false, 8000)
     } catch (e) {
+      console.error(e)
       this.error = e.message
     } finally {
       await loader.dismiss()
@@ -210,6 +213,7 @@ export class ServerShowPage {
       await this.apiService.restartServer(server.id)
       await this.navCtrl.pop()
     } catch (e) {
+      console.error(e)
       this.error = e.mesasge
     } finally {
       await loader.dismiss()
@@ -226,6 +230,7 @@ export class ServerShowPage {
       await this.apiService.shutdownServer(server.id)
       await this.navCtrl.pop()
     } catch (e) {
+      console.error(e)
       this.error = e.mesasge
     } finally {
       await loader.dismiss()

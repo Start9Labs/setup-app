@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Storage } from '@ionic/storage'
 import { BehaviorSubject, Observable } from 'rxjs'
-import { AuthStatus } from '../types/enums'
 import * as cryptoUtil from '../util/crypto.util'
 import { NavController } from '@ionic/angular'
 
@@ -27,6 +26,7 @@ export class AuthService {
       try {
         await this.authenticate('')
       } catch (e) {
+        console.error(e)
         this.pinEnabled = true
         this.authState$.next(AuthStatus.UNVERIFIED)
       }
@@ -95,4 +95,11 @@ export class AuthService {
   isMissing (): boolean {
     return this.authState$.value === AuthStatus.MISSING && !this.mnemonicEncrypted && !this.mnemonic
   }
+}
+
+export enum AuthStatus {
+  UNINITIALIZED = 'UNINITIALIZED',
+  UNVERIFIED = 'UNVERIFIED',
+  VERIFIED = 'VERIFIED',
+  MISSING = 'MISSING',
 }

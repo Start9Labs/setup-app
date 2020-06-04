@@ -63,6 +63,7 @@ export class ServerMetricsPage {
         }
       })
     } catch (e) {
+      console.error(e)
       this.error = e.message
       this.stopDaemon()
     }

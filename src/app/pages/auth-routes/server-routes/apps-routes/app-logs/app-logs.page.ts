@@ -44,6 +44,7 @@ export class AppLogsPage {
       this.error = ''
       setTimeout(async () => await this.content.scrollToBottom(100), 200)
     } catch (e) {
+      console.error(e)
       this.error = e.message
     } finally {
       if (!initialLoad) { this.loading = false }

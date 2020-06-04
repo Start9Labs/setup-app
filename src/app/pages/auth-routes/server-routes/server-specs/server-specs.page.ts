@@ -35,6 +35,7 @@ export class ServerSpecsPage {
       ])
       this.specs = specs
     } catch (e) {
+      console.error(e)
       this.error = e.message
     } finally {
       this.loading = false

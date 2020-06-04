@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core'
 import { HttpPluginNativeImpl, HttpOptions } from 'capacitor-http'
 import { ZeroconfMonitor } from './zeroconf.service'
-import { Method } from '../types/enums'
 import { TokenSigner } from 'jsontokens'
 import { S9BuilderWith } from './setup.service'
 import { S9Server, ServerModel, getLanIP, EmbassyConnection } from '../models/server-model'
@@ -43,11 +42,6 @@ export class HttpService {
         throw new Error('Tor not connected')
       }
       host = server.torAddress.trim() // @COMPAT Ambassador <= 1.3.0 retuned torAddress with trailing "\n"
-      options.proxy = {
-        host: 'localhost',
-        port: TorService.PORT,
-        protocol: 'SOCKS',
-      }
     }
 
     const ambassadorVersion = withVersion ? `/v${server.versionInstalled.charAt(0)}` : ''
@@ -67,12 +61,21 @@ export class HttpService {
       'Content-Type': 'application/json',
       'app-version': version,
     })
+
     if (options.method === Method.POST && !options.data) {
       options.data = { }
     }
 
     if (!(this.networkMonitor.peekConnection()).connected) {
       throw new Error('Internet disconnected')
+    }
+
+    if (options.url.includes('.onion')) {
+      options.proxy = {
+        host: 'localhost',
+        port: TorService.PORT,
+        protocol: 'SOCKS',
+      }
     }
 
     try {
@@ -85,9 +88,9 @@ export class HttpService {
       try {
         message = JSON.parse(e.error).message
       } catch (e) {
-        message = e.error
+        message = e.error || 'Unknown Error'
       }
-      throw new Error(message || 'Unknown Error')
+      throw new Error(message)
     }
   }
 }
@@ -103,4 +106,12 @@ export function getAuthHeader (privkey: string): string {
   const token = new TokenSigner('ES256K', privkey).sign(tokenPayload)
 
   return `Bearer ${token}`
+}
+
+export enum Method {
+  GET = 'GET',
+  POST = 'POST',
+  PUT = 'PUT',
+  PATCH = 'PATCH',
+  DELETE = 'DELETE',
 }

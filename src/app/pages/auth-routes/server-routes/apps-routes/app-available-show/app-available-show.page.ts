@@ -42,6 +42,7 @@ export class AppAvailableShowPage {
       ])
       this.app = app
     } catch (e) {
+      console.error(e)
       this.error = e.message
     } finally {
       this.loading = false
@@ -88,6 +89,7 @@ export class AppAvailableShowPage {
       const info = await this.apiService.getAvailableAppVersionInfo(this.serverId, this.app.id, version)
       Object.assign(this.app, info)
     } catch (e) {
+      console.error(e)
       this.error = e.message
     } finally {
       await loader.dismiss()
@@ -198,6 +200,7 @@ async presentAlertDowngrade () {
       }
       await this.navCtrl.navigateBack(['/auth', 'servers', this.serverId])
     } catch (e) {
+      console.error(e)
       this.error = e.message
     } finally {
       await loader.dismiss()
@@ -217,6 +220,7 @@ async presentAlertDowngrade () {
       this.appModel.removeApp(this.app.id)
       await this.navCtrl.navigateBack(['/auth', 'servers', this.serverId])
     } catch (e) {
+      console.error(e)
       this.error = e.message
     } finally {
       await loader.dismiss()

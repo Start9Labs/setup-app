@@ -60,6 +60,7 @@ export class ServerNotificationsPage {
       this.page++
       this.error = ''
     } catch (e) {
+      console.error(e)
       this.error = e.message
     } finally {
       return notifications
@@ -95,6 +96,7 @@ export class ServerNotificationsPage {
       this.notifications.splice(index, 1)
       this.error = ''
     } catch (e) {
+      console.error(e)
       this.error = e.message
     } finally {
       await loader.dismiss()

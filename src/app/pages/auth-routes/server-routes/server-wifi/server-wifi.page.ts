@@ -56,6 +56,7 @@ export class ServerWifiPage {
       this.current = current
       this.error = ''
     } catch (e) {
+      console.error(e)
       this.error = e.message
     }
   }
@@ -102,6 +103,7 @@ export class ServerWifiPage {
       await this.confirmWifi(ssid)
       this.error = ''
     } catch (e) {
+      console.error(e)
       this.error = e.message
     } finally {
       await loader.dismiss()
@@ -123,6 +125,7 @@ export class ServerWifiPage {
       this.password = ''
       this.error = ''
     } catch (e) {
+      console.error(e)
       this.error = e.message
     } finally {
       await loader.dismiss()
@@ -142,6 +145,7 @@ export class ServerWifiPage {
       this.savedNetworks.splice(index, 1)
       this.error = ''
     } catch (e) {
+      console.error(e)
       this.error = e.message
     } finally {
       await loader.dismiss()
@@ -173,7 +177,7 @@ export class ServerWifiPage {
         }
       } catch (e) {
         attempts++
-        console.error(e.message)
+        console.error(e)
       }
     }
 
