@@ -14,8 +14,9 @@ import { ServerAppModel } from './models/server-app-model'
 import { Storage } from '@ionic/storage'
 import { animate, style, transition, trigger } from '@angular/animations'
 
-import { Plugins, StatusBarStyle } from '@capacitor/core'
-const { SplashScreen, StatusBar } = Plugins
+import { AppState, Plugins, StatusBarStyle } from '@capacitor/core'
+import { stat } from 'fs'
+const { App, SplashScreen, StatusBar } = Plugins
 
 const torAnimation = trigger(
   'torChange',
@@ -47,7 +48,7 @@ export class AppComponent {
   progress: number
   @HostBinding('class.has-global-footer') globalFooterEnabled = false
 
-  constructor (
+  constructor(
     private readonly platform: Platform,
     private readonly serverModel: ServerModel,
     private readonly serverAppModel: ServerAppModel,
@@ -97,14 +98,14 @@ export class AppComponent {
       this.authService.watch().subscribe(authStatus => {
         this.handleAuthChange(authStatus)
       })
-      // subscribe to app pause event
-      this.platform.pause.subscribe(() => {
-        this.stopServices()
-      })
-      // sunscribe to app resume event
-      this.platform.resume.subscribe(async () => {
-        await this.initNetworkAndAuth()
-        this.initMonitors()
+      // subscribe to app pause/resume event
+      App.addListener('appStateChange', async (state: AppState) => {
+        if (state.isActive) {
+          await this.initNetworkAndAuth()
+          this.initMonitors()
+        } else {
+          this.stopServices()
+        }
       })
       // set StatusBar style
       StatusBar.setStyle({
@@ -115,12 +116,12 @@ export class AppComponent {
     })
   }
 
-  private async initNetworkAndAuth (): Promise<void> {
+  private async initNetworkAndAuth(): Promise<void> {
     await this.networkMonitor.init()
     await this.authService.init()
   }
 
-  private initMonitors (): void {
+  private initMonitors(): void {
     this.store.initMonitors()
     this.serverModel.initMonitors()
     this.serverAppModel.initMonitors()
@@ -129,25 +130,25 @@ export class AppComponent {
     this.zeroconfMonitor.initMonitors()
   }
 
-  private stopServices (): void {
+  private stopServices(): void {
     this.torService.stop()
     this.authService.uninit()
     this.networkMonitor.unint()
   }
 
-  private async handleFirstAuth (): Promise<void> {
+  private async handleFirstAuth(): Promise<void> {
     await this.serverModel.load(this.authService.mnemonic!)
     await this.store.load()
     this.router.navigate(['/auth'])
     this.firstAuth = false
   }
 
-  private async handleFirstUnauth (): Promise<void> {
+  private async handleFirstUnauth(): Promise<void> {
     this.router.navigate(['/unauth'])
     this.firstAuth = false
   }
 
-  private async handleAuthChange (status: AuthStatus): Promise<void> {
+  private async handleAuthChange(status: AuthStatus): Promise<void> {
     if (this.firstAuth) {
       if (status === AuthStatus.VERIFIED) {
         this.handleFirstAuth()
@@ -160,7 +161,7 @@ export class AppComponent {
     }
   }
 
-  private async presentModalAuthenticate (): Promise<void> {
+  private async presentModalAuthenticate(): Promise<void> {
     const modal = await this.modalCtrl.create({
       backdropDismiss: false,
       component: AuthenticatePage,
