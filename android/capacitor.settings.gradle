@@ -2,8 +2,8 @@
 include ':capacitor-android'
 project(':capacitor-android').projectDir = new File('../node_modules/@capacitor/android/capacitor')
 
-include ':capacitor-http'
-project(':capacitor-http').projectDir = new File('../node_modules/capacitor-http/android')
+include ':start9labs-capacitor-http'
+project(':start9labs-capacitor-http').projectDir = new File('../node_modules/@start9labs/capacitor-http/android')
 
-include ':capacitor-tor'
-project(':capacitor-tor').projectDir = new File('../node_modules/capacitor-tor/android')
+include ':start9labs-capacitor-tor'
+project(':start9labs-capacitor-tor').projectDir = new File('../node_modules/@start9labs/capacitor-tor/android')

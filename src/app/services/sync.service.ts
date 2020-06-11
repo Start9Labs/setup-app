@@ -134,7 +134,7 @@ export class SyncService {
     const torStatus = this.torService.peekConnection()
     servers.forEach(s => {
       const zcs = this.zeroconfMonitor.getService(s.id)
-      if (s.status === ServerStatus.UNKNOWN && !zcs && (torStatus === TorConnection.uninitialized || torStatus === TorConnection.disconnected)) {
+      if (s.status === ServerStatus.UNKNOWN && !zcs && (torStatus === TorConnection.disconnected)) {
         this.serverModel.markServerUnreachable(s.id)
       }
     })

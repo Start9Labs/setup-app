@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core'
-import { HttpPluginNativeImpl, HttpOptions } from 'capacitor-http'
+import { HttpPluginNativeImpl, HttpOptions } from '@start9labs/capacitor-http'
 import { ZeroconfMonitor } from './zeroconf.service'
 import { TokenSigner } from 'jsontokens'
-import { S9BuilderWith } from './setup.service'
+import { EmbassyBuilderWith } from './setup.service'
 import { S9Server, ServerModel, getLanIP, EmbassyConnection } from '../models/server-model'
 import { TorService, TorConnection } from './tor.service'
 import { NetworkMonitor } from './network.service'
@@ -20,7 +20,7 @@ export class HttpService {
     private readonly networkMonitor: NetworkMonitor,
   ) { }
 
-  async serverRequest<T> (server: string | S9Server | S9BuilderWith<'versionInstalled' | 'privkey' | 'torAddress'>, options: HttpOptions, withVersion = true): Promise<T> {
+  async serverRequest<T> (server: string | S9Server | EmbassyBuilderWith<'versionInstalled' | 'privkey' | 'torAddress'>, options: HttpOptions, withVersion = true): Promise<T> {
     if (typeof server === 'string') {
       server = this.serverModel.peek(server)
     }
@@ -38,9 +38,6 @@ export class HttpService {
       host = getLanIP(zcs)
     } else {
       connectionType = EmbassyConnection.TOR
-      if (this.torService.peekConnection() !== TorConnection.connected) {
-        throw new Error('Tor not connected')
-      }
       host = server.torAddress.trim() // @COMPAT Ambassador <= 1.3.0 retuned torAddress with trailing "\n"
     }
 
@@ -71,6 +68,9 @@ export class HttpService {
     }
 
     if (options.url.includes('.onion')) {
+      if (this.torService.peekConnection() !== TorConnection.connected) {
+        throw new Error('Tor not connected')
+      }
       options.proxy = {
         host: 'localhost',
         port: TorService.PORT,

@@ -133,11 +133,11 @@ export class ServerShowPage {
     fromPropertyObservable(this.server).pipe(take(1)).subscribe(async server => {
 
       const alert = await this.alertCtrl.create(
-        Menu.EditFriendlyNameAlert(server, (data: { inputValue: string }) => {
+        Menu.EditNameAlert(server, (data: { inputValue: string }) => {
           const inputValue = data.inputValue
           if (server.label === inputValue) { return } // return if no change
           if (!inputValue) {                          // throw error if no server name
-            alert.message = 'Server must have a name'
+            alert.message = 'Embassy must have a name'
             return false
           }
           this.serverModel.updateServer(server.id, { label: inputValue })

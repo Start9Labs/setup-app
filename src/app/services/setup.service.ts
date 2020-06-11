@@ -1,255 +1,182 @@
 import { Injectable } from '@angular/core'
-import { S9Server, getLanIP, ServerStatus, EmbassyConnection } from '../models/server-model'
+import { S9Server, getLanIP, ServerStatus, EmbassyConnection, idFromProductKey } from '../models/server-model'
 import { AuthService } from './auth.service'
 import { ReqRes } from './api.service'
-import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { ZeroconfMonitor } from './zeroconf.service'
 import { HttpService, getAuthHeader, Method } from './http.service'
-import { HttpOptions } from 'capacitor-http'
-import { pauseFor } from '../util/misc.util'
+import { HttpOptions } from '@start9labs/capacitor-http'
 import * as cryptoUtil from '../util/crypto.util'
 
 @Injectable({
   providedIn: 'root',
 })
 export class SetupService {
-  private static readonly setupAttempts = 8
-  private static readonly waitForMS = 1000 // miliseconds
-  public message = ''
-
   constructor (
     private readonly http: HttpService,
     private readonly authService: AuthService,
     private readonly zeroconfMonitor: ZeroconfMonitor,
   ) { }
 
-  async setup (builder: S9ServerBuilder, productKey: string): Promise<S9Server> {
-    // **** Mocks ****
-    // return toS9Server(this.mockServer(builder))
+  async setupTor (torAddress: string, productKey: string): Promise <S9Server> {
+    const id = idFromProductKey(productKey)
 
-    for (let i = 0; i < SetupService.setupAttempts; i ++) {
-      builder = await this.discoverAttempt(builder)
-      await pauseFor(SetupService.waitForMS)
-    }
+    // get agent version
+    const versionInstalled = await this.getVersion(torAddress)
 
-    if (!isDiscovered(builder)) {
-      throw new Error(`Failed ${this.message}`)
-    }
+    // derive keys
+    const { privkey, pubkey } = await this.deriveKeys(id)
 
-    builder = await this.setupAttempt(builder, productKey)
+    // register pubkey
+    await this.registerPubkey(torAddress, versionInstalled, pubkey, productKey)
 
-    if (!isFullySetup(builder)) {
-      throw new Error(`Failed ${this.message}`)
+    // get server
+    const builder: Required<EmbassyBuilder> = {
+      id,
+      label: 'Embassy:' + id,
+      versionInstalled,
+      privkey,
+      torAddress,
+      connectionType: EmbassyConnection.LAN,
+      ...await this.getServer(torAddress, versionInstalled, privkey),
     }
 
     return toS9Server(builder)
   }
 
-  private async discoverAttempt (builder: S9ServerBuilder): Promise<S9ServerBuilder> {
-    // enable lan
-    if (!hasValues(['zeroconf'], builder)) {
-      this.message = `discovering Embassy on local network. Please check your Product Key and see "Instructions" below.`
-      builder.zeroconf = this.zeroconfMonitor.getService(builder.id)
-    }
+  async setupZeroconf (productKey: string): Promise<S9Server> {
+    // derive id
+    const id = idFromProductKey(productKey)
 
-    // agent version
-    if (hasValues(['zeroconf'], builder) && !hasValues(['versionInstalled'], builder)) {
-      this.message = `communicating with Embassy`
-      builder.versionInstalled = await this.getVersion(builder)
-    }
+    // discover zeroconf service
+    const zeroconfService = this.zeroconfMonitor.getService(id)
+    if (!zeroconfService) { throw new Error('Embassy not found on local network. Please check Product Key and see "Instructions" below') }
 
-    return builder
+    // get IP
+    const ip = getLanIP(zeroconfService)
+    if (!ip) { throw new Error('IP address not found. Please contact support.') }
+
+    return this.finishSetup(ip, id, productKey)
   }
 
-  private async setupAttempt (builder: S9BuilderWith<'zeroconf' | 'versionInstalled'>, productKey: string): Promise<S9ServerBuilder> {
+  async setupIP (ip: string, productKey: string): Promise<S9Server> {
+    return this.finishSetup(ip, idFromProductKey(productKey), productKey)
+  }
+
+  private async finishSetup (host: string, id: string, productKey: string): Promise<S9Server> {
+    // get agent version
+    const versionInstalled = await this.getVersion(host)
+
     // derive keys
-    if (!hasValues(['pubkey', 'privkey'], builder)) {
-      this.message = 'getting mnemonic'
-      if (this.authService.mnemonic) {
-        this.message = `deriving keys`
-        const { privkey, pubkey } = cryptoUtil.deriveKeys(this.authService.mnemonic, builder.id)
-        builder.privkey = privkey
-        builder.pubkey = pubkey
-      }
-    }
+    const { privkey, pubkey } = await this.deriveKeys(id)
 
     // register pubkey
-    if (hasValues(['pubkey', 'privkey'], builder) && !builder.registered) {
-      this.message = `registering pubkey. Server may already be claimed.`
-      builder.registered = await this.registerPubkey(builder, productKey) // true or false
-    }
+    await this.registerPubkey(host, versionInstalled, pubkey, productKey)
 
-    // tor acquisition
-    if (hasValues(['pubkey', 'privkey'], builder) && builder.registered && !hasValues(['torAddress'], builder)) {
-      this.message = `getting Embassy tor address`
-      builder.torAddress = await this.getTor(builder)
-    }
+    // tor acquisition. @TODO we don't need this if torAddress comes back in /v0
+    const torAddress = await this.getTor(host, versionInstalled, privkey)
 
     // get server
-    if (
-      hasValues(['pubkey', 'privkey', 'torAddress'], builder) &&
-      builder.registered &&
-      builder.status !== ServerStatus.RUNNING
-    ) {
-      this.message = `getting Embassy information`
-      await this.getServer(builder)
-        .then(serverRes => {
-          builder = { ...builder, ...serverRes }
-        })
-        .catch(e => {
-          console.error(e)
-        })
+    const builder: Required<EmbassyBuilder> = {
+      id,
+      label: 'Embassy:' + id,
+      versionInstalled,
+      privkey,
+      torAddress,
+      connectionType: EmbassyConnection.LAN,
+      ...await this.getServer(host, versionInstalled, privkey),
     }
 
-    return builder
+    return toS9Server(builder)
   }
 
-  async getVersion (builder: S9BuilderWith<'zeroconf'>): Promise<string | undefined> {
+  private async getVersion (host: string): Promise <string> {
     try {
-      const { version } = await this.request<ReqRes.GetVersionRes>(builder, Method.GET, '/version')
+      const { version } = await this.request<ReqRes.GetVersionRes>(host, Method.GET, '/version')
       return version
     } catch (e) {
       console.error(e)
-      return undefined
+      throw new Error('Failed communicating with Embassy. Potential VPN or router issue. Please see "Instructions" below')
     }
   }
 
-  async registerPubkey (builder: S9BuilderWith<'zeroconf' | 'versionInstalled' | 'pubkey' | 'privkey'>, productKey: string): Promise<boolean> {
-    const { pubkey } = builder
+  private async registerPubkey (host: string, versionInstalled: string, pubKey: string, productKey: string): Promise < void > {
+    const path = `/v${versionInstalled.charAt(0)}/register`
+    const data: ReqRes.PostRegisterReq = { pubKey, productKey }
+    // @TODO do I need to pass privkey to this?
     try {
-      const data: ReqRes.PostRegisterReq = { pubKey: pubkey, productKey }
-      await this.request<ReqRes.PostRegisterRes>(builder, Method.POST, '/register', data)
-      return true
+      await this.request<ReqRes.PostRegisterRes>(host, Method.POST, path, undefined, data)
     } catch (e) {
       console.error(e)
-      return false
+      throw new Error (`Auth rejected. Invalid mnemonic or Product Key`)
     }
   }
 
-  async getTor (builder: S9BuilderWith<'zeroconf' | 'versionInstalled' | 'pubkey' | 'privkey'>): Promise<string | undefined> {
+  private async deriveKeys (id: string): Promise<{ privkey: string, pubkey: string }> {
     try {
-      const { torAddress } = await this.request<ReqRes.GetTorRes>(builder, Method.GET, `/tor`)
+      if (!this .authService.mnemonic) {
+        throw new Error('Mnemonic not found')
+      }
+      return cryptoUtil.deriveKeys(this.authService.mnemonic, id)
+    } catch (e) {
+      console.error(e)
+      throw new Error('Error deriving keys. Please contact support')
+    }
+  }
+
+  private async getTor (host: string, versionInstalled: string, privkey: string): Promise<string> {
+    const path = `/v${versionInstalled.charAt(0)}/tor`
+    try {
+      const { torAddress } = await this.request<ReqRes.GetTorRes>(host, Method.GET, path, privkey)
       return torAddress
     } catch (e) {
       console.error(e)
-      return undefined
+      throw new Error('Error fetching Tor Address. Please contact support')
     }
   }
 
-  async getServer (builder: S9BuilderWith<'zeroconf' | 'versionInstalled' | 'pubkey' | 'privkey' | 'torAddress'>): Promise<ReqRes.GetServerRes> {
-    return this.request<ReqRes.GetServerRes>(builder, Method.GET, '')
+  private async getServer (host: string, versionInstalled: string, privkey: string): Promise<ReqRes.GetServerRes> {
+    const path = `/v${versionInstalled.charAt(0)}`
+    try {
+      return this.request<ReqRes.GetServerRes>(host, Method.GET, path, privkey)
+    } catch (e) {
+      console.error(e)
+      throw new Error('Failed getting Embassy information. Please contact support')
+    }
   }
 
-  async request<T> (builder: S9BuilderWith<'zeroconf'>, method: Method, path: string, data?: any): Promise<T> {
-    const host = getLanIP(builder.zeroconf)
-    path = builder.versionInstalled ? `/v${builder.versionInstalled.charAt(0)}${path}` : path
+  private async request<T> (host: string, method: Method, path: string, privkey ? : string, data ? : any): Promise<T> {
     const options: HttpOptions = {
       method,
       url: `http://${host}:5959${path}`,
       data,
     }
-    if (builder.privkey) {
-      options.headers = { 'Authorization': getAuthHeader(builder.privkey) }
+    if (privkey) {
+      options.headers = { 'Authorization': getAuthHeader(privkey) }
     }
 
     return this.http.rawRequest<T>(options)
   }
-
-  // @TODO remove
-  mockServer (builder: S9ServerBuilder): Required<S9ServerBuilder> {
-    return {
-      id: builder.id,
-      label: builder.label,
-      torAddress: 'agent-tor-address-isaverylongaddresssothaticantestwrapping.onion',
-      versionInstalled: '0.1.0',
-      status: ServerStatus.RUNNING,
-      privkey: 'testprivkey',
-      pubkey: 'testpubkey',
-      registered: true,
-      zeroconf: {
-        domain: 'local.',
-        type: '_http._tcp',
-        name: `start9-${builder.id}`,
-        hostname: '',
-        ipv4Addresses: ['192.168.20.1'],
-        ipv6Addresses: ['end9823u0ej2fb'],
-        port: 5959,
-        txtRecord: { },
-      },
-      connectionType: EmbassyConnection.LAN,
-    }
-  }
 }
 
-export type S9BuilderWith<T extends keyof S9ServerBuilder> = S9ServerBuilder & {
-  [t in T]: Exclude<S9ServerBuilder[t], undefined>
-}
-
-export interface S9ServerBuilder {
-  id: string
-  label: string
-
-  status: ServerStatus
-  versionInstalled?: string
-
-  privkey?: string
-  pubkey?: string
-  registered: boolean
-
-  torAddress?: string
-  zeroconf?: ZeroconfService
-
-  connectionType?: EmbassyConnection
-}
-
-export function hasValues<T extends keyof S9ServerBuilder> (t: T[], s: S9ServerBuilder): s is S9BuilderWith<T> {
-  return t.every(k => !!s[k])
-}
-
-export function isDiscovered (ss: S9ServerBuilder): ss is S9BuilderWith<'zeroconf' | 'versionInstalled'> {
-  return hasValues(['zeroconf', 'versionInstalled'], ss)
-}
-
-export function isFullySetup (ss: S9ServerBuilder): ss is Required<S9ServerBuilder> {
-  return hasValues(builderKeys(), ss) && ss.registered && ss.status === ServerStatus.RUNNING
-}
-
-export function fromUserInput (id: string, label: string): S9ServerBuilder {
-  return {
-    id,
-    label,
-    status: ServerStatus.UNKNOWN,
-    registered: false,
-    connectionType: EmbassyConnection.NONE,
-  }
-}
-
-export function toS9Server (builder: Required<S9ServerBuilder>): S9Server {
+export function toS9Server (builder: Required<EmbassyBuilder>): S9Server {
   return {
     ...builder,
     badge: 0,
     notifications: [],
     versionLatest: undefined, // @COMPAT 0.1.1 - versionLatest dropped in 0.1.2
-    connectionType: EmbassyConnection.LAN,
   }
 }
 
-
-/////////////////// DONT LOOK AT THIS //////////////////////
-
-function builderKeys (): (keyof S9ServerBuilder)[] {
-  return Object.keys(defaultBuilder) as (keyof S9ServerBuilder)[]
+export type EmbassyBuilderWith<T extends keyof EmbassyBuilder> = EmbassyBuilder & {
+  [t in T]: Exclude<EmbassyBuilder[t], undefined>
 }
 
-const defaultBuilder: Required<S9ServerBuilder> = {
-  id:               undefined as any,
-  label:            undefined as any,
-  status:           undefined as any,
-  versionInstalled: undefined as any,
-  privkey:          undefined as any,
-  pubkey:           undefined as any,
-  registered:       undefined as any,
-  torAddress:       undefined as any,
-  zeroconf:         undefined as any,
-  connectionType:   undefined as any,
+export interface EmbassyBuilder {
+  id?: string
+  label?: string
+  status?: ServerStatus
+  versionInstalled?: string
+  privkey?: string
+  torAddress?: string
+  connectionType?: EmbassyConnection
 }

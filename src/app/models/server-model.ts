@@ -203,7 +203,7 @@ export function toStorableServer (ss: S9Server): S9ServerStorable {
   }
 }
 
-export function idFromSerial (serialNo: string): string {
+export function idFromProductKey (serialNo: string): string {
   // sha256 hash is big endian
   return CryptoJS.SHA256(serialNo).toString(CryptoJS.enc.Hex).substr(0, 8)
 }

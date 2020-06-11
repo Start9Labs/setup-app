@@ -2,9 +2,9 @@ import { S9Server } from 'src/app/models/server-model'
 import { AlertOptions, LoadingOptions } from '@ionic/core'
 import { ActionSheetButton } from '@ionic/core'
 
-export const EditFriendlyNameAlert: (s: S9Server, h: (a?: any) => any) => AlertOptions = (server, handler) => ({
+export const EditNameAlert: (s: S9Server, h: (a?: any) => any) => AlertOptions = (server, handler) => ({
   backdropDismiss: false,
-  header: 'Friendly Name',
+  header: 'Embassy Name',
   inputs: [{
       name: 'inputValue',
       type: 'text',
@@ -65,7 +65,7 @@ export const ForgetAlert: (s: S9Server, h: () => any) => AlertOptions = (server,
     message: `Are you sure you want to forget ${server.label} on this device? You can add it back later. The Embassy itself will not be affected.`,
     buttons: [
       CancelButton, {
-        text: 'Forget Server',
+        text: 'Forget Embassy',
         cssClass: 'alert-danger',
         handler: () => { handler() },
       },

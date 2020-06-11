@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { Tor } from 'capacitor-tor'
+import { Tor } from '@start9labs/capacitor-tor'
 import { Observable, BehaviorSubject, Subscription } from 'rxjs'
 import { NetworkMonitor } from './network.service'
 import { NetworkStatus } from '@capacitor/core'
@@ -13,7 +13,7 @@ export class TorService {
   static readonly PORT = 59590
   private readonly tor = new Tor()
   private readonly progress$ = new BehaviorSubject<number>(0)
-  private readonly connection$ = new BehaviorSubject<TorConnection>(TorConnection.uninitialized)
+  private readonly connection$ = new BehaviorSubject<TorConnection>(TorConnection.disconnected)
   watchProgress (): Observable<number> { return this.progress$.asObservable() }
   watchConnection (): Observable<TorConnection> { return this.connection$.asObservable() }
   peekConnection (): TorConnection { return this.connection$.getValue() }
@@ -34,13 +34,13 @@ export class TorService {
     // return this.mock()
 
     if (!this.platform.is('ios') && !this.platform.is('android')) { return }
-    if (await this.tor.isRunning()) { return }
+    if (await this.tor.isRunning() || this.peekConnection() === TorConnection.in_progress) { return }
 
     console.log('starting Tor')
 
     this.connection$.next(TorConnection.in_progress)
 
-    this.tor.start({ socksPort: TorService.PORT, initTimeout: 40000 }).subscribe({
+    this.tor.start({ socksPort: TorService.PORT, controlPort: 59591, initTimeout: 40000 }).subscribe({
       next: (progress: number) => this.handleConnecting(progress),
       error: (e: string) => {
         console.error(e)
@@ -115,9 +115,7 @@ export class TorService {
 }
 
 export enum TorConnection {
-  uninitialized = 'uninitialized',
   in_progress = 'in_progress',
   connected = 'connected',
   disconnected = 'disconnected',
-  reconnecting = 'reconnecting',
 }
