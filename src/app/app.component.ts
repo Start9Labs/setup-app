@@ -14,7 +14,6 @@ import { Storage } from '@ionic/storage'
 import { animate, style, transition, trigger } from '@angular/animations'
 
 import { AppState, Plugins, StatusBarStyle } from '@capacitor/core'
-import { stat } from 'fs'
 const { App, SplashScreen, StatusBar } = Plugins
 
 const torAnimation = trigger(
@@ -47,7 +46,7 @@ export class AppComponent {
   progress: number
   @HostBinding('class.has-global-footer') globalFooterEnabled = false
 
-  constructor(
+  constructor (
     private readonly platform: Platform,
     private readonly serverModel: ServerModel,
     private readonly serverAppModel: ServerAppModel,
@@ -118,12 +117,12 @@ export class AppComponent {
     })
   }
 
-  private async initNetworkAndAuth(): Promise<void> {
+  private async initNetworkAndAuth (): Promise<void> {
     await this.networkMonitor.init()
     await this.authService.init()
   }
 
-  private initMonitors(): void {
+  private initMonitors (): void {
     this.store.initMonitors()
     this.serverModel.initMonitors()
     this.serverAppModel.initMonitors()
@@ -132,25 +131,25 @@ export class AppComponent {
     this.zeroconfMonitor.initMonitors()
   }
 
-  private stopServices(): void {
+  private stopServices (): void {
     this.torService.stop()
     this.authService.uninit()
     this.networkMonitor.unint()
   }
 
-  private async handleFirstAuth(): Promise<void> {
+  private async handleFirstAuth (): Promise<void> {
     await this.serverModel.load(this.authService.mnemonic!)
     await this.store.load()
     await this.router.navigate(['/auth'])
     this.firstAuth = false
   }
 
-  private async handleFirstUnauth(): Promise<void> {
+  private async handleFirstUnauth (): Promise<void> {
     await this.router.navigate(['/unauth'])
     this.firstAuth = false
   }
 
-  private async handleAuthChange(status: AuthStatus): Promise<void> {
+  private async handleAuthChange (status: AuthStatus): Promise<void> {
     if (this.firstAuth) {
       if (status === AuthStatus.VERIFIED) {
         this.handleFirstAuth()
@@ -163,7 +162,7 @@ export class AppComponent {
     }
   }
 
-  private async presentModalAuthenticate(): Promise<void> {
+  private async presentModalAuthenticate (): Promise<void> {
     const modal = await this.modalCtrl.create({
       backdropDismiss: false,
       component: AuthenticatePage,
@@ -171,7 +170,7 @@ export class AppComponent {
     await modal.present()
   }
 
-  private interceptErrors(): void {
+  private interceptErrors (): void {
     const console = window.console
     if (!console) { return }
 
@@ -184,7 +183,7 @@ export class AppComponent {
     }
   }
 
-  private recordErrors(...messages: any[]) {
+  private recordErrors (...messages: any[]) {
 
     const getCircularReplacer = () => {
       const seen = new WeakSet()
