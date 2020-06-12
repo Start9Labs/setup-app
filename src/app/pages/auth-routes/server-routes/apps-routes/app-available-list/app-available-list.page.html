@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="['/auth', 'servers', serverId]"></ion-back-button>
     </ion-buttons>
-    <ion-title>Get Apps</ion-title>
+    <ion-title>Embassy Mods</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -41,7 +41,7 @@
             </ng-container>
             <!-- actively installing -->
             <h2 *ngIf="app.status === 'INSTALLING'">
-              <ion-text color="primary">Installing...</ion-text>
+              <ion-text color="primary">Installing to Embassy...</ion-text>
             </h2>
           </ng-container>
           <!-- not installed -->

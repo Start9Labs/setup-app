@@ -21,8 +21,8 @@
   <!-- segment -->
   <ion-toolbar *ngIf="!updating">
     <ion-segment [(ngModel)]="segmentValue">
-      <ion-segment-button value="apps">
-        <ion-label>Apps</ion-label>
+      <ion-segment-button value="mods">
+        <ion-label>Mods</ion-label>
       </ion-segment-button>
       <ion-segment-button value="embassy">
         <ion-label>Embassy</ion-label>
@@ -43,14 +43,14 @@
       <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
     </ion-item>
 
-    <!-- Apps Segment -->
-    <div *ngIf="segmentValue === 'apps'">
+    <!-- Mods Segment -->
+    <div *ngIf="segmentValue === 'mods'">
       <ion-item-group>
 
         <ion-item-divider></ion-item-divider>
         <ion-item [routerLink]="['apps', 'available']" detail="false">
           <ion-icon slot="start" name="apps-outline" color="primary"></ion-icon>
-          <ion-label><ion-text color="primary">Get Apps</ion-text></ion-label>
+          <ion-label><ion-text color="primary">Get Embassy Mods</ion-text></ion-label>
           <ion-icon slot="end" name="arrow-forward-outline" color="primary"></ion-icon>
         </ion-item>
 

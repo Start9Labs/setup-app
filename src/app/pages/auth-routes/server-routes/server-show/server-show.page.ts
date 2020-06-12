@@ -21,7 +21,6 @@ import { doForAtLeast, getIcon } from 'src/app/util/misc.util'
 })
 export class ServerShowPage {
   error = ''
-  view: 'apps' | 'about' = 'apps'
   loading$ = new BehaviorSubject(true)
   versionLatest: string | undefined
   compareVersions = compareVersions
@@ -39,7 +38,7 @@ export class ServerShowPage {
   getIcon = getIcon
   updatingFreeze = false
   updating = false
-  segmentValue: 'apps' | 'embassy' = 'apps'
+  segmentValue: 'mods' | 'embassy' = 'mods'
 
   constructor (
     private readonly route: ActivatedRoute,

@@ -16,13 +16,13 @@ export class AppModel extends MapSubject<AppInstalled> {
 
   watchAppProperties (appId: string) : PropertySubject<AppInstalled> {
     const toReturn = this.watch(appId)
-    if (!toReturn) throw new Error(`Expected app ${appId} but not found.`)
+    if (!toReturn) throw new Error(`Expected Mod ${appId} but not found.`)
     return toReturn
   }
 
   peekApp (appId: string): AppInstalled {
     const toReturn = this.peek(appId)
-    if (!toReturn) throw new Error(`Expected app ${appId} but not found.`)
+    if (!toReturn) throw new Error(`Expected Mod ${appId} but not found.`)
     return toReturn
   }
 

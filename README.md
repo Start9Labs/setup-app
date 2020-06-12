@@ -1,4 +1,4 @@
-# Start9 Companion App
+# Start9 Embassy Companion
 
 ## Setup Instructions
 

@@ -181,8 +181,8 @@ export class AppInstalledShowPage {
 
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
-      header: 'Caution',
-      message: `Are you sure you want to uninstall ${app.title}?`,
+      header: 'Confirm',
+      message: `Uninstall ${app.title}?`,
       buttons: [
         {
           text: 'Cancel',
@@ -204,7 +204,7 @@ export class AppInstalledShowPage {
     const app = peekProperties(this.app)
 
     const loader = await this.loadingCtrl.create({
-      message: `Uninstalling ${app.title}`,
+      message: `Uninstalling ${app.title}...`,
       spinner: 'lines',
       cssClass: 'loader',
     })

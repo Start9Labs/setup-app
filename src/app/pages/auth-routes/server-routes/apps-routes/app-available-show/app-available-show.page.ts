@@ -100,7 +100,7 @@ export class AppAvailableShowPage {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Confirm',
-      message: `Are you sure you want to install ${this.app.title} ${this.app.versionViewing}?`,
+      message: `Install ${this.app.title} ${this.app.versionViewing} to Embassy?`,
       buttons: [
         {
           text: 'Cancel',
@@ -122,7 +122,7 @@ async presentAlertDowngrade () {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Confirm',
-      message: `Are you sure you want to downgrade ${this.app.title} from ${this.app.versionInstalled} to ${this.app.versionViewing}?`,
+      message: `Downgrade ${this.app.title} from ${this.app.versionInstalled} to ${this.app.versionViewing}?`,
       buttons: [
         {
           text: 'Cancel',
@@ -144,7 +144,7 @@ async presentAlertDowngrade () {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
       header: 'Confirm',
-      message: `Are you sure you want to update ${this.app.title} from ${this.app.versionInstalled} to ${this.app.versionViewing}?`,
+      message: `Update ${this.app.title} from ${this.app.versionInstalled} to ${this.app.versionViewing}?`,
       buttons: [
         {
           text: 'Cancel',
@@ -165,8 +165,8 @@ async presentAlertDowngrade () {
   async presentAlertUninstall () {
     const alert = await this.alertCtrl.create({
       backdropDismiss: false,
-      header: 'Caution',
-      message: `Are you sure you want to uninstall ${this.app.title}? All app data will be permanently deleted.`,
+      header: 'Confirm',
+      message: `Uninstall ${this.app.title}? All app data will be permanently deleted.`,
       buttons: [
         {
           text: 'Cancel',

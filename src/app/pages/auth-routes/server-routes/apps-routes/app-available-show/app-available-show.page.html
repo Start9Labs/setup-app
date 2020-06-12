@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="['/auth', 'servers', serverId, 'apps', 'available']"></ion-back-button>
     </ion-buttons>
-    <ion-title>App Details</ion-title>
+    <ion-title>Mod Details</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -33,7 +33,7 @@
         <ion-row *ngIf="!app.versionInstalled">
           <ion-col>
             <ion-button expand="block" fill="outline" color="success" (click)="presentAlertInstall()">
-              Install
+              Install to Embassy
             </ion-button>
           </ion-col>
         </ion-row>
@@ -42,7 +42,7 @@
             <ion-col>
               <ion-item>
                 <ion-label>
-                  <ion-text color="primary">Installing...</ion-text>
+                  <ion-text color="primary">Installing to Embassy...</ion-text>
                 </ion-label>
               </ion-item>
             </ion-col>
