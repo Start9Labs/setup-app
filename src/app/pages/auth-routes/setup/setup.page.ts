@@ -89,17 +89,17 @@ export class SetupPage {
     try {
       let server: S9Server
       // **** Mocks ****
-      // server = toS9Server(mockServer)
+      server = toS9Server(mockServer)
       // comment entire if/else block if mocks enabled
-      if (host) {
-        if (host.endsWith('.onion')) {
-          server = await this.setupService.setupTor(host, this.productKey)
-        } else {
-          server = await this.setupService.setupIP(host, this.productKey)
-        }
-      } else {
-        server = await this.setupService.setupZeroconf(this.productKey)
-      }
+      // if (host) {
+      //   if (host.endsWith('.onion')) {
+      //     server = await this.setupService.setupTor(host, this.productKey)
+      //   } else {
+      //     server = await this.setupService.setupIP(host, this.productKey)
+      //   }
+      // } else {
+      //   server = await this.setupService.setupZeroconf(this.productKey)
+      // }
       this.serverModel.createServer(server)
       await this.serverModel.saveAll()
       this.syncService.sync(server.id)
