@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { ServerModel, S9Server } from 'src/app/models/server-model'
-import { NavController, AlertController } from '@ionic/angular'
+import { NavController, AlertController, ActionSheetController } from '@ionic/angular'
 import { SyncService } from 'src/app/services/sync.service'
 import { Subscription } from 'rxjs'
 import { PropertyObservableWithId } from 'src/app/util/property-subject.util'
@@ -21,6 +21,7 @@ export class ServerListPage {
     private readonly serverModel: ServerModel,
     private readonly syncService: SyncService,
     private readonly navCtrl: NavController,
+    private readonly actionCtrl: ActionSheetController,
     private readonly alertCtrl: AlertController,
     private readonly store: Store,
   ) { }
@@ -92,5 +93,21 @@ export class ServerListPage {
       ],
     })
     await alert.present()
+  }
+
+  async presentAction (server: PropertyObservableWithId<S9Server>, e: Event) {
+    e.stopPropagation()
+    const action = await this.actionCtrl.create({
+      buttons: [
+        {
+          text: 'Connection Options',
+          handler: () => {
+            this.navCtrl.navigateForward(['/auth', 'servers', server.id, 'connection'])
+          },
+        },
+      ],
+    })
+
+    await action.present()
   }
 }

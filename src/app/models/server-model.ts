@@ -121,7 +121,9 @@ export interface S9ServerStorable {
   id: string
   label: string
   torAddress: string
+  staticIP: string | undefined
   versionInstalled: string
+  connectionPreference: ConnectionPreference
 }
 
 export interface S9Server extends S9ServerStorable {
@@ -131,6 +133,7 @@ export interface S9Server extends S9ServerStorable {
   notifications: S9Notification[]
   versionLatest: string | undefined // @COMPAT 0.1.1 - versionLatest dropped in 0.1.2
   connectionType: EmbassyConnection
+  connectionPreference: ConnectionPreference
 }
 
 export interface S9Notification {
@@ -177,13 +180,15 @@ export function getLanIP (zcs: ZeroconfService): string {
   return url
 }
 
-export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): S9Server {
-  const { label, torAddress, id, versionInstalled } = ss
+export function fromStorableServer (ss: S9ServerStorable, mnemonic: string[]): S9Server {
+  const { label, torAddress, id, versionInstalled, connectionPreference, staticIP } = ss
   return {
     id,
     label,
     torAddress,
+    staticIP,
     versionInstalled,
+    connectionPreference: connectionPreference || ConnectionPreference.LAN_TOR,
     status: ServerStatus.UNKNOWN,
     privkey: deriveKeys(mnemonic, id).privkey,
     badge: 0,
@@ -194,12 +199,14 @@ export function fromStorableServer (ss : S9ServerStorable, mnemonic: string[]): 
 }
 
 export function toStorableServer (ss: S9Server): S9ServerStorable {
-  const { label, torAddress, id, versionInstalled } = ss
+  const { label, torAddress, id, versionInstalled, connectionPreference, staticIP } = ss
   return {
     id,
     label,
     torAddress: torAddress.trim(), // @COMPAT Ambassador <= 1.3.0 retuned torAddress with trailing \n
+    staticIP,
     versionInstalled,
+    connectionPreference,
   }
 }
 
@@ -212,6 +219,12 @@ export enum EmbassyConnection {
   NONE = 'NONE',
   LAN = 'LAN',
   TOR = 'TOR',
+}
+
+export enum ConnectionPreference {
+  LAN_TOR = 'LAN/Tor',
+  LAN = 'LAN',
+  TOR = 'Tor',
 }
 
 export enum ServerStatus {

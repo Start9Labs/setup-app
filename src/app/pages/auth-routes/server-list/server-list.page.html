@@ -23,7 +23,7 @@
         <h3>Welcome</h3>
         <br />
         <h2>
-          <ion-text color="medium">To set up your first server, click the plus button below.</ion-text>
+          <ion-text color="medium">To set up your first Embassy, click the plus button below.</ion-text>
         </h2>
       </ion-label>
     </ion-item>
@@ -36,10 +36,13 @@
           <img src="assets/img/cube.png" alt="icon" />
         </ion-avatar>
         <ion-label>
-          <h1>{{ server.observe['label'] | async }}</h1>
+          <h2>{{ server.observe['label'] | async }}</h2>
           <s9-status [serverStatus]="server.observe['status'] | async" [connectionType]="server.observe['connectionType'] | async" size="medium"></s9-status>
         </ion-label>
         <ion-badge slot="end" *ngIf="server.observe['badge'] | async as badge" color="danger">{{ badge }}</ion-badge>
+        <ion-button slot="end" fill="clear" color="primary" (click)="presentAction(server, $event)">
+          <ion-icon slot="icon-only" name="ellipsis-vertical-outline"></ion-icon>
+        </ion-button>
       </ion-item>
     </ion-card>
   </ng-container>

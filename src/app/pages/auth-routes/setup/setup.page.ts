@@ -1,6 +1,6 @@
 import { Component, NgZone } from '@angular/core'
 import { NavController, LoadingController } from '@ionic/angular'
-import { ServerModel, ServerStatus, EmbassyConnection, S9Server } from 'src/app/models/server-model'
+import { ServerModel, ServerStatus, EmbassyConnection, S9Server, ConnectionPreference } from 'src/app/models/server-model'
 import { SetupService, EmbassyBuilder, toS9Server } from 'src/app/services/setup.service'
 import { ZeroconfMonitor } from 'src/app/services/zeroconf.service'
 import { SyncService } from 'src/app/services/sync.service'
@@ -89,17 +89,17 @@ export class SetupPage {
     try {
       let server: S9Server
       // **** Mocks ****
-      server = toS9Server(mockServer)
+      // server = toS9Server(mockServer)
       // comment entire if/else block if mocks enabled
-      // if (host) {
-      //   if (host.endsWith('.onion')) {
-      //     server = await this.setupService.setupTor(host, this.productKey)
-      //   } else {
-      //     server = await this.setupService.setupIP(host, this.productKey)
-      //   }
-      // } else {
-      //   server = await this.setupService.setupZeroconf(this.productKey)
-      // }
+      if (host) {
+        if (host.endsWith('.onion')) {
+          server = await this.setupService.setupTor(host, this.productKey)
+        } else {
+          server = await this.setupService.setupIP(host, this.productKey)
+        }
+      } else {
+        server = await this.setupService.setupZeroconf(this.productKey)
+      }
       this.serverModel.createServer(server)
       await this.serverModel.saveAll()
       this.syncService.sync(server.id)
@@ -149,8 +149,10 @@ const mockServer: Required<EmbassyBuilder> = {
   id: '12345678',
   label: 'home',
   torAddress: 'agent-tor-address-isaverylongaddresssothaticantestwrapping.onion',
+  staticIP: '',
   versionInstalled: '0.1.0',
   status: ServerStatus.RUNNING,
   privkey: 'testprivkey',
   connectionType: EmbassyConnection.LAN,
+  connectionPreference: ConnectionPreference.LAN_TOR,
 }

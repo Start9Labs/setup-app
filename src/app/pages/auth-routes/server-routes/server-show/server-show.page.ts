@@ -38,7 +38,7 @@ export class ServerShowPage {
   getIcon = getIcon
   updatingFreeze = false
   updating = false
-  segmentValue: 'mods' | 'embassy' = 'mods'
+  segmentValue: 'apps' | 'embassy' = 'apps'
 
   constructor (
     private readonly route: ActivatedRoute,
