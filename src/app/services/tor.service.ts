@@ -31,22 +31,22 @@ export class TorService {
 
   async start (): Promise<void> {
     // ** MOCKS **
-    return this.mock()
+    // return this.mock()
 
-    // if (!this.platform.is('ios') && !this.platform.is('android')) { return }
-    // if (await this.tor.isRunning() || this.peekConnection() === TorConnection.in_progress) { return }
+    if (!this.platform.is('ios') && !this.platform.is('android')) { return }
+    if (await this.tor.isRunning() || this.peekConnection() === TorConnection.in_progress) { return }
 
-    // console.log('starting Tor')
+    console.log('starting Tor')
 
-    // this.connection$.next(TorConnection.in_progress)
+    this.connection$.next(TorConnection.in_progress)
 
-    // this.tor.start({ socksPort: TorService.PORT, controlPort: 59591, initTimeout: 40000 }).subscribe({
-    //   next: (progress: number) => this.handleConnecting(progress),
-    //   error: (e: string) => {
-    //     console.error(e)
-    //     this.connection$.next(TorConnection.disconnected)
-    //   },
-    // })
+    this.tor.start({ socksPort: TorService.PORT, controlPort: 59591, initTimeout: 40000 }).subscribe({
+      next: (progress: number) => this.handleConnecting(progress),
+      error: (e: string) => {
+        console.error(e)
+        this.connection$.next(TorConnection.disconnected)
+      },
+    })
   }
 
   async stop (): Promise<void> {

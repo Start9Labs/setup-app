@@ -15,6 +15,10 @@ const routes: Routes = [
     loadChildren: () => import('./server-wifi/server-wifi.module').then(m => m.ServerWifiPageModule),
   },
   {
+    path: 'connection',
+    loadChildren: () => import('./server-connection/server-connection.module').then(m => m.ServerConnectionPageModule),
+  },
+  {
     path: 'specs',
     loadChildren: () => import('./server-specs/server-specs.module').then(m => m.ServerSpecsPageModule),
   },

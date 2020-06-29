@@ -21,8 +21,8 @@
   <!-- segment -->
   <ion-toolbar *ngIf="!updating">
     <ion-segment [(ngModel)]="segmentValue">
-      <ion-segment-button value="mods">
-        <ion-label>Mods</ion-label>
+      <ion-segment-button value="apps">
+        <ion-label>Apps</ion-label>
       </ion-segment-button>
       <ion-segment-button value="embassy">
         <ion-label>Embassy</ion-label>
@@ -43,14 +43,14 @@
       <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
     </ion-item>
 
-    <!-- Mods Segment -->
-    <div *ngIf="segmentValue === 'mods'">
+    <!-- Apps Segment -->
+    <div *ngIf="segmentValue === 'apps'">
       <ion-item-group>
 
         <ion-item-divider></ion-item-divider>
         <ion-item [routerLink]="['apps', 'available']" detail="false">
           <ion-icon slot="start" name="apps-outline" color="primary"></ion-icon>
-          <ion-label><ion-text color="primary">Get Embassy Mods</ion-text></ion-label>
+          <ion-label><ion-text color="primary">Get Apps</ion-text></ion-label>
           <ion-icon slot="end" name="arrow-forward-outline" color="primary"></ion-icon>
         </ion-item>
 
@@ -131,14 +131,6 @@
             <ion-label><ion-text color="primary">Shutdown</ion-text></ion-label>
           </ion-item>
         </ng-container>
-
-        <ion-item-divider></ion-item-divider>
-
-        <!-- forget -->
-        <ion-item button (click)="presentAlertForget()">
-          <ion-icon slot="start" name="trash-outline" color="danger"></ion-icon>
-          <ion-label><ion-text color="danger">Forget</ion-text></ion-label>
-        </ion-item>
       </ion-item-group>
     </div>
   </ng-container>

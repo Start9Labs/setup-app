@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { S9Server, getLanIP, ServerStatus, EmbassyConnection, idFromProductKey } from '../models/server-model'
+import { S9Server, getLanIP, ServerStatus, EmbassyConnection, idFromProductKey, ConnectionPreference } from '../models/server-model'
 import { AuthService } from './auth.service'
 import { ReqRes } from './api.service'
 import { ZeroconfMonitor } from './zeroconf.service'
@@ -36,7 +36,9 @@ export class SetupService {
       versionInstalled,
       privkey,
       torAddress,
-      connectionType: EmbassyConnection.LAN,
+      staticIP: '',
+      connectionType: EmbassyConnection.TOR,
+      connectionPreference: ConnectionPreference.LAN_TOR,
       ...await this.getServer(torAddress, versionInstalled, privkey),
     }
 
@@ -55,14 +57,14 @@ export class SetupService {
     const ip = getLanIP(zeroconfService)
     if (!ip) { throw new Error('IP address not found. Please contact support.') }
 
-    return this.finishSetup(ip, id, productKey)
+    return this.finishLANSetup(ip, id, productKey)
   }
 
   async setupIP (ip: string, productKey: string): Promise<S9Server> {
-    return this.finishSetup(ip, idFromProductKey(productKey), productKey)
+    return this.finishLANSetup(ip, idFromProductKey(productKey), productKey, true)
   }
 
-  private async finishSetup (host: string, id: string, productKey: string): Promise<S9Server> {
+  private async finishLANSetup (host: string, id: string, productKey: string, useStatic = false): Promise<S9Server> {
     // get agent version
     const versionInstalled = await this.getVersion(host)
 
@@ -82,7 +84,9 @@ export class SetupService {
       versionInstalled,
       privkey,
       torAddress,
+      staticIP: useStatic ? host : '',
       connectionType: EmbassyConnection.LAN,
+      connectionPreference: ConnectionPreference.LAN_TOR,
       ...await this.getServer(host, versionInstalled, privkey),
     }
 
@@ -178,5 +182,7 @@ export interface EmbassyBuilder {
   versionInstalled?: string
   privkey?: string
   torAddress?: string
+  staticIP: string | undefined
   connectionType?: EmbassyConnection
+  connectionPreference: ConnectionPreference
 }

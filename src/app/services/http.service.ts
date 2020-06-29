@@ -3,7 +3,7 @@ import { HttpPluginNativeImpl, HttpOptions } from '@start9labs/capacitor-http'
 import { ZeroconfMonitor } from './zeroconf.service'
 import { TokenSigner } from 'jsontokens'
 import { EmbassyBuilderWith } from './setup.service'
-import { S9Server, ServerModel, getLanIP, EmbassyConnection } from '../models/server-model'
+import { S9Server, ServerModel, getLanIP, EmbassyConnection, ConnectionPreference } from '../models/server-model'
 import { TorService, TorConnection } from './tor.service'
 import { NetworkMonitor } from './network.service'
 import * as uuid from 'uuid'
@@ -28,15 +28,42 @@ export class HttpService {
       'Authorization': getAuthHeader(server.privkey),
     })
 
-    const zcs = this.zeroconfMonitor.getService(server.id)
-
     let host: string
     let connectionType: EmbassyConnection
 
-    if (zcs) {
-      connectionType = EmbassyConnection.LAN
-      host = getLanIP(zcs)
-    } else {
+    // LAN/Tor
+    if (server.connectionPreference === ConnectionPreference.LAN_TOR) {
+      if (server.staticIP) {
+        connectionType = EmbassyConnection.LAN
+        host = server.staticIP
+      } else {
+        const zcs = this.zeroconfMonitor.getService(server.id)
+
+        if (zcs) {
+          connectionType = EmbassyConnection.LAN
+          host = getLanIP(zcs)
+        } else {
+          connectionType = EmbassyConnection.TOR
+          host = server.torAddress.trim() // @COMPAT Ambassador <= 1.3.0 retuned torAddress with trailing "\n"
+        }
+      }
+    // LAN only
+    } else if (server.connectionPreference === ConnectionPreference.LAN) {
+      if (server.staticIP) {
+        connectionType = EmbassyConnection.LAN
+        host = server.staticIP
+      } else {
+        const zcs = this.zeroconfMonitor.getService(server.id)
+
+        if (zcs) {
+          connectionType = EmbassyConnection.LAN
+          host = getLanIP(zcs)
+        } else {
+          throw new Error('Embassy not found on LAN')
+        }
+      }
+    // Tor only
+    } else if (server.connectionPreference === ConnectionPreference.TOR) {
       connectionType = EmbassyConnection.TOR
       host = server.torAddress.trim() // @COMPAT Ambassador <= 1.3.0 retuned torAddress with trailing "\n"
     }

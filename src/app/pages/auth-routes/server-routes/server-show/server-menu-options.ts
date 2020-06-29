@@ -22,56 +22,42 @@ export const EditNameAlert: (s: S9Server, h: (a?: any) => any) => AlertOptions =
 } as AlertOptions)
 
 export const UpdateAlert: (s: S9Server, version: string, h: () => any) => AlertOptions = (server, version, handler) => ({
-    backdropDismiss: false,
-    header: 'Confirm',
-    message: `Update Ambassador to ${version}?`,
-    buttons: [
-      CancelButton, {
-        text: 'Update',
-        handler: () => { handler() },
-      },
+  backdropDismiss: false,
+  header: 'Confirm',
+  message: `Update Ambassador to ${version}?`,
+  buttons: [
+    CancelButton, {
+      text: 'Update',
+      handler: () => { handler() },
+    },
   ],
-  } as AlertOptions)
+} as AlertOptions)
 
 export const RestartAlert: (s: S9Server, h: () => any) => AlertOptions = (server, handler) => ({
-    backdropDismiss: false,
-    header: 'Confirm',
-    message: `Are you sure you want to restart ${server.label}?`,
-    buttons: [
-      CancelButton, {
-        text: 'Restart',
-        cssClass: 'alert-danger',
-        handler: () => { handler() },
-      },
-    ],
+  backdropDismiss: false,
+  header: 'Confirm',
+  message: `Are you sure you want to restart ${server.label}?`,
+  buttons: [
+    CancelButton, {
+      text: 'Restart',
+      cssClass: 'alert-danger',
+      handler: () => { handler() },
+    },
+  ],
 } as AlertOptions)
 
 export const ShutdownAlert: (s: S9Server, h: () => any) => AlertOptions = (server, handler) => ({
-    backdropDismiss: false,
-    header: 'Confirm',
-    message: `Are you sure you want to shut down ${server.label}?`,
-    buttons: [
-      CancelButton, {
-        text: 'Shutdown',
-        cssClass: 'alert-danger',
-        handler: () => { handler() },
-      },
-    ],
-  } as AlertOptions)
-
-export const ForgetAlert: (s: S9Server, h: () => any) => AlertOptions = (server, handler) => ({
-    backdropDismiss: false,
-    header: 'Caution',
-    message: `Are you sure you want to forget ${server.label} on this device? You can add it back later. The Embassy itself will not be affected.`,
-    buttons: [
-      CancelButton, {
-        text: 'Forget Embassy',
-        cssClass: 'alert-danger',
-        handler: () => { handler() },
-      },
-    ],
-  } as AlertOptions
-)
+  backdropDismiss: false,
+  header: 'Confirm',
+  message: `Are you sure you want to shut down ${server.label}?`,
+  buttons: [
+    CancelButton, {
+      text: 'Shutdown',
+      cssClass: 'alert-danger',
+      handler: () => { handler() },
+    },
+  ],
+} as AlertOptions)
 
 export const LoadingSpinner: (m?: string) => LoadingOptions = (m) => {
   const toMergeIn = m ? { message: m } : { }

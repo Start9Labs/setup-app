@@ -1,0 +1,37 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="['/auth', 'servers', serverId]"></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      Connection Options
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding-top">
+
+  <ion-item *ngIf="error">
+    <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
+  </ion-item>
+
+  <ion-item-group>
+    <ion-item>
+      <ion-label>Preference</ion-label>
+      <ion-select slot="end" placeholder="Select" [(ngModel)]="connectionPreference" [selectedText]="connectionPreference">
+        <ion-select-option [value]="ConnectionPreference.LAN_TOR">LAN/Tor</ion-select-option>
+        <ion-select-option [value]="ConnectionPreference.LAN">LAN only</ion-select-option>
+        <ion-select-option [value]="ConnectionPreference.TOR">Tor only</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating" color="medium">Static LAN IP</ion-label>
+      <ion-input [(ngModel)]="staticIP"></ion-input>
+    </ion-item>
+  </ion-item-group>
+
+  <ion-button expand="block" fill="outline" (click)="save()" style="margin: 40px 0;">
+    Save
+  </ion-button>
+
+</ion-content>

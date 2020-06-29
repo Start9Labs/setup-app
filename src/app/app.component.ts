@@ -92,10 +92,12 @@ export class AppComponent {
           this.stopServices()
         }
       })
-      // set StatusBar style
-      StatusBar.setStyle({
-        style: StatusBarStyle.Dark,
-      })
+      if (this.platform.is('ios') || this.platform.is('android')) {
+        // set StatusBar style
+        StatusBar.setStyle({
+          style: StatusBarStyle.Dark,
+        })
+      }
       // dismiss SplashScreen
       SplashScreen.hide()
       // show Tor footer if loading
