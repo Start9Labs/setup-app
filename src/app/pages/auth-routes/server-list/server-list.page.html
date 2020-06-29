@@ -40,9 +40,6 @@
           <s9-status [serverStatus]="server.observe['status'] | async" [connectionType]="server.observe['connectionType'] | async" size="medium"></s9-status>
         </ion-label>
         <ion-badge slot="end" *ngIf="server.observe['badge'] | async as badge" color="danger">{{ badge }}</ion-badge>
-        <ion-button slot="end" fill="clear" color="primary" (click)="presentAction(server, $event)">
-          <ion-icon slot="icon-only" name="ellipsis-vertical-outline"></ion-icon>
-        </ion-button>
       </ion-item>
     </ion-card>
   </ng-container>
