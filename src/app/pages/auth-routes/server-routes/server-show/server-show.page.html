@@ -95,6 +95,11 @@
           <ion-icon slot="start" name="bookmark-outline" color="primary"></ion-icon>
           <ion-label><ion-text color="primary">Edit Name</ion-text></ion-label>
         </ion-item>
+        <!-- connection options -->
+        <ion-item [routerLink]="['connection']">
+          <ion-icon slot="start" name="globe-outline" color="primary"></ion-icon>
+          <ion-label><ion-text color="primary">Connection Options</ion-text></ion-label>
+        </ion-item>
 
         <ng-container *ngIf="(server.status | async) === 'RUNNING'">
           <!-- specs -->
