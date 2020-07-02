@@ -174,6 +174,15 @@ export class ServerShowPage {
     })
   }
 
+  async presentAlertForget () {
+    fromPropertyObservable(this.server).pipe(take(1)).subscribe(async server => {
+      const alert = await this.alertCtrl.create(
+        Menu.ForgetAlert(server, () => this.forget(server)),
+      )
+      await alert.present()
+    })
+  }
+
   async update (server: S9Server) {
     const loader = await this.loadingCtrl.create(Menu.LoadingSpinner())
     await loader.present()
@@ -225,5 +234,11 @@ export class ServerShowPage {
     } finally {
       await loader.dismiss()
     }
+  }
+
+  async forget (server: S9Server) {
+    this.serverModel.removeServer(server.id)
+    this.serverModel.saveAll()
+    await this.navCtrl.navigateRoot(['/auth'])
   }
 }
