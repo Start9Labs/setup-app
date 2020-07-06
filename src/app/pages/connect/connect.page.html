@@ -1,0 +1,85 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="['/devices']"></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      Connect
+    </ion-title>
+  </ion-toolbar>
+  <!-- segment -->
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="segmentValue" (ionChange)="segmentChanged($event)">
+      <ion-segment-button value="basic">
+        <ion-label>Basic</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="advanced">
+        <ion-label>Advanced</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding-top">
+
+  <ion-item *ngIf="error" style="margin-bottom: 16px;">
+    <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
+  </ion-item>
+
+  <div *ngIf="segmentValue === 'basic'">
+    <ion-item *ngIf="!serviceExists">
+      <ion-label class="ion-text-wrap">
+        <h2>No Embassies discovered on local area network.</h2>
+      </ion-label>
+    </ion-item>
+
+    <form (submit)="connect()" *ngIf="serviceExists">
+      <ion-item-group style="margin-bottom: 40px;">
+        <ion-item>
+          <ion-label position="floating" color="medium">Product Key (located on device)</ion-label>
+          <ion-input maxlength="8" name="productKey" [(ngModel)]="productKey"></ion-input>
+        </ion-item>
+      </ion-item-group>
+      <ion-button type="submit" [disabled]="productKey.length !== 8" expand="block" fill="outline">
+        Connect
+      </ion-button>
+    </form>
+
+    <ion-item-group>
+      <ion-item-divider></ion-item-divider>
+      <ion-item>
+        <ion-label class="ion-text-wrap">
+          <ion-text color="warning"><h2>Instructions</h2></ion-text>
+          <ion-text color="medium">
+            <ul>
+              <li>Connect Embassy to power using provided power adapter.</li>
+              <li>Connect Embassy to your router's Ethernet port using provided Ethernet cable.</li>
+              <li><ion-text color="warning">Embassy is ready when you hear the 2nd chime. It is the longer and more pleasant noise and can take up to 2 minutes.</ion-text></li>
+              <li>Connect your phone to router's own wifi network</li>
+              <li>Enter the Product Key located on bottom of Embassy.</li>
+            </ul>
+          </ion-text>
+        </ion-label>
+      </ion-item>
+    </ion-item-group>
+  </div>
+
+  <div *ngIf="segmentValue === 'advanced'">
+    <form (submit)="connect(true)">
+      <ion-item-group style="margin-bottom: 40px;">
+        <ion-item>
+          <ion-label position="floating" color="medium">Product Key (located on device)</ion-label>
+          <ion-input maxlength="8" name="productKey" [(ngModel)]="productKey"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating" color="medium">LAN IP Address</ion-label>
+          <ion-input maxlength="70" name="host" [(ngModel)]="host"></ion-input>
+        </ion-item>
+      </ion-item-group>
+      <ion-button type="submit" [disabled]="!host || !productKey || productKey.length < 8" expand="block" fill="outline">
+        Connect
+      </ion-button>
+    </form>
+  </div>
+
+</ion-content>

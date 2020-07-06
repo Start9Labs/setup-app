@@ -1,0 +1,42 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="['/devices']"></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      Setup
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding-top">
+
+  <ion-item *ngIf="error" style="margin-bottom: 16px;">
+    <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
+  </ion-item>
+
+  <ion-item-group style="margin-bottom: 40px;">
+    <ion-item>
+      <ion-label>{{ torAddress }}</ion-label>
+    </ion-item>
+  </ion-item-group>
+  <ion-button expand="block" fill="outline" (click)="setup()">
+    Setup
+  </ion-button>
+
+  <ion-item-group>
+    <ion-item-divider></ion-item-divider>
+    <ion-item>
+      <ion-label class="ion-text-wrap">
+        <ion-text color="warning"><h2>Explanation</h2></ion-text>
+        <p>
+          To ensure that Start9 has no special insight into your activity, the Tor Address of your Embassy is generated right here, right now, by your own device.
+        </p>
+        <p>
+          Randomly generate as many Tor addresses as you like, then click "Setup".
+        </p>
+      </ion-label>
+    </ion-item>
+  </ion-item-group>
+
+</ion-content>

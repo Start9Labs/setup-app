@@ -25,36 +25,6 @@
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
 
-$global-footer-height: 70px;
-
-.tor-footer {
-  height: $global-footer-height;
-  position: fixed;
-  bottom: 0%;
-
-  & ion-toolbar {
-    min-height: 70px;
-  }
-  & p {
-    font-size: 12px;
-  }
-  & img {
-    width: auto; 
-    height: 20px;
-    vertical-align: bottom;
-    padding-right: 16px;
-  }
-}
-
-.has-global-footer ion-app {
-  height: calc(100% - #{$global-footer-height});
-}
-
-.naked-item {
-  --padding-start: 0;
-  --inner-padding-end: 0;
-}
-
 .loader {
   --spinner-color: var(--ion-color-warning) !important;
 }
@@ -74,43 +44,10 @@ $global-footer-height: 70px;
   --border-width: 2px;
 }
 
-.help-button {
-  margin: 0 8px 0 0;
-}
-
-.item-interactive {
-  --highlight-background: transparent !important;
-}
-
-.alert-config-value {
-  .alert-message.sc-ion-alert-md {
-    color: var(--ion-color-danger) !important;
-  }
-}
-
 .center {
   display: block;
   margin: auto;
   height: 100%;
-}
-
-.notification-toast {
-  --background: var(--ion-color-light);
-  --button-color: var(--ion-color-primary);
-  --border-color: var(--ion-color-warning);
-  --border-style: solid;
-  --border-width: 2px;
-  --color: white;
-}
-
-.sublist-spinner {
-  text-align: center;
-  margin-top: 40px;
-}
-
-ion-textarea {
-  margin-top: 0;
-  padding-left: 12px;
 }
 
 ion-note {
@@ -120,16 +57,8 @@ ion-note {
   white-space: nowrap;
 }
 
-ion-badge {
-  font-weight: bold;
-}
-
 ion-item-divider {
   --background: transparent;
-}
-
-ion-infinite-scroll ion-infinite-scroll-content {
-  --color: var(--ion-color-warning) !important;
 }
 
 ion-action-sheet {

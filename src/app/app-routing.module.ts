@@ -1,23 +1,23 @@
 import { NgModule } from '@angular/core'
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router'
-import { AuthGuard } from './pages/auth-routes/auth.guard'
-import { UnauthGuard } from './pages/unauth-routes/unauth.guard'
 
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'auth',
+    redirectTo: 'devices',
     pathMatch: 'full',
   },
   {
-    path: 'auth',
-    canActivate: [AuthGuard],
-    loadChildren: () => import('./pages/auth-routes/auth-routing.module').then(m => m.AuthRoutingModule),
+    path: 'devices',
+    loadChildren: () => import('./pages/device-list/device-list.module').then(m => m.DeviceListPageModule),
   },
   {
-    path: 'unauth',
-    canActivate: [UnauthGuard],
-    loadChildren: () => import('./pages/unauth-routes/unauth-routing.module').then(m => m.UnauthRoutingModule),
+    path: 'connect',
+    loadChildren: () => import('./pages/connect/connect.module').then(m => m.ConnectPageModule),
+  },
+  {
+    path: 'setup',
+    loadChildren: () => import('./pages/setup/setup.module').then(m => m.ConnectPageModule),
   },
 ]
 

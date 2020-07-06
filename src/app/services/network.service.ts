@@ -13,7 +13,6 @@ export class NetworkMonitor {
   private readonly networkStatus$ = new BehaviorSubject<NetworkStatus>({ connected: false, connectionType: 'none' })
   watchConnection (): Observable<NetworkStatus> { return this.networkStatus$.asObservable() }
   peekConnection (): NetworkStatus { return this.networkStatus$.getValue() }
-  private listener: PluginListenerHandle
   private previous: string | undefined
 
   async init () {
@@ -21,7 +20,7 @@ export class NetworkMonitor {
 
     this.networkStatus$.next(await Network.getStatus())
 
-    this.listener = Network.addListener('networkStatusChange', async (status) => {
+    Network.addListener('networkStatusChange', async (status) => {
       await mutex.runExclusive(() => {
         const current = JSON.stringify(status)
 
@@ -32,10 +31,5 @@ export class NetworkMonitor {
         this.networkStatus$.next(status)
       })
     })
-  }
-
-  unint (): void {
-    this.networkStatus$.next({ connected: false, connectionType: 'none' })
-    this.listener.remove()
   }
 }

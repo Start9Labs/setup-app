@@ -7,8 +7,7 @@ import com.getcapacitor.Plugin;
 
 import java.util.ArrayList;
 
-import tor.plugin.TorPlugin;
-import http.plugin.HttpPlugin;
+import com.getcapacitor.plugin.http.Http;
 
 public class MainActivity extends BridgeActivity {
   @Override
@@ -18,8 +17,7 @@ public class MainActivity extends BridgeActivity {
     // Initializes the Bridge
     this.init(savedInstanceState, new ArrayList<Class<? extends Plugin>>() {{
       // Additional plugins you've installed go here
-      add(TorPlugin.class);
-      add(HttpPlugin.class);
+      add(Http.class);
     }});
   }
 }
