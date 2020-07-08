@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { Plugins, NetworkStatus, PluginListenerHandle } from '@capacitor/core'
+import { Plugins, NetworkStatus } from '@capacitor/core'
 import { Observable, BehaviorSubject } from 'rxjs'
 import { Mutex } from 'async-mutex'
 

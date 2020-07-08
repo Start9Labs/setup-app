@@ -9,8 +9,7 @@ android {
 
 apply from: "../capacitor-cordova-android-plugins/cordova.variables.gradle"
 dependencies {
-    implementation project(':start9labs-capacitor-http')
-    implementation project(':start9labs-capacitor-tor')
+    implementation project(':capacitor-community-http')
     implementation "org.jmdns:jmdns:3.5.5"
 }
 

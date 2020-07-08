@@ -1,7 +1,7 @@
 {
-  "name": "start9-device-companion",
+  "name": "start9-companion",
   "version": "2.0.0",
-  "description": "Embassy setup app",
+  "description": "Companion app for setting up Start9 devices",
   "author": "Start9 Labs",
   "private": true,
   "homepage": "https://start9labs.com",
