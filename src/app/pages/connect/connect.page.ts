@@ -1,7 +1,9 @@
 import { Component, NgZone } from '@angular/core'
-import { NavController, LoadingController } from '@ionic/angular'
+import { LoadingController, NavController } from '@ionic/angular'
+import { Router } from '@angular/router'
 import { ZeroconfMonitor } from '../../services/zeroconf.service'
-import { HttpService, getLanIP, idFromProductKey, Method } from '../../services/http.service'
+import { HttpService, getLanIP, idFromProductKey } from '../../services/http.service'
+import { AppState, Device } from 'src/app/app-state'
 import { Subscription } from 'rxjs'
 
 @Component({
@@ -18,11 +20,12 @@ export class ConnectPage {
   segmentValue: 'basic' | 'advanced' = 'basic'
 
   constructor (
-    private readonly navController: NavController,
+    private readonly navCtrl: NavController,
     private readonly loadingCtrl: LoadingController,
     private readonly zeroconfMonitor: ZeroconfMonitor,
     private readonly httpService: HttpService,
     private readonly zone: NgZone,
+    private readonly appState: AppState,
   ) { }
 
   ngOnInit () {
@@ -51,8 +54,9 @@ export class ConnectPage {
     try {
       const id = idFromProductKey(this.productKey)
       ip = ip || this.getIP(id)
-      await this.finishConnect(ip, id)
-      await this.navController.navigateRoot(['/setup'])
+      const device = await this.finishConnect(ip, id)
+      this.appState.addDevice(device)
+      this.navCtrl.navigateRoot(['/devices', id], { queryParams: { success: 1 } })
     } catch (e) {
       console.error(e)
       this.error = `Error: ${e.message}`
@@ -73,17 +77,28 @@ export class ConnectPage {
     return ip
   }
 
-  private async finishConnect (ip: string, id: string): Promise<void> {
-    // get Ambassador version
-    const version = await this.httpService.request({
-      method: Method.GET,
-      url: `http://${ip}:5959/version`,
-    })
-    // hmac
-    const pubKey = await this.httpService.request({
-      method: Method.POST,
-      url: `http://${ip}:5959/dhe`,
-      data: { publicKey: '' },
-    })
+  private async finishConnect (ip: string, id: string): Promise<Device> {
+    return mockDevice(id)
+    // // get Ambassador version
+    // const version = await this.httpService.request({
+    //   method: Method.GET,
+    //   url: `http://${ip}:5959/version`,
+    // })
+    // // hmac
+    // const pubKey = await this.httpService.request({
+    //   method: Method.POST,
+    //   url: `http://${ip}:5959/${version}/dhe`,
+    //   data: { publicKey: '' },
+    // })
+  }
+}
+
+function mockDevice (id: string): Device {
+  const type = 'Embassy'
+  return {
+    id,
+    torAddress: 'extralongmocktoraddresstotestwrapping.onion',
+    type,
+    label: `${type}:${id}`,
   }
 }

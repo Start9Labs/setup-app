@@ -6,21 +6,17 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="ion-padding-top">
 
   <ion-item-group *ngIf="!(devices$ | async).length">
     <ion-item>
       <ion-label class="ion-text-wrap">
-        <h3>Welcome</h3>
-        <br />
-        <h2>
-          <ion-text color="medium">To set up your first Embassy, click the plus button below.</ion-text>
-        </h2>
+        <ion-text color="medium">To set up your first Start9 device, click the plus button below.</ion-text>
       </ion-label>
     </ion-item>
   </ion-item-group>
 
-  <ion-card button *ngFor="let device of devices$ | async" style="margin-bottom: 16px;" (click)="show(device.id)">
+  <ion-card button *ngFor="let device of devices$ | async" style="margin-bottom: 16px;" [routerLink]="['/devices', device.id]">
     <ion-item>
       <ion-avatar slot="start">
         <img src="assets/img/cube.png" alt="icon" />
@@ -34,7 +30,7 @@
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button [routerLink]="['/connect']" class="fab-button">
-      <ion-icon name="add" color="primary"></ion-icon>
+      <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
-import CryptoJS from 'crypto-js'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
+import * as CryptoJS from 'crypto-js'
 
 import { Plugins } from '@capacitor/core'
 import { HttpOptions } from '@capacitor-community/http'

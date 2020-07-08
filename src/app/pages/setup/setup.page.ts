@@ -1,28 +1,28 @@
-import { Component, NgZone } from '@angular/core'
+import { Component } from '@angular/core'
 import { NavController, LoadingController } from '@ionic/angular'
-import { ZeroconfMonitor } from '../../services/zeroconf.service'
-import { HttpService, getLanIP, idFromProductKey, Method } from '../../services/http.service'
-import { Subscription } from 'rxjs'
+import { HttpService, Method } from '../../services/http.service'
 
 @Component({
-  selector: 'page-connect',
-  templateUrl: 'connect.page.html',
-  styleUrls: ['connect.page.scss'],
+  selector: 'page-setup',
+  templateUrl: 'setup.page.html',
+  styleUrls: ['setup.page.scss'],
 })
-export class ConnectPage {
+export class SetupPage {
   error = ''
   torAddress = ''
 
   constructor (
     private readonly navController: NavController,
     private readonly loadingCtrl: LoadingController,
-    private readonly zeroconfMonitor: ZeroconfMonitor,
     private readonly httpService: HttpService,
-    private readonly zone: NgZone,
   ) { }
 
   ngOnInit () {
     this.torAddress = 'hellotor.onion'
+  }
+
+  refresh (): void {
+    this.torAddress = 'lalalala.onion'
   }
 
   async setup (ip?: string): Promise<void> {

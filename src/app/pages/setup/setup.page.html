@@ -15,28 +15,29 @@
     <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
   </ion-item>
 
-  <ion-item-group style="margin-bottom: 40px;">
-    <ion-item>
-      <ion-label>{{ torAddress }}</ion-label>
-    </ion-item>
-  </ion-item-group>
-  <ion-button expand="block" fill="outline" (click)="setup()">
-    Setup
-  </ion-button>
-
-  <ion-item-group>
-    <ion-item-divider></ion-item-divider>
+  <ion-item-group class="ion-padding-bottom">
     <ion-item>
       <ion-label class="ion-text-wrap">
-        <ion-text color="warning"><h2>Explanation</h2></ion-text>
         <p>
-          To ensure that Start9 has no special insight into your activity, the Tor Address of your Embassy is generated right here, right now, by your own device.
+          To ensure that Start9 has no special insight into your activity, the Tor address of your Embassy is generated right here, right now, by your own device.
         </p>
+        <br />
         <p>
           Randomly generate as many Tor addresses as you like, then click "Setup".
         </p>
       </ion-label>
     </ion-item>
   </ion-item-group>
+
+  <p class="ion-text-center" style="margin-bottom: 40px;">
+    {{ torAddress }}
+  </p>
+  <ion-button class="ion-margin-bottom" expand="block" fill="outline" color="warning" (click)="refresh()">
+    <ion-icon slot="start" name="reload"></ion-icon>
+    Refresh
+  </ion-button>
+  <ion-button expand="block" fill="outline" color="primary" (click)="setup()">
+    Setup
+  </ion-button>
 
 </ion-content>
