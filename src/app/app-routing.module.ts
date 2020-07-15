@@ -19,10 +19,6 @@ const routes: Routes = [
     path: 'connect',
     loadChildren: () => import('./pages/connect/connect.module').then(m => m.ConnectPageModule),
   },
-  {
-    path: 'setup',
-    loadChildren: () => import('./pages/setup/setup.module').then(m => m.SetupPageModule),
-  },
 ]
 
 @NgModule({

@@ -1,8 +1,7 @@
 import { Component, NgZone } from '@angular/core'
 import { LoadingController, NavController } from '@ionic/angular'
-import { Router } from '@angular/router'
 import { ZeroconfMonitor } from '../../services/zeroconf.service'
-import { HttpService, getLanIP, idFromProductKey } from '../../services/http.service'
+import { getLanIP, idFromProductKey } from '../../services/http.service'
 import { AppState, Device } from 'src/app/app-state'
 import { Subscription } from 'rxjs'
 
@@ -23,7 +22,6 @@ export class ConnectPage {
     private readonly navCtrl: NavController,
     private readonly loadingCtrl: LoadingController,
     private readonly zeroconfMonitor: ZeroconfMonitor,
-    private readonly httpService: HttpService,
     private readonly zone: NgZone,
     private readonly appState: AppState,
   ) { }
@@ -38,7 +36,7 @@ export class ConnectPage {
     this.existsSub.unsubscribe()
   }
 
-  segmentChanged (e: Event): void {
+  segmentChanged (): void {
     this.error = ''
   }
 
@@ -54,7 +52,7 @@ export class ConnectPage {
     try {
       const id = idFromProductKey(this.productKey)
       ip = ip || this.getIP(id)
-      const device = await this.finishConnect(ip, id)
+      const device = await this.finishConnect(id)
       this.appState.addDevice(device)
       this.navCtrl.navigateRoot(['/devices', id], { queryParams: { success: 1 } })
     } catch (e) {
@@ -77,8 +75,12 @@ export class ConnectPage {
     return ip
   }
 
-  private async finishConnect (ip: string, id: string): Promise<Device> {
+  private async finishConnect (id: string): Promise<Device> {
     return mockDevice(id)
+
+    
+
+
     // // get Ambassador version
     // const version = await this.httpService.request({
     //   method: Method.GET,

@@ -8,11 +8,13 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "npm run postinstall && ionic build && npx cap sync",
+    "ios": "npm run build && npx cap open ios",
+    "android": "npm run build && npx cap open android",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "postinstall": "cp -r node_modules/crypto-browserify node_modules/crypto && cp -r node_modules/stream-browserify node_modules/stream && cp -r node_modules/vm-browserify node_modules/vm"
+    "postinstall": "node patch_polyfills.js && cp -r node_modules/crypto-browserify node_modules/crypto && cp -r node_modules/stream-browserify node_modules/stream && cp -r node_modules/vm-browserify node_modules/vm"
   },
   "dependencies": {
     "@angular/common": "^10.0.0",
@@ -30,7 +32,11 @@
     "buffer": "^5.6.0",
     "cordova-plugin-zeroconf": "^1.4.0",
     "core-js": "^3.4.0",
+    "crypto": "^1.0.1",
     "crypto-js": "^4.0.0",
+    "ed25519-wasm-pro": "^1.1.1",
+    "hi-base32": "^0.5.0",
+    "noble-ed25519": "^1.0.1",
     "rxjs": "^6.5.0",
     "zone.js": "^0.10.0"
   },

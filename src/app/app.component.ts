@@ -4,6 +4,7 @@ import { ZeroconfMonitor } from './services/zeroconf.service'
 
 import { Plugins, StatusBarStyle } from '@capacitor/core'
 import { AppState } from './app-state'
+import { genKey } from './util/window'
 const { SplashScreen, StatusBar } = Plugins
 
 @Component({
@@ -25,6 +26,9 @@ export class AppComponent {
   }
 
   async init (): Promise<void> {
+    console.log('subtleCryptoEncryptExists', window.crypto.subtle, window.crypto.subtle.encrypt)
+
+    window['genKey'] = genKey
     // load storage
     await this.appState.load()
     // start network monitor
@@ -37,5 +41,5 @@ export class AppComponent {
     })
     // dismiss SplashScreen
     SplashScreen.hide()
-  }
+  } 
 }
