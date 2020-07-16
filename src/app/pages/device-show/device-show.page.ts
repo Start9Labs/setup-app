@@ -4,6 +4,7 @@ import { AppState, Device } from '../../app-state'
 import { ActivatedRoute } from '@angular/router'
 
 import { Plugins } from '@capacitor/core'
+import { hmac256 } from 'src/app/util/crypto'
 const { Clipboard } = Plugins
 
 @Component({
@@ -14,6 +15,9 @@ const { Clipboard } = Plugins
 export class DeviceShowPage {
   device: Device
   success: string
+  hmac: string
+  message: string
+  productKey?: string
 
   constructor (
     private readonly navCtrl: NavController,
@@ -26,14 +30,17 @@ export class DeviceShowPage {
   ngOnInit ( ) {
     const deviceId = this.route.snapshot.paramMap.get('deviceId')
     this.success = this.route.snapshot.queryParamMap.get('success')
+    this.productKey = this.route.snapshot.queryParamMap.get('productKey')
+
     this.device = this.appState.peekDevices().find(d => d.id === deviceId)
   }
 
-  async copyTor () {
-    let message: string
-    await Clipboard.write({ url: this.device.torAddress || '' })
-      .then(() => { message = 'copied to clipboard!' })
-      .catch(() => { message = 'failed to copy' })
+  async copyTor (forRedirect = false) {
+    let url = forRedirect ? await this.getLink() : this.device.torAddress
+
+    const message = await Clipboard.write({ url: url || '' })
+      .then(() => 'copied to clipboard!')
+      .catch(() => 'failed to copy')
 
     const toast = await this.toastCtrl.create({
       message,
@@ -41,6 +48,17 @@ export class DeviceShowPage {
       duration: 1000,
     })
     await toast.present()
+  }
+
+  async getLink (): Promise<string | undefined> {
+    if (!this.device.torAddress) return undefined
+    if (!this.productKey) return undefined
+
+    const expiration = modulateTime(new Date(), 5, 'minutes')
+    const message = expiration.toISOString()
+    const hmac = await hmac256(this.productKey, message)
+
+    return this.device.torAddress + `/v0/register?hmac=${hmac}&message=${message}`
   }
 
   async presentAlertForget () {
@@ -67,5 +85,21 @@ export class DeviceShowPage {
   async forget (): Promise<void> {
     await this.appState.removeDevice(this.device.id)
     await this.navCtrl.navigateRoot(['/devices'])
+  }
+}
+
+function modulateTime (ts: Date, count: number, unit: 'days' | 'hours' | 'minutes' | 'seconds' ) {
+  const ms = inMs(count, unit)
+  const toReturn = new Date(ts)
+  toReturn.setMilliseconds( toReturn.getMilliseconds() + ms)
+  return toReturn
+}
+
+function inMs ( count: number, unit: 'days' | 'hours' | 'minutes' | 'seconds' ) {
+  switch (unit){
+    case 'seconds' : return count * 1000
+    case 'minutes' : return inMs(count * 60, 'seconds')
+    case 'hours' : return inMs(count * 60, 'minutes')
+    case 'days' : return inMs(count * 24, 'hours')
   }
 }
