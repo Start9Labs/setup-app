@@ -4,6 +4,7 @@ import { AppState, Device } from '../../app-state'
 import { ActivatedRoute } from '@angular/router'
 
 import { Plugins } from '@capacitor/core'
+import { hmac256 } from 'src/app/util/crypto'
 const { Clipboard } = Plugins
 
 @Component({
@@ -16,6 +17,7 @@ export class DeviceShowPage {
   success: string
   hmac: string
   message: string
+  productKey?: string
 
   constructor (
     private readonly navCtrl: NavController,
@@ -28,16 +30,15 @@ export class DeviceShowPage {
   ngOnInit ( ) {
     const deviceId = this.route.snapshot.paramMap.get('deviceId')
     this.success = this.route.snapshot.queryParamMap.get('success')
-    this.hmac = this.route.snapshot.queryParamMap.get('hmac')
-    this.message = this.route.snapshot.queryParamMap.get('message')
+    this.productKey = this.route.snapshot.queryParamMap.get('productKey')
 
     this.device = this.appState.peekDevices().find(d => d.id === deviceId)
   }
 
   async copyTor (forRedirect = false) {
-    const  url = (forRedirect ? this.getLink() : this.device.torAddress) || ''
+    let url = forRedirect ? await this.getLink() : this.device.torAddress
 
-    const message = await Clipboard.write({ url })
+    const message = await Clipboard.write({ url: url || '' })
       .then(() => 'copied to clipboard!')
       .catch(() => 'failed to copy')
 
@@ -49,9 +50,15 @@ export class DeviceShowPage {
     await toast.present()
   }
 
-  private getLink (): string | undefined {
+  async getLink (): Promise<string | undefined> {
     if (!this.device.torAddress) return undefined
-    return this.device.torAddress + `/v0/register?hmac=${this.hmac}&message=${this.message}`
+    if (!this.productKey) return undefined
+
+    const expiration = modulateTime(new Date(), 5, 'minutes')
+    const message = expiration.toISOString()
+    const hmac = await hmac256(this.productKey, message)
+
+    return this.device.torAddress + `/v0/register?hmac=${hmac}&message=${message}`
   }
 
   async presentAlertForget () {
@@ -78,5 +85,21 @@ export class DeviceShowPage {
   async forget (): Promise<void> {
     await this.appState.removeDevice(this.device.id)
     await this.navCtrl.navigateRoot(['/devices'])
+  }
+}
+
+function modulateTime (ts: Date, count: number, unit: 'days' | 'hours' | 'minutes' | 'seconds' ) {
+  const ms = inMs(count, unit)
+  const toReturn = new Date(ts)
+  toReturn.setMilliseconds( toReturn.getMilliseconds() + ms)
+  return toReturn
+}
+
+function inMs ( count: number, unit: 'days' | 'hours' | 'minutes' | 'seconds' ) {
+  switch (unit){
+    case 'seconds' : return count * 1000
+    case 'minutes' : return inMs(count * 60, 'seconds')
+    case 'hours' : return inMs(count * 60, 'minutes')
+    case 'days' : return inMs(count * 24, 'hours')
   }
 }

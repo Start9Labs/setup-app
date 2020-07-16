@@ -48,7 +48,7 @@
         <h2>{{ device.id }}</h2>
       </ion-label>
     </ion-item>
-    <ion-item>
+    <ion-item *ngIf="device.torAddress">
       <ion-label>
         <p>Tor Address</p>
         <h2 class="ion-text-wrap">{{ device.torAddress }}</h2>
@@ -57,7 +57,7 @@
         <ion-button fill="outline" size="small" (click)="copyTor()">
           Copy
         </ion-button>
-        <ion-button fill="outline" size="small" (click)="copyTor(true)">
+        <ion-button *ngIf="productKey" fill="outline" size="small" (click)="copyTor(true)">
           Link
         </ion-button>
       </ion-note>

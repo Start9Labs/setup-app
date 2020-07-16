@@ -32,11 +32,11 @@ export class AppComponent {
     await this.networkMonitor.init()
     // start zeroconf monitor
     this.zeroconfMonitor.init()
-    // set StatusBar style
-    StatusBar.setStyle({
-      style: StatusBarStyle.Dark,
-    })
-    // dismiss SplashScreen
-    SplashScreen.hide()
+    // // set StatusBar style
+    // StatusBar.setStyle({
+    //   style: StatusBarStyle.Dark,
+    // })
+    // // dismiss SplashScreen
+    // SplashScreen.hide()
   }
 }

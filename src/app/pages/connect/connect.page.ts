@@ -57,11 +57,7 @@ export class ConnectPage {
       const device = await this.finishConnect(ip, identifier)
       this.appState.addDevice(device)
 
-      const expiration = modulateTime(new Date(), 5, 'minutes')
-      const message = expiration.toISOString()
-      const hmac = await hmac256(this.productKey, message)
-
-      this.navCtrl.navigateRoot(['/devices', identifier], { queryParams: { success: 1, hmac, message } })
+      this.navCtrl.navigateRoot(['/devices', identifier], { queryParams: { success: 1, productKey: this.productKey } })
     } catch (e) {
       console.error(e)
       this.error = `Error: ${e.message}`
@@ -105,22 +101,6 @@ export class ConnectPage {
       torAddress: serverComputedTorAddress,
       type,
     }
-  }
-}
-
-function modulateTime (ts: Date, count: number, unit: 'days' | 'hours' | 'minutes' | 'seconds' ) {
-  const ms = inMs(count, unit)
-  const toReturn = new Date(ts)
-  toReturn.setMilliseconds( toReturn.getMilliseconds() + ms)
-  return toReturn
-}
-
-function inMs ( count: number, unit: 'days' | 'hours' | 'minutes' | 'seconds' ) {
-  switch (unit){
-    case 'seconds' : return count * 1000
-    case 'minutes' : return inMs(count * 60, 'seconds')
-    case 'hours' : return inMs(count * 60, 'minutes')
-    case 'days' : return inMs(count * 24, 'hours')
   }
 }
 
