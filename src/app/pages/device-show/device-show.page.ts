@@ -14,6 +14,7 @@ const { Clipboard } = Plugins
 export class DeviceShowPage {
   device: Device
   success: string
+  hmac: string
 
   constructor (
     private readonly navCtrl: NavController,
@@ -26,12 +27,20 @@ export class DeviceShowPage {
   ngOnInit ( ) {
     const deviceId = this.route.snapshot.paramMap.get('deviceId')
     this.success = this.route.snapshot.queryParamMap.get('success')
+    this.hmac = this.route.snapshot.queryParamMap.get('hmac')
     this.device = this.appState.peekDevices().find(d => d.id === deviceId)
   }
 
-  async copyTor () {
+  async copyTor (forRedirect = false) {
+    let url
+    if (!this.device.torAddress) {
+      url = ''
+    } else {
+      url = this.device.torAddress + (forRedirect ? `/register/${this.hmac}` : '')
+    }
+
     let message: string
-    await Clipboard.write({ url: this.device.torAddress || '' })
+    await Clipboard.write({ url })
       .then(() => { message = 'copied to clipboard!' })
       .catch(() => { message = 'failed to copy' })
 

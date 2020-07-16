@@ -4,7 +4,7 @@ import { ZeroconfMonitor } from '../../services/zeroconf.service'
 import { getLanIP, idFromProductKey, HttpService, Method } from '../../services/http.service'
 import { AppState, Device } from 'src/app/app-state'
 import { Subscription } from 'rxjs'
-import { genPrivKey, encrypt } from 'src/app/util/window'
+import { genPrivKey, encrypt, getPubKey, onionFromPubkey, hmac256 } from 'src/app/util/window'
 
 @Component({
   selector: 'page-connect',
@@ -56,7 +56,11 @@ export class ConnectPage {
       ip = ip || this.getIP(id)
       const device = await this.finishConnect(id)
       this.appState.addDevice(device)
-      this.navCtrl.navigateRoot(['/devices', id], { queryParams: { success: 1 } })
+
+      const expiration = modulateTime(new Date(), 5, 'minutes')
+      const hmac = await hmac256(this.productKey, expiration.toISOString())
+
+      this.navCtrl.navigateRoot(['/devices', id], { queryParams: { success: 1, hmac } })
     } catch (e) {
       console.error(e)
       this.error = `Error: ${e.message}`
@@ -78,31 +82,48 @@ export class ConnectPage {
   }
 
   private async finishConnect (id: string): Promise<Device> {
-    // return mockDevice(id)
+    return mockDevice(id)
+    
+    // const torkey = genPrivKey()
+    // const clientComputedTorAddress = await getPubKey(torkey).then(pk => onionFromPubkey(pk))
+    // // const arrayBuff = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin))
 
+    // const encrypted = encrypt(this.productKey, torkey)
 
-    const torkey = genPrivKey()
-
-    // const arrayBuff = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin))
-
-    const encrypted = encrypt(this.productKey, torkey)
-
-    const torAddress = await this.httpService.request({
-      method: Method.POST,
-      url: `http://${ip}:5959/registerTor`,
-      data: { encrypted },
-    })
-
-    // // get Ambassador version
-
-    // // hmac
-    // const pubKey = await this.httpService.request({
+    // const serverComputedTorAddress = await this.httpService.request({
     //   method: Method.POST,
-    //   url: `http://${ip}:5959/${version}/dhe`,
-    //   data: { publicKey: '' },
+    //   url: `http://${ip}:5959/registerTor`,
+    //   data: { encrypted },
     // })
+
+    // if (clientComputedTorAddress !== serverComputedTorAddress) throw new Error('Miscalculation of tor address')
+
+    // const type = 'Embassy'
+    // return {
+    //   id,
+    //   label: `${type}:${id}`,
+    //   torAddress: serverComputedTorAddress,
+    //   type,
+    // }
   }
 }
+
+function modulateTime (ts: Date, count: number, unit: 'days' | 'hours' | 'minutes' | 'seconds' ) {
+  const ms = inMs(count, unit)
+  const toReturn = new Date(ts)
+  toReturn.setMilliseconds( toReturn.getMilliseconds() + ms)
+  return toReturn
+}
+
+function inMs ( count: number, unit: 'days' | 'hours' | 'minutes' | 'seconds' ) {
+  switch (unit){
+    case 'seconds' : return count * 1000
+    case 'minutes' : return inMs(count * 60, 'seconds')
+    case 'hours' : return inMs(count * 60, 'minutes')
+    case 'days' : return inMs(count * 24, 'hours')
+  }
+}
+
 
 function mockDevice (id: string): Device {
   const type = 'Embassy'
