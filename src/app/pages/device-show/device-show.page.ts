@@ -48,7 +48,7 @@ export class DeviceShowPage {
 
   private getLink (): string | undefined {
     if (!this.device.torAddress) return undefined
-    return this.device.torAddress + `/v0/register/${this.hmac}`
+    return this.device.torAddress + `/v0/register?hmac=${this.hmac}`
   }
 
   async presentAlertForget () {
