@@ -86,7 +86,7 @@ export class ConnectPage {
     // return mockDevice(id)
 
     const torkey = genPrivKey()
-    const torkeyIndicator = new TextEncoder().encode('torkey:')
+    const torkeyIndicator = new TextEncoder().encode('== ed25519v1-secret: type0 ==')
     const encrypted = encrypt(this.productKey, new Uint8Array([...torkeyIndicator, ...torkey]))
 
     const serverComputedTorAddress = await this.httpService.request({
