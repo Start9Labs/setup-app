@@ -4,7 +4,7 @@ import { ZeroconfMonitor } from '../../services/zeroconf.service'
 import { getLanIP, idFromProductKey, HttpService, Method } from '../../services/http.service'
 import { AppState, Device } from 'src/app/app-state'
 import { Subscription } from 'rxjs'
-import { genPrivKey, encrypt, getPubKey, onionFromPubkey, hmac256 } from 'src/app/util/window'
+import { genPrivKey, encrypt, getPubKey, onionFromPubkey, hmac256 } from 'src/app/util/crypto'
 
 @Component({
   selector: 'page-connect',
@@ -52,15 +52,15 @@ export class ConnectPage {
     this.error = ''
 
     try {
-      const id = idFromProductKey(this.productKey)
-      ip = ip || this.getIP(id)
-      const device = await this.finishConnect(id)
+      const identifier = idFromProductKey(this.productKey)
+      ip = ip || this.getIP(identifier)
+      const device = await this.finishConnect(ip, identifier)
       this.appState.addDevice(device)
 
       const expiration = modulateTime(new Date(), 5, 'minutes')
       const hmac = await hmac256(this.productKey, expiration.toISOString())
 
-      this.navCtrl.navigateRoot(['/devices', id], { queryParams: { success: 1, hmac } })
+      this.navCtrl.navigateRoot(['/devices', identifier], { queryParams: { success: 1, hmac } })
     } catch (e) {
       console.error(e)
       this.error = `Error: ${e.message}`
@@ -81,30 +81,28 @@ export class ConnectPage {
     return ip
   }
 
-  private async finishConnect (id: string): Promise<Device> {
-    return mockDevice(id)
-    
-    // const torkey = genPrivKey()
-    // const clientComputedTorAddress = await getPubKey(torkey).then(pk => onionFromPubkey(pk))
-    // // const arrayBuff = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin))
+  private async finishConnect (ip: string, id: string): Promise<Device> {
+    // return mockDevice(id)
 
-    // const encrypted = encrypt(this.productKey, torkey)
+    const torkey = genPrivKey()
+    const encrypted = encrypt(this.productKey, torkey)
 
-    // const serverComputedTorAddress = await this.httpService.request({
-    //   method: Method.POST,
-    //   url: `http://${ip}:5959/registerTor`,
-    //   data: { encrypted },
-    // })
+    const serverComputedTorAddress = await this.httpService.request({
+      method: Method.POST,
+      url: `http://${ip}:5959/v0/registerTor`,
+      data: { torkey: encrypted },
+    })
+    const clientComputedTorAddress = await getPubKey(torkey).then(pk => onionFromPubkey(pk))
 
-    // if (clientComputedTorAddress !== serverComputedTorAddress) throw new Error('Miscalculation of tor address')
+    if (clientComputedTorAddress !== serverComputedTorAddress) throw new Error('Misalignment on tor address')
 
-    // const type = 'Embassy'
-    // return {
-    //   id,
-    //   label: `${type}:${id}`,
-    //   torAddress: serverComputedTorAddress,
-    //   type,
-    // }
+    const type = 'Embassy'
+    return {
+      id,
+      label: `${type}:${id}`,
+      torAddress: serverComputedTorAddress,
+      type,
+    }
   }
 }
 

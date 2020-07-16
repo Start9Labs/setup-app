@@ -4,7 +4,7 @@ import { ZeroconfMonitor } from './services/zeroconf.service'
 
 import { Plugins, StatusBarStyle } from '@capacitor/core'
 import { AppState } from './app-state'
-import { onionToPubkey, onionFromPubkey, genPrivKey, getPubKey } from './util/window'
+import { onionToPubkey, onionFromPubkey, genPrivKey, getPubKey } from './util/crypto'
 const { SplashScreen, StatusBar } = Plugins
 
 @Component({
@@ -33,11 +33,10 @@ export class AppComponent {
     // start zeroconf monitor
     this.zeroconfMonitor.init()
     // set StatusBar style
-
     StatusBar.setStyle({
       style: StatusBarStyle.Dark,
     })
     // dismiss SplashScreen
     SplashScreen.hide()
-  } 
+  }
 }
