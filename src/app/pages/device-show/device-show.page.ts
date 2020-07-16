@@ -32,17 +32,11 @@ export class DeviceShowPage {
   }
 
   async copyTor (forRedirect = false) {
-    let url
-    if (!this.device.torAddress) {
-      url = ''
-    } else {
-      url = this.device.torAddress + (forRedirect ? `/register/${this.hmac}` : '')
-    }
+    const  url = (forRedirect ? this.getLink() : this.device.torAddress) || ''
 
-    let message: string
-    await Clipboard.write({ url })
-      .then(() => { message = 'copied to clipboard!' })
-      .catch(() => { message = 'failed to copy' })
+    const message = await Clipboard.write({ url })
+      .then(() => 'copied to clipboard!')
+      .catch(() => 'failed to copy')
 
     const toast = await this.toastCtrl.create({
       message,
@@ -50,6 +44,11 @@ export class DeviceShowPage {
       duration: 1000,
     })
     await toast.present()
+  }
+
+  private getLink (): string | undefined {
+    if (!this.device.torAddress) return undefined
+    return this.device.torAddress + `/v0/register/${this.hmac}`
   }
 
   async presentAlertForget () {

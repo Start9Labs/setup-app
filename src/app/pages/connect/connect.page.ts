@@ -92,7 +92,7 @@ export class ConnectPage {
       url: `http://${ip}:5959/v0/registerTor`,
       data: { torkey: encrypted },
     })
-    const clientComputedTorAddress = await getPubKey(torkey).then(pk => onionFromPubkey(pk))
+    const clientComputedTorAddress = await getPubKey(torkey).then(onionFromPubkey)
 
     if (clientComputedTorAddress !== serverComputedTorAddress) throw new Error('Misalignment on tor address')
 
@@ -121,7 +121,6 @@ function inMs ( count: number, unit: 'days' | 'hours' | 'minutes' | 'seconds' ) 
     case 'days' : return inMs(count * 24, 'hours')
   }
 }
-
 
 function mockDevice (id: string): Device {
   const type = 'Embassy'
