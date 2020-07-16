@@ -15,6 +15,7 @@ export class DeviceShowPage {
   device: Device
   success: string
   hmac: string
+  message: string
 
   constructor (
     private readonly navCtrl: NavController,
@@ -28,6 +29,8 @@ export class DeviceShowPage {
     const deviceId = this.route.snapshot.paramMap.get('deviceId')
     this.success = this.route.snapshot.queryParamMap.get('success')
     this.hmac = this.route.snapshot.queryParamMap.get('hmac')
+    this.message = this.route.snapshot.queryParamMap.get('message')
+
     this.device = this.appState.peekDevices().find(d => d.id === deviceId)
   }
 
@@ -48,7 +51,7 @@ export class DeviceShowPage {
 
   private getLink (): string | undefined {
     if (!this.device.torAddress) return undefined
-    return this.device.torAddress + `/v0/register?hmac=${this.hmac}`
+    return this.device.torAddress + `/v0/register?hmac=${this.hmac}&message=${this.message}`
   }
 
   async presentAlertForget () {

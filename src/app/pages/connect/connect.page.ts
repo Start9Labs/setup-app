@@ -58,9 +58,10 @@ export class ConnectPage {
       this.appState.addDevice(device)
 
       const expiration = modulateTime(new Date(), 5, 'minutes')
-      const hmac = await hmac256(this.productKey, expiration.toISOString())
+      const message = expiration.toISOString()
+      const hmac = await hmac256(this.productKey, message)
 
-      this.navCtrl.navigateRoot(['/devices', identifier], { queryParams: { success: 1, hmac } })
+      this.navCtrl.navigateRoot(['/devices', identifier], { queryParams: { success: 1, hmac, message } })
     } catch (e) {
       console.error(e)
       this.error = `Error: ${e.message}`
