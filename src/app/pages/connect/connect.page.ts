@@ -90,13 +90,11 @@ export class ConnectPage {
     const torAddress = await this.httpService.request({
       method: Method.POST,
       url: `http://${ip}:5959/registerTor`,
-      data: { encrypted }
+      data: { encrypted },
     })
 
-
-
     // // get Ambassador version
-    
+
     // // hmac
     // const pubKey = await this.httpService.request({
     //   method: Method.POST,

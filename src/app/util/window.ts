@@ -1,4 +1,5 @@
 import * as base32 from 'base32.js'
+import * as ed from 'noble-ed25519'
 
 export async function encrypt (secretKey: string, messageBuffer: Uint8Array): Promise<string> {
   const encoder = new TextEncoder()
@@ -31,4 +32,8 @@ export async function hmac (secretKey: string, message: string): Promise<string>
 
 export function genPrivKey (): Uint8Array {
   return window.crypto.getRandomValues(new Uint8Array(32))
+}
+
+export async function getPubKey(privKey: Uint8Array): Promise<Uint8Array> {
+  return ed.getPublicKey(privKey)
 }
