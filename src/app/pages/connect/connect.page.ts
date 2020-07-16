@@ -1,9 +1,10 @@
 import { Component, NgZone } from '@angular/core'
 import { LoadingController, NavController } from '@ionic/angular'
 import { ZeroconfMonitor } from '../../services/zeroconf.service'
-import { getLanIP, idFromProductKey } from '../../services/http.service'
+import { getLanIP, idFromProductKey, HttpService, Method } from '../../services/http.service'
 import { AppState, Device } from 'src/app/app-state'
 import { Subscription } from 'rxjs'
+import { genPrivKey, encrypt } from 'src/app/util/window'
 
 @Component({
   selector: 'page-connect',
@@ -24,6 +25,7 @@ export class ConnectPage {
     private readonly zeroconfMonitor: ZeroconfMonitor,
     private readonly zone: NgZone,
     private readonly appState: AppState,
+    private readonly httpService: HttpService,
   ) { }
 
   ngOnInit () {
@@ -76,16 +78,25 @@ export class ConnectPage {
   }
 
   private async finishConnect (id: string): Promise<Device> {
-    return mockDevice(id)
+    // return mockDevice(id)
 
-    
+
+    const torkey = genPrivKey()
+
+    // const arrayBuff = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin))
+
+    const encrypted = encrypt(this.productKey, torkey)
+
+    const torAddress = await this.httpService.request({
+      method: Method.POST,
+      url: `http://${ip}:5959/registerTor`,
+      data: { encrypted }
+    })
+
 
 
     // // get Ambassador version
-    // const version = await this.httpService.request({
-    //   method: Method.GET,
-    //   url: `http://${ip}:5959/version`,
-    // })
+    
     // // hmac
     // const pubKey = await this.httpService.request({
     //   method: Method.POST,
