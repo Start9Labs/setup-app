@@ -2,7 +2,7 @@ import * as base32 from 'base32.js'
 import * as ed from 'noble-ed25519'
 import * as h from 'js-sha3'
 
-export async function encrypt (secretKey: string, messageBuffer: Uint8Array): Promise<string> {
+export async function encrypt (secretKey: string, messageBuffer: Uint8Array): Promise<{ ciphertext: string, counter: Uint8Array }> {
   const encoder = new TextEncoder()
   const b32encoder = new base32.Encoder({ type: 'rfc4648' })
 
@@ -10,11 +10,12 @@ export async function encrypt (secretKey: string, messageBuffer: Uint8Array): Pr
 
   const key = await crypto.subtle.importKey('raw', keyBuffer, 'AES-CTR', false, ['encrypt'])
   const counter = window.crypto.getRandomValues(new Uint8Array(16))
-  const algorithm = { name: 'AES-CTR', counter, length: 256 }
+  const algorithm = { name: 'AES-CTR', counter, length: 64 }
 
   return window.crypto.subtle.encrypt(algorithm, key, messageBuffer)
     .then(encrypted => new Uint8Array(encrypted))
     .then(uint8Arr => b32encoder.write(uint8Arr).finalize())
+    .then(ciphertext => ({ ciphertext, counter }))
 }
 
 export async function hmac256 (secretKey: string, message: string): Promise<string> {

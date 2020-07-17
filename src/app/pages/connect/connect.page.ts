@@ -83,12 +83,12 @@ export class ConnectPage {
 
     const torkey = genPrivKey()
     const torkeyIndicator = new TextEncoder().encode('== ed25519v1-secret: type0 ==')
-    const encrypted = encrypt(this.productKey, new Uint8Array([...torkeyIndicator, ...torkey]))
+    const { ciphertext, counter } = await encrypt(this.productKey, new Uint8Array([...torkeyIndicator, ...torkey]))
 
     const serverComputedTorAddress = await this.httpService.request({
       method: Method.POST,
       url: `http://${ip}:5959/v0/registerTor`,
-      data: { torkey: encrypted },
+      data: { torkey: ciphertext, counter },
     })
     const clientComputedTorAddress = await getPubKey(torkey).then(onionFromPubkey)
 
