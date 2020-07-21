@@ -3,7 +3,7 @@ import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import * as CryptoJS from 'crypto-js'
 
 import { Plugins } from '@capacitor/core'
-import { HttpOptions } from '@capacitor-community/http'
+import { HttpOptions, HttpResponse } from '@capacitor-community/http'
 const { Http } = Plugins
 
 const version = require('../../../package.json').version
@@ -12,16 +12,14 @@ const version = require('../../../package.json').version
   providedIn: 'root',
 })
 export class HttpService {
-
-  async request<T> (options: HttpOptions): Promise<T> {
+  async requestFull<T> (options: HttpOptions): Promise<TypedHttpResponse<T>> {
     options.headers = Object.assign(options.headers || { }, {
       'Content-Type': 'application/json',
       'app-version': version,
     })
 
     try {
-      const res = await Http.request(options)
-      return res.data || { }
+      return Http.request(options)
     } catch (e) {
       console.error(e)
 
@@ -34,6 +32,15 @@ export class HttpService {
       throw new Error(message)
     }
   }
+
+
+  async request<T> (options: HttpOptions): Promise<T> {
+    return this.requestFull<T>(options).then(res => (res.data || ({ } as T)))
+  }
+}
+
+export interface TypedHttpResponse<T> extends HttpResponse {
+  data: T
 }
 
 export enum Method {

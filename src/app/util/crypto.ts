@@ -1,6 +1,8 @@
 import * as base32 from 'base32.js'
-import * as ed from 'noble-ed25519'
 import * as h from 'js-sha3'
+import * as elliptic from 'elliptic'
+const ED25519 = elliptic.eddsa('ed25519')
+
 
 export async function encrypt (secretKey: string, messageBuffer: Uint8Array): Promise<{ ciphertext: string, counter: Uint8Array }> {
   const encoder = new TextEncoder()
@@ -37,7 +39,7 @@ export function genPrivKey (): Uint8Array {
 }
 
 export async function getPubKey (privKey: Uint8Array): Promise<Uint8Array> {
-  return ed.getPublicKey(privKey)
+  return Uint8Array.from(ED25519.keyFromSecret(privKey).getPublic())
 }
 
 // onion_address = base32(PUBKEY | CHECKSUM | VERSION) + ".onion"

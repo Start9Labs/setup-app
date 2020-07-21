@@ -1,5 +1,5 @@
 import { Component, NgZone } from '@angular/core'
-import { LoadingController, NavController } from '@ionic/angular'
+import { LoadingController, NavController, ModalController, AlertController } from '@ionic/angular'
 import { ZeroconfMonitor } from '../../services/zeroconf.service'
 import { getLanIP, idFromProductKey, HttpService, Method } from '../../services/http.service'
 import { AppState, Device } from 'src/app/app-state'
@@ -26,6 +26,7 @@ export class ConnectPage {
     private readonly zone: NgZone,
     private readonly appState: AppState,
     private readonly httpService: HttpService,
+    private readonly alertCtrl: AlertController,
   ) { }
 
   ngOnInit () {
@@ -85,20 +86,33 @@ export class ConnectPage {
     const torkeyIndicator = new TextEncoder().encode('== ed25519v1-secret: type0 ==')
     const { ciphertext, counter } = await encrypt(this.productKey, new Uint8Array([...torkeyIndicator, ...torkey]))
 
-    const serverComputedTorAddress = await this.httpService.request({
+    const fullRes = await this.httpService.requestFull<string>({
       method: Method.POST,
       url: `http://${ip}:5959/v0/registerTor`,
       data: { torkey: ciphertext, counter },
     })
-    const clientComputedTorAddress = await getPubKey(torkey).then(onionFromPubkey)
 
-    if (clientComputedTorAddress !== serverComputedTorAddress) throw new Error('Misalignment on tor address')
+    const torAddress = fullRes.data
+    if (fullRes.status === 209) {
+      const alert = await this.alertCtrl.create({
+        cssClass: 'my-custom-class',
+        header: 'Alert',
+        // subHeader: 'Subtitle',
+        message: 'Tor address already registered on Embassy. If this is your first time setting up your Embassy, please call support. This could be a sign of a security breach.',
+        buttons: ['OK'],
+      })
+
+      await alert.present()
+    } else {
+      const clientComputedTorAddress = await getPubKey(torkey).then(onionFromPubkey)
+      if (clientComputedTorAddress !== torAddress) throw new Error('Misalignment on tor address')
+    }
 
     const type = 'Embassy'
     return {
       id,
       label: `${type}:${id}`,
-      torAddress: serverComputedTorAddress,
+      torAddress: torAddress,
       type,
     }
   }

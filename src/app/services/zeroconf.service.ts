@@ -40,17 +40,17 @@ export class ZeroconfMonitor {
 
   private async start (): Promise<void> {
     // ** MOCKS **
-    return this.mock()
+    // return this.mock()
 
-    // if (!this.platform.is('ios') && !this.platform.is('android')) { return }
+    if (!this.platform.is('ios') && !this.platform.is('android')) { return }
 
-    // console.log('starting zeroconf monitor')
+    console.log('starting zeroconf monitor')
 
-    // await this.zeroconf.reInit()
+    await this.zeroconf.reInit()
 
-    // this.zeroconfSub = this.zeroconf.watch('_http._tcp.', 'local.').subscribe(result => {
-    //   this.handleServiceUpdate(result)
-    // })
+    this.zeroconfSub = this.zeroconf.watch('_http._tcp.', 'local.').subscribe(result => {
+      this.handleServiceUpdate(result)
+    })
   }
 
   private stop (): void {

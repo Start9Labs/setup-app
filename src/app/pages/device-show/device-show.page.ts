@@ -28,8 +28,8 @@ export class DeviceShowPage {
   ) { }
 
   ngOnInit ( ) {
-    const deviceId = this.route.snapshot.paramMap.get('deviceId')
-    this.success = this.route.snapshot.queryParamMap.get('success')
+    const deviceId  = this.route.snapshot.paramMap.get('deviceId')
+    this.success    = this.route.snapshot.queryParamMap.get('success')
     this.productKey = this.route.snapshot.queryParamMap.get('productKey')
 
     this.device = this.appState.peekDevices().find(d => d.id === deviceId)
