@@ -29,6 +29,7 @@ export function genPrivKey (): Uint8Array {
 
 
 async function pbkdf2Stretch (secretKey: string, algorithm: AesKeyAlgorithm | HmacKeyGenParams): Promise<{ salt: Uint8Array, key: CryptoKey }> {
+  const usages: KeyUsage[] = algorithm.name === 'AES-CTR' ? [ 'encrypt' ] : [ 'sign' ]
   const keyMaterial = await window.crypto.subtle.importKey(
     'raw',
     encodeUtf8(secretKey),
@@ -48,7 +49,7 @@ async function pbkdf2Stretch (secretKey: string, algorithm: AesKeyAlgorithm | Hm
     keyMaterial,
     algorithm,
     true,
-    [ 'encrypt'],
+    usages,
   )
   return { salt, key }
 }
