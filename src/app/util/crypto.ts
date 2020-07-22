@@ -16,7 +16,7 @@ export async function encrypt (secretKey: string, messageBuffer: Uint8Array): Pr
 
 export async function hmac256 (secretKey: string, messagePlain: string): Promise<{ message: Uint8Array, hmac: Uint8Array, salt: Uint8Array }> {
   const message = encodeUtf8(messagePlain)
-  const { key, salt } = await pbkdf2Stretch(secretKey, { name: 'HMAC', hash: { name: 'SHA-256'}, length: 256}) //256 is length in bites of output key
+  const { key, salt } = await pbkdf2Stretch(secretKey, { name: 'HMAC', hash: { name: 'SHA-256'}, length: 256}) // 256 is length in bites of output key
 
   return window.crypto.subtle.sign('HMAC', key, message)
     .then(signature => new Uint8Array(signature))
@@ -27,8 +27,7 @@ export function genPrivKey (): Uint8Array {
   return encodeUtf8(encode32(window.crypto.getRandomValues(new Uint8Array(32))))
 }
 
-
-async function pbkdf2Stretch (secretKey: string, algorithm: AesKeyAlgorithm | HmacKeyGenParams): Promise<{ salt: Uint8Array, key: CryptoKey }> {
+export async function pbkdf2Stretch (secretKey: string, algorithm: AesKeyAlgorithm | HmacKeyGenParams): Promise<{ salt: Uint8Array, key: CryptoKey, rawKey: Uint8Array }> {
   const usages: KeyUsage[] = algorithm.name === 'AES-CTR' ? [ 'encrypt' ] : [ 'sign' ]
   const keyMaterial = await window.crypto.subtle.importKey(
     'raw',
@@ -51,7 +50,9 @@ async function pbkdf2Stretch (secretKey: string, algorithm: AesKeyAlgorithm | Hm
     true,
     usages,
   )
-  return { salt, key }
+
+  const rawKey = await window.crypto.subtle.exportKey('raw', key).then(r => new Uint8Array(r))
+  return { salt, key, rawKey }
 }
 
 export const encode16 = (buffer: Uint8Array) => buffer.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '')
