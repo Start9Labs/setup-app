@@ -16,7 +16,7 @@ export async function encrypt (secretKey: string, messageBuffer: Uint8Array): Pr
 
 export async function hmac256 (secretKey: string, messagePlain: string): Promise<{ message: Uint8Array, hmac: Uint8Array, salt: Uint8Array }> {
   const message = encodeUtf8(messagePlain)
-  const { key, salt } = await pbkdf2Stretch(secretKey, { name: 'HMAC', hash: { name: 'SHA-256'}})
+  const { key, salt } = await pbkdf2Stretch(secretKey, { name: 'HMAC', hash: { name: 'SHA-256'}, length: 256}) //256 is length in bites of output key
 
   return window.crypto.subtle.sign('HMAC', key, message)
     .then(signature => new Uint8Array(signature))
