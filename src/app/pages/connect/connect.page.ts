@@ -1,10 +1,12 @@
 import { Component, NgZone } from '@angular/core'
-import { LoadingController, NavController, ModalController, AlertController } from '@ionic/angular'
+import { LoadingController, NavController, AlertController } from '@ionic/angular'
 import { ZeroconfMonitor } from '../../services/zeroconf.service'
-import { getLanIP, idFromProductKey, HttpService, Method } from '../../services/http.service'
+import { getLanIP, idFromProductKey, HttpService, Method } from '../../services/http/http.service'
 import { AppState, Device } from 'src/app/app-state'
 import { Subscription } from 'rxjs'
-import { genPrivKey, encrypt, getPubKey, onionFromPubkey, hmac256 } from 'src/app/util/crypto'
+import { genPrivKey, encrypt, getPubKey, onionFromPubkey, encode16 } from 'src/app/util/crypto'
+import * as base32 from 'base32.js'
+const b32decoder = new base32.Decoder({ type: 'rfc4648' })
 
 @Component({
   selector: 'page-connect',
@@ -80,16 +82,15 @@ export class ConnectPage {
   }
 
   private async finishConnect (ip: string, id: string): Promise<Device> {
-    // return mockDevice(id)
-
     const torkey = genPrivKey()
+
     const torkeyIndicator = new TextEncoder().encode('== ed25519v1-secret: type0 ==')
-    const { ciphertext, counter } = await encrypt(this.productKey, new Uint8Array([...torkeyIndicator, ...torkey]))
+    const { cipher, counter, salt } = await encrypt(this.productKey, new Uint8Array([...torkeyIndicator, ...torkey]))
 
     const fullRes = await this.httpService.requestFull<string>({
       method: Method.POST,
       url: `http://${ip}:5959/v0/registerTor`,
-      data: { torkey: ciphertext, counter },
+      data: { torkey: encode16(cipher), counter: encode16(counter), salt: encode16(salt) },
     })
 
     const torAddress = fullRes.data
@@ -118,12 +119,4 @@ export class ConnectPage {
   }
 }
 
-function mockDevice (id: string): Device {
-  const type = 'Embassy'
-  return {
-    id,
-    torAddress: 'extralongmocktoraddresstotestwrapping.onion',
-    type,
-    label: `${type}:${id}`,
-  }
-}
+

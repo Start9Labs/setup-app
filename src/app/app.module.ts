@@ -6,6 +6,8 @@ import { AppComponent } from './app.component'
 import { AppRoutingModule } from './app-routing.module'
 // native
 import { Zeroconf } from '@ionic-native/zeroconf/ngx'
+import { HttpService } from './services/http/http.service'
+import { HttpServiceFactory } from './services/http/http.service.factory'
 
 @NgModule({
   declarations: [AppComponent],
@@ -18,6 +20,7 @@ import { Zeroconf } from '@ionic-native/zeroconf/ngx'
   providers: [
     Zeroconf,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    { provide: HttpService, useFactory: HttpServiceFactory, deps: [] },
   ],
   bootstrap: [AppComponent],
 })

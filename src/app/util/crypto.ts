@@ -4,38 +4,65 @@ import * as elliptic from 'elliptic'
 const ED25519 = elliptic.eddsa('ed25519')
 
 
-export async function encrypt (secretKey: string, messageBuffer: Uint8Array): Promise<{ ciphertext: string, counter: Uint8Array }> {
-  const encoder = new TextEncoder()
-  const b32encoder = new base32.Encoder({ type: 'rfc4648' })
-
-  const keyBuffer = await window.crypto.subtle.digest('SHA-256', encoder.encode(secretKey))
-
-  const key = await crypto.subtle.importKey('raw', keyBuffer, 'AES-CTR', false, ['encrypt'])
+export async function encrypt (secretKey: string, messageBuffer: Uint8Array): Promise<{ cipher: Uint8Array, counter: Uint8Array, salt: Uint8Array }> {
+  const { key, salt } = await pbkdf2Stretch(secretKey, { name: 'AES-CTR', length: 256 })
   const counter = window.crypto.getRandomValues(new Uint8Array(16))
   const algorithm = { name: 'AES-CTR', counter, length: 64 }
 
   return window.crypto.subtle.encrypt(algorithm, key, messageBuffer)
     .then(encrypted => new Uint8Array(encrypted))
-    .then(uint8Arr => b32encoder.write(uint8Arr).finalize())
-    .then(ciphertext => ({ ciphertext, counter }))
+    .then(cipher => ({ cipher, counter, salt }))
 }
 
-export async function hmac256 (secretKey: string, message: string): Promise<string> {
-  const encoder = new TextEncoder()
-  const b32encoder = new base32.Encoder({ type: 'rfc4648' })
+export async function hmac256 (secretKey: string, messagePlain: string): Promise<{ message: Uint8Array, hmac: Uint8Array, salt: Uint8Array }> {
+  const message = encodeUtf8(messagePlain)
+  const { key, salt } = await pbkdf2Stretch(secretKey, { name: 'HMAC', hash: { name: 'SHA-256'}})
 
-  const keyBuffer = await window.crypto.subtle.digest('SHA-256', encoder.encode(secretKey))
-
-  const messageBuffer = encoder.encode(message)
-  const key = await window.crypto.subtle.importKey('raw', keyBuffer, { name: 'HMAC', hash: { name: 'SHA-256'} }, false, ['sign'] )
-
-  return window.crypto.subtle.sign('HMAC', key, messageBuffer)
+  return window.crypto.subtle.sign('HMAC', key, message)
     .then(signature => new Uint8Array(signature))
-    .then(uint8Arr => b32encoder.write(uint8Arr).finalize())
+    .then(hmac => ({ hmac, message, salt }))
 }
 
 export function genPrivKey (): Uint8Array {
-  return window.crypto.getRandomValues(new Uint8Array(32))
+  return encodeUtf8(encode32(window.crypto.getRandomValues(new Uint8Array(32))))
+}
+
+
+async function pbkdf2Stretch (secretKey: string, algorithm: AesKeyAlgorithm | HmacKeyGenParams): Promise<{ salt: Uint8Array, key: CryptoKey }> {
+  const keyMaterial = await window.crypto.subtle.importKey(
+    'raw',
+    encodeUtf8(secretKey),
+    'PBKDF2',
+    false,
+    ['deriveBits', 'deriveKey'],
+  )
+
+  const salt =  window.crypto.getRandomValues(new Uint8Array(16))
+  const key = await window.crypto.subtle.deriveKey(
+    {
+      name: 'PBKDF2',
+      salt: salt,
+      iterations: 100000,
+      hash: 'SHA-256',
+    },
+    keyMaterial,
+    algorithm,
+    true,
+    [ 'encrypt'],
+  )
+  return { salt, key }
+}
+
+export const encode16 = (buffer: Uint8Array) => buffer.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '')
+
+function encode32 (buffer: Uint8Array): string {
+  const b32encoder = new base32.Encoder({ type: 'rfc4648' })
+  return b32encoder.write(buffer).finalize()
+}
+
+function encodeUtf8 (str: string): Uint8Array {
+  const encoder = new TextEncoder()
+  return encoder.encode(str)
 }
 
 export async function getPubKey (privKey: Uint8Array): Promise<Uint8Array> {

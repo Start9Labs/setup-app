@@ -4,7 +4,7 @@ import { AppState, Device } from '../../app-state'
 import { ActivatedRoute } from '@angular/router'
 
 import { Plugins } from '@capacitor/core'
-import { hmac256 } from 'src/app/util/crypto'
+import { hmac256, encode16 } from 'src/app/util/crypto'
 const { Clipboard } = Plugins
 
 @Component({
@@ -55,10 +55,10 @@ export class DeviceShowPage {
     if (!this.productKey) return undefined
 
     const expiration = modulateTime(new Date(), 5, 'minutes')
-    const message = expiration.toISOString()
-    const hmac = await hmac256(this.productKey, message)
+    const messagePlain = expiration.toISOString()
+    const { hmac, message, salt } = await hmac256(this.productKey, messagePlain)
 
-    return this.device.torAddress + `/v0/register?hmac=${hmac}&message=${message}`
+    return this.device.torAddress + `/v0/register?hmac=${encode16(hmac)}&message=${encode16(message)}&salt=${encode16((salt))}`
   }
 
   async presentAlertForget () {
