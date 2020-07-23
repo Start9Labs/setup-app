@@ -24,7 +24,7 @@ export async function hmac256 (secretKey: string, messagePlain: string): Promise
 }
 
 export function genPrivKey (): Uint8Array {
-  return window.crypto.getRandomValues(new Uint8Array(32))
+  return window.crypto.getRandomValues(new Uint8Array(64))
 }
 
 export async function pbkdf2Stretch (secretKey: string, algorithm: AesKeyAlgorithm | HmacKeyGenParams): Promise<{ salt: Uint8Array, key: CryptoKey, rawKey: Uint8Array }> {

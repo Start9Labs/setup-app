@@ -16,6 +16,8 @@ export class LiveHttpService extends HttpService {
       'app-version': version,
     })
 
+    if (config.http.customLogReqs) console.log(`requestFull body`, JSON.stringify(JSON.stringify(options.data)))
+
     try {
       return Http.request(options)
     } catch (e) {
@@ -32,7 +34,6 @@ export class LiveHttpService extends HttpService {
   }
 
   async request<T> (options: HttpOptions): Promise<T> {
-    if (config.http.customLogReqs) console.log(`request`, JSON.stringify(JSON.stringify(options.data)))
     return this.requestFull<T>(options).then(res => (res.data || ({ } as T)))
   }
 }
