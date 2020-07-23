@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core'
 import { Plugins } from '@capacitor/core'
 import { HttpOptions } from '@capacitor-community/http'
 import { TypedHttpResponse, HttpService } from './http.service'
+import { config } from 'src/app/config'
 const { Http } = Plugins
 const version = require('../../../../package.json').version
 
@@ -31,6 +32,7 @@ export class LiveHttpService extends HttpService {
   }
 
   async request<T> (options: HttpOptions): Promise<T> {
+    if (config.http.customLogReqs) console.log(`request`, JSON.stringify(JSON.stringify(options.data)))
     return this.requestFull<T>(options).then(res => (res.data || ({ } as T)))
   }
 }
