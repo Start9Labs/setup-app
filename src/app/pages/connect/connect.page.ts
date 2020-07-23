@@ -4,7 +4,7 @@ import { ZeroconfMonitor } from '../../services/zeroconf.service'
 import { getLanIP, idFromProductKey, HttpService, Method } from '../../services/http/http.service'
 import { AppState, Device } from 'src/app/app-state'
 import { Subscription } from 'rxjs'
-import { genPrivKey, encrypt, getPubKey, onionFromPubkey, encode16 } from 'src/app/util/crypto'
+import { genExtendedPrivKey, encrypt, getPubKey, onionFromPubkey, encode16 } from 'src/app/util/crypto'
 import * as base32 from 'base32.js'
 const b32decoder = new base32.Decoder({ type: 'rfc4648' })
 
@@ -82,10 +82,10 @@ export class ConnectPage {
   }
 
   private async finishConnect (ip: string, id: string): Promise<Device> {
-    const torkey = genPrivKey()
+    const torkey = genExtendedPrivKey()
 
     const torkeyIndicator = new TextEncoder().encode('== ed25519v1-secret: type0 ==')
-    const { cipher, counter, salt } = await encrypt(this.productKey, new Uint8Array([...torkeyIndicator, ...torkey]))
+    const { cipher, counter, salt } = await encrypt(this.productKey, new Uint8Array([...torkeyIndicator, 0, 0, 0, ...torkey]))
 
     const fullRes = await this.httpService.requestFull<string>({
       method: Method.POST,

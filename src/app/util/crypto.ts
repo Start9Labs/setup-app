@@ -23,7 +23,7 @@ export async function hmac256 (secretKey: string, messagePlain: string): Promise
     .then(hmac => ({ hmac, message, salt }))
 }
 
-export function genPrivKey (): Uint8Array {
+export function genExtendedPrivKey (): Uint8Array {
   return window.crypto.getRandomValues(new Uint8Array(64))
 }
 
