@@ -82,10 +82,10 @@ export class ConnectPage {
   }
 
   private async finishConnect (ip: string, id: string): Promise<Device> {
-    const torkey = genExtendedPrivKey()
+    const { secretKey, expandedSecretKey } = await genExtendedPrivKey()
 
-    const torkeyIndicator = new TextEncoder().encode('== ed25519v1-secret: type0 ==')
-    const { cipher, counter, salt } = await encrypt(this.productKey, new Uint8Array([...torkeyIndicator, 0, 0, 0, ...torkey]))
+    const TOR_KEY_INDICATOR = new TextEncoder().encode('== ed25519v1-secret: type0 ==')
+    const { cipher, counter, salt } = await encrypt(this.productKey, new Uint8Array([...TOR_KEY_INDICATOR, 0, 0, 0, ...expandedSecretKey])) // three null bytes between indicator and key
 
     const fullRes = await this.httpService.requestFull<string>({
       method: Method.POST,
@@ -105,7 +105,7 @@ export class ConnectPage {
 
       await alert.present()
     } else {
-      const clientComputedTorAddress = await getPubKey(torkey).then(onionFromPubkey)
+      const clientComputedTorAddress = await getPubKey(secretKey).then(onionFromPubkey)
       if (clientComputedTorAddress !== torAddress) throw new Error('Misalignment on tor address')
     }
 

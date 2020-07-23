@@ -4,6 +4,7 @@ import { ZeroconfMonitor } from './services/zeroconf.service'
 
 import { Plugins, StatusBarStyle } from '@capacitor/core'
 import { AppState } from './app-state'
+import { genExtendedPrivKey, cryptoUtils } from './util/crypto'
 const { SplashScreen, StatusBar } = Plugins
 
 @Component({
@@ -25,6 +26,7 @@ export class AppComponent {
   }
 
   async init (): Promise<void> {
+    window['cryptoUtils'] = cryptoUtils
     // load storage
     await this.appState.load()
     // start network monitor

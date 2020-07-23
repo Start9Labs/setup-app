@@ -23,8 +23,12 @@ export async function hmac256 (secretKey: string, messagePlain: string): Promise
     .then(hmac => ({ hmac, message, salt }))
 }
 
-export function genExtendedPrivKey (): Uint8Array {
-  return window.crypto.getRandomValues(new Uint8Array(64))
+export async function genExtendedPrivKey (secretKey = window.crypto.getRandomValues(new Uint8Array(32))): Promise<{ secretKey: Uint8Array, expandedSecretKey: Uint8Array }> {
+  let expandedSecretKey = new Uint8Array(await crypto.subtle.digest('SHA-512', secretKey))
+  expandedSecretKey[0]  &= 248
+  expandedSecretKey[31] &=  127
+  expandedSecretKey[31] |=  64
+  return { secretKey, expandedSecretKey }
 }
 
 export async function pbkdf2Stretch (secretKey: string, algorithm: AesKeyAlgorithm | HmacKeyGenParams): Promise<{ salt: Uint8Array, key: CryptoKey, rawKey: Uint8Array }> {
@@ -56,19 +60,23 @@ export async function pbkdf2Stretch (secretKey: string, algorithm: AesKeyAlgorit
 }
 
 export const encode16 = (buffer: Uint8Array) => buffer.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '')
+export const decode16 = hexString => new Uint8Array(hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)))
 
 function encode32 (buffer: Uint8Array): string {
   const b32encoder = new base32.Encoder({ type: 'rfc4648' })
   return b32encoder.write(buffer).finalize()
 }
-
 function encodeUtf8 (str: string): Uint8Array {
   const encoder = new TextEncoder()
   return encoder.encode(str)
 }
 
 export async function getPubKey (privKey: Uint8Array): Promise<Uint8Array> {
-  return Uint8Array.from(ED25519.keyFromSecret(privKey).getPublic())
+  return Uint8Array.from(ED25519.keyFromSecret(privKey.slice(0, 32)).getPublic())
+}
+
+export const cryptoUtils = {
+  encode16, decode16, getPubKey, onionFromPubkey, genExtendedPrivKey,
 }
 
 // onion_address = base32(PUBKEY | CHECKSUM | VERSION) + ".onion"
