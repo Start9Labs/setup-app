@@ -19,6 +19,7 @@ export class RecorderHttpService extends HttpService {
 
     try {
       console.log(`requestFull`, options)
+      console.log(`requestBody`, JSON.stringify(options.data))
       this.requestRecord.push(options)
       return this.response(options)
     } catch (e) {
