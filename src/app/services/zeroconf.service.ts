@@ -4,6 +4,7 @@ import { Subscription, Observable, BehaviorSubject, ReplaySubject } from 'rxjs'
 import { Platform } from '@ionic/angular'
 import { NetworkMonitor } from './network.service'
 import { NetworkStatus } from '@capacitor/core'
+import { getLanIP } from './http/http.service'
 
 @Injectable({
   providedIn: 'root',
@@ -85,6 +86,7 @@ export class ZeroconfMonitor {
 
   private addService (service: ZeroconfService): void {
     console.log(`discovered zeroconf service: ${service.name}`)
+    console.log(`ip address is: `, getLanIP(service))
     // add service and broadcast existence
     this.services[service.name] = service
     this.serviceFound$.next(service)
