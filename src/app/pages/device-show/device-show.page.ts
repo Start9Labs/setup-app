@@ -60,7 +60,7 @@ export class DeviceShowPage {
     const messagePlain = expiration.toISOString()
     const { hmac, message, salt } = await hmac256(this.productKey, messagePlain)
 
-    return this.device.torAddress + `:5959/v0/register?hmac=${encode16(hmac)}&message=${encode16(message)}&salt=${encode16((salt))}`
+    return this.device.torAddress + `/v0/register?hmac=${encode16(hmac)}&message=${encode16(message)}&salt=${encode16((salt))}`
   }
 
   async presentAlertForget () {
