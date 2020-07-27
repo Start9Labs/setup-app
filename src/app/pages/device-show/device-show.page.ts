@@ -33,13 +33,15 @@ export class DeviceShowPage {
     this.productKey = this.route.snapshot.queryParamMap.get('productKey')
 
     this.device = this.appState.peekDevices().find(d => d.id === deviceId)
+    console.log(`device-show`, this.device)
+    console.log(`device-show`, deviceId)
   }
 
   async copyTor (forRedirect = false) {
     let url = forRedirect ? await this.getLink() : this.device.torAddress
 
     const message = await Clipboard.write({ url: url || '' })
-      .then(() => 'copied to clipboard!')
+      .then(() => `${forRedirect ? 'Link' : 'Address'} copied to clipboard!`)
       .catch(() => 'failed to copy')
 
     const toast = await this.toastCtrl.create({
@@ -58,7 +60,7 @@ export class DeviceShowPage {
     const messagePlain = expiration.toISOString()
     const { hmac, message, salt } = await hmac256(this.productKey, messagePlain)
 
-    return this.device.torAddress + `/v0/register?hmac=${encode16(hmac)}&message=${encode16(message)}&salt=${encode16((salt))}`
+    return this.device.torAddress + `:5959/v0/register?hmac=${encode16(hmac)}&message=${encode16(message)}&salt=${encode16((salt))}`
   }
 
   async presentAlertForget () {

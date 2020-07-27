@@ -58,7 +58,8 @@ export class ConnectPage {
       const identifier = idFromProductKey(this.productKey)
       ip = ip || this.getIP(identifier)
       const device = await this.finishConnect(ip, identifier)
-      this.appState.addDevice(device)
+      console.log(`connect`, device)
+      await this.appState.addDevice(device)
 
       this.navCtrl.navigateRoot(['/devices', identifier], { queryParams: { success: 1, productKey: this.productKey } })
     } catch (e) {
@@ -94,11 +95,11 @@ export class ConnectPage {
     })
 
     const torAddress = fullRes.data
+    console.log(`connect`, torAddress)
     if (fullRes.status === 209) {
       const alert = await this.alertCtrl.create({
         cssClass: 'my-custom-class',
         header: 'Alert',
-        // subHeader: 'Subtitle',
         message: 'Tor address already registered on Embassy. If this is your first time setting up your Embassy, please call support. This could be a sign of a security breach.',
         buttons: ['OK'],
       })
