@@ -8,7 +8,7 @@ const version = require('../../../../package.json').version
 
 @Injectable()
 export class LiveHttpService extends HttpService {
-  constructor () { super() }
+  constructor (private readonly fullLogs: boolean) { super() }
 
   async requestFull<T> (options: HttpOptions): Promise<TypedHttpResponse<T>> {
     options.headers = Object.assign(options.headers || { }, {
@@ -16,7 +16,7 @@ export class LiveHttpService extends HttpService {
       'app-version': version,
     })
 
-    if (config.http.customLogReqs) console.log(`requestFull body`, JSON.stringify(JSON.stringify(options.data)))
+    if (this.fullLogs) console.log(`requestFull body`, JSON.stringify(JSON.stringify(options.data)))
 
     try {
       return Http.request(options)

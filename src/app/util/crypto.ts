@@ -126,3 +126,11 @@ export function onionToPubkey (onion: string): ArrayBuffer {
   }
   return pubkey
 }
+
+export function encodeObject (encoder: (u: Uint8Array) => string, object: { [key: string]: Uint8Array }): { [key: string]: string } {
+  const toReturn = { }
+  Object.keys(object).forEach( k => {
+    toReturn[k] = encoder(object[k])
+  } )
+  return toReturn
+}

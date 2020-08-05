@@ -6,6 +6,6 @@ export function HttpServiceFactory () {
   if (config.http.useMocks) {
     return new RecorderHttpService()
   } else {
-    return new LiveHttpService()
+    return new LiveHttpService(config.http.customLogReqs)
   }
 }
