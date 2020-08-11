@@ -3,7 +3,7 @@ import { LoadingController, NavController, AlertController } from '@ionic/angula
 import { ZeroconfMonitor } from '../../services/zeroconf.service'
 import { getLanIP, idFromProductKey, HttpService, Method, RegisterResponse } from '../../services/http/http.service'
 import { Subscription } from 'rxjs'
-import { encode16, hmac256 } from 'src/app/util/crypto'
+import { encode16, HMAC } from 'src/app/util/crypto'
 import { AppState } from 'src/app/app-state'
 
 @Component({
@@ -64,7 +64,7 @@ export class ConnectPage {
 
       const expiration = modulateTime(new Date(), 5, 'minutes')
       const messagePlain = expiration.toISOString()
-      const { hmac, message, salt } = await hmac256(this.productKey, messagePlain)
+      const { hmac, message, salt } = await HMAC.sha256(this.productKey, messagePlain)
 
       const { data } = await this.httpService.requestFull<RegisterResponse | void>({
         method: Method.GET,

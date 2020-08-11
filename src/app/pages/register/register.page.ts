@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { LoadingController, NavController } from '@ionic/angular'
 import { HttpService, Method, RegisterResponse } from '../../services/http/http.service'
 import { AppState } from 'src/app/app-state'
-import { genExtendedPrivKey, encrypt, encode16, encodeObject } from 'src/app/util/crypto'
+import { genTorSecretKey, encode16, encodeObject, AES_CTR } from 'src/app/util/crypto'
 import { ActivatedRoute } from '@angular/router'
 
 @Component({
@@ -41,7 +41,7 @@ export class RegisterPage {
     await loader.present()
 
     try {
-      const { secretKey, expandedSecretKey } = await genExtendedPrivKey()
+      const { secretKey, expandedSecretKey } = await genTorSecretKey()
       const { cipher: torkey, counter: torkeyCounter, salt: torkeySalt } = await this.encryptTorSecretKey(expandedSecretKey)
       const torData = {
         torkey,
@@ -77,14 +77,14 @@ export class RegisterPage {
 
   private async encryptTorSecretKey (expandedSecretKey: Uint8Array): Promise<{ cipher: string, counter: string, salt: string }> {
     const TOR_KEY_INDICATOR = new TextEncoder().encode('== ed25519v1-secret: type0 ==')
-    const res = await encrypt(this.productKey, new Uint8Array([...TOR_KEY_INDICATOR, 0, 0, 0, ...expandedSecretKey]))
+    const res = await AES_CTR.encryptPbkdf2(this.productKey, new Uint8Array([...TOR_KEY_INDICATOR, 0, 0, 0, ...expandedSecretKey]))
     return encodeObject(encode16, res) as { cipher: string, counter: string, salt: string }
   }
 
   private async encryptPassword (password: string): Promise<{ cipher: string, counter: string, salt: string }> {
     const PASSWORD_INDICATOR = new TextEncoder().encode('== password ==') as Uint8Array
     const encodedPassword = new TextEncoder().encode(password) as Uint8Array
-    const res = await encrypt(this.productKey, new Uint8Array([...PASSWORD_INDICATOR, ...encodedPassword]))
+    const res = await AES_CTR.encryptPbkdf2(this.productKey, new Uint8Array([...PASSWORD_INDICATOR, ...encodedPassword]))
     return encodeObject(encode16, res) as { cipher: string, counter: string, salt: string }
   }
 }
