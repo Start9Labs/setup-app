@@ -1,8 +1,8 @@
 {
-  "name": "start9-companion",
-  "version": "2.0.0",
-  "description": "Companion app for setting up Start9 devices",
-  "author": "Start9 Labs",
+  "name": "embassy-setup-app",
+  "version": "1.0.0",
+  "description": "Mobile app for setting up the Embassy Peronal Server",
+  "author": "Start9 Labs, Inc",
   "private": true,
   "homepage": "https://start9labs.com",
   "scripts": {

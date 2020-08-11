@@ -3,7 +3,7 @@ import { AppState, Device } from '../../app-state'
 import { Observable } from 'rxjs'
 
 @Component({
-  selector: 'page-device-list',
+  selector: 'device-list',
   templateUrl: './device-list.page.html',
   styleUrls: ['./device-list.page.scss'],
 })

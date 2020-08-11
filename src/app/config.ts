@@ -1,7 +1,7 @@
 type AppConfig = { http: { useMocks: boolean, customLogReqs: boolean }, window: { cryptoUtils: boolean } }
 export const config: AppConfig = {
   http: {
-    useMocks: false,
+    useMocks: true,
     customLogReqs: true,
   },
   window: {

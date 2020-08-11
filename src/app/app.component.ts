@@ -1,11 +1,11 @@
 import { Component } from '@angular/core'
 import { NetworkMonitor } from './services/network.service'
 import { ZeroconfMonitor } from './services/zeroconf.service'
-
-import { Plugins, StatusBarStyle } from '@capacitor/core'
 import { AppState } from './app-state'
 import { cryptoUtils } from './util/crypto'
 import { config } from './config'
+
+import { Plugins, StatusBarStyle } from '@capacitor/core'
 const { SplashScreen, StatusBar } = Plugins
 
 @Component({
@@ -33,8 +33,8 @@ export class AppComponent {
     // start network monitor
     await this.networkMonitor.init()
     // start zeroconf
-    await this.zeroconfMonitor.init()
-    // // set StatusBar style
+    this.zeroconfMonitor.init()
+    // set StatusBar style
     StatusBar.setStyle({
       style: StatusBarStyle.Dark,
     })

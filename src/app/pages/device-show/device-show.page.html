@@ -31,35 +31,22 @@
 
   <ion-item-group>
     <ion-item>
-      <ion-label>
-        <p>Label</p>
-        <h2>{{ device.label }}</h2>
-      </ion-label>
+      <ion-label position="stacked">Name</ion-label>
+      <p><ion-text color="medium">{{ device.label }}</ion-text></p>
     </ion-item>
     <ion-item>
-      <ion-label>
-        <p>Type</p>
-        <h2>{{ device.type }}</h2>
-      </ion-label>
+      <ion-label position="stacked">Type</ion-label>
+      <p><ion-text color="medium">{{ device.type }}</ion-text></p>
     </ion-item>
     <ion-item>
-      <ion-label>
-        <p>ID</p>
-        <h2>{{ device.id }}</h2>
-      </ion-label>
+      <ion-label position="stacked">Id</ion-label>
+      <p><ion-text color="medium">{{ device.id }}</ion-text></p>
     </ion-item>
-    <ion-item *ngIf="device.torAddress">
-      <ion-label>
-        <p>Tor Address</p>
-        <h2 class="ion-text-wrap">{{ device.torAddress }}</h2>
-      </ion-label>
+    <ion-item>
+      <ion-label position="stacked">Tor Address</ion-label>
+      <p><ion-text color="medium">{{ device.torAddress }}</ion-text></p>
       <ion-note slot="end">
-        <ion-button fill="outline" size="small" (click)="copyTor()">
-          Copy
-        </ion-button>
-        <ion-button *ngIf="productKey" fill="outline" size="small" (click)="copyTor(true)">
-          Link
-        </ion-button>
+        <ion-button fill="outline" size="small" (click)="copyTor()">Copy</ion-button>
       </ion-note>
     </ion-item>
   </ion-item-group>

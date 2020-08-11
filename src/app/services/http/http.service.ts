@@ -31,7 +31,11 @@ export function getLanIP (zcs: ZeroconfService): string {
   return url
 }
 
-export function idFromProductKey (serialNo: string): string {
+export function idFromProductKey (productKey: string): string {
   // sha256 hash is big endian
-  return CryptoJS.SHA256(serialNo).toString(CryptoJS.enc.Hex).substr(0, 8)
+  return CryptoJS.SHA256(productKey).toString(CryptoJS.enc.Hex).substr(0, 8)
+}
+
+export interface RegisterResponse {
+  torAddress: string
 }

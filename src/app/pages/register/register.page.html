@@ -1,0 +1,30 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="['/connect']"></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      Register
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding-top">
+
+  <ion-item *ngIf="error" style="margin-bottom: 16px;">
+    <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
+  </ion-item>
+
+  <form (submit)="register()">
+    <ion-item-group style="margin-bottom: 40px;">
+      <ion-item>
+        <ion-label position="floating" color="medium">Password</ion-label>
+        <ion-input required maxlength="32" name="password" [(ngModel)]="password"></ion-input>
+      </ion-item>
+    </ion-item-group>
+    <ion-button type="submit" [disabled]="password.length < 12" expand="block" fill="outline">
+      Submit
+    </ion-button>
+  </form>
+
+</ion-content>
