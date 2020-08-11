@@ -11,7 +11,7 @@ export class RecorderHttpService extends HttpService {
     '*': { status: 200, data: { }, headers: { } },
   }
 
-  async requestFull<T> (options: HttpOptions): Promise<TypedHttpResponse<T>> {
+  async request<T> (options: HttpOptions): Promise<TypedHttpResponse<T>> {
     options.headers = Object.assign(options.headers || { }, {
       'Content-Type': 'application/json',
       'app-version': version,
@@ -34,11 +34,6 @@ export class RecorderHttpService extends HttpService {
       }
       throw new Error(message)
     }
-  }
-
-  async request<T> (options: HttpOptions): Promise<T> {
-    console.log(`request`, options)
-    return this.requestFull<T>(options).then(res => (res.data || ({ } as T)))
   }
 
   private response<T> (options: HttpOptions): TypedHttpResponse<T> {

@@ -1,9 +1,9 @@
 import { Component, NgZone } from '@angular/core'
 import { LoadingController, NavController, AlertController } from '@ionic/angular'
 import { ZeroconfMonitor } from '../../services/zeroconf.service'
-import { getLanIP, idFromProductKey, HttpService, Method, RegisterResponse } from '../../services/http/http.service'
+import { getLanIP, idFromProductKey, HttpService, Method, HostsResponse } from '../../services/http/http.service'
 import { Subscription } from 'rxjs'
-import { encode16, HMAC } from 'src/app/util/crypto'
+import { encode16, HMAC, decode16 } from 'src/app/util/crypto'
 import { AppState } from 'src/app/app-state'
 
 @Component({
@@ -66,7 +66,7 @@ export class ConnectPage {
       const messagePlain = expiration.toISOString()
       const { hmac, message, salt } = await HMAC.sha256(this.productKey, messagePlain)
 
-      const { data } = await this.httpService.requestFull<RegisterResponse | void>({
+      const { data } = await this.httpService.request<HostsResponse>({
         method: Method.GET,
         url: `http://${ip}:5959/v0/hosts`,
         params: {
@@ -76,7 +76,10 @@ export class ConnectPage {
         },
       })
 
-      if (data) {
+      // const validRes = await HMAC.verify256(this.productKey, decode16(data.hmac), data.message, decode16(data.salt))
+      // if (!validRes) { return this.presentAlertInvalidRes() }
+
+      if (data.torAddress) {
         this.appState.addDevice(id, data.torAddress)
         this.presentAlertAlreadyRegistered(id)
       } else {
@@ -86,7 +89,7 @@ export class ConnectPage {
       }
     } catch (e) {
       console.error(e)
-      this.error = `Error: ${e.message}`
+      this.error = e.message
     } finally {
       loader.dismiss()
     }
@@ -104,15 +107,25 @@ export class ConnectPage {
     return ip
   }
 
+  private async presentAlertInvalidRes () {
+    const alert = await this.alertCtrl.create({
+      header: 'Warning!',
+      message: 'Unable to verify response from Embassy. It is possible you are experiencing a "Man in the Middle" attack. Please contact support.',
+      buttons: ['OK'],
+    })
+
+    return alert.present()
+  }
+
   private async presentAlertAlreadyRegistered (id: string) {
     const alert = await this.alertCtrl.create({
       header: 'Warning',
-      message: 'This Embassy has already been registered. If you did not do this, it could mean your Embassy has been compromised, and you should contact support for assistance.',
+      message: 'This Embassy has already been registered. If you did not do this, it could mean your Embassy has been compromised. Please contact support',
       buttons: [
         {
           text: 'OK',
           handler: () => {
-            this.navCtrl.navigateForward(['/devices', id])
+            this.navCtrl.navigateRoot(['/devices', id])
           },
         },
       ],

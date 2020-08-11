@@ -1,8 +1,8 @@
 import { Component } from '@angular/core'
-import { LoadingController, NavController } from '@ionic/angular'
+import { LoadingController, NavController, AlertController } from '@ionic/angular'
 import { HttpService, Method, RegisterResponse } from '../../services/http/http.service'
 import { AppState } from 'src/app/app-state'
-import { genTorSecretKey, encode16, encodeObject, AES_CTR } from 'src/app/util/crypto'
+import { genTorSecretKey, encode16, encodeObject, AES_CTR, HMAC, decode16 } from 'src/app/util/crypto'
 import { ActivatedRoute } from '@angular/router'
 
 @Component({
@@ -21,14 +21,16 @@ export class RegisterPage {
     private readonly route: ActivatedRoute,
     private readonly navCtrl: NavController,
     private readonly loadingCtrl: LoadingController,
+    private readonly alertCtrl: AlertController,
     private readonly appState: AppState,
     private readonly httpService: HttpService,
   ) { }
 
   ngOnInit () {
-    this.id = this.route.snapshot.paramMap.get('id')
-    this.ip = this.route.snapshot.paramMap.get('ip')
-    this.productKey = this.route.snapshot.paramMap.get('productKey')
+    this.id = this.route.snapshot.queryParamMap.get('id')
+    this.ip = this.route.snapshot.queryParamMap.get('ip')
+    this.productKey = this.route.snapshot.queryParamMap.get('productKey')
+    console.log(this.id, this.ip, this.productKey)
   }
 
   async register (): Promise<void> {
@@ -55,7 +57,7 @@ export class RegisterPage {
         passwordSalt,
       }
 
-      const { data } = await this.httpService.requestFull<RegisterResponse>({
+      const { data } = await this.httpService.request<RegisterResponse>({
         method: Method.POST,
         url: `http://${this.ip}:5959/v0/register`,
         data: {
@@ -64,15 +66,28 @@ export class RegisterPage {
         },
       })
 
+      const validRes = await HMAC.verify256(this.productKey, decode16(data.hmac), data.message, decode16(data.salt))
+      if (!validRes) { return this.presentAlertInvalidRes() }
+
       await this.appState.addDevice(this.id, data.torAddress)
 
-      this.navCtrl.navigateForward(['/devices', this.id], { queryParams: { success: 1 } })
+      this.navCtrl.navigateRoot(['/devices', this.id], { queryParams: { success: 1 } })
     } catch (e) {
       console.error(e)
       this.error = e.message
     } finally {
       loader.dismiss()
     }
+  }
+
+  private async presentAlertInvalidRes () {
+    const alert = await this.alertCtrl.create({
+      header: 'Warning!',
+      message: 'Unable to verify response from Embassy. It is possible you are experiencing a "Man in the Middle" attack. Please contact support.',
+      buttons: ['OK'],
+    })
+
+    return alert.present()
   }
 
   private async encryptTorSecretKey (expandedSecretKey: Uint8Array): Promise<{ cipher: string, counter: string, salt: string }> {

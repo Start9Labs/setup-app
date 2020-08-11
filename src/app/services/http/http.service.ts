@@ -3,8 +3,7 @@ import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import * as CryptoJS from 'crypto-js'
 
 export abstract class HttpService {
-  abstract requestFull<T> (opt: HttpOptions): Promise<TypedHttpResponse<T>>
-  abstract request<T> (opt: HttpOptions): Promise<T>
+  abstract request<T> (opt: HttpOptions): Promise<TypedHttpResponse<T>>
 }
 
 export interface TypedHttpResponse<T> extends HttpResponse {
@@ -36,6 +35,13 @@ export function idFromProductKey (productKey: string): string {
   return CryptoJS.SHA256(productKey).toString(CryptoJS.enc.Hex).substr(0, 8)
 }
 
-export interface RegisterResponse {
+export interface HostsResponse {
+  hmac: string,
+  message: string,
+  salt: string
+  torAddress?: string
+}
+
+export interface RegisterResponse extends HostsResponse {
   torAddress: string
 }

@@ -1,16 +1,17 @@
 import { Injectable } from '@angular/core'
-import { Plugins } from '@capacitor/core'
 import { HttpOptions } from '@capacitor-community/http'
 import { TypedHttpResponse, HttpService } from './http.service'
-import { config } from 'src/app/config'
+
+import { Plugins } from '@capacitor/core'
 const { Http } = Plugins
+
 const version = require('../../../../package.json').version
 
 @Injectable()
 export class LiveHttpService extends HttpService {
   constructor (private readonly fullLogs: boolean) { super() }
 
-  async requestFull<T> (options: HttpOptions): Promise<TypedHttpResponse<T>> {
+  async request<T> (options: HttpOptions): Promise<TypedHttpResponse<T>> {
     options.headers = Object.assign(options.headers || { }, {
       'Content-Type': 'application/json',
       'app-version': version,
@@ -31,9 +32,5 @@ export class LiveHttpService extends HttpService {
       }
       throw new Error(message)
     }
-  }
-
-  async request<T> (options: HttpOptions): Promise<T> {
-    return this.requestFull<T>(options).then(res => (res.data || ({ } as T)))
   }
 }
