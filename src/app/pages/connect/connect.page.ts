@@ -5,6 +5,7 @@ import { getLanIP, idFromProductKey, HttpService, Method, HostsResponse } from '
 import { Subscription } from 'rxjs'
 import { encode16, HMAC, decode16 } from 'src/app/util/crypto'
 import { AppState } from 'src/app/app-state'
+import { decode } from 'querystring'
 
 @Component({
   selector: 'connect',
@@ -64,14 +65,14 @@ export class ConnectPage {
 
       const expiration = modulateTime(new Date(), 5, 'minutes')
       const messagePlain = expiration.toISOString()
-      const { hmac, message, salt } = await HMAC.sha256(this.productKey, messagePlain)
+      const { hmac, salt } = await HMAC.sha256(this.productKey, messagePlain)
 
       const { data } = await this.httpService.request<HostsResponse>({
         method: Method.GET,
         url: `http://${ip}:5959/v0/hosts`,
         params: {
           hmac: encode16(hmac),
-          message: encode16(message),
+          message: messagePlain,
           salt: encode16(salt),
         },
       })
