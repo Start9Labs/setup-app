@@ -9,6 +9,7 @@ export interface Device {
   type: 'Embassy'
   label: string
   torAddress: string
+  cert: string
 }
 
 @Injectable({
@@ -24,7 +25,7 @@ export class AppState {
     this.$devices$.next(devices || [])
   }
 
-  async addDevice (id: string, torAddress: string): Promise<void> {
+  async addDevice (id: string, torAddress: string, cert: string): Promise<void> {
     const devices = this.peekDevices().filter(d => d.id !== id)
     const type = 'Embassy'
     devices.push({
@@ -32,6 +33,7 @@ export class AppState {
       torAddress,
       type,
       label: `${type}: ${id}`,
+      cert,
     })
     await this.save(devices)
   }

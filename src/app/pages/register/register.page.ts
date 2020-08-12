@@ -69,9 +69,9 @@ export class RegisterPage {
       const validRes = await HMAC.verify256(this.productKey, decode16(data.hmac), data.message, decode16(data.salt))
       if (!validRes) { return this.presentAlertInvalidRes() }
 
-      await this.appState.addDevice(this.id, data.torAddress)
+      await this.appState.addDevice(this.id, data.torAddress, data.cert)
 
-      this.navCtrl.navigateRoot(['/devices', this.id], { queryParams: { success: 1 } })
+      this.navCtrl.navigateRoot(['/devices', this.id], { queryParams: { success: true } })
     } catch (e) {
       console.error(e)
       this.error = e.message

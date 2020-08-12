@@ -76,11 +76,11 @@ export class ConnectPage {
         },
       })
 
-      // const validRes = await HMAC.verify256(this.productKey, decode16(data.hmac), data.message, decode16(data.salt))
-      // if (!validRes) { return this.presentAlertInvalidRes() }
+      const validRes = await HMAC.verify256(this.productKey, decode16(data.hmac), data.message, decode16(data.salt))
+      if (!validRes) { return this.presentAlertInvalidRes() }
 
-      if (data.torAddress) {
-        this.appState.addDevice(id, data.torAddress)
+      if (data.torAddress || data.cert) {
+        this.appState.addDevice(id, data.torAddress, data.cert)
         this.presentAlertAlreadyRegistered(id)
       } else {
         this.navCtrl.navigateForward(['/register'], {
@@ -125,7 +125,7 @@ export class ConnectPage {
         {
           text: 'OK',
           handler: () => {
-            this.navCtrl.navigateRoot(['/devices', id])
+            this.navCtrl.navigateRoot(['/devices', id], { queryParams: { success: true } })
           },
         },
       ],

@@ -23,7 +23,7 @@
       </ion-avatar>
       <ion-label>
         <h2>{{ device.label }}</h2>
-        <p>{{ device.torAddress }}</p>
+        <p>{{ device.torAddress | slice:0:7 }}...{{ device.torAddress | slice:50:62 }}</p>
       </ion-label>
     </ion-item>
   </ion-card>

@@ -28,6 +28,7 @@
     "@ionic-native/core": "^5.25.0",
     "@ionic-native/zeroconf": "^5.25.0",
     "@ionic/angular": "^5.2.0",
+    "@start9labs/capacitor-cert-installer": "file:../capacitor-cert-installer",
     "async-mutex": "^0.2.0",
     "base32.js": "^0.1.0",
     "big-integer": "^1.6.48",
