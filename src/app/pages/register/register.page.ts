@@ -30,7 +30,6 @@ export class RegisterPage {
     this.id = this.route.snapshot.queryParamMap.get('id')
     this.ip = this.route.snapshot.queryParamMap.get('ip')
     this.productKey = this.route.snapshot.queryParamMap.get('productKey')
-    console.log(this.id, this.ip, this.productKey)
   }
 
   async register (): Promise<void> {

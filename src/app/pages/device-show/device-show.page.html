@@ -32,12 +32,12 @@
 
   <ion-item-group>
     <ion-item-divider></ion-item-divider>
-    <ion-item button (click)="copyURL('http://' + device.torAddress)">
+    <ion-item button (click)="copyToClipboard('http://' + device.torAddress)">
       <ion-icon slot="start" src="assets/svg/tor.svg"></ion-icon>
       <ion-label>Tor Address</ion-label>
       <ion-note slot="end">{{ device.torAddress | slice:0:7 }}...{{ device.torAddress | slice:50:62 }}</ion-note>
     </ion-item>
-    <ion-item button (click)="copyURL('https://start9-' + device.id + '.local')">
+    <ion-item button (click)="copyToClipboard('https://start9-' + device.id + '.local')">
       <ion-icon slot="start" name="globe-outline" color="primary"></ion-icon>
       <ion-label>LAN Address</ion-label>
       <ion-note slot="end">{{ 'start9-' + device.id + '.local' }}</ion-note>
