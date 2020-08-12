@@ -48,8 +48,6 @@ export const HMAC: HMAC = {
   sha256,
   verify256: async (secretKey: string, hmac: Uint8Array, messagePlain: string, salt: Uint8Array) => {
     const { hmac: computedHmac } = await sha256(secretKey, messagePlain, salt)
-    console.log(`hmac1`, hmac)
-    console.log(`hmac2`, computedHmac)
     return hmac.every(( _, i ) => computedHmac[i] === hmac[i])
   },
 }
@@ -99,16 +97,6 @@ async function pbkdf2 (secretKey: string, algorithm: AesKeyAlgorithm | HmacKeyGe
 
 export const encode16 = (buffer: Uint8Array) => buffer.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '')
 export const decode16 = hexString => new Uint8Array(hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)))
-
-export function decode162 (hexString: string): Uint8Array {
-  var result = []
-  while (hexString.length >= 8) {
-      result.push(parseInt(hexString.substring(0, 8), 16))
-      hexString = hexString.substring(8, hexString.length)
-  }
-
-  return new Uint8Array(result)
-}
 
 function encode32 (buffer: Uint8Array): string {
   const b32encoder = new base32.Encoder({ type: 'rfc4648' })
