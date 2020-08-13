@@ -63,16 +63,9 @@ ion-item-divider {
 }
 
 ion-action-sheet {
-  --backdrop-opacity: 0.75 !important;
+  --backdrop-opacity: 0.7 !important;
 }
 
 ion-alert {
-  --backdrop-opacity: 0.75 !important;
-}
-
-* {
-  -webkit-user-select: text;
-  -moz-user-select: text;
-  -ms-user-select: text;
-  user-select: text;
+  --backdrop-opacity: 0.7 !important;
 }

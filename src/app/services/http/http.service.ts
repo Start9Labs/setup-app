@@ -43,6 +43,18 @@ export interface HostsResponse {
   cert?: string
 }
 
+export interface RegisterRequest {
+  rsaKey: string
+  rsaCounter: string
+  rsaSalt: string
+  torkey: string
+  torkeyCounter: string
+  torkeySalt: string
+  password: string
+  passwordCounter: string
+  passwordSalt: string
+}
+
 export interface RegisterResponse extends HostsResponse {
   torAddress: string
   cert: string

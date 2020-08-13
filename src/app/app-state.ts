@@ -7,7 +7,6 @@ const { Storage } = Plugins
 export interface Device {
   id: string
   type: 'Embassy'
-  label: string
   torAddress: string
   cert: string
 }
@@ -30,9 +29,8 @@ export class AppState {
     const type = 'Embassy'
     devices.push({
       id,
+      type: 'Embassy',
       torAddress,
-      type,
-      label: `${type}: ${id}`,
       cert,
     })
     await this.save(devices)

@@ -5,7 +5,6 @@ import { getLanIP, idFromProductKey, HttpService, Method, HostsResponse } from '
 import { Subscription } from 'rxjs'
 import { encode16, HMAC, decode16 } from 'src/app/util/crypto'
 import { AppState } from 'src/app/app-state'
-import { decode } from 'querystring'
 
 @Component({
   selector: 'connect',
@@ -126,7 +125,7 @@ export class ConnectPage {
         {
           text: 'OK',
           handler: () => {
-            this.navCtrl.navigateRoot(['/devices', id], { queryParams: { success: true } })
+            this.navCtrl.navigateRoot(['/devices', id])
           },
         },
       ],

@@ -15,7 +15,6 @@ const { Clipboard } = Plugins
 export class DeviceShowPage {
   private readonly CertName = 'Embassy Local CA'
   device: Device
-  success: boolean
 
   constructor (
     private readonly navCtrl: NavController,
@@ -28,12 +27,7 @@ export class DeviceShowPage {
 
   ngOnInit ( ) {
     const id = this.route.snapshot.paramMap.get('id')
-    this.success = !!this.route.snapshot.queryParamMap.get('success')
     this.device = this.appState.peekDevices().find(d => d.id === id)
-
-    if (this.success) {
-      this.installCert()
-    }
   }
 
   async copyToClipboard (string: string): Promise<void> {
@@ -71,20 +65,20 @@ export class DeviceShowPage {
     await alert.present()
   }
 
-  async presentAlertForget () {
+  async presentAlertRemove () {
     const alert = await this.alertCtrl.create({
       header: 'Confirm',
-      message: `Forget ${this.device.label} on this device? You can always add it back later using the product key`,
+      message: 'Remove Embassy contact information from this device? This action will have no affect on the Embassy itself.',
       buttons: [
         {
           text: 'Cancel',
           role: 'cancel',
         },
         {
-          text: 'Forget',
+          text: 'Remove',
           cssClass: 'alert-danger',
           handler: () => {
-            this.forget()
+            this.remove()
           },
         },
       ],
@@ -92,9 +86,13 @@ export class DeviceShowPage {
     await alert.present()
   }
 
-  private async forget (): Promise<void> {
+  private async remove (): Promise<void> {
     await this.appState.removeDevice(this.device.id)
-    await this.navCtrl.navigateRoot(['/devices'])
+    if (this.appState.peekDevices().length) {
+      await this.navCtrl.navigateRoot(['/devices'])
+    } else {
+      await this.navCtrl.navigateRoot(['/connect'])
+    }
   }
 
   private async installCert (): Promise<void> {

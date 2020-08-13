@@ -1,6 +1,7 @@
 import * as base32 from 'base32.js'
 import * as h from 'js-sha3'
 import * as elliptic from 'elliptic'
+import * as RSA from 'node-rsa'
 const ED25519 = elliptic.eddsa('ed25519')
 
 
@@ -52,12 +53,17 @@ export const HMAC: HMAC = {
   },
 }
 
-export async function genTorSecretKey (secretKey = window.crypto.getRandomValues(new Uint8Array(32))): Promise<{ secretKey: Uint8Array, expandedSecretKey: Uint8Array }> {
-  let expandedSecretKey = new Uint8Array(await crypto.subtle.digest('SHA-512', secretKey))
-  expandedSecretKey[0]  &= 248
-  expandedSecretKey[31] &=  127
-  expandedSecretKey[31] |=  64
-  return { secretKey, expandedSecretKey }
+export async function genRSAKey (): Promise<string> {
+  return new RSA({ b: 4096 }).exportKey()
+}
+
+export async function genTorKey (): Promise<Uint8Array> {
+  const entropy = window.crypto.getRandomValues(new Uint8Array(32))
+  let privKey = new Uint8Array(await crypto.subtle.digest('SHA-512', entropy))
+  privKey[0] &= 248
+  privKey[31] &= 127
+  privKey[31] |= 64
+  return privKey
 }
 
 /** KEY STRETCH */
@@ -102,6 +108,7 @@ function encode32 (buffer: Uint8Array): string {
   const b32encoder = new base32.Encoder({ type: 'rfc4648' })
   return b32encoder.write(buffer).finalize()
 }
+
 function encodeUtf8 (str: string): Uint8Array {
   const encoder = new TextEncoder()
   return encoder.encode(str)
@@ -112,7 +119,7 @@ export async function getPubKey (privKey: Uint8Array): Promise<Uint8Array> {
 }
 
 export const cryptoUtils = {
-  encode16, decode16, getPubKey, onionFromPubkey, genExtendedPrivKey: genTorSecretKey,
+  encode16, decode16, getPubKey, onionFromPubkey, genTorKey,
 }
 
 // onion_address = base32(PUBKEY | CHECKSUM | VERSION) + ".onion"
