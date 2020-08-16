@@ -4,6 +4,7 @@ import { HttpService, Method, RegisterResponse } from '../../services/http/http.
 import { AppState } from 'src/app/app-state'
 import { genTorSecretKey, encode16, encodeObject, AES_CTR, HMAC, decode16 } from 'src/app/util/crypto'
 import { ActivatedRoute } from '@angular/router'
+import { HmacService } from 'src/app/services/hmac.service'
 
 @Component({
   selector: 'register',
@@ -24,6 +25,7 @@ export class RegisterPage {
     private readonly alertCtrl: AlertController,
     private readonly appState: AppState,
     private readonly httpService: HttpService,
+    private readonly hmacService: HmacService,
   ) { }
 
   ngOnInit () {
@@ -43,7 +45,7 @@ export class RegisterPage {
     await loader.present()
 
     try {
-      const { secretKey, expandedSecretKey } = await genTorSecretKey()
+      const { expandedSecretKey } = await genTorSecretKey()
       const { cipher: torkey, counter: torkeyCounter, salt: torkeySalt } = await this.encryptTorSecretKey(expandedSecretKey)
       const torData = {
         torkey,
@@ -66,8 +68,12 @@ export class RegisterPage {
         },
       })
 
-      const validRes = await HMAC.verify256(this.productKey, decode16(data.hmac), data.message, decode16(data.salt))
-      if (!validRes) { return this.presentAlertInvalidRes() }
+      const hmacRes = await this.hmacService.validateHmacExpiration(this.productKey, decode16(data.hmac), data.message, decode16(data.salt))
+      switch (hmacRes) {
+        case 'hmac-invalid': return this.presentAlertInvalidRes()
+        case 'expiration-invalid': return this.presentAlertExpiredRes()
+        case 'success': console.log(`Successful hmac validation`)
+      }
 
       await this.appState.addDevice(this.id, data.torAddress)
 
@@ -84,6 +90,16 @@ export class RegisterPage {
     const alert = await this.alertCtrl.create({
       header: 'Warning!',
       message: 'Unable to verify response from Embassy. It is possible you are experiencing a "Man in the Middle" attack. Please contact support.',
+      buttons: ['OK'],
+    })
+
+    return alert.present()
+  }
+
+  private async presentAlertExpiredRes () {
+    const alert = await this.alertCtrl.create({
+      header: 'Warning!',
+      message: 'Response from embassy valid, but expired. It is possible you are experiencing a "Man in the Middle" replay attack. Please contact support.',
       buttons: ['OK'],
     })
 

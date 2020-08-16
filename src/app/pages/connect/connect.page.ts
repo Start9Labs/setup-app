@@ -5,6 +5,7 @@ import { getLanIP, idFromProductKey, HttpService, Method, HostsResponse } from '
 import { Subscription } from 'rxjs'
 import { encode16, HMAC, decode16 } from 'src/app/util/crypto'
 import { AppState } from 'src/app/app-state'
+import { HmacService } from 'src/app/services/hmac.service'
 
 @Component({
   selector: 'connect',
@@ -27,6 +28,7 @@ export class ConnectPage {
     private readonly alertCtrl: AlertController,
     private readonly appState: AppState,
     private readonly zone: NgZone,
+    private readonly hmacService: HmacService,
   ) { }
 
   ngOnInit () {
@@ -76,8 +78,12 @@ export class ConnectPage {
         },
       })
 
-      // const validRes = await HMAC.verify256(this.productKey, decode16(data.hmac), data.message, decode16(data.salt))
-      // if (!validRes) { return this.presentAlertInvalidRes() }
+      const hmacRes = await this.hmacService.validateHmacExpiration(this.productKey, decode16(data.hmac), data.message, decode16(data.salt))
+      switch (hmacRes) {
+        case 'hmac-invalid': return this.presentAlertInvalidRes()
+        case 'expiration-invalid': return this.presentAlertExpiredRes()
+        case 'success': console.log(`Successful hmac validation`)
+      }
 
       if (data.torAddress) {
         this.appState.addDevice(id, data.torAddress)
@@ -111,6 +117,16 @@ export class ConnectPage {
     const alert = await this.alertCtrl.create({
       header: 'Warning!',
       message: 'Unable to verify response from Embassy. It is possible you are experiencing a "Man in the Middle" attack. Please contact support.',
+      buttons: ['OK'],
+    })
+
+    return alert.present()
+  }
+
+  private async presentAlertExpiredRes () {
+    const alert = await this.alertCtrl.create({
+      header: 'Warning!',
+      message: 'Response from embassy valid, but expired. It is possible you are experiencing a "Man in the Middle" replay attack. Please contact support.',
       buttons: ['OK'],
     })
 
