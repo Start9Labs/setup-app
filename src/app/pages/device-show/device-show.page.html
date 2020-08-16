@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="['/devices']"></ion-back-button>
     </ion-buttons>
-    <ion-title>{{ device.type + ": " + device.id }}</ion-title>
+    <ion-title>{{ device.type + ":" + device.id }}</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="presentAlertRemove()">
         <ion-icon size="small" slot="icon-only" name="trash-outline" color="danger"></ion-icon>
@@ -19,9 +19,9 @@
       <ion-label class="ion-text-wrap">
         <p><ion-text color="warning">Your Embassy is now privately hosted on the Internet! Access it by:</ion-text></p>
         <ol>
-          <li><p>Visiting its Tor Address from any Tor-enabled browser, including: Start9 Consulate, Tor Browser, Firefox (with SOCKS5 proxy enabled), and Brave</p></li>
+          <li><p>Visiting its Tor Address from any Tor-enabled browser, including: Start9 Consulate, Tor Browser, Firefox (with SOCKS5 proxy enabled), or Brave</p></li>
           <br />
-          <li><p>Saving the SSL Certificate to your phone or computer, then visiting its LAN Address from any browser (phone/computer must be connected to the same WiFi as the Embassy).</p></li>
+          <li><p>Saving the SSL Certificate to your phone or computer, then visiting its LAN Address from any browser while connected to the LAN</p></li>
         </ol>
       </ion-label>
     </ion-item>
@@ -31,12 +31,12 @@
     <ion-item-divider></ion-item-divider>
     <ion-item button (click)="copyToClipboard('http://' + device.torAddress)">
       <ion-icon slot="start" src="assets/svg/tor.svg"></ion-icon>
-      <ion-label>Tor Address</ion-label>
-      <ion-note slot="end">{{ device.torAddress | slice:0:7 }}...{{ device.torAddress | slice:50:62 }}</ion-note>
+      <ion-label>Tor URL</ion-label>
+      <ion-note slot="end">{{ device.torAddress | slice:0:7 }}...{{ device.torAddress | slice:-12 }}</ion-note>
     </ion-item>
     <ion-item button (click)="copyToClipboard('https://start9-' + device.id + '.local')">
       <ion-icon slot="start" name="globe-outline" color="primary"></ion-icon>
-      <ion-label>LAN Address</ion-label>
+      <ion-label>Local URL</ion-label>
       <ion-note slot="end">{{ 'start9-' + device.id + '.local' }}</ion-note>
     </ion-item>
     <ion-item-divider></ion-item-divider>

@@ -11,7 +11,7 @@
   <ion-card button *ngFor="let device of devices$ | async" style="margin-bottom: 16px;" [routerLink]="['/devices', device.id]">
     <ion-card-header>
       <ion-card-subtitle>Device ID</ion-card-subtitle>
-      <ion-card-title>{{ device.type + ": " + device.id }}</ion-card-title>
+      <ion-card-title>{{ device.type + ":" + device.id }}</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <ion-icon style="margin-right: 12px;" src="assets/svg/tor.svg"></ion-icon>
