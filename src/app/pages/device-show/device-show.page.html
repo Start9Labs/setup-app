@@ -3,11 +3,9 @@
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="['/devices']"></ion-back-button>
     </ion-buttons>
-    <ion-title>
-      Details
-    </ion-title>
+    <ion-title>{{ device.type + ":" + device.id }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="presentAlertForget()">
+      <ion-button (click)="presentAlertRemove()">
         <ion-icon size="small" slot="icon-only" name="trash-outline" color="danger"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -16,38 +14,35 @@
 
 <ion-content class="ion-padding-top">
 
-  <ion-item-group *ngIf="success">
+  <ion-item-group>
     <ion-item>
       <ion-label class="ion-text-wrap">
-        <h2><ion-icon class="icon" slot="start" name="checkmark" color="success"></ion-icon>Success!</h2>
-        <br />
-        <p>Your Embassy is now hosted on its own Tor Hidden Service.</p>
-        <br />
-        <p>Copy the Tor Address below and paste it into any Tor browser, inlcuding Firebox and Brave.</p>
+        <p><ion-text color="warning">Your Embassy is now privately hosted on the Internet! Access it by:</ion-text></p>
+        <ol>
+          <li><p>Visiting its Tor Address from any Tor-enabled browser, including: Start9 Consulate, Tor Browser, Firefox (with SOCKS5 proxy enabled), or Brave</p></li>
+          <br />
+          <li><p>Saving the SSL Certificate to your phone or computer, then visiting its LAN Address from any browser while connected to the LAN</p></li>
+        </ol>
       </ion-label>
     </ion-item>
-    <ion-item-divider></ion-item-divider>
   </ion-item-group>
 
   <ion-item-group>
-    <ion-item>
-      <ion-label position="stacked">Name</ion-label>
-      <p><ion-text color="medium">{{ device.label }}</ion-text></p>
+    <ion-item-divider></ion-item-divider>
+    <ion-item button (click)="copyToClipboard('http://' + device.torAddress)">
+      <ion-icon slot="start" src="assets/svg/tor.svg"></ion-icon>
+      <ion-label>Tor URL</ion-label>
+      <ion-note slot="end">{{ device.torAddress | slice:0:7 }}...{{ device.torAddress | slice:-12 }}</ion-note>
     </ion-item>
-    <ion-item>
-      <ion-label position="stacked">Type</ion-label>
-      <p><ion-text color="medium">{{ device.type }}</ion-text></p>
+    <ion-item button (click)="copyToClipboard('https://start9-' + device.id + '.local')">
+      <ion-icon slot="start" name="globe-outline" color="primary"></ion-icon>
+      <ion-label>Local URL</ion-label>
+      <ion-note slot="end">{{ 'start9-' + device.id + '.local' }}</ion-note>
     </ion-item>
-    <ion-item>
-      <ion-label position="stacked">Id</ion-label>
-      <p><ion-text color="medium">{{ device.id }}</ion-text></p>
-    </ion-item>
-    <ion-item>
-      <ion-label position="stacked">Tor Address</ion-label>
-      <p><ion-text color="medium">{{ device.torAddress }}</ion-text></p>
-      <ion-note slot="end">
-        <ion-button fill="outline" size="small" (click)="copyTor()">Copy</ion-button>
-      </ion-note>
+    <ion-item-divider></ion-item-divider>
+    <ion-item button (click)="presentActionCert()">
+      <ion-icon slot="start" name="finger-print-outline" color="success"></ion-icon>
+      <ion-label><ion-text color="success">SSL Certificate</ion-text></ion-label>
     </ion-item>
   </ion-item-group>
 

@@ -1,7 +1,8 @@
 import { Component } from '@angular/core'
-import { ToastController, AlertController, NavController } from '@ionic/angular'
+import { ToastController, AlertController, NavController, ActionSheetController } from '@ionic/angular'
 import { AppState, Device } from '../../app-state'
 import { ActivatedRoute } from '@angular/router'
+import { CertInstaller } from '@start9labs/capacitor-cert-installer'
 
 import { Plugins } from '@capacitor/core'
 const { Clipboard } = Plugins
@@ -12,25 +13,25 @@ const { Clipboard } = Plugins
   styleUrls: ['./device-show.page.scss'],
 })
 export class DeviceShowPage {
+  private readonly CertName = 'Embassy Local CA'
   device: Device
-  success: string
 
   constructor (
     private readonly navCtrl: NavController,
     private readonly appState: AppState,
     private readonly route: ActivatedRoute,
     private readonly toastCtrl: ToastController,
+    private readonly actionSheetCtrl: ActionSheetController,
     private readonly alertCtrl: AlertController,
   ) { }
 
   ngOnInit ( ) {
     const id = this.route.snapshot.paramMap.get('id')
-    this.success = this.route.snapshot.queryParamMap.get('success')
     this.device = this.appState.peekDevices().find(d => d.id === id)
   }
 
-  async copyTor () {
-    const message = await Clipboard.write({ url: this.device.torAddress || '' })
+  async copyToClipboard (string: string): Promise<void> {
+    const message = await Clipboard.write({ string })
       .then(() => 'Copied to clipboard!')
       .catch(() => 'failed to copy')
 
@@ -39,23 +40,24 @@ export class DeviceShowPage {
       position: 'bottom',
       duration: 1000,
     })
-    await toast.present()
+    toast.present()
   }
 
-  async presentAlertForget () {
-    const alert = await this.alertCtrl.create({
-      header: 'Confirm',
-      message: `Forget ${this.device.label} on this device? You can always add it back later using the product key`,
+  async presentActionCert () {
+    const alert = await this.actionSheetCtrl.create({
       buttons: [
         {
-          text: 'Cancel',
-          role: 'cancel',
+          icon: 'copy-outline',
+          text: 'Copy to clipboard',
+          handler: () => {
+            this.copyToClipboard(this.device.cert)
+          },
         },
         {
-          text: 'Forget',
-          cssClass: 'alert-danger',
+          icon: 'save-outline',
+          text: 'Save to device',
           handler: () => {
-            this.forget()
+            this.installCert()
           },
         },
       ],
@@ -63,8 +65,37 @@ export class DeviceShowPage {
     await alert.present()
   }
 
-  async forget (): Promise<void> {
+  async presentAlertRemove () {
+    const alert = await this.alertCtrl.create({
+      header: 'Confirm',
+      message: 'Remove Embassy contact information from this device? This action will have no affect on the Embassy itself.',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: 'Remove',
+          cssClass: 'alert-danger',
+          handler: () => {
+            this.remove()
+          },
+        },
+      ],
+    })
+    await alert.present()
+  }
+
+  private async remove (): Promise<void> {
     await this.appState.removeDevice(this.device.id)
-    await this.navCtrl.navigateRoot(['/devices'])
+    if (this.appState.peekDevices().length) {
+      await this.navCtrl.navigateRoot(['/devices'])
+    } else {
+      await this.navCtrl.navigateRoot(['/connect'])
+    }
+  }
+
+  private async installCert (): Promise<void> {
+    return CertInstaller.installCert({ value: this.device.cert, name: this.CertName })
   }
 }

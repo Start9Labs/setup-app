@@ -1,6 +1,7 @@
 import * as base32 from 'base32.js'
 import * as h from 'js-sha3'
 import * as elliptic from 'elliptic'
+import * as RSA from 'node-rsa'
 const ED25519 = elliptic.eddsa('ed25519')
 
 
@@ -35,27 +36,34 @@ type HMAC = {
   verify256: (secretKey: string, hmac: Uint8Array, messagePlain: String, salt: Uint8Array) => Promise<boolean>
 }
 
-export const HMAC: HMAC = {
-  sha256: async (secretKey: string, messagePlain: string, saltOverride?: Uint8Array) => {
-    const message = encodeUtf8(messagePlain)
-    const { key, salt } = await STRETCH.pbkdf2(secretKey, { name: 'HMAC', hash: { name: 'SHA-256'}, length: 256}, saltOverride) //256 is the length in bits of the output key
+const sha256 = async (secretKey: string, messagePlain: string, saltOverride?: Uint8Array) => {
+  const message = encodeUtf8(messagePlain)
+  const { key, salt } = await STRETCH.pbkdf2(secretKey, { name: 'HMAC', hash: { name: 'SHA-256'}, length: 256}, saltOverride) //256 is the length in bits of the output key
 
-    return window.crypto.subtle.sign('HMAC', key, message)
-      .then(signature => new Uint8Array(signature))
-      .then(hmac => ({ hmac, message, salt }))
-  },
+  return window.crypto.subtle.sign('HMAC', key, message)
+    .then(signature => new Uint8Array(signature))
+    .then(hmac => ({ hmac, message, salt }))
+}
+
+export const HMAC: HMAC = {
+  sha256,
   verify256: async (secretKey: string, hmac: Uint8Array, messagePlain: string, salt: Uint8Array) => {
-    const { hmac: computedHmac } = await HMAC.sha256(secretKey, messagePlain, salt)
+    const { hmac: computedHmac } = await sha256(secretKey, messagePlain, salt)
     return hmac.every(( _, i ) => computedHmac[i] === hmac[i])
   },
 }
 
-export async function genTorSecretKey (secretKey = window.crypto.getRandomValues(new Uint8Array(32))): Promise<{ secretKey: Uint8Array, expandedSecretKey: Uint8Array }> {
-  let expandedSecretKey = new Uint8Array(await crypto.subtle.digest('SHA-512', secretKey))
-  expandedSecretKey[0]  &= 248
-  expandedSecretKey[31] &=  127
-  expandedSecretKey[31] |=  64
-  return { secretKey, expandedSecretKey }
+export async function genRSAKey (): Promise<string> {
+  return new RSA({ b: 4096 }).exportKey()
+}
+
+export async function genTorKey (): Promise<Uint8Array> {
+  const entropy = window.crypto.getRandomValues(new Uint8Array(32))
+  let privKey = new Uint8Array(await crypto.subtle.digest('SHA-512', entropy))
+  privKey[0] &= 248
+  privKey[31] &= 127
+  privKey[31] |= 64
+  return privKey
 }
 
 /** KEY STRETCH */
@@ -79,7 +87,7 @@ async function pbkdf2 (secretKey: string, algorithm: AesKeyAlgorithm | HmacKeyGe
   const key = await window.crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt: salt,
+      salt,
       iterations: 100000,
       hash: 'SHA-256',
     },
@@ -100,6 +108,7 @@ function encode32 (buffer: Uint8Array): string {
   const b32encoder = new base32.Encoder({ type: 'rfc4648' })
   return b32encoder.write(buffer).finalize()
 }
+
 function encodeUtf8 (str: string): Uint8Array {
   const encoder = new TextEncoder()
   return encoder.encode(str)
@@ -110,7 +119,7 @@ export async function getPubKey (privKey: Uint8Array): Promise<Uint8Array> {
 }
 
 export const cryptoUtils = {
-  encode16, decode16, getPubKey, onionFromPubkey, genExtendedPrivKey: genTorSecretKey,
+  encode16, decode16, getPubKey, onionFromPubkey, genTorKey,
 }
 
 // onion_address = base32(PUBKEY | CHECKSUM | VERSION) + ".onion"

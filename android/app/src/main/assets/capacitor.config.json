@@ -1,5 +1,5 @@
 {
-  "appId": "com.start9labs.start9companion",
+  "appId": "com.start9labs.embassySetuApp",
   "appName": "Start9 Companion",
   "bundledWebRuntime": false,
   "npmClient": "npm",

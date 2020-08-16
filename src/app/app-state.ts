@@ -7,8 +7,8 @@ const { Storage } = Plugins
 export interface Device {
   id: string
   type: 'Embassy'
-  label: string
   torAddress: string
+  cert: string
 }
 
 @Injectable({
@@ -24,14 +24,14 @@ export class AppState {
     this.$devices$.next(devices || [])
   }
 
-  async addDevice (id: string, torAddress: string): Promise<void> {
+  async addDevice (id: string, torAddress: string, cert: string): Promise<void> {
     const devices = this.peekDevices().filter(d => d.id !== id)
     const type = 'Embassy'
     devices.push({
       id,
+      type: 'Embassy',
       torAddress,
-      type,
-      label: `${type}: ${id}`,
+      cert,
     })
     await this.save(devices)
   }

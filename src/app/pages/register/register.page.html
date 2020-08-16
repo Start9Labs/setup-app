@@ -1,10 +1,10 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button [defaultHref]="['/connect']"></ion-back-button>
+      <ion-back-button></ion-back-button>
     </ion-buttons>
     <ion-title>
-      Register
+      Finish Setup
     </ion-title>
   </ion-toolbar>
 </ion-header>
@@ -23,8 +23,22 @@
       </ion-item>
     </ion-item-group>
     <ion-button type="submit" [disabled]="password.length < 12" expand="block" fill="outline">
-      Submit
+      Finish
     </ion-button>
   </form>
+
+  <ion-item-group>
+    <ion-item-divider></ion-item-divider>
+    <ion-item>
+      <ion-label class="ion-text-wrap">
+        <h2><ion-text color="warning">Important</ion-text></h2>
+        <br />
+        <p><b>Create a great master password for your Embassy. Write it down.</b></p>
+        <br />
+        <p><b>If you lose your password, you will need to force reset your Embassy, resulting in permanent loss of data.</b></p>
+        <br />
+      </ion-label>
+    </ion-item>
+  </ion-item-group>
 
 </ion-content>

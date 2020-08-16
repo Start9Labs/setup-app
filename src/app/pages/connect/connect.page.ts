@@ -66,14 +66,14 @@ export class ConnectPage {
 
       const expiration = modulateTime(new Date(), 5, 'minutes')
       const messagePlain = expiration.toISOString()
-      const { hmac, message, salt } = await HMAC.sha256(this.productKey, messagePlain)
+      const { hmac, salt } = await HMAC.sha256(this.productKey, messagePlain)
 
       const { data } = await this.httpService.request<HostsResponse>({
         method: Method.GET,
         url: `http://${ip}:5959/v0/hosts`,
         params: {
           hmac: encode16(hmac),
-          message: encode16(message),
+          message: messagePlain,
           salt: encode16(salt),
         },
       })
@@ -85,8 +85,8 @@ export class ConnectPage {
         case 'success': console.log(`Successful hmac validation`)
       }
 
-      if (data.torAddress) {
-        this.appState.addDevice(id, data.torAddress)
+      if (data.torAddress || data.cert) {
+        this.appState.addDevice(id, data.torAddress, data.cert)
         this.presentAlertAlreadyRegistered(id)
       } else {
         this.navCtrl.navigateForward(['/register'], {
