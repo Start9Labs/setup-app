@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { LoadingController, NavController, AlertController } from '@ionic/angular'
 import { HttpService, Method, RegisterResponse, RegisterRequest } from '../../services/http/http.service'
 import { AppState } from 'src/app/app-state'
-import { genTorKey, genRSAKey, encode16, encodeObject, AES_CTR, HMAC, decode16 } from 'src/app/util/crypto'
+import { genTorKey, genRSAKey, encode16, encodeObject, AES_CTR, decode16 } from 'src/app/util/crypto'
 import { ActivatedRoute } from '@angular/router'
 import { HmacService } from 'src/app/services/hmac.service'
 

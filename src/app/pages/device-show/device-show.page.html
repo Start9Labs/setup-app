@@ -17,13 +17,17 @@
   <ion-item-group>
     <ion-item>
       <ion-label class="ion-text-wrap">
+        <p><ion-text color="warning">Your Embassy is now privately hosted on the Internet!</ion-text></p>
+        <p>Access your Embassy by visiting its Tor Address from any Tor-enabled browser, including: Start9 Consulate, Tor Browser, Firefox (with SOCKS5 proxy enabled), or Brave</p>
+      </ion-label>
+      <!-- <ion-label class="ion-text-wrap">
         <p><ion-text color="warning">Your Embassy is now privately hosted on the Internet! Access it by:</ion-text></p>
         <ol>
           <li><p>Visiting its Tor Address from any Tor-enabled browser, including: Start9 Consulate, Tor Browser, Firefox (with SOCKS5 proxy enabled), or Brave</p></li>
           <br />
           <li><p>Saving the SSL Certificate to your phone or computer, then visiting its LAN Address from any browser while connected to the LAN</p></li>
         </ol>
-      </ion-label>
+      </ion-label> -->
     </ion-item>
   </ion-item-group>
 
@@ -34,7 +38,7 @@
       <ion-label>Tor URL</ion-label>
       <ion-note slot="end">{{ device.torAddress | slice:0:7 }}...{{ device.torAddress | slice:-12 }}</ion-note>
     </ion-item>
-    <ion-item button (click)="copyToClipboard('https://start9-' + device.id + '.local')">
+    <!-- <ion-item button (click)="copyToClipboard('https://start9-' + device.id + '.local')">
       <ion-icon slot="start" name="globe-outline" color="primary"></ion-icon>
       <ion-label>Local URL</ion-label>
       <ion-note slot="end">{{ 'start9-' + device.id + '.local' }}</ion-note>
@@ -43,7 +47,7 @@
     <ion-item button (click)="presentActionCert()">
       <ion-icon slot="start" name="finger-print-outline" color="success"></ion-icon>
       <ion-label><ion-text color="success">SSL Certificate</ion-text></ion-label>
-    </ion-item>
+    </ion-item> -->
   </ion-item-group>
 
 </ion-content>

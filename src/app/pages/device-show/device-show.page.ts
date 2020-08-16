@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { ToastController, AlertController, NavController, ActionSheetController } from '@ionic/angular'
 import { AppState, Device } from '../../app-state'
 import { ActivatedRoute } from '@angular/router'
-import { CertInstaller } from 'capacitor-cert-installer'
+// import { CertInstaller } from 'capacitor-cert-installer'
 
 import { Plugins } from '@capacitor/core'
 const { Clipboard } = Plugins
@@ -13,7 +13,7 @@ const { Clipboard } = Plugins
   styleUrls: ['./device-show.page.scss'],
 })
 export class DeviceShowPage {
-  private readonly CertName = 'Embassy Local CA'
+  // private readonly CertName = 'Embassy Local CA'
   device: Device
 
   constructor (
@@ -21,7 +21,7 @@ export class DeviceShowPage {
     private readonly appState: AppState,
     private readonly route: ActivatedRoute,
     private readonly toastCtrl: ToastController,
-    private readonly actionSheetCtrl: ActionSheetController,
+    // private readonly actionSheetCtrl: ActionSheetController,
     private readonly alertCtrl: AlertController,
   ) { }
 
@@ -43,27 +43,27 @@ export class DeviceShowPage {
     toast.present()
   }
 
-  async presentActionCert () {
-    const alert = await this.actionSheetCtrl.create({
-      buttons: [
-        {
-          icon: 'copy-outline',
-          text: 'Copy to clipboard',
-          handler: () => {
-            this.copyToClipboard(this.device.cert)
-          },
-        },
-        {
-          icon: 'save-outline',
-          text: 'Save to device',
-          handler: () => {
-            this.installCert()
-          },
-        },
-      ],
-    })
-    await alert.present()
-  }
+  // async presentActionCert () {
+  //   const alert = await this.actionSheetCtrl.create({
+  //     buttons: [
+  //       {
+  //         icon: 'copy-outline',
+  //         text: 'Copy to clipboard',
+  //         handler: () => {
+  //           this.copyToClipboard(this.device.cert)
+  //         },
+  //       },
+  //       {
+  //         icon: 'save-outline',
+  //         text: 'Save to device',
+  //         handler: () => {
+  //           this.installCert()
+  //         },
+  //       },
+  //     ],
+  //   })
+  //   await alert.present()
+  // }
 
   async presentAlertRemove () {
     const alert = await this.alertCtrl.create({
@@ -95,7 +95,7 @@ export class DeviceShowPage {
     }
   }
 
-  private async installCert (): Promise<void> {
-    return CertInstaller.installCert({ value: this.device.cert, name: this.CertName })
-  }
+  // private async installCert (): Promise<void> {
+  //   return CertInstaller.installCert({ value: this.device.cert, name: this.CertName })
+  // }
 }

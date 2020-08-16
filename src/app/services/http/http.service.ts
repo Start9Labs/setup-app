@@ -57,5 +57,5 @@ export interface RegisterRequest {
 
 export interface RegisterResponse extends HostsResponse {
   torAddress: string
-  cert: string
+  // cert: string
 }
