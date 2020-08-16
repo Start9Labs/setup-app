@@ -1,7 +1,7 @@
 platform :ios, '11.0'
 use_frameworks!
 
-# workaround to avoid Xcode 10 caching of Pods that requires
+# workaround to avoid Xcode caching of Pods that requires
 # Product -> Clean Build Folder after new Cordova plugins installed
 # Requires CocoaPods 1.6 or newer
 install! 'cocoapods', :disable_input_output_paths => true
@@ -11,11 +11,12 @@ def capacitor_pods
   pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'
   pod 'CapacitorCordova', :path => '../../node_modules/@capacitor/ios'
   pod 'CapacitorCommunityHttp', :path => '../../node_modules/@capacitor-community/http'
+  pod 'CapacitorCertInstaller', :path => '../../../capacitor-cert-installer'
   pod 'CordovaPlugins', :path => '../capacitor-cordova-ios-plugins'
   # Do not delete
 end
 
-target 'Embassy' do
+target 'Setup' do
   capacitor_pods
   # Add your Pods here
 end
