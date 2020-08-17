@@ -17,8 +17,6 @@ export class LiveHttpService extends HttpService {
       'app-version': version,
     })
 
-    if (this.fullLogs) console.log(`requestFull body`, JSON.stringify(JSON.stringify(options.data)))
-
     try {
       return Http.request(options).then( (res: HttpResponse) => {
         const httpStatus = toHttpStatus(res.status)
