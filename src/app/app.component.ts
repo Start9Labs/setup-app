@@ -1,11 +1,10 @@
 import { Component } from '@angular/core'
 import { NetworkMonitor } from './services/network.service'
-import { ZeroconfMonitor } from './services/zeroconf.service'
-
-import { Plugins, StatusBarStyle } from '@capacitor/core'
 import { AppState } from './app-state'
-import { cryptoUtils } from './util/crypto'
-import { config } from './config'
+import { Router } from '@angular/router'
+import { Plugins, StatusBarStyle } from '@capacitor/core'
+import { ZeroconfMonitor } from './services/zeroconf/zeroconf.service'
+
 const { SplashScreen, StatusBar } = Plugins
 
 @Component({
@@ -19,6 +18,7 @@ export class AppComponent {
     private readonly networkMonitor: NetworkMonitor,
     private readonly zeroconfMonitor: ZeroconfMonitor,
     private readonly appState: AppState,
+    private readonly router: Router,
   ) {
     // set dark theme
     document.body.classList.toggle('dark', true)
@@ -27,14 +27,19 @@ export class AppComponent {
   }
 
   async init (): Promise<void> {
-    if (config.window.cryptoUtils) { window['cryptoUtils'] = cryptoUtils }
     // load storage
     await this.appState.load()
     // start network monitor
     await this.networkMonitor.init()
     // start zeroconf
-    await this.zeroconfMonitor.init()
-    // // set StatusBar style
+    this.zeroconfMonitor.init()
+    // navigate
+    if (this.appState.peekDevices().length) {
+      this.router.navigate(['/'])
+    } else {
+      this.router.navigate(['/connect'], { queryParams: { isRoot: 1 } })
+    }
+    // set StatusBar style
     StatusBar.setStyle({
       style: StatusBarStyle.Dark,
     })

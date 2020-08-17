@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core'
+import { BehaviorSubject, Observable } from 'rxjs'
 
 import { Plugins } from '@capacitor/core'
-import { BehaviorSubject, Observable } from 'rxjs'
 const { Storage } = Plugins
 
 export interface Device {
   id: string
-  label: string
-  torAddress: string
   type: 'Embassy'
+  torAddress: string
+  // cert: string
 }
 
 @Injectable({
@@ -20,13 +20,19 @@ export class AppState {
   peekDevices (): Device[] { return this.$devices$.getValue() }
 
   async load (): Promise<void> {
-    const devices = JSON.parse((await Storage.get({ key: 'servers' })).value)
+    const devices = JSON.parse((await Storage.get({ key: 'devices' })).value)
     this.$devices$.next(devices || [])
   }
 
-  async addDevice (device: Device): Promise<void> {
-    const devices = this.peekDevices().filter(d => d.id !== device.id)
-    devices.push(device)
+  // async addDevice (id: string, torAddress: string, cert: string): Promise<void> {
+  async addDevice (id: string, torAddress: string): Promise<void> {
+    const devices = this.peekDevices().filter(d => d.id !== id)
+    devices.push({
+      id,
+      type: 'Embassy',
+      torAddress,
+      // cert,
+    })
     await this.save(devices)
   }
 
@@ -36,7 +42,7 @@ export class AppState {
   }
 
   async save (devices: Device[]): Promise<void> {
-    await Storage.set({ key: 'servers', value: JSON.stringify(devices) })
+    await Storage.set({ key: 'devices', value: JSON.stringify(devices) })
     this.$devices$.next(devices)
   }
 }

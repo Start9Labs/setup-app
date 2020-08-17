@@ -1,14 +1,14 @@
-# Start9 Companion
+# Setup App
 
-## Setup Instructions
+## Instructions
 
 **Make sure you have git, node, and npm installed**
 
 `npm i -g @ionic/cli cordova`
 
-`git clone https://github.com/Start9Labs/companion-app.git`
+`git clone https://github.com/Start9Labs/setup-app.git`
 
-`cd companion-app`
+`cd setup-app`
 
 `npm i`
 

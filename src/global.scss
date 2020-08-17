@@ -25,9 +25,6 @@
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
 
-.loader {
-  --spinner-color: var(--ion-color-warning) !important;
-}
 
 .alert-danger {
   color: var(--ion-color-danger) !important;
@@ -36,42 +33,14 @@
   }
 }
 
-.fab-button {
-  margin: 20px;
-  --background: transparent;
-  --border-color: var(--ion-color-primary);
-  --border-style: solid;
-  --border-width: 2px;
-}
-
-.center {
-  display: block;
-  margin: auto;
-  height: 100%;
-}
-
-ion-note {
-  max-width: 180px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 ion-item-divider {
   --background: transparent;
 }
 
 ion-action-sheet {
-  --backdrop-opacity: 0.75 !important;
+  --backdrop-opacity: 0.7 !important;
 }
 
 ion-alert {
-  --backdrop-opacity: 0.75 !important;
-}
-
-* {
-  -webkit-user-select: text;
-  -moz-user-select: text;
-  -ms-user-select: text;
-  user-select: text;
+  --backdrop-opacity: 0.7 !important;
 }

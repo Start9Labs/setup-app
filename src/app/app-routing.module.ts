@@ -12,12 +12,16 @@ const routes: Routes = [
     loadChildren: () => import('./pages/device-list/device-list.module').then(m => m.DeviceListPageModule),
   },
   {
-    path: 'devices/:deviceId',
+    path: 'devices/:id',
     loadChildren: () => import('./pages/device-show/device-show.module').then(m => m.DeviceShowPageModule),
   },
   {
     path: 'connect',
     loadChildren: () => import('./pages/connect/connect.module').then(m => m.ConnectPageModule),
+  },
+  {
+    path: 'register',
+    loadChildren: () => import('./pages/register/register.module').then(m => m.RegisterPageModule),
   },
 ]
 

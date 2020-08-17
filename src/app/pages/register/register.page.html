@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      Finish Setup
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding-top">
+
+  <ion-item *ngIf="error" style="margin-bottom: 16px;">
+    <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
+  </ion-item>
+
+  <form (submit)="register()">
+    <ion-item-group style="margin-bottom: 40px;">
+      <ion-item>
+        <ion-label position="floating" color="medium">Password</ion-label>
+        <ion-input maxlength="32" name="password" [(ngModel)]="password"></ion-input>
+      </ion-item>
+    </ion-item-group>
+    <ion-button type="submit" [disabled]="password.length < 12" expand="block" fill="outline">
+      Finish
+    </ion-button>
+  </form>
+
+  <ion-item-group>
+    <ion-item-divider></ion-item-divider>
+    <ion-item>
+      <ion-label class="ion-text-wrap">
+        <h2><ion-text color="warning">Important</ion-text></h2>
+        <br />
+        <p><b>Create a great master password for your Embassy. Write it down.</b></p>
+        <br />
+        <p><b>If you lose your password, you will need to force reset your Embassy, resulting in permanent loss of data.</b></p>
+        <br />
+      </ion-label>
+    </ion-item>
+  </ion-item-group>
+
+</ion-content>

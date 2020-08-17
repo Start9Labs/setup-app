@@ -1,28 +1,31 @@
+
+
 import { Injectable } from '@angular/core'
 import { Zeroconf, ZeroconfResult, ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import { Subscription, Observable, BehaviorSubject, ReplaySubject } from 'rxjs'
 import { Platform } from '@ionic/angular'
-import { NetworkMonitor } from './network.service'
+import { NetworkMonitor } from '../network.service'
 import { NetworkStatus } from '@capacitor/core'
-import { getLanIP } from './http/http.service'
 
 @Injectable({
   providedIn: 'root',
 })
-export class ZeroconfMonitor {
-  private readonly serviceFound$ = new ReplaySubject<ZeroconfService>(10)
-  private readonly serviceExists$ = new BehaviorSubject<boolean>(false)
+export abstract class ZeroconfMonitor {
+  protected readonly serviceFound$ = new ReplaySubject<ZeroconfService>(10)
+  protected readonly serviceExists$ = new BehaviorSubject<boolean>(false)
   watchServiceFound (): Observable<ZeroconfService> { return this.serviceFound$.asObservable() }
   watchServiceExists (): Observable<boolean> { return this.serviceExists$.asObservable() }
   services: { [hostname: string]: ZeroconfService } = { }
-  private zeroconfSub: Subscription
-  private networkSub: Subscription
+  protected zeroconfSub: Subscription
+  protected networkSub: Subscription
 
   constructor (
-    private readonly platform: Platform,
-    private readonly zeroconf: Zeroconf,
-    private readonly networkMonitor: NetworkMonitor,
+    protected readonly platform: Platform,
+    protected readonly zeroconf: Zeroconf,
+    protected readonly networkMonitor: NetworkMonitor,
   ) { }
+
+  abstract start (): Promise<void> 
 
   init (): void {
     this.networkSub = this.networkSub || this.networkMonitor.watchConnection().subscribe(n => this.handleNetworkChange(n))
@@ -32,29 +35,14 @@ export class ZeroconfMonitor {
     return this.services[`start9-${serverId}`]
   }
 
-  private handleNetworkChange (network: NetworkStatus): void {
+  protected handleNetworkChange (network: NetworkStatus): void {
     this.stop()
     if (network.connectionType === 'wifi') {
       this.start()
     }
   }
 
-  private async start (): Promise<void> {
-    // ** MOCKS **
-    // return this.mock()
-
-    if (!this.platform.is('ios') && !this.platform.is('android')) { return }
-
-    console.log('starting zeroconf monitor')
-
-    await this.zeroconf.reInit()
-
-    this.zeroconfSub = this.zeroconf.watch('_http._tcp.', 'local.').subscribe(result => {
-      this.handleServiceUpdate(result)
-    })
-  }
-
-  private stop (): void {
+  protected stop (): void {
     if (!this.zeroconfSub) { return }
     console.log('stopping zeroconf monitor')
     for (let service of Object.values(this.services)) {
@@ -63,7 +51,7 @@ export class ZeroconfMonitor {
     this.zeroconfSub.unsubscribe()
   }
 
-  private handleServiceUpdate (result: ZeroconfResult): void {
+  protected handleServiceUpdate (result: ZeroconfResult): void {
     const { action, service } = result
 
     // don't care about non-Start9 stuff
@@ -84,9 +72,8 @@ export class ZeroconfMonitor {
     }
   }
 
-  private addService (service: ZeroconfService): void {
+  protected addService (service: ZeroconfService): void {
     console.log(`discovered zeroconf service: ${service.name}`)
-    console.log(`ip address is: `, getLanIP(service))
     // add service and broadcast existence
     this.services[service.name] = service
     this.serviceFound$.next(service)
@@ -96,7 +83,7 @@ export class ZeroconfMonitor {
     }
   }
 
-  private removeService (service: ZeroconfService): void {
+  protected removeService (service: ZeroconfService): void {
     console.log(`removing zeroconf service: ${service.name}`)
     // remove service
     delete this.services[service.name]
@@ -104,24 +91,5 @@ export class ZeroconfMonitor {
     if (!Object.keys(this.services).length) {
       this.serviceExists$.next(false)
     }
-  }
-
-  // @TODO remove
-  mock (): void {
-    const result: ZeroconfResult = {
-      action: 'resolved',
-      service: {
-        domain: 'local.',
-        type: '_http._tcp',
-        name: 'start9-1f3ce404',
-        hostname: '',
-        ipv4Addresses: ['192.168.20.1'],
-        ipv6Addresses: ['end9823u0ej2fb'],
-        port: 5959,
-        txtRecord: { },
-      },
-    }
-
-    this.handleServiceUpdate(result)
   }
 }

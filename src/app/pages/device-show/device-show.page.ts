@@ -2,46 +2,37 @@ import { Component } from '@angular/core'
 import { ToastController, AlertController, NavController } from '@ionic/angular'
 import { AppState, Device } from '../../app-state'
 import { ActivatedRoute } from '@angular/router'
+// import { CertInstaller } from 'capacitor-cert-installer'
 
 import { Plugins } from '@capacitor/core'
-import { hmac256, encode16 } from 'src/app/util/crypto'
 const { Clipboard } = Plugins
 
 @Component({
-  selector: 'page-device-show',
+  selector: 'device-show',
   templateUrl: './device-show.page.html',
   styleUrls: ['./device-show.page.scss'],
 })
 export class DeviceShowPage {
+  // private readonly CertName = 'Embassy Local CA'
   device: Device
-  success: string
-  hmac: string
-  message: string
-  productKey?: string
 
   constructor (
     private readonly navCtrl: NavController,
     private readonly appState: AppState,
     private readonly route: ActivatedRoute,
     private readonly toastCtrl: ToastController,
+    // private readonly actionSheetCtrl: ActionSheetController,
     private readonly alertCtrl: AlertController,
   ) { }
 
   ngOnInit ( ) {
-    const deviceId  = this.route.snapshot.paramMap.get('deviceId')
-    this.success    = this.route.snapshot.queryParamMap.get('success')
-    this.productKey = this.route.snapshot.queryParamMap.get('productKey')
-
-    this.device = this.appState.peekDevices().find(d => d.id === deviceId)
-    console.log(`device-show`, this.device)
-    console.log(`device-show`, deviceId)
+    const id = this.route.snapshot.paramMap.get('id')
+    this.device = this.appState.peekDevices().find(d => d.id === id)
   }
 
-  async copyTor (forRedirect = false) {
-    let url = forRedirect ? await this.getLink() : this.device.torAddress
-
-    const message = await Clipboard.write({ url: url || '' })
-      .then(() => `${forRedirect ? 'Link' : 'Address'} copied to clipboard!`)
+  async copyToClipboard (string: string): Promise<void> {
+    const message = await Clipboard.write({ string })
+      .then(() => 'Copied to clipboard!')
       .catch(() => 'failed to copy')
 
     const toast = await this.toastCtrl.create({
@@ -49,34 +40,45 @@ export class DeviceShowPage {
       position: 'bottom',
       duration: 1000,
     })
-    await toast.present()
+    toast.present()
   }
 
-  async getLink (): Promise<string | undefined> {
-    if (!this.device.torAddress) return undefined
-    if (!this.productKey) return undefined
+  // async presentActionCert () {
+  //   const alert = await this.actionSheetCtrl.create({
+  //     buttons: [
+  //       {
+  //         icon: 'copy-outline',
+  //         text: 'Copy to clipboard',
+  //         handler: () => {
+  //           this.copyToClipboard(this.device.cert)
+  //         },
+  //       },
+  //       {
+  //         icon: 'save-outline',
+  //         text: 'Save to device',
+  //         handler: () => {
+  //           this.installCert()
+  //         },
+  //       },
+  //     ],
+  //   })
+  //   await alert.present()
+  // }
 
-    const expiration = modulateTime(new Date(), 5, 'minutes')
-    const messagePlain = expiration.toISOString()
-    const { hmac, message, salt } = await hmac256(this.productKey, messagePlain)
-
-    return this.device.torAddress + `/v0/register?hmac=${encode16(hmac)}&message=${encode16(message)}&salt=${encode16((salt))}`
-  }
-
-  async presentAlertForget () {
+  async presentAlertRemove () {
     const alert = await this.alertCtrl.create({
       header: 'Confirm',
-      message: `Forget ${this.device.label} on this device? You can always add it back later using the product key`,
+      message: 'Remove Embassy contact information from this device? This action will have no affect on the Embassy itself.',
       buttons: [
         {
           text: 'Cancel',
           role: 'cancel',
         },
         {
-          text: 'Forget',
+          text: 'Remove',
           cssClass: 'alert-danger',
           handler: () => {
-            this.forget()
+            this.remove()
           },
         },
       ],
@@ -84,24 +86,16 @@ export class DeviceShowPage {
     await alert.present()
   }
 
-  async forget (): Promise<void> {
+  private async remove (): Promise<void> {
     await this.appState.removeDevice(this.device.id)
-    await this.navCtrl.navigateRoot(['/devices'])
+    if (this.appState.peekDevices().length) {
+      await this.navCtrl.navigateRoot(['/devices'])
+    } else {
+      await this.navCtrl.navigateRoot(['/connect'])
+    }
   }
-}
 
-function modulateTime (ts: Date, count: number, unit: 'days' | 'hours' | 'minutes' | 'seconds' ) {
-  const ms = inMs(count, unit)
-  const toReturn = new Date(ts)
-  toReturn.setMilliseconds( toReturn.getMilliseconds() + ms)
-  return toReturn
-}
-
-function inMs ( count: number, unit: 'days' | 'hours' | 'minutes' | 'seconds' ) {
-  switch (unit){
-    case 'seconds' : return count * 1000
-    case 'minutes' : return inMs(count * 60, 'seconds')
-    case 'hours' : return inMs(count * 60, 'minutes')
-    case 'days' : return inMs(count * 24, 'hours')
-  }
+  // private async installCert (): Promise<void> {
+  //   return CertInstaller.installCert({ value: this.device.cert, name: this.CertName })
+  // }
 }

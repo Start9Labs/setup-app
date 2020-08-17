@@ -1,37 +1,26 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>
-      Devices
-    </ion-title>
+    <ion-title>Saved Embassies</ion-title>
+    <ion-buttons slot="end">
+      <ion-button [routerLink]="['/connect']">
+        <ion-icon size="small" slot="icon-only" name="add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding-top">
-
-  <ion-item-group *ngIf="!(devices$ | async).length">
-    <ion-item>
-      <ion-label class="ion-text-wrap">
-        <ion-text color="medium">To set up your first Start9 device, click the plus button below.</ion-text>
-      </ion-label>
-    </ion-item>
-  </ion-item-group>
+<ion-content class="ion-padding">
 
   <ion-card button *ngFor="let device of devices$ | async" style="margin-bottom: 16px;" [routerLink]="['/devices', device.id]">
-    <ion-item>
-      <ion-avatar slot="start">
-        <img src="assets/img/cube.png" alt="icon" />
-      </ion-avatar>
-      <ion-label>
-        <h2>{{ device.label }}</h2>
-        <p>{{ device.torAddress }}</p>
-      </ion-label>
-    </ion-item>
+    <ion-card-header>
+      <ion-card-subtitle>Device ID</ion-card-subtitle>
+      <ion-card-title>{{ device.type + ":" + device.id }}</ion-card-title>
+    </ion-card-header>
+    <!-- <ion-card-content>
+      <ion-icon style="margin-right: 12px;" src="assets/svg/tor.svg"></ion-icon>
+      <ion-icon style="margin-right: 12px;" name="globe-outline" color="primary"></ion-icon>
+      <ion-icon name="finger-print-outline" color="success"></ion-icon>
+    </ion-card-content> -->
   </ion-card>
-
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button [routerLink]="['/connect']" class="fab-button">
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
 
 </ion-content>

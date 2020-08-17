@@ -2,28 +2,67 @@ import * as base32 from 'base32.js'
 import * as h from 'js-sha3'
 import * as elliptic from 'elliptic'
 const ED25519 = elliptic.eddsa('ed25519')
+import * as forge from 'node-forge'
 
-
-export async function encrypt (secretKey: string, messageBuffer: Uint8Array): Promise<{ cipher: Uint8Array, counter: Uint8Array, salt: Uint8Array }> {
-  const { key, salt } = await pbkdf2Stretch(secretKey, { name: 'AES-CTR', length: 256 })
-  const counter = window.crypto.getRandomValues(new Uint8Array(16))
-  const algorithm = { name: 'AES-CTR', counter, length: 64 }
-
-  return window.crypto.subtle.encrypt(algorithm, key, messageBuffer)
-    .then(encrypted => new Uint8Array(encrypted))
-    .then(cipher => ({ cipher, counter, salt }))
+type AES_CTR = {
+  encryptPbkdf2: (secretKey: string, messageBuffer: Uint8Array) => Promise<{ cipher: Uint8Array, counter: Uint8Array, salt: Uint8Array }>
+  decryptPbkdf2: (secretKey, a: { cipher: Uint8Array, counter: Uint8Array, salt: Uint8Array }) => Promise<Uint8Array>
 }
 
-export async function hmac256 (secretKey: string, messagePlain: string): Promise<{ message: Uint8Array, hmac: Uint8Array, salt: Uint8Array }> {
+export const AES_CTR: AES_CTR = {
+  encryptPbkdf2: async (secretKey: string, messageBuffer: Uint8Array) =>  {
+    const { key, salt } = await STRETCH.pbkdf2(secretKey, { name: 'AES-CTR', length: 256 })
+    const counter = window.crypto.getRandomValues(new Uint8Array(16))
+    const algorithm = { name: 'AES-CTR', counter, length: 64 }
+
+    return window.crypto.subtle.encrypt(algorithm, key, messageBuffer)
+      .then(encrypted => new Uint8Array(encrypted))
+      .then(cipher => ({ cipher, counter, salt }))
+  },
+  decryptPbkdf2: async (secretKey: string, a: { cipher: Uint8Array, counter: Uint8Array, salt: Uint8Array }) =>  {
+    const { cipher, counter, salt } = a
+    const { key } = await STRETCH.pbkdf2(secretKey, { name: 'AES-CTR', length: 256 }, salt)
+    const algorithm = { name: 'AES-CTR', counter, length: 64 }
+
+    return window.crypto.subtle.decrypt(algorithm, key, cipher)
+      .then(decrypted => new Uint8Array(decrypted))
+  },
+}
+
+/** HMAC */
+type HMAC = {
+  sha256: (secretKey: string, messagePlain: string, saltOverride?: Uint8Array) => Promise<{ message: Uint8Array, hmac: Uint8Array, salt: Uint8Array }>
+  verify256: (secretKey: string, hmac: Uint8Array, messagePlain: String, salt: Uint8Array) => Promise<boolean>
+}
+
+const sha256 = async (secretKey: string, messagePlain: string, saltOverride?: Uint8Array) => {
   const message = encodeUtf8(messagePlain)
-  const { key, salt } = await pbkdf2Stretch(secretKey, { name: 'HMAC', hash: { name: 'SHA-256'}, length: 256}) // 256 is length in bites of output key
+  const { key, salt } = await STRETCH.pbkdf2(secretKey, { name: 'HMAC', hash: { name: 'SHA-256'}, length: 256}, saltOverride) //256 is the length in bits of the output key
 
   return window.crypto.subtle.sign('HMAC', key, message)
     .then(signature => new Uint8Array(signature))
     .then(hmac => ({ hmac, message, salt }))
 }
 
-export async function genExtendedPrivKey (secretKey = window.crypto.getRandomValues(new Uint8Array(32))): Promise<{ secretKey: Uint8Array, expandedSecretKey: Uint8Array }> {
+export const HMAC: HMAC = {
+  sha256,
+  verify256: async (secretKey: string, hmac: Uint8Array, messagePlain: string, salt: Uint8Array) => {
+    const { hmac: computedHmac } = await sha256(secretKey, messagePlain, salt)
+    return hmac.every(( _, i ) => computedHmac[i] === hmac[i])
+  },
+}
+
+type KEY_GEN = {
+  rsa (): Promise<string> // outputs in pem encoded text format
+  tor (): Promise<{ secretKey: Uint8Array, expandedSecretKey: Uint8Array }> // outputs expanded key
+}
+
+export const KEY_GEN: KEY_GEN = {
+  tor,
+  rsa,
+}
+
+export async function tor (secretKey = window.crypto.getRandomValues(new Uint8Array(32))): Promise<{ secretKey: Uint8Array, expandedSecretKey: Uint8Array }> {
   let expandedSecretKey = new Uint8Array(await crypto.subtle.digest('SHA-512', secretKey))
   expandedSecretKey[0]  &= 248
   expandedSecretKey[31] &=  127
@@ -31,7 +70,24 @@ export async function genExtendedPrivKey (secretKey = window.crypto.getRandomVal
   return { secretKey, expandedSecretKey }
 }
 
-export async function pbkdf2Stretch (secretKey: string, algorithm: AesKeyAlgorithm | HmacKeyGenParams): Promise<{ salt: Uint8Array, key: CryptoKey, rawKey: Uint8Array }> {
+export async function rsa (): Promise<string> {
+  return new Promise((resolve, reject) => {
+    forge.pki.rsa.generateKeyPair({ bits: 2048, workers: 2}, (err, keypair) => {
+      if (err) reject(err)
+      resolve(forge.pki.privateKeyToPem(keypair.privateKey))
+    })
+  })
+}
+
+/** KEY STRETCH */
+type STRETCH = {
+  pbkdf2: (secretKey: string, algorithm: AesKeyAlgorithm | HmacKeyGenParams, salt?: Uint8Array) => Promise<{ salt: Uint8Array, key: CryptoKey, rawKey: Uint8Array }>
+}
+export const STRETCH: STRETCH = {
+  pbkdf2,
+}
+
+async function pbkdf2 (secretKey: string, algorithm: AesKeyAlgorithm | HmacKeyGenParams, salt = window.crypto.getRandomValues(new Uint8Array(16))): Promise<{ salt: Uint8Array, key: CryptoKey, rawKey: Uint8Array }> {
   const usages: KeyUsage[] = algorithm.name === 'AES-CTR' ? [ 'encrypt' ] : [ 'sign' ]
   const keyMaterial = await window.crypto.subtle.importKey(
     'raw',
@@ -41,11 +97,10 @@ export async function pbkdf2Stretch (secretKey: string, algorithm: AesKeyAlgorit
     ['deriveBits', 'deriveKey'],
   )
 
-  const salt =  window.crypto.getRandomValues(new Uint8Array(16))
   const key = await window.crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt: salt,
+      salt,
       iterations: 100000,
       hash: 'SHA-256',
     },
@@ -66,6 +121,7 @@ function encode32 (buffer: Uint8Array): string {
   const b32encoder = new base32.Encoder({ type: 'rfc4648' })
   return b32encoder.write(buffer).finalize()
 }
+
 function encodeUtf8 (str: string): Uint8Array {
   const encoder = new TextEncoder()
   return encoder.encode(str)
@@ -76,12 +132,11 @@ export async function getPubKey (privKey: Uint8Array): Promise<Uint8Array> {
 }
 
 export const cryptoUtils = {
-  encode16, decode16, getPubKey, onionFromPubkey, genExtendedPrivKey,
+  encode16, decode16, getPubKey, onionFromPubkey,
 }
 
 // onion_address = base32(PUBKEY | CHECKSUM | VERSION) + ".onion"
 // CHECKSUM = H(".onion checksum" | PUBKEY | VERSION)[:2]
-
 // where:
 //   - PUBKEY is the 32 bytes ed25519 master pubkey of the hidden service.
 //   - VERSION is an one byte version field (default value '\x03')

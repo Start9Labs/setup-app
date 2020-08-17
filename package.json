@@ -1,8 +1,8 @@
 {
-  "name": "start9-companion",
-  "version": "2.0.0",
-  "description": "Companion app for setting up Start9 devices",
-  "author": "Start9 Labs",
+  "name": "setup-app",
+  "version": "1.0.0",
+  "description": "Mobile app for setting up the Start9 Embassy",
+  "author": "Start9 Labs, Inc",
   "private": true,
   "homepage": "https://start9labs.com",
   "scripts": {
@@ -32,11 +32,14 @@
     "base32.js": "^0.1.0",
     "big-integer": "^1.6.48",
     "buffer": "^5.6.0",
+    "capacitor-cert-installer": "file:../capacitor-cert-installer",
     "cordova-plugin-zeroconf": "^1.4.0",
     "core-js": "^3.4.0",
     "crypto-js": "^4.0.0",
     "elliptic": "^6.5.3",
     "js-sha3": "^0.8.0",
+    "node-forge": "^0.9.1",
+    "openssl-nodejs": "^1.0.5",
     "rxjs": "^6.5.0",
     "zone.js": "^0.10.0"
   },
