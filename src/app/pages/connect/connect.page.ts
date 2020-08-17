@@ -84,8 +84,10 @@ export class ConnectPage {
         case 'success': console.log(`Successful hmac validation`)
       }
 
-      if (data.torAddress || data.cert) {
-        this.appState.addDevice(id, data.torAddress, data.cert)
+      // if (data.torAddress || data.cert) {
+      if (data.torAddress) {
+        // this.appState.addDevice(id, data.torAddress, data.cert)
+        this.appState.addDevice(id, data.torAddress)
         this.presentAlertAlreadyRegistered(id)
       } else {
         this.navCtrl.navigateForward(['/register'], {

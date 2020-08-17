@@ -40,7 +40,7 @@ export interface HostsResponse {
   message: string,
   salt: string
   torAddress?: string
-  cert?: string
+  // cert?: string
 }
 
 export interface RegisterRequest {
