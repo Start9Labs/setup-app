@@ -1,15 +1,12 @@
 export const config = {
   http: {
-    useMocks: true,
-    customLogReqs: true,
+    useMocks: false,
+    customLogReqs: false,
   },
   hmac: {
-    useMocks: true,
+    useMocks: false,
   },
   zeroconf: {
-    useMocks: true,
-  },
-  window: {
-    cryptoUtils: false,
+    useMocks: false,
   },
 }
