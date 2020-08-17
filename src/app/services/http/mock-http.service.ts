@@ -5,9 +5,10 @@ import { HttpService, TypedHttpResponse } from './http.service'
 const version = require('../../../../package.json').version
 
 @Injectable()
-export class RecorderHttpService extends HttpService {
+export class MockHttpService extends HttpService {
   readonly requestRecord: HttpOptions[] = []
   readonly respondWith: { [path: string]: HttpResponse } = {
+    '/v0/hosts' : { status: 200, data: { torAddress: 'gff4ixq3takworeuhkubzz4xh2ulytoct4xrpazkiykhupalqlo53ryd.onion' }, headers: { } },
     '*': { status: 200, data: { }, headers: { } },
   }
 
@@ -37,6 +38,7 @@ export class RecorderHttpService extends HttpService {
   }
 
   private response<T> (options: HttpOptions): TypedHttpResponse<T> {
-    return this.respondWith[options.url] || this.respondWith['*']
+    const path = new URL(options.url).pathname
+    return this.respondWith[path] || this.respondWith['*']
   }
 }

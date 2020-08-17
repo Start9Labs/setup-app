@@ -26,7 +26,6 @@ export class AppState {
 
   async addDevice (id: string, torAddress: string, cert: string): Promise<void> {
     const devices = this.peekDevices().filter(d => d.id !== id)
-    const type = 'Embassy'
     devices.push({
       id,
       type: 'Embassy',

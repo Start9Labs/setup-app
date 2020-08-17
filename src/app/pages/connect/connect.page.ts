@@ -5,8 +5,7 @@ import { getLanIP, idFromProductKey, HttpService, Method, HostsResponse } from '
 import { Subscription } from 'rxjs'
 import { encode16, HMAC, decode16 } from 'src/app/util/crypto'
 import { AppState } from 'src/app/app-state'
-import { HmacService } from 'src/app/services/hmac.service'
-
+import { HmacService } from 'src/app/services/hmac/hmac.service'
 @Component({
   selector: 'connect',
   templateUrl: 'connect.page.html',
@@ -78,7 +77,7 @@ export class ConnectPage {
         },
       })
 
-      const hmacRes = await this.hmacService.validateHmacExpiration(this.productKey, decode16(data.hmac), data.message, decode16(data.salt))
+      const hmacRes = await this.hmacService.validateHmacExpiration(this.productKey, data.hmac, data.message, data.salt)
       switch (hmacRes) {
         case 'hmac-invalid': return this.presentAlertInvalidRes()
         case 'expiration-invalid': return this.presentAlertExpiredRes()

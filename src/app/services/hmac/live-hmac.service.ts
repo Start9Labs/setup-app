@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core'
-import { HMAC } from '../util/crypto'
+import { HMAC, decode16 } from '../../util/crypto'
+import { HmacService } from './hmac.service'
 
 @Injectable({
   providedIn: 'root',
 })
-export class HmacService {
-  constructor () { }
+export class LiveHmacService extends HmacService {
+  constructor () { super() }
 
-  async validateHmacExpiration (secretKey: string, hmac: Uint8Array, expirationIso: string, salt: Uint8Array) : Promise<'hmac-invalid' | 'expiration-invalid' | 'success' > {
-    const validRes = await HMAC.verify256(secretKey, hmac, expirationIso, salt)
+  async validateHmacExpiration (secretKey: string, hmacHex: string, expirationIso: string, saltHex: string) : Promise<'hmac-invalid' | 'expiration-invalid' | 'success' > {
+    const validRes = await HMAC.verify256(secretKey, decode16(hmacHex), expirationIso, decode16(saltHex))
     if (!validRes) return 'hmac-invalid'
     const withinExp = notExpired(expirationIso)
     if (!withinExp) return 'expiration-invalid'

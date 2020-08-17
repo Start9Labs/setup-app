@@ -39,7 +39,9 @@
     "crypto-js": "^4.0.0",
     "elliptic": "^6.5.3",
     "js-sha3": "^0.8.0",
+    "node-forge": "^0.9.1",
     "node-rsa": "^1.1.1",
+    "openssl-nodejs": "^1.0.5",
     "rxjs": "^6.5.0",
     "zone.js": "^0.10.0"
   },

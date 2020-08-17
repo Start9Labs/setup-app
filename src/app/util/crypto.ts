@@ -1,9 +1,8 @@
 import * as base32 from 'base32.js'
 import * as h from 'js-sha3'
 import * as elliptic from 'elliptic'
-import * as RSA from 'node-rsa'
 const ED25519 = elliptic.eddsa('ed25519')
-
+import * as forge from 'node-forge'
 
 type AES_CTR = {
   encryptPbkdf2: (secretKey: string, messageBuffer: Uint8Array) => Promise<{ cipher: Uint8Array, counter: Uint8Array, salt: Uint8Array }>
@@ -53,17 +52,31 @@ export const HMAC: HMAC = {
   },
 }
 
-export async function genRSAKey (): Promise<string> {
-  return new RSA({ b: 4096 }).exportKey()
+type KEY_GEN = {
+  rsa (): Promise<string> // outputs in pem encoded text format
+  tor (): Promise<{ secretKey: Uint8Array, expandedSecretKey: Uint8Array }> // outputs expanded key
 }
 
-export async function genTorKey (): Promise<Uint8Array> {
-  const entropy = window.crypto.getRandomValues(new Uint8Array(32))
-  let privKey = new Uint8Array(await crypto.subtle.digest('SHA-512', entropy))
-  privKey[0] &= 248
-  privKey[31] &= 127
-  privKey[31] |= 64
-  return privKey
+export const KEY_GEN: KEY_GEN = {
+  tor,
+  rsa,
+}
+
+export async function tor (secretKey = window.crypto.getRandomValues(new Uint8Array(32))): Promise<{ secretKey: Uint8Array, expandedSecretKey: Uint8Array }> {
+  let expandedSecretKey = new Uint8Array(await crypto.subtle.digest('SHA-512', secretKey))
+  expandedSecretKey[0]  &= 248
+  expandedSecretKey[31] &=  127
+  expandedSecretKey[31] |=  64
+  return { secretKey, expandedSecretKey }
+}
+
+export async function rsa (): Promise<string> {
+  return new Promise((resolve, reject) => {
+    forge.pki.rsa.generateKeyPair({ bits: 2048, workers: 2}, (err, keypair) => {
+      if (err) reject(err)
+      resolve(forge.pki.privateKeyToPem(keypair.privateKey))
+    })
+  })
 }
 
 /** KEY STRETCH */
@@ -119,12 +132,11 @@ export async function getPubKey (privKey: Uint8Array): Promise<Uint8Array> {
 }
 
 export const cryptoUtils = {
-  encode16, decode16, getPubKey, onionFromPubkey, genTorKey,
+  encode16, decode16, getPubKey, onionFromPubkey,
 }
 
 // onion_address = base32(PUBKEY | CHECKSUM | VERSION) + ".onion"
 // CHECKSUM = H(".onion checksum" | PUBKEY | VERSION)[:2]
-
 // where:
 //   - PUBKEY is the 32 bytes ed25519 master pubkey of the hidden service.
 //   - VERSION is an one byte version field (default value '\x03')

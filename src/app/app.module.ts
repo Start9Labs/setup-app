@@ -8,6 +8,8 @@ import { AppRoutingModule } from './app-routing.module'
 import { Zeroconf } from '@ionic-native/zeroconf/ngx'
 import { HttpService } from './services/http/http.service'
 import { HttpServiceFactory } from './services/http/http.service.factory'
+import { HmacService } from './services/hmac/hmac.service'
+import { HmacServiceFactory } from './services/hmac/hmac.service.factory'
 
 @NgModule({
   declarations: [AppComponent],
@@ -21,6 +23,7 @@ import { HttpServiceFactory } from './services/http/http.service.factory'
     Zeroconf,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     { provide: HttpService, useFactory: HttpServiceFactory, deps: [] },
+    { provide: HmacService, useFactory: HmacServiceFactory, deps: [] },
   ],
   bootstrap: [AppComponent],
 })

@@ -1,8 +1,10 @@
-type AppConfig = { http: { useMocks: boolean, customLogReqs: boolean }, window: { cryptoUtils: boolean } }
-export const config: AppConfig = {
+export const config = {
   http: {
     useMocks: true,
     customLogReqs: true,
+  },
+  hmac: {
+    useMocks: true,
   },
   window: {
     cryptoUtils: false,

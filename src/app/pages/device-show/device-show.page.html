@@ -34,9 +34,9 @@
   <ion-item-group>
     <ion-item-divider></ion-item-divider>
     <ion-item button (click)="copyToClipboard('http://' + device.torAddress)">
-      <ion-icon slot="start" src="assets/svg/tor.svg"></ion-icon>
-      <ion-label>Tor URL</ion-label>
-      <ion-note slot="end">{{ device.torAddress | slice:0:7 }}...{{ device.torAddress | slice:-12 }}</ion-note>
+      <ion-icon style="margin-right: 10px;" slot="start" src="assets/svg/tor.svg"></ion-icon>
+      <div slot="start" style="font-size: 13px">Tor URL</div>
+      <ion-note style="margin-left: 0px; padding-left: 0px" slot="end">{{ device.torAddress | slice:0:7 }}...{{ device.torAddress | slice:-12 }}</ion-note>
     </ion-item>
     <!-- <ion-item button (click)="copyToClipboard('https://start9-' + device.id + '.local')">
       <ion-icon slot="start" name="globe-outline" color="primary"></ion-icon>

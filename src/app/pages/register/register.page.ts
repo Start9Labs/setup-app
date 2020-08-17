@@ -2,9 +2,9 @@ import { Component } from '@angular/core'
 import { LoadingController, NavController, AlertController } from '@ionic/angular'
 import { HttpService, Method, RegisterResponse, RegisterRequest } from '../../services/http/http.service'
 import { AppState } from 'src/app/app-state'
-import { genTorKey, genRSAKey, encode16, encodeObject, AES_CTR, decode16 } from 'src/app/util/crypto'
+import { KEY_GEN, encode16, encodeObject, AES_CTR, decode16 } from 'src/app/util/crypto'
 import { ActivatedRoute } from '@angular/router'
-import { HmacService } from 'src/app/services/hmac.service'
+import { HmacService } from 'src/app/services/hmac/hmac.service'
 
 @Component({
   selector: 'register',
@@ -46,16 +46,16 @@ export class RegisterPage {
 
     try {
       const [torPrivKey] = await Promise.all([
-        genTorKey(),
-        pauseFor(4000),
+        KEY_GEN.tor().then(({ expandedSecretKey }) => expandedSecretKey),
+        pauseFor(1500),
       ])
 
       loader.message = '(2/3) Generating RSA private key for SSL Certificate. This could take a while...'
       await pauseFor(100)
 
       const [rsaPrivKey] = await Promise.all([
-        genRSAKey(),
-        pauseFor(2000),
+        KEY_GEN.rsa(),
+        pauseFor(1500),
       ])
 
       loader.message = '(3/3) Transferring encrypted data to Embassy'
@@ -94,10 +94,11 @@ export class RegisterPage {
           url: `http://${this.ip}:5959/v0/register`,
           data: requestData,
         }),
-        pauseFor(4000),
+        pauseFor(1500),
       ])
 
-      const hmacRes = await this.hmacService.validateHmacExpiration(this.productKey, decode16(data.hmac), data.message, decode16(data.salt))
+      debugger
+      const hmacRes = await this.hmacService.validateHmacExpiration(this.productKey, data.hmac, data.message, data.salt)
       switch (hmacRes) {
         case 'hmac-invalid': return this.presentAlertInvalidRes()
         case 'expiration-invalid': return this.presentAlertExpiredRes()
