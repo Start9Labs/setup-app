@@ -6,6 +6,9 @@ export const config = {
   hmac: {
     useMocks: true,
   },
+  zeroconf: {
+    useMocks: true,
+  },
   window: {
     cryptoUtils: false,
   },

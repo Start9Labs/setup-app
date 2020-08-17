@@ -50,7 +50,7 @@ export class RegisterPage {
         pauseFor(1500),
       ])
 
-      loader.message = '(2/3) Generating RSA private key for SSL Certificate. This could take a while...'
+      loader.message = '(2/3) Generating RSA private key for SSL Certificate'
       await pauseFor(100)
 
       const [rsaPrivKey] = await Promise.all([
