@@ -18,6 +18,7 @@
     <ion-item>
       <ion-label class="ion-text-wrap">
         <p><ion-text color="warning">Your Embassy is now privately hosted on the Internet!</ion-text></p>
+        <br />
         <p>Access your Embassy by visiting its Tor Address from any Tor-enabled browser, including: Start9 Consulate, Tor Browser, Firefox (with SOCKS5 proxy enabled), or Brave</p>
       </ion-label>
       <!-- <ion-label class="ion-text-wrap">
@@ -34,9 +35,12 @@
   <ion-item-group>
     <ion-item-divider></ion-item-divider>
     <ion-item button (click)="copyToClipboard('http://' + device.torAddress)">
-      <ion-icon style="margin-right: 10px;" slot="start" src="assets/svg/tor.svg"></ion-icon>
-      <div slot="start" style="font-size: 13px">Tor URL</div>
-      <ion-note style="margin-left: 0px; padding-left: 0px" slot="end">{{ device.torAddress | slice:0:7 }}...{{ device.torAddress | slice:-12 }}</ion-note>
+      <ion-icon slot="start" src="assets/svg/tor.svg"></ion-icon>
+      <ion-label class="ion-text-wrap">
+        <h2>Tor URL</h2>
+        <p>{{ device.torAddress }}</p>
+        <!-- <p>{{ device.torAddress | slice:0:7 }}...{{ device.torAddress | slice:-12 }}</p> -->
+      </ion-label>
     </ion-item>
     <!-- <ion-item button (click)="copyToClipboard('https://start9-' + device.id + '.local')">
       <ion-icon slot="start" name="globe-outline" color="primary"></ion-icon>

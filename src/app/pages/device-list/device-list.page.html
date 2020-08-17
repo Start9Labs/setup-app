@@ -1,8 +1,11 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>
-      Saved Embassies
-    </ion-title>
+    <ion-title>Saved Embassies</ion-title>
+    <ion-buttons slot="end">
+      <ion-button [routerLink]="['/connect']">
+        <ion-icon size="small" slot="icon-only" name="add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -19,11 +22,5 @@
       <ion-icon name="finger-print-outline" color="success"></ion-icon>
     </ion-card-content> -->
   </ion-card>
-
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button [routerLink]="['/connect']" class="fab-button">
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
 
 </ion-content>

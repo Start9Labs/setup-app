@@ -97,7 +97,6 @@ export class RegisterPage {
         pauseFor(1500),
       ])
 
-      debugger
       const hmacRes = await this.hmacService.validateHmacExpiration(this.productKey, data.hmac, data.message, data.salt)
       switch (hmacRes) {
         case 'hmac-invalid': return this.presentAlertInvalidRes()
