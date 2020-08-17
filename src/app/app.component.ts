@@ -1,10 +1,10 @@
 import { Component } from '@angular/core'
 import { NetworkMonitor } from './services/network.service'
-import { ZeroconfMonitor } from './services/zeroconf.service'
 import { AppState } from './app-state'
 import { Router } from '@angular/router'
-
 import { Plugins, StatusBarStyle } from '@capacitor/core'
+import { ZeroconfMonitor } from './services/zeroconf/zeroconf.service'
+
 const { SplashScreen, StatusBar } = Plugins
 
 @Component({

@@ -2,9 +2,7 @@ import { Injectable } from '@angular/core'
 import { HMAC, decode16 } from '../../util/crypto'
 import { HmacService } from './hmac.service'
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class LiveHmacService extends HmacService {
   constructor () { super() }
 

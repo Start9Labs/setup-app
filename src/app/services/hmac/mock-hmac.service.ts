@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core'
 import { HmacService } from './hmac.service'
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class MockHmacService extends HmacService {
   constructor () { super() }
 

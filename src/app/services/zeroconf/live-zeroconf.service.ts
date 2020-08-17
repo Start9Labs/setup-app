@@ -4,9 +4,7 @@ import { Platform } from '@ionic/angular'
 import { NetworkMonitor } from '../network.service'
 import { ZeroconfMonitor } from './zeroconf.service'
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class LiveZeroconfMonitor extends ZeroconfMonitor {
   constructor (
     platform: Platform,
