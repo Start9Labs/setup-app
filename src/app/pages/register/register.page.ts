@@ -2,7 +2,7 @@ import { Component } from '@angular/core'
 import { LoadingController, NavController, AlertController } from '@ionic/angular'
 import { HttpService, Method, RegisterResponse, RegisterRequest } from '../../services/http/http.service'
 import { AppState } from 'src/app/app-state'
-import { KEY_GEN, encode16, encodeObject, AES_CTR, decode16 } from 'src/app/util/crypto'
+import { KEY_GEN, encode16, encodeObject, AES_CTR } from 'src/app/util/crypto'
 import { ActivatedRoute } from '@angular/router'
 import { HmacService } from 'src/app/services/hmac/hmac.service'
 
@@ -105,7 +105,8 @@ export class RegisterPage {
         case 'success': console.log(`Successful hmac validation`)
       }
 
-      await this.appState.addDevice(this.id, data.torAddress, data.cert)
+      // await this.appState.addDevice(this.id, data.torAddress, data.cert)
+      await this.appState.addDevice(this.id, data.torAddress)
 
       this.navCtrl.navigateRoot(['/devices', this.id])
     } catch (e) {

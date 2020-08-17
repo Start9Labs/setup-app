@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { ToastController, AlertController, NavController, ActionSheetController } from '@ionic/angular'
+import { ToastController, AlertController, NavController } from '@ionic/angular'
 import { AppState, Device } from '../../app-state'
 import { ActivatedRoute } from '@angular/router'
 // import { CertInstaller } from 'capacitor-cert-installer'

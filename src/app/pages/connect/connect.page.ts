@@ -3,9 +3,10 @@ import { LoadingController, NavController, AlertController } from '@ionic/angula
 import { ZeroconfMonitor } from '../../services/zeroconf.service'
 import { getLanIP, idFromProductKey, HttpService, Method, HostsResponse } from '../../services/http/http.service'
 import { Subscription } from 'rxjs'
-import { encode16, HMAC, decode16 } from 'src/app/util/crypto'
+import { encode16, HMAC } from 'src/app/util/crypto'
 import { AppState } from 'src/app/app-state'
 import { HmacService } from 'src/app/services/hmac/hmac.service'
+
 @Component({
   selector: 'connect',
   templateUrl: 'connect.page.html',
