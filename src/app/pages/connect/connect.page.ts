@@ -1,7 +1,6 @@
 import { Component, NgZone } from '@angular/core'
 import { LoadingController, NavController, AlertController } from '@ionic/angular'
 import { getLanIP, idFromProductKey, HttpService, Method, HostsResponse } from '../../services/http/http.service'
-import { Subscription } from 'rxjs'
 import { encode16, HMAC } from 'src/app/util/crypto'
 import { AppState } from 'src/app/app-state'
 import { HmacService } from 'src/app/services/hmac/hmac.service'
@@ -16,8 +15,6 @@ export class ConnectPage {
   error = ''
   productKey = ''
   host = ''
-  existsSub: Subscription
-  serviceExists = false
   segmentValue: 'basic' | 'advanced' = 'basic'
 
   constructor (
@@ -27,20 +24,8 @@ export class ConnectPage {
     private readonly httpService: HttpService,
     private readonly alertCtrl: AlertController,
     private readonly appState: AppState,
-    private readonly zone: NgZone,
     private readonly hmacService: HmacService,
   ) { }
-
-  ngOnInit () {
-    // start zeroconf monitor
-    this.existsSub = this.zeroconfMonitor.watchServiceExists().subscribe(e => {
-      this.zone.run(() => { this.serviceExists = e })
-    })
-  }
-
-  ngOnDestroy () {
-    this.existsSub.unsubscribe()
-  }
 
   segmentChanged (): void {
     this.error = ''

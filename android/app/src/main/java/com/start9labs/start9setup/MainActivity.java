@@ -1,4 +1,4 @@
-package com.start9labs.start9setup;
+package com.start9labs.setup;
 
 import android.os.Bundle;
 

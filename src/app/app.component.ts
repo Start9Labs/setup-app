@@ -35,12 +35,12 @@ export class AppComponent {
     this.zeroconfMonitor.init()
     // navigate
     if (this.appState.peekDevices().length) {
-      this.router.navigate(['/'])
+      await this.router.navigate(['/'])
     } else {
-      this.router.navigate(['/connect'], { queryParams: { isRoot: 1 } })
+      await this.router.navigate(['/connect'])
     }
     // set StatusBar style
-    StatusBar.setStyle({
+    await StatusBar.setStyle({
       style: StatusBarStyle.Dark,
     })
     // dismiss SplashScreen

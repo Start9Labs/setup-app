@@ -1,5 +1,5 @@
 {
-  "appId": "com.start9labs.start9setup",
+  "appId": "com.start9labs.setup",
   "appName": "Start9 Setup App",
   "bundledWebRuntime": false,
   "npmClient": "npm",

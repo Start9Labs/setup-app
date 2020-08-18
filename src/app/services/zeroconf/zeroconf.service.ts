@@ -1,8 +1,6 @@
-
-
 import { Injectable } from '@angular/core'
 import { Zeroconf, ZeroconfResult, ZeroconfService } from '@ionic-native/zeroconf/ngx'
-import { Subscription, Observable, BehaviorSubject, ReplaySubject } from 'rxjs'
+import { Subscription, Observable, ReplaySubject } from 'rxjs'
 import { Platform } from '@ionic/angular'
 import { NetworkMonitor } from '../network.service'
 import { NetworkStatus } from '@capacitor/core'
@@ -12,9 +10,7 @@ import { NetworkStatus } from '@capacitor/core'
 })
 export abstract class ZeroconfMonitor {
   protected readonly serviceFound$ = new ReplaySubject<ZeroconfService>(10)
-  protected readonly serviceExists$ = new BehaviorSubject<boolean>(false)
   watchServiceFound (): Observable<ZeroconfService> { return this.serviceFound$.asObservable() }
-  watchServiceExists (): Observable<boolean> { return this.serviceExists$.asObservable() }
   services: { [hostname: string]: ZeroconfService } = { }
   protected zeroconfSub: Subscription
   protected networkSub: Subscription
@@ -25,7 +21,7 @@ export abstract class ZeroconfMonitor {
     protected readonly networkMonitor: NetworkMonitor,
   ) { }
 
-  abstract start (): Promise<void> 
+  abstract start (): Promise<void>
 
   init (): void {
     this.networkSub = this.networkSub || this.networkMonitor.watchConnection().subscribe(n => this.handleNetworkChange(n))
@@ -77,19 +73,11 @@ export abstract class ZeroconfMonitor {
     // add service and broadcast existence
     this.services[service.name] = service
     this.serviceFound$.next(service)
-    // if first service, broadcast serviceExists$ with true
-    if (Object.keys(this.services).length === 1) {
-      this.serviceExists$.next(true)
-    }
   }
 
   protected removeService (service: ZeroconfService): void {
     console.log(`removing zeroconf service: ${service.name}`)
     // remove service
     delete this.services[service.name]
-    // if no services remain, broadcast serviceExists$ with false
-    if (!Object.keys(this.services).length) {
-      this.serviceExists$.next(false)
-    }
   }
 }

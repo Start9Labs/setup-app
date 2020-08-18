@@ -9,7 +9,8 @@ const version = require('../../../../package.json').version
 
 @Injectable()
 export class LiveHttpService extends HttpService {
-  constructor (private readonly fullLogs: boolean) { super() }
+
+  constructor () { super() }
 
   async request<T> (options: HttpOptions): Promise<TypedHttpResponse<T>> {
     options.headers = Object.assign(options.headers || { }, {

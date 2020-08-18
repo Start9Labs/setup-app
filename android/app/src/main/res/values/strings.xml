@@ -2,6 +2,6 @@
 <resources>
     <string name="app_name">Setup</string>
     <string name="title_activity_main">Setup</string>
-    <string name="package_name">com.start9labs.start9setup</string>
-    <string name="custom_url_scheme">com.start9labs.start9setup</string>
+    <string name="package_name">com.start9labs.setup</string>
+    <string name="custom_url_scheme">com.start9labs.setup</string>
 </resources>

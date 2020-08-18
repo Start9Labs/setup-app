@@ -9,7 +9,7 @@
   </ion-toolbar>
   <!-- segment -->
   <ion-toolbar>
-    <ion-segment [(ngModel)]="segmentValue" (ionChange)="segmentChanged($event)">
+    <ion-segment [(ngModel)]="segmentValue" (ionChange)="segmentChanged()">
       <ion-segment-button value="basic">
         <ion-label>Basic</ion-label>
       </ion-segment-button>
@@ -27,14 +27,8 @@
   </ion-item>
 
   <div *ngIf="segmentValue === 'basic'">
-    <ion-item *ngIf="!serviceExists">
-      <ion-label class="ion-text-wrap">
-        <h2>No Embassies discovered on local area network.</h2>
-      </ion-label>
-    </ion-item>
-
-    <form (submit)="connect()" *ngIf="serviceExists">
-      <ion-item-group style="margin-bottom: 40px;">
+    <form (submit)="connect()">
+      <ion-item-group style="margin-bottom: 20px;">
         <ion-item>
           <ion-label position="floating" color="medium">Product Key</ion-label>
           <ion-input maxlength="8" name="productKey" [(ngModel)]="productKey"></ion-input>
@@ -48,7 +42,7 @@
 
   <div *ngIf="segmentValue === 'advanced'">
     <form (submit)="connectWithIp()">
-      <ion-item-group style="margin-bottom: 40px;">
+      <ion-item-group style="margin-bottom: 20px;">
         <ion-item>
           <ion-label position="floating" color="medium">Product Key</ion-label>
           <ion-input maxlength="8" name="productKey" [(ngModel)]="productKey"></ion-input>

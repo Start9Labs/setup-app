@@ -1,5 +1,5 @@
 ext {
-    applicationId = 'com.start9labs.start9setup'
+    applicationId = 'com.start9labs.setup'
     minSdkVersion = 23
     compileSdkVersion = 29
     targetSdkVersion = 29
