@@ -21,19 +21,13 @@ export class LiveHttpService extends HttpService {
     try {
       return Http.request(options).then( (res: HttpResponse) => {
         const httpStatus = toHttpStatus(res.status)
-        if (isError(httpStatus)) throw { message: httpStatus, name: `http-error: ${res.status}` }
+        if (isError(httpStatus)) throw new Error(httpStatus)
+        if (res.status === 209) throw new Error('Device already claimed')
         return res
       })
     } catch (e) {
       console.error(e)
-
-      let message: string
-      try {
-        message = JSON.parse(e.error).message
-      } catch (e) {
-        message = e.error || 'Unknown Error'
-      }
-      throw new Error(message)
+      throw new Error(e.message)
     }
   }
 }
