@@ -91,7 +91,7 @@ export class ConnectPage {
   private getIP (id: string): string {
     // get zeroconf service
     const zeroconfService = this.zeroconfMonitor.getService(id)
-    if (!zeroconfService) { throw new Error('Embassy not found on local network. Please check Product Key and see "Instructions" below') }
+    if (!zeroconfService) { throw new Error('Embassy not found on local network. Please check Product Key and ensure you phone is connected to WiFi.') }
 
     // get IP
     const ip = getLanIP(zeroconfService)
