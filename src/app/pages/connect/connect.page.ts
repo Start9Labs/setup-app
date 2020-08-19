@@ -1,4 +1,4 @@
-import { Component, NgZone } from '@angular/core'
+import { Component } from '@angular/core'
 import { LoadingController, NavController, AlertController } from '@ionic/angular'
 import { getLanIP, idFromProductKey, HttpService, Method, HostsResponse } from '../../services/http/http.service'
 import { encode16, HMAC } from 'src/app/util/crypto'
@@ -103,7 +103,7 @@ export class ConnectPage {
   private async presentAlertInvalidRes () {
     const alert = await this.alertCtrl.create({
       header: 'Warning!',
-      message: 'Unable to verify response from Embassy. It is possible you are experiencing a "Man in the Middle" attack. Please contact support.',
+      message: 'Unable to verify response from Embassy. It is possible you are experiencing a "Man in the Middle" attack, and you should contact support.',
       buttons: ['OK'],
     })
 
@@ -113,7 +113,7 @@ export class ConnectPage {
   private async presentAlertExpiredRes () {
     const alert = await this.alertCtrl.create({
       header: 'Warning!',
-      message: 'Response from embassy valid, but expired. It is possible you are experiencing a "Man in the Middle" replay attack. Please contact support.',
+      message: 'Response from Embassy valid, but expired. It is possible you are experiencing a "Man in the Middle" replay attack, and you should contact support.',
       buttons: ['OK'],
     })
 
@@ -123,7 +123,7 @@ export class ConnectPage {
   private async presentAlertAlreadyRegistered (id: string) {
     const alert = await this.alertCtrl.create({
       header: 'Warning',
-      message: 'This Embassy has already been registered. If you did not do this, it could mean your Embassy has been compromised. Please contact support',
+      message: 'Embassy is already setup. If you have never set up this Embassy, it means the device may be compromised, and you should contact support.',
       buttons: [
         {
           text: 'OK',
