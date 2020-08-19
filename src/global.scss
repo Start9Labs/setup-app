@@ -25,6 +25,13 @@
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
 
+.alert-success {
+  --min-width: 80%;
+  --min-height: 40%;
+  .alert-title {
+    color: var(--ion-color-success) !important;
+  }
+}
 
 .alert-danger {
   color: var(--ion-color-danger) !important;

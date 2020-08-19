@@ -1,9 +1,9 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Saved Embassies</ion-title>
+    <ion-title>Devices</ion-title>
     <ion-buttons slot="end">
       <ion-button [routerLink]="['/connect']">
-        <ion-icon size="small" slot="icon-only" name="add"></ion-icon>
+        <ion-icon slot="icon-only" name="add" color="primary"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -11,10 +11,10 @@
 
 <ion-content class="ion-padding">
 
-  <ion-card button *ngFor="let device of devices$ | async" style="margin-bottom: 16px;" [routerLink]="['/devices', device.id]">
+  <ion-card button *ngFor="let device of devices$ | async" style="margin-bottom: 16px;" [routerLink]="['/devices', device.productKey]">
     <ion-card-header>
-      <ion-card-subtitle>Device ID</ion-card-subtitle>
-      <ion-card-title>{{ device.type + ":" + device.id }}</ion-card-title>
+      <ion-card-title>{{ device.type }}</ion-card-title>
+      <ion-card-subtitle>Claimed: {{ device.claimedAt | date: 'short' }}</ion-card-subtitle>
     </ion-card-header>
     <!-- <ion-card-content>
       <ion-icon style="margin-right: 12px;" src="assets/svg/tor.svg"></ion-icon>

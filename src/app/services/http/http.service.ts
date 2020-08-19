@@ -39,8 +39,10 @@ export interface HostsResponse {
   hmac: string,
   message: string,
   salt: string
+  claimedAt: string | null
   torAddress?: string
-  // cert?: string
+  lanAddress?: string
+  cert?: string
 }
 
 export interface RegisterRequest {
@@ -56,6 +58,8 @@ export interface RegisterRequest {
 }
 
 export interface RegisterResponse extends HostsResponse {
+  claimedAt: string
   torAddress: string
-  // cert: string
+  lanAddress?: string
+  cert?: string
 }

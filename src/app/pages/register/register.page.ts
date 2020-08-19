@@ -12,7 +12,6 @@ import { HmacService } from 'src/app/services/hmac/hmac.service'
   styleUrls: ['register.page.scss'],
 })
 export class RegisterPage {
-  id: string
   ip: string
   productKey: string
   password = ''
@@ -29,7 +28,6 @@ export class RegisterPage {
   ) { }
 
   ngOnInit () {
-    this.id = this.route.snapshot.queryParamMap.get('id')
     this.ip = this.route.snapshot.queryParamMap.get('ip')
     this.productKey = this.route.snapshot.queryParamMap.get('productKey')
   }
@@ -104,10 +102,9 @@ export class RegisterPage {
         case 'success': console.log(`Successful hmac validation`)
       }
 
-      // await this.appState.addDevice(this.id, data.torAddress, data.cert)
-      await this.appState.addDevice(this.id, data.torAddress)
+      await this.appState.addDevice(new Date(data.claimedAt), this.productKey, data.torAddress, data.lanAddress, data.cert)
 
-      this.navCtrl.navigateRoot(['/devices', this.id])
+      this.navCtrl.navigateRoot(['/devices', this.productKey], { queryParams: { fresh: true } })
     } catch (e) {
       console.error(e)
       this.error = e.message

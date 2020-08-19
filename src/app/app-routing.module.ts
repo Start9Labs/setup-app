@@ -12,7 +12,7 @@ const routes: Routes = [
     loadChildren: () => import('./pages/device-list/device-list.module').then(m => m.DeviceListPageModule),
   },
   {
-    path: 'devices/:id',
+    path: 'devices/:productKey',
     loadChildren: () => import('./pages/device-show/device-show.module').then(m => m.DeviceShowPageModule),
   },
   {

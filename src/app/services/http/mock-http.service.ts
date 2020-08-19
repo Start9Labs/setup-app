@@ -8,7 +8,26 @@ const version = require('../../../../package.json').version
 export class MockHttpService extends HttpService {
   readonly requestRecord: HttpOptions[] = []
   readonly respondWith: { [path: string]: HttpResponse } = {
-    '/v0/register' : { status: 200, data: { torAddress: 'gff4ixq3takworeuhkubzz4xh2ulytoct4xrpazkiykhupalqlo53ryd.onion' }, headers: { } },
+    '/v0/hosts': {
+      status: 200,
+      data: {
+        claimedAt: new Date().toISOString(),
+        torAddress: 'gff4ixq3takworeuhkubzz4xh2ulytoct4xrpazkiykhupalqlo53ryd.onion',
+        // lanAddress: 'start9-12345678.local',
+        // cert: 'hello-cert',
+      },
+      headers: { },
+    },
+    '/v0/register': {
+      status: 200,
+      data: {
+        claimedAt: new Date().toISOString(),
+        torAddress: 'gff4ixq3takworeuhkubzz4xh2ulytoct4xrpazkiykhupalqlo53ryd.onion',
+        // lanAddress: 'start9-12345678.local',
+        // cert: 'hello-cert',
+      },
+      headers: { },
+    },
     '*': { status: 200, data: { }, headers: { } },
   }
 

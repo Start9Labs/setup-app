@@ -70,14 +70,12 @@ export class ConnectPage {
         case 'success': console.log(`Successful hmac validation`)
       }
 
-      // if (data.torAddress || data.cert) {
-      if (data.torAddress) {
-        // this.appState.addDevice(id, data.torAddress, data.cert)
-        this.appState.addDevice(id, data.torAddress)
-        this.presentAlertAlreadyRegistered(id)
+      if (data.claimedAt) {
+        this.appState.addDevice(new Date(data.claimedAt), this.productKey, data.torAddress, data.lanAddress, data.cert)
+        this.presentAlertAlreadyRegistered()
       } else {
         this.navCtrl.navigateForward(['/register'], {
-          queryParams: { ip, id, productKey: this.productKey },
+          queryParams: { ip, productKey: this.productKey },
         })
       }
     } catch (e) {
@@ -120,7 +118,7 @@ export class ConnectPage {
     return alert.present()
   }
 
-  private async presentAlertAlreadyRegistered (id: string) {
+  private async presentAlertAlreadyRegistered () {
     const alert = await this.alertCtrl.create({
       header: 'Warning',
       message: 'Embassy is already setup. If you have never set up this Embassy, it means the device may be compromised, and you should contact support.',
@@ -128,7 +126,7 @@ export class ConnectPage {
         {
           text: 'OK',
           handler: () => {
-            this.navCtrl.navigateRoot(['/devices', id])
+            this.navCtrl.navigateRoot(['/devices', this.productKey], { queryParams: { fresh: true } })
           },
         },
       ],

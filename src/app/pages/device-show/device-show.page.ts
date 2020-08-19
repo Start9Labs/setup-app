@@ -1,8 +1,8 @@
 import { Component } from '@angular/core'
-import { ToastController, AlertController, NavController } from '@ionic/angular'
+import { ToastController, AlertController, NavController, IonicSafeString, ActionSheetController } from '@ionic/angular'
 import { AppState, Device } from '../../app-state'
 import { ActivatedRoute } from '@angular/router'
-// import { CertInstaller } from 'capacitor-cert-installer'
+import { CertInstaller } from 'capacitor-cert-installer'
 
 import { Plugins } from '@capacitor/core'
 const { Clipboard } = Plugins
@@ -13,7 +13,7 @@ const { Clipboard } = Plugins
   styleUrls: ['./device-show.page.scss'],
 })
 export class DeviceShowPage {
-  // private readonly CertName = 'Embassy Local CA'
+  private readonly CertName = 'Embassy Local CA'
   device: Device
 
   constructor (
@@ -21,13 +21,36 @@ export class DeviceShowPage {
     private readonly appState: AppState,
     private readonly route: ActivatedRoute,
     private readonly toastCtrl: ToastController,
-    // private readonly actionSheetCtrl: ActionSheetController,
+    private readonly actionSheetCtrl: ActionSheetController,
     private readonly alertCtrl: AlertController,
   ) { }
 
   ngOnInit ( ) {
-    const id = this.route.snapshot.paramMap.get('id')
-    this.device = this.appState.peekDevices().find(d => d.id === id)
+    const productKey = this.route.snapshot.paramMap.get('productKey')
+    this.device = this.appState.peekDevices().find(d => d.productKey === productKey)
+
+    if (this.route.snapshot.queryParamMap.get('fresh')) {
+      this.presentAlertSuccess()
+    }
+  }
+
+  async presentAlertSuccess (): Promise<void> {
+    let message = `Your ${this.device.type} is now privately hosted on the Internet!.<br /><br />View and manage your ${this.device.type} by`
+    const torMessage = ' visiting its ".onion" URL from any Tor-enabled browser.'
+    if (this.device.lanAddress && this.device.cert) {
+      message = message + `:<ol><li>${torMessage}</li><li>installing the SSL certificate to your phone or computer and visiting its ".local" address from any browser.</li></ol>`
+    } else {
+      message = message + torMessage + '<br />'
+    }
+    message = message + `<br />For help, check the Embassy documentation online or contact support.`
+
+    const alert = await this.alertCtrl.create({
+      header: 'Success',
+      message,
+      buttons: ['OK'],
+      cssClass: 'alert-success',
+    })
+    await alert.present()
   }
 
   async copyToClipboard (string: string): Promise<void> {
@@ -43,32 +66,32 @@ export class DeviceShowPage {
     toast.present()
   }
 
-  // async presentActionCert () {
-  //   const alert = await this.actionSheetCtrl.create({
-  //     buttons: [
-  //       {
-  //         icon: 'copy-outline',
-  //         text: 'Copy to clipboard',
-  //         handler: () => {
-  //           this.copyToClipboard(this.device.cert)
-  //         },
-  //       },
-  //       {
-  //         icon: 'save-outline',
-  //         text: 'Save to device',
-  //         handler: () => {
-  //           this.installCert()
-  //         },
-  //       },
-  //     ],
-  //   })
-  //   await alert.present()
-  // }
+  async presentActionCert () {
+    const alert = await this.actionSheetCtrl.create({
+      buttons: [
+        {
+          icon: 'copy-outline',
+          text: 'Copy to clipboard',
+          handler: () => {
+            this.copyToClipboard(this.device.cert)
+          },
+        },
+        {
+          icon: 'save-outline',
+          text: 'Save to device',
+          handler: () => {
+            this.installCert()
+          },
+        },
+      ],
+    })
+    await alert.present()
+  }
 
   async presentAlertRemove () {
     const alert = await this.alertCtrl.create({
       header: 'Confirm',
-      message: 'Remove Embassy contact information from this device? This action will have no affect on the Embassy itself.',
+      message: `Remove ${this.device.type} from this Setup App?<br /><br />This action will have no affect on the ${this.device.type} itself.<br /><br />You can always re-add this ${this.device.type} later using its Product Key.`,
       buttons: [
         {
           text: 'Cancel',
@@ -87,7 +110,7 @@ export class DeviceShowPage {
   }
 
   private async remove (): Promise<void> {
-    await this.appState.removeDevice(this.device.id)
+    await this.appState.removeDevice(this.device.productKey)
     if (this.appState.peekDevices().length) {
       await this.navCtrl.navigateRoot(['/devices'])
     } else {
@@ -95,7 +118,7 @@ export class DeviceShowPage {
     }
   }
 
-  // private async installCert (): Promise<void> {
-  //   return CertInstaller.installCert({ value: this.device.cert, name: this.CertName })
-  // }
+  private async installCert (): Promise<void> {
+    return CertInstaller.installCert({ value: this.device.cert, name: this.CertName })
+  }
 }

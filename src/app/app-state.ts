@@ -5,10 +5,12 @@ import { Plugins } from '@capacitor/core'
 const { Storage } = Plugins
 
 export interface Device {
-  id: string
+  claimedAt: Date
   type: 'Embassy'
+  productKey: string
   torAddress: string
-  // cert: string
+  lanAddress: string
+  cert: string
 }
 
 @Injectable({
@@ -24,20 +26,21 @@ export class AppState {
     this.$devices$.next(devices || [])
   }
 
-  // async addDevice (id: string, torAddress: string, cert: string): Promise<void> {
-  async addDevice (id: string, torAddress: string): Promise<void> {
-    const devices = this.peekDevices().filter(d => d.id !== id)
+  async addDevice (claimedAt: Date, productKey: string, torAddress: string, lanAddress: string, cert: string): Promise<void> {
+    const devices = this.peekDevices().filter(d => d.productKey !== productKey)
     devices.push({
-      id,
+      claimedAt,
       type: 'Embassy',
+      productKey,
       torAddress,
-      // cert,
+      lanAddress,
+      cert,
     })
     await this.save(devices)
   }
 
-  async removeDevice (id: string): Promise<void> {
-    const devices = this.peekDevices().filter(d => d.id !== id)
+  async removeDevice (productKey: string): Promise<void> {
+    const devices = this.peekDevices().filter(d => d.productKey !== productKey)
     await this.save(devices)
   }
 
