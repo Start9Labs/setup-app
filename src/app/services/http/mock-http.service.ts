@@ -12,7 +12,7 @@ export class MockHttpService extends HttpService {
       status: 200,
       data: {
         claimedAt: new Date().toISOString(),
-        torAddress: 'gff4ixq3takworeuhkubzz4xh2ulytoct4xrpazkiykhupalqlo53ryd.onion',
+        torAddress: 'privacy34kn4ez3y3nijweec6w4g54i3g54sdv7r5mr6soma3w4begyd.onion',
         // lanAddress: 'start9-12345678.local',
         // cert: 'hello-cert',
       },
@@ -22,7 +22,7 @@ export class MockHttpService extends HttpService {
       status: 200,
       data: {
         claimedAt: new Date().toISOString(),
-        torAddress: 'gff4ixq3takworeuhkubzz4xh2ulytoct4xrpazkiykhupalqlo53ryd.onion',
+        torAddress: 'privacy34kn4ez3y3nijweec6w4g54i3g54sdv7r5mr6soma3w4begyd.onion',
         // lanAddress: 'start9-12345678.local',
         // cert: 'hello-cert',
       },

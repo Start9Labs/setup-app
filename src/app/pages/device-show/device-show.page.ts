@@ -35,7 +35,7 @@ export class DeviceShowPage {
   }
 
   async presentAlertSuccess (): Promise<void> {
-    let message = `Your ${this.device.type} is now privately hosted on the Internet!.<br /><br />View and manage your ${this.device.type} by`
+    let message = `Your ${this.device.type} is now privately hosted on the Internet!<br /><br />View and manage your ${this.device.type} by`
     const torMessage = ' visiting its ".onion" URL from any Tor-enabled browser.'
     if (this.device.lanAddress && this.device.cert) {
       message = message + `:<ol><li>${torMessage}</li><li>installing the SSL certificate to your phone or computer and visiting its ".local" address from any browser.</li></ol>`

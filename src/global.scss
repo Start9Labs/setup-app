@@ -27,7 +27,8 @@
 
 .alert-success {
   --min-width: 80%;
-  --min-height: 40%;
+  --max-width: 80%;
+  --max-height: 30%;
   .alert-title {
     color: var(--ion-color-success) !important;
   }
