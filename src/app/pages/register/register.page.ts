@@ -15,6 +15,7 @@ export class RegisterPage {
   ip: string
   productKey: string
   password = ''
+  passwordRetype = ''
   error = ''
 
   constructor (
