@@ -29,7 +29,7 @@
     </ion-item>
     <!-- Addresses -->
     <ion-item-divider>Addresses</ion-item-divider>
-    <ion-item button (click)="copyToClipboard('http://' + device.torAddress)">
+    <ion-item button (click)="copyToClipboard(device.torAddress)">
       <ion-icon slot="start" src="assets/svg/tor.svg"></ion-icon>
       <ion-label class="ion-text-wrap">
         <h2>Tor</h2>
