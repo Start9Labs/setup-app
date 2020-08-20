@@ -9,7 +9,12 @@ export interface Device {
   type: 'Embassy'
   productKey: string
   torAddress: string
-  lanAddress: string
+  lanAddress: string | null
+  cert: Cert | null
+}
+
+export interface Cert {
+  name: string
   cert: string
 }
 
@@ -26,7 +31,7 @@ export class AppState {
     this.$devices$.next(devices || [])
   }
 
-  async addDevice (claimedAt: Date, productKey: string, torAddress: string, lanAddress: string, cert: string): Promise<void> {
+  async addDevice (claimedAt: Date, productKey: string, torAddress: string, lanAddress: string, cert: Cert): Promise<void> {
     const devices = this.peekDevices().filter(d => d.productKey !== productKey)
     devices.push({
       claimedAt,

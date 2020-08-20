@@ -1,7 +1,6 @@
 import { Component } from '@angular/core'
 import { NetworkMonitor } from './services/network.service'
 import { AppState } from './app-state'
-import { Router } from '@angular/router'
 import { Plugins, StatusBarStyle } from '@capacitor/core'
 import { ZeroconfMonitor } from './services/zeroconf/zeroconf.service'
 
@@ -18,7 +17,6 @@ export class AppComponent {
     private readonly networkMonitor: NetworkMonitor,
     private readonly zeroconfMonitor: ZeroconfMonitor,
     private readonly appState: AppState,
-    private readonly router: Router,
   ) {
     // set dark theme
     document.body.classList.toggle('dark', true)
@@ -33,14 +31,8 @@ export class AppComponent {
     await this.networkMonitor.init()
     // start zeroconf
     this.zeroconfMonitor.init()
-    // navigate
-    if (this.appState.peekDevices().length) {
-      await this.router.navigate(['/'])
-    } else {
-      await this.router.navigate(['/connect'])
-    }
     // set StatusBar style
-    await StatusBar.setStyle({
+    StatusBar.setStyle({
       style: StatusBarStyle.Dark,
     })
     // dismiss SplashScreen

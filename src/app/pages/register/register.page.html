@@ -19,7 +19,11 @@
     <ion-item-group style="margin-bottom: 40px;">
       <ion-item>
         <ion-label position="floating" color="medium">Password</ion-label>
-        <ion-input maxlength="32" name="password" [(ngModel)]="password"></ion-input>
+        <ion-input maxlength="32" type="text" name="password" [(ngModel)]="password"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating" color="medium">Retype Password</ion-label>
+        <ion-input maxlength="32" type="text" name="password" [(ngModel)]="password"></ion-input>
       </ion-item>
     </ion-item-group>
     <ion-button type="submit" [disabled]="password.length < 12" expand="block" fill="outline">

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core'
 import { HttpOptions, HttpResponse } from '@capacitor-community/http'
 import { HttpService, TypedHttpResponse } from './http.service'
+import { sampleCert } from './sample-cert'
 
 const version = require('../../../../package.json').version
 
@@ -13,8 +14,8 @@ export class MockHttpService extends HttpService {
       data: {
         claimedAt: new Date().toISOString(),
         torAddress: 'privacy34kn4ez3y3nijweec6w4g54i3g54sdv7r5mr6soma3w4begyd.onion',
-        // lanAddress: 'start9-12345678.local',
-        // cert: 'hello-cert',
+        lanAddress: 'start9-12345678.local',
+        cert: sampleCert,
       },
       headers: { },
     },
@@ -23,8 +24,8 @@ export class MockHttpService extends HttpService {
       data: {
         claimedAt: new Date().toISOString(),
         torAddress: 'privacy34kn4ez3y3nijweec6w4g54i3g54sdv7r5mr6soma3w4begyd.onion',
-        // lanAddress: 'start9-12345678.local',
-        // cert: 'hello-cert',
+        lanAddress: 'start9-12345678.local',
+        cert: sampleCert,
       },
       headers: { },
     },

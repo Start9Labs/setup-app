@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { ToastController, AlertController, NavController, IonicSafeString, ActionSheetController } from '@ionic/angular'
+import { ToastController, AlertController, NavController, ActionSheetController } from '@ionic/angular'
 import { AppState, Device } from '../../app-state'
 import { ActivatedRoute } from '@angular/router'
 import { CertInstaller } from 'capacitor-cert-installer'
@@ -13,7 +13,6 @@ const { Clipboard } = Plugins
   styleUrls: ['./device-show.page.scss'],
 })
 export class DeviceShowPage {
-  private readonly CertName = 'Embassy Local CA'
   device: Device
 
   constructor (
@@ -73,7 +72,7 @@ export class DeviceShowPage {
           icon: 'copy-outline',
           text: 'Copy to clipboard',
           handler: () => {
-            this.copyToClipboard(this.device.cert)
+            this.copyToClipboard(this.device.cert.cert)
           },
         },
         {
@@ -119,6 +118,6 @@ export class DeviceShowPage {
   }
 
   private async installCert (): Promise<void> {
-    return CertInstaller.installCert({ value: this.device.cert, name: this.CertName })
+    return CertInstaller.installCert({ value: this.device.cert.cert, name: this.device.cert.name })
   }
 }

@@ -92,7 +92,7 @@ export class RegisterPage {
           url: `http://${this.ip}:5959/v0/register`,
           data: requestData,
         }),
-        pauseFor(1500),
+        pauseFor(2500),
       ])
 
       const hmacRes = await this.hmacService.validateHmacExpiration(this.productKey, data.hmac, data.message, data.salt)

@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core'
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router'
+import { RouterGuard } from './router-guard.guard'
 
 const routes: Routes = [
   {
@@ -9,6 +10,7 @@ const routes: Routes = [
   },
   {
     path: 'devices',
+    canActivate: [RouterGuard],
     loadChildren: () => import('./pages/device-list/device-list.module').then(m => m.DeviceListPageModule),
   },
   {

@@ -4,6 +4,11 @@
       <ion-back-button [defaultHref]="['/devices']"></ion-back-button>
     </ion-buttons>
     <ion-title>{{ device.type }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="presentAlertRemove()">
+        <ion-icon slot="icon-only" name="trash-outline" size="small" color="danger"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -39,20 +44,13 @@
       </ion-label>
     </ion-item>
     <!-- Certificates -->
-    <ng-container *ngIf="device.cert">
+    <ng-container *ngIf="device.cert && device.cert.cert">
       <ion-item-divider>Certificates</ion-item-divider>
       <ion-item button (click)="presentActionCert()">
         <ion-icon slot="start" src="assets/svg/cert.svg"></ion-icon>
-        <ion-label><ion-text color="success">SSL Certificate</ion-text></ion-label>
+        <ion-label class="ion-text-wrap">{{ device.cert.name }}</ion-label>
       </ion-item>
     </ng-container>
-  </ion-item-group>
-
-  <ion-item-group>
-    <ion-item-divider></ion-item-divider>
-    <ion-item button (click)="presentAlertRemove()">
-      <ion-label><ion-text color="danger">Remove</ion-text></ion-label>
-    </ion-item>
   </ion-item-group>
 
 </ion-content>

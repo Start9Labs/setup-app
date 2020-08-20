@@ -1,6 +1,7 @@
 import { HttpOptions, HttpResponse } from '@capacitor-community/http'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import * as CryptoJS from 'crypto-js'
+import { Cert } from 'src/app/app-state'
 
 export abstract class HttpService {
   abstract request<T> (opt: HttpOptions): Promise<TypedHttpResponse<T>>
@@ -42,7 +43,7 @@ export interface HostsResponse {
   claimedAt: string | null
   torAddress?: string
   lanAddress?: string
-  cert?: string
+  cert?: Cert
 }
 
 export interface RegisterRequest {
@@ -61,5 +62,5 @@ export interface RegisterResponse extends HostsResponse {
   claimedAt: string
   torAddress: string
   lanAddress?: string
-  cert?: string
+  cert?: Cert
 }
