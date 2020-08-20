@@ -25,35 +25,31 @@
   </ion-item>
 
   <div *ngIf="segmentValue === 'basic'">
-    <form (submit)="connect()">
-      <ion-item-group style="margin-bottom: 20px;">
-        <ion-item>
-          <ion-label position="floating" color="medium">Product Key</ion-label>
-          <ion-input maxlength="8" name="productKey" [(ngModel)]="productKey"></ion-input>
-        </ion-item>
-      </ion-item-group>
-      <ion-button type="submit" [disabled]="productKey.length !== 8" expand="block" fill="outline">
-        Connect
-      </ion-button>
-    </form>
+    <ion-item-group style="margin-bottom: 20px;">
+      <ion-item>
+        <ion-label position="floating" color="medium">Product Key</ion-label>
+        <ion-input maxlength="8" name="productKey" [(ngModel)]="productKey"></ion-input>
+      </ion-item>
+    </ion-item-group>
+    <ion-button type="submit" [disabled]="productKey.length !== 8" expand="block" fill="outline" (click)="connect()">
+      Connect
+    </ion-button>
   </div>
 
   <div *ngIf="segmentValue === 'advanced'">
-    <form (submit)="connectWithIp()">
-      <ion-item-group style="margin-bottom: 20px;">
-        <ion-item>
-          <ion-label position="floating" color="medium">Product Key</ion-label>
-          <ion-input maxlength="8" name="productKey" [(ngModel)]="productKey"></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label position="floating" color="medium">LAN IP Address</ion-label>
-          <ion-input maxlength="70" name="host" [(ngModel)]="host"></ion-input>
-        </ion-item>
-      </ion-item-group>
-      <ion-button type="submit" [disabled]="!host || !productKey || productKey.length < 8" expand="block" fill="outline">
-        Connect
-      </ion-button>
-    </form>
+    <ion-item-group style="margin-bottom: 20px;">
+      <ion-item>
+        <ion-label position="floating" color="medium">Product Key</ion-label>
+        <ion-input maxlength="8" name="productKey" [(ngModel)]="productKey"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating" color="medium">LAN IP Address</ion-label>
+        <ion-input maxlength="70" name="host" [(ngModel)]="host"></ion-input>
+      </ion-item>
+    </ion-item-group>
+    <ion-button [disabled]="!host || !productKey || productKey.length < 8" expand="block" fill="outline" (click)="connectWithIp()">
+      Connect
+    </ion-button>
   </div>
 
 </ion-content>

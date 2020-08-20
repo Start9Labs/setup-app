@@ -15,21 +15,19 @@
     <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
   </ion-item>
 
-  <form (submit)="register()">
-    <ion-item-group style="margin-bottom: 40px;">
-      <ion-item>
-        <ion-label position="floating" color="medium">Password</ion-label>
-        <ion-input maxlength="32" type="text" name="password" [(ngModel)]="password"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="floating" color="medium">Retype Password</ion-label>
-        <ion-input maxlength="32" type="text" name="password" [(ngModel)]="passwordRetype"></ion-input>
-      </ion-item>
-    </ion-item-group>
-    <ion-button type="submit" [disabled]="password.length < 12 || password.length > 32 || password !== passwordRetype" expand="block" fill="outline">
-      Finish
-    </ion-button>
-  </form>
+  <ion-item-group style="margin-bottom: 40px;">
+    <ion-item>
+      <ion-label position="floating" color="medium">Password</ion-label>
+      <ion-input maxlength="32" type="text" name="password" [(ngModel)]="password"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating" color="medium">Retype Password</ion-label>
+      <ion-input maxlength="32" type="text" name="passwordRetype" [(ngModel)]="passwordRetype"></ion-input>
+    </ion-item>
+  </ion-item-group>
+  <ion-button [disabled]="password.length < 12 || password.length > 32 || password !== passwordRetype" expand="block" fill="outline" (click)="register()">
+    Finish
+  </ion-button>
 
   <ion-item-group>
     <ion-item-divider></ion-item-divider>
