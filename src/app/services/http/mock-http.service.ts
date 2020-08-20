@@ -12,10 +12,10 @@ export class MockHttpService extends HttpService {
     '/v0/hosts': {
       status: 200,
       data: {
-        claimedAt: new Date().toISOString(),
-        torAddress: 'privacy34kn4ez3y3nijweec6w4g54i3g54sdv7r5mr6soma3w4begyd.onion',
-        lanAddress: 'start9-12345678.local',
-        cert: sampleCert,
+        // claimedAt: new Date().toISOString(),
+        // torAddress: 'privacy34kn4ez3y3nijweec6w4g54i3g54sdv7r5mr6soma3w4begyd.onion',
+        // lanAddress: 'start9-12345678.local',
+        // cert: sampleCert,
       },
       headers: { },
     },

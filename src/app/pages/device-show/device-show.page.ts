@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router'
 import { CertInstaller } from 'capacitor-cert-installer'
 
 import { Plugins } from '@capacitor/core'
+import { pauseFor } from '../register/register.page'
 const { Clipboard } = Plugins
 
 @Component({
@@ -27,9 +28,11 @@ export class DeviceShowPage {
   ngOnInit ( ) {
     const productKey = this.route.snapshot.paramMap.get('productKey')
     this.device = this.appState.peekDevices().find(d => d.productKey === productKey)
+  }
 
+  ionViewDidEnter () {
     if (this.route.snapshot.queryParamMap.get('fresh')) {
-      this.presentAlertSuccess()
+      pauseFor(500).then(() => this.presentAlertSuccess())
     }
   }
 
@@ -44,7 +47,7 @@ export class DeviceShowPage {
     message = message + `<br />For help, check the Embassy documentation online or contact support.`
 
     const alert = await this.alertCtrl.create({
-      header: 'Success',
+      header: 'Success!',
       message,
       buttons: ['OK'],
       cssClass: 'alert-success',
@@ -90,7 +93,7 @@ export class DeviceShowPage {
   async presentAlertRemove () {
     const alert = await this.alertCtrl.create({
       header: 'Confirm',
-      message: `Remove ${this.device.type} from this Setup App?<br /><br />This action will have no affect on the ${this.device.type} itself.<br /><br />You can always re-add this ${this.device.type} later using its Product Key.`,
+      message: `Remove ${this.device.type} from Setup App?<br /><br />This action will have no affect on the ${this.device.type} itself.<br /><br />You can re-add this ${this.device.type} later using its Product Key.`,
       buttons: [
         {
           text: 'Cancel',

@@ -41,6 +41,10 @@
   }
 }
 
+.borderless {
+  border-style: none;
+}
+
 ion-item-divider {
   --background: transparent;
 }
@@ -51,4 +55,10 @@ ion-action-sheet {
 
 ion-alert {
   --backdrop-opacity: 0.7 !important;
+}
+
+ion-item {
+  --highlight-color-valid: transparent;
+  --highlight-color-invalid: transparent;
+  --highlight-color-focused: var(--ion-color-light);
 }

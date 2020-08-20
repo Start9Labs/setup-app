@@ -17,6 +17,7 @@ export class RegisterPage {
   password = ''
   passwordRetype = ''
   error = ''
+  passwordError = ''
 
   constructor (
     private readonly route: ActivatedRoute,
@@ -33,7 +34,21 @@ export class RegisterPage {
     this.productKey = this.route.snapshot.queryParamMap.get('productKey')
   }
 
+  checkPass (): boolean {
+    if ((this.password || this.passwordRetype) && this.password.length < 12) {
+      this.passwordError = 'Must be at least 12 characters'
+      return false
+    } else if (this.password && this.passwordRetype && this.password !== this.passwordRetype) {
+      this.passwordError = 'Passwords do not match'
+      return false
+    } else {
+      this.passwordError = ''
+      return true
+    }
+  }
+
   async register (): Promise<void> {
+    if (!this.checkPass()) { return }
     this.error = ''
 
     const loader = await this.loadingCtrl.create({
@@ -105,11 +120,11 @@ export class RegisterPage {
 
       await this.appState.addDevice(new Date(data.claimedAt), this.productKey, data.torAddress, data.lanAddress, data.cert)
 
+      await loader.dismiss()
       this.navCtrl.navigateRoot(['/devices', this.productKey], { queryParams: { fresh: true } })
     } catch (e) {
       console.error(e)
       this.error = e.message
-    } finally {
       loader.dismiss()
     }
   }
