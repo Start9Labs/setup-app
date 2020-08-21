@@ -2,6 +2,7 @@ import { HttpOptions, HttpResponse } from '@capacitor-community/http'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
 import * as CryptoJS from 'crypto-js'
 import { Cert } from 'src/app/app-state'
+import { Hmac } from 'crypto'
 
 export abstract class HttpService {
   abstract request<T> (opt: HttpOptions): Promise<TypedHttpResponse<T>>
@@ -36,14 +37,23 @@ export function idFromProductKey (productKey: string): string {
   return CryptoJS.SHA256(productKey).toString(CryptoJS.enc.Hex).substr(0, 8)
 }
 
-export interface HostsResponse {
+export type HostsResponse = { __: never } | RegisterResponse
+export function isAlreadyClaimed (h: HostsResponse): h is RegisterResponse {
+  return !!(h as any).claimedAt
+}
+export interface RegisterResponse {
+  claimedAt: string
+  torAddressSig: HmacSig
+  // TODO: once certs are implemented on the backend, the following should lose the '?'s
+  certSig?: HmacSig
+  certName?: string
+  lanAddress?: string
+}
+
+export interface HmacSig {
   hmac: string,
   message: string,
   salt: string
-  claimedAt: string | null
-  torAddress?: string
-  lanAddress?: string
-  cert?: Cert
 }
 
 export interface RegisterRequest {
@@ -56,11 +66,4 @@ export interface RegisterRequest {
   password: string
   passwordCounter: string
   passwordSalt: string
-}
-
-export interface RegisterResponse extends HostsResponse {
-  claimedAt: string
-  torAddress: string
-  lanAddress?: string
-  cert?: Cert
 }

@@ -111,14 +111,24 @@ export class RegisterPage {
         pauseFor(2500),
       ])
 
-      const hmacRes = await this.hmacService.validateHmacExpiration(this.productKey, data.hmac, data.message, data.salt)
-      switch (hmacRes) {
-        case 'hmac-invalid': return this.presentAlertInvalidRes()
-        case 'expiration-invalid': return this.presentAlertExpiredRes()
+      const { torAddressSig } = data
+      const torAddress = torAddressSig.message
+      const hmacTorRes = await this.hmacService.validateHmac(this.productKey, torAddressSig.hmac, torAddress, torAddressSig.salt)
+      switch (hmacTorRes) {
+        case 'hmac-invalid': return this.presentAlertInvalidRes('tor address')
         case 'success': console.log(`Successful hmac validation`)
       }
 
-      await this.appState.addDevice(new Date(data.claimedAt), this.productKey, data.torAddress, data.lanAddress, data.cert)
+      const { certSig, certName } = data
+      const cert = { cert: certSig.message, name: certName }
+      // TODO uncomment when ssl is complete on the backend
+      // const hmacCertRes = await this.hmacService.validateHmac(this.productKey, certSig.hmac, certSig.message, certSig.salt)
+      // switch (hmacCertRes) {
+      //   case 'hmac-invalid': return this.presentAlertInvalidRes('ssl cert')
+      //   case 'success': console.log(`Successful hmac validation`)
+      // }
+
+      await this.appState.addDevice(new Date(data.claimedAt), this.productKey, torAddressSig.message, data.lanAddress, cert)
 
       await loader.dismiss()
       this.navCtrl.navigateRoot(['/devices', this.productKey], { queryParams: { fresh: true } })
@@ -129,20 +139,10 @@ export class RegisterPage {
     }
   }
 
-  private async presentAlertInvalidRes () {
+  private async presentAlertInvalidRes (sigDescription: string) {
     const alert = await this.alertCtrl.create({
       header: 'Warning!',
-      message: 'Unable to verify response from Embassy. It is possible you are experiencing a "Man in the Middle" attack. Please contact support.',
-      buttons: ['OK'],
-    })
-
-    return alert.present()
-  }
-
-  private async presentAlertExpiredRes () {
-    const alert = await this.alertCtrl.create({
-      header: 'Warning!',
-      message: 'Response from embassy valid, but expired. It is possible you are experiencing a "Man in the Middle" replay attack. Please contact support.',
+      message: `Unable to verify ${sigDescription} response from Embassy. It is possible you are experiencing a "Man in the Middle" attack. Please contact support.`,
       buttons: ['OK'],
     })
 
