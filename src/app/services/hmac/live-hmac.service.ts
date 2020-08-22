@@ -6,9 +6,7 @@ import { HmacService } from './hmac.service'
 export class LiveHmacService extends HmacService {
   constructor () { super() }
 
-  async validateHmac (secretKey: string, hmacHex: string, message: string, saltHex: string) : Promise<'hmac-invalid' | 'success' > {
-    const validRes = await HMAC.verify256(secretKey, decode16(hmacHex), message, decode16(saltHex))
-    if (!validRes) return 'hmac-invalid'
-    return 'success'
+  async validateHmac (secretKey: string, hmacHex: string, message: string, saltHex: string) : Promise<boolean> {
+    return HMAC.verify256(secretKey, decode16(hmacHex), message, decode16(saltHex))
   }
 }

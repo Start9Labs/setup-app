@@ -18,25 +18,21 @@ export class ProcessResService {
     const { torAddressSig, claimedAt, certSig, certName, lanAddress } = data
 
     const torAddress = torAddressSig.message
-    const hmacTorRes = await this.hmacService.validateHmac(productKey, torAddressSig.hmac, torAddress, torAddressSig.salt)
-    switch (hmacTorRes) {
-      case 'hmac-invalid':
-        await this.presentAlertInvalidRes('tor address')
-        return false
-      case 'success': console.log(`Successful hmac validation`)
+    if (!await this.hmacService.validateHmac(productKey, torAddressSig.hmac, torAddress, torAddressSig.salt)) {
+      await this.presentAlertInvalidRes('tor address')
+      return false
     }
 
-    const cert = { cert: certSig.message, name: certName }
-    // TODO uncomment when ssl is complete on the backend
-    const hmacCertRes = await this.hmacService.validateHmac(productKey, certSig.hmac, certSig.message, certSig.salt)
-    switch (hmacCertRes) {
-      case 'hmac-invalid':
-        await this.presentAlertInvalidRes('ssl cert')
-        return false
-      case 'success': console.log(`Successful hmac validation`)
-    }
+    // TODO uncomment when ssl is complete
+    // const cert = { cert: certSig.message, name: certName }
+    // if (!await this.hmacService.validateHmac(productKey, certSig.hmac, certSig.message, certSig.salt)) {
+    //   await this.presentAlertInvalidRes('ssl cert')
+    //   return false
+    // }
+    // await this.appState.addDevice(new Date(claimedAt), productKey, torAddress, lanAddress, cert)
 
-    await this.appState.addDevice(new Date(claimedAt), productKey, torAddress, lanAddress, cert)
+    // TODO delete when ssl is complete
+    await this.appState.addDevice(new Date(claimedAt), productKey, torAddress, lanAddress, { } as any)
     return true
   }
 
