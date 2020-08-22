@@ -1,10 +1,9 @@
 import { Component } from '@angular/core'
-import { LoadingController, NavController, AlertController } from '@ionic/angular'
+import { LoadingController, NavController } from '@ionic/angular'
 import { HttpService, Method, RegisterResponse, RegisterRequest } from '../../services/http/http.service'
-import { AppState } from 'src/app/app-state'
 import { KEY_GEN, encode16, encodeObject, AES_CTR } from 'src/app/util/crypto'
 import { ActivatedRoute } from '@angular/router'
-import { HmacService } from 'src/app/services/hmac/hmac.service'
+import { ProcessResService } from 'src/app/services/process-res.service'
 
 @Component({
   selector: 'register',
@@ -23,10 +22,8 @@ export class RegisterPage {
     private readonly route: ActivatedRoute,
     private readonly navCtrl: NavController,
     private readonly loadingCtrl: LoadingController,
-    private readonly alertCtrl: AlertController,
-    private readonly appState: AppState,
     private readonly httpService: HttpService,
-    private readonly hmacService: HmacService,
+    private readonly processRes: ProcessResService,
   ) { }
 
   ngOnInit () {
@@ -61,7 +58,7 @@ export class RegisterPage {
     try {
       const [torPrivKey] = await Promise.all([
         KEY_GEN.tor().then(({ expandedSecretKey }) => expandedSecretKey),
-        pauseFor(1500),
+        pauseFor(2000),
       ])
 
       loader.message = '(2/3) Generating RSA private key for SSL Certificate'
@@ -69,7 +66,7 @@ export class RegisterPage {
 
       const [rsaPrivKey] = await Promise.all([
         KEY_GEN.rsa(),
-        pauseFor(1500),
+        pauseFor(2000),
       ])
 
       loader.message = '(3/3) Transferring encrypted data to Embassy'
@@ -108,45 +105,19 @@ export class RegisterPage {
           url: `http://${this.ip}:5959/v0/register`,
           data: requestData,
         }),
-        pauseFor(2500),
+        pauseFor(2000),
       ])
 
-      const { torAddressSig } = data
-      const torAddress = torAddressSig.message
-      const hmacTorRes = await this.hmacService.validateHmac(this.productKey, torAddressSig.hmac, torAddress, torAddressSig.salt)
-      switch (hmacTorRes) {
-        case 'hmac-invalid': return this.presentAlertInvalidRes('tor address')
-        case 'success': console.log(`Successful hmac validation`)
+      loader.dismiss()
+
+      if (await this.processRes.processRes(this.productKey, data)) {
+        this.navCtrl.navigateRoot(['/devices', this.productKey], { queryParams: { fresh: true } })
       }
-
-      const { certSig, certName } = data
-      const cert = { cert: certSig.message, name: certName }
-      // TODO uncomment when ssl is complete on the backend
-      // const hmacCertRes = await this.hmacService.validateHmac(this.productKey, certSig.hmac, certSig.message, certSig.salt)
-      // switch (hmacCertRes) {
-      //   case 'hmac-invalid': return this.presentAlertInvalidRes('ssl cert')
-      //   case 'success': console.log(`Successful hmac validation`)
-      // }
-
-      await this.appState.addDevice(new Date(data.claimedAt), this.productKey, torAddressSig.message, data.lanAddress, cert)
-
-      await loader.dismiss()
-      this.navCtrl.navigateRoot(['/devices', this.productKey], { queryParams: { fresh: true } })
     } catch (e) {
       console.error(e)
       this.error = e.message
       loader.dismiss()
     }
-  }
-
-  private async presentAlertInvalidRes (sigDescription: string) {
-    const alert = await this.alertCtrl.create({
-      header: 'Warning!',
-      message: `Unable to verify ${sigDescription} response from Embassy. It is possible you are experiencing a "Man in the Middle" attack. Please contact support.`,
-      buttons: ['OK'],
-    })
-
-    return alert.present()
   }
 
   private async encryptTorSecretKey (expandedSecretKey: Uint8Array): Promise<{ cipher: string, counter: string, salt: string }> {

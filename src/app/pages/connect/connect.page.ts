@@ -2,9 +2,8 @@ import { Component } from '@angular/core'
 import { LoadingController, NavController, AlertController } from '@ionic/angular'
 import { getLanIP, idFromProductKey, HttpService, Method, HostsResponse, isAlreadyClaimed } from '../../services/http/http.service'
 import { encode16, HMAC } from 'src/app/util/crypto'
-import { AppState } from 'src/app/app-state'
-import { HmacService } from 'src/app/services/hmac/hmac.service'
 import { ZeroconfMonitor } from 'src/app/services/zeroconf/zeroconf.service'
+import { ProcessResService } from 'src/app/services/process-res.service'
 
 @Component({
   selector: 'connect',
@@ -23,8 +22,7 @@ export class ConnectPage {
     private readonly zeroconfMonitor: ZeroconfMonitor,
     private readonly httpService: HttpService,
     private readonly alertCtrl: AlertController,
-    private readonly appState: AppState,
-    private readonly hmacService: HmacService,
+    private readonly processRes: ProcessResService,
   ) { }
 
   segmentChanged (): void {
@@ -63,26 +61,12 @@ export class ConnectPage {
         },
       })
 
+      loader.dismiss()
+
       if (isAlreadyClaimed(data)) {
-        const { torAddressSig } = data
-        const torAddress = torAddressSig.message
-        const hmacTorRes = await this.hmacService.validateHmac(this.productKey, torAddressSig.hmac, torAddress, torAddressSig.salt)
-        switch (hmacTorRes) {
-          case 'hmac-invalid': return this.presentAlertInvalidRes('tor address')
-          case 'success': console.log(`Successful hmac validation`)
+        if (await this.processRes.processRes(this.productKey, data)) {
+          return this.presentAlertAlreadyRegistered()
         }
-
-        const { claimedAt, certSig, certName, lanAddress } = data
-        const cert = { cert: certSig.message, name: certName }
-        // TODO uncomment when ssl is complete on the backend
-        // const hmacCertRes = await this.hmacService.validateHmac(this.productKey, certSig.hmac, certSig.message, certSig.salt)
-        // switch (hmacCertRes) {
-        //   case 'hmac-invalid': return this.presentAlertInvalidRes('ssl cert')
-        //   case 'success': console.log(`Successful hmac validation`)
-        // }
-
-        this.appState.addDevice(new Date(claimedAt), this.productKey, torAddress, lanAddress, cert)
-        return this.presentAlertAlreadyRegistered()
       } else {
         this.navCtrl.navigateForward(['/register'], {
           queryParams: { ip, productKey: this.productKey },
@@ -91,7 +75,6 @@ export class ConnectPage {
     } catch (e) {
       console.error(e)
       this.error = e.message
-    } finally {
       loader.dismiss()
     }
   }
@@ -106,26 +89,6 @@ export class ConnectPage {
     if (!ip) { throw new Error('IP address not found. Please contact support.') }
 
     return ip
-  }
-
-  private async presentAlertInvalidRes (sigDescription: string) {
-    const alert = await this.alertCtrl.create({
-      header: 'Warning!',
-      message: `Unable to verify ${sigDescription} response from Embassy. It is possible you are experiencing a "Man in the Middle" attack, and you should contact support.`,
-      buttons: ['OK'],
-    })
-
-    return alert.present()
-  }
-
-  private async presentAlertExpiredRes () {
-    const alert = await this.alertCtrl.create({
-      header: 'Warning!',
-      message: 'Response from Embassy valid, but expired. It is possible you are experiencing a "Man in the Middle" replay attack, and you should contact support.',
-      buttons: ['OK'],
-    })
-
-    return alert.present()
   }
 
   private async presentAlertAlreadyRegistered () {
