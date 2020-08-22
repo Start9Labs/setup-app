@@ -29,4 +29,4 @@ npm-debug.log*
 resources/android
 resources/ios
 
-embassy-setup-release-key.keystore
+setup-release-key.keystore
