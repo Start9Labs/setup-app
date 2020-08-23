@@ -1,10 +1,11 @@
 import { Component } from '@angular/core'
-import { LoadingController, NavController, AlertController } from '@ionic/angular'
+import { LoadingController, NavController } from '@ionic/angular'
 import { HttpService, Method, RegisterResponse, RegisterRequest } from '../../services/http/http.service'
-import { AppState } from 'src/app/app-state'
 import { KEY_GEN, encode16, encodeObject, AES_CTR } from 'src/app/util/crypto'
 import { ActivatedRoute } from '@angular/router'
-import { HmacService } from 'src/app/services/hmac/hmac.service'
+import { ProcessResService } from 'src/app/services/process-res.service'
+import { traceDesc } from 'src/app/util/logging'
+import { pauseFor } from 'src/app/util/misc'
 
 @Component({
   selector: 'register',
@@ -23,10 +24,8 @@ export class RegisterPage {
     private readonly route: ActivatedRoute,
     private readonly navCtrl: NavController,
     private readonly loadingCtrl: LoadingController,
-    private readonly alertCtrl: AlertController,
-    private readonly appState: AppState,
     private readonly httpService: HttpService,
-    private readonly hmacService: HmacService,
+    private readonly processRes: ProcessResService,
   ) { }
 
   ngOnInit () {
@@ -61,7 +60,7 @@ export class RegisterPage {
     try {
       const [torPrivKey] = await Promise.all([
         KEY_GEN.tor().then(({ expandedSecretKey }) => expandedSecretKey),
-        pauseFor(1500),
+        pauseFor(2000),
       ])
 
       loader.message = '(2/3) Generating RSA private key for SSL Certificate'
@@ -69,7 +68,7 @@ export class RegisterPage {
 
       const [rsaPrivKey] = await Promise.all([
         KEY_GEN.rsa(),
-        pauseFor(1500),
+        pauseFor(2000),
       ])
 
       loader.message = '(3/3) Transferring encrypted data to Embassy'
@@ -108,45 +107,18 @@ export class RegisterPage {
           url: `http://${this.ip}:5959/v0/register`,
           data: requestData,
         }),
-        pauseFor(2500),
-      ])
+        pauseFor(2000),
+      ]).then(traceDesc('Register response'))
 
-      const hmacRes = await this.hmacService.validateHmacExpiration(this.productKey, data.hmac, data.message, data.salt)
-      switch (hmacRes) {
-        case 'hmac-invalid': return this.presentAlertInvalidRes()
-        case 'expiration-invalid': return this.presentAlertExpiredRes()
-        case 'success': console.log(`Successful hmac validation`)
+      loader.dismiss()
+      if (await this.processRes.processRes(this.productKey, data)) {
+        this.navCtrl.navigateRoot(['/devices', this.productKey], { queryParams: { fresh: true } })
       }
-
-      await this.appState.addDevice(new Date(data.claimedAt), this.productKey, data.torAddress, data.lanAddress, data.cert)
-
-      await loader.dismiss()
-      this.navCtrl.navigateRoot(['/devices', this.productKey], { queryParams: { fresh: true } })
     } catch (e) {
       console.error(e)
       this.error = e.message
       loader.dismiss()
     }
-  }
-
-  private async presentAlertInvalidRes () {
-    const alert = await this.alertCtrl.create({
-      header: 'Warning!',
-      message: 'Unable to verify response from Embassy. It is possible you are experiencing a "Man in the Middle" attack. Please contact support.',
-      buttons: ['OK'],
-    })
-
-    return alert.present()
-  }
-
-  private async presentAlertExpiredRes () {
-    const alert = await this.alertCtrl.create({
-      header: 'Warning!',
-      message: 'Response from embassy valid, but expired. It is possible you are experiencing a "Man in the Middle" replay attack. Please contact support.',
-      buttons: ['OK'],
-    })
-
-    return alert.present()
   }
 
   private async encryptTorSecretKey (expandedSecretKey: Uint8Array): Promise<{ cipher: string, counter: string, salt: string }> {
@@ -167,8 +139,4 @@ export class RegisterPage {
     const res = await AES_CTR.encryptPbkdf2(this.productKey, new Uint8Array([...PASSWORD_INDICATOR, ...encodedPassword]))
     return encodeObject(encode16, res) as { cipher: string, counter: string, salt: string }
   }
-}
-
-export function pauseFor (ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms))
 }

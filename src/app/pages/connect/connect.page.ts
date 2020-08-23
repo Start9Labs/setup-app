@@ -1,10 +1,9 @@
 import { Component } from '@angular/core'
 import { LoadingController, NavController, AlertController } from '@ionic/angular'
-import { getLanIP, idFromProductKey, HttpService, Method, HostsResponse } from '../../services/http/http.service'
+import { getLanIP, idFromProductKey, HttpService, Method, HostsResponse, isAlreadyClaimed } from '../../services/http/http.service'
 import { encode16, HMAC } from 'src/app/util/crypto'
-import { AppState } from 'src/app/app-state'
-import { HmacService } from 'src/app/services/hmac/hmac.service'
 import { ZeroconfMonitor } from 'src/app/services/zeroconf/zeroconf.service'
+import { ProcessResService } from 'src/app/services/process-res.service'
 
 @Component({
   selector: 'connect',
@@ -23,8 +22,7 @@ export class ConnectPage {
     private readonly zeroconfMonitor: ZeroconfMonitor,
     private readonly httpService: HttpService,
     private readonly alertCtrl: AlertController,
-    private readonly appState: AppState,
-    private readonly hmacService: HmacService,
+    private readonly processRes: ProcessResService,
   ) { }
 
   segmentChanged (): void {
@@ -63,16 +61,12 @@ export class ConnectPage {
         },
       })
 
-      const hmacRes = await this.hmacService.validateHmacExpiration(this.productKey, data.hmac, data.message, data.salt)
-      switch (hmacRes) {
-        case 'hmac-invalid': return this.presentAlertInvalidRes()
-        case 'expiration-invalid': return this.presentAlertExpiredRes()
-        case 'success': console.log(`Successful hmac validation`)
-      }
+      loader.dismiss()
 
-      if (data.claimedAt) {
-        this.appState.addDevice(new Date(data.claimedAt), this.productKey, data.torAddress, data.lanAddress, data.cert)
-        this.presentAlertAlreadyRegistered()
+      if (isAlreadyClaimed(data)) {
+        if (await this.processRes.processRes(this.productKey, data)) {
+          return this.presentAlertAlreadyRegistered()
+        }
       } else {
         this.navCtrl.navigateForward(['/register'], {
           queryParams: { ip, productKey: this.productKey },
@@ -81,7 +75,6 @@ export class ConnectPage {
     } catch (e) {
       console.error(e)
       this.error = e.message
-    } finally {
       loader.dismiss()
     }
   }
@@ -96,26 +89,6 @@ export class ConnectPage {
     if (!ip) { throw new Error('IP address not found. Please contact support.') }
 
     return ip
-  }
-
-  private async presentAlertInvalidRes () {
-    const alert = await this.alertCtrl.create({
-      header: 'Warning!',
-      message: 'Unable to verify response from Embassy. It is possible you are experiencing a "Man in the Middle" attack, and you should contact support.',
-      buttons: ['OK'],
-    })
-
-    return alert.present()
-  }
-
-  private async presentAlertExpiredRes () {
-    const alert = await this.alertCtrl.create({
-      header: 'Warning!',
-      message: 'Response from Embassy valid, but expired. It is possible you are experiencing a "Man in the Middle" replay attack, and you should contact support.',
-      buttons: ['OK'],
-    })
-
-    return alert.present()
   }
 
   private async presentAlertAlreadyRegistered () {

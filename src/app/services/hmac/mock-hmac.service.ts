@@ -5,7 +5,7 @@ import { HmacService } from './hmac.service'
 export class MockHmacService extends HmacService {
   constructor () { super() }
 
-  async validateHmacExpiration (secretKey: string, hmacHex: string, expirationIso: string, saltHex: string) : Promise<'hmac-invalid' | 'expiration-invalid' | 'success' > {
-    return 'success'
+  async validateHmac (secretKey: string, hmacHex: string, expirationIso: string, saltHex: string) : Promise<boolean> {
+    return true
   }
 }

@@ -29,28 +29,26 @@
     </ion-item>
     <!-- Addresses -->
     <ion-item-divider>Addresses</ion-item-divider>
-    <ion-item button (click)="copyToClipboard('http://' + device.torAddress)">
+    <ion-item button (click)="presentActionTor()">
       <ion-icon slot="start" src="assets/svg/tor.svg"></ion-icon>
       <ion-label class="ion-text-wrap">
         <h2>Tor</h2>
         <p>{{ device.torAddress }}</p>
       </ion-label>
     </ion-item>
-    <ion-item button *ngIf="device.lanAddress" (click)="copyToClipboard('https://' + device.lanAddress)">
-      <ion-icon slot="start" name="globe-outline" color="primary"></ion-icon>
+    <ion-item button (click)="presentActionLan()">
+      <ion-icon slot="start" name="home-outline" color="primary"></ion-icon>
       <ion-label class="ion-text-wrap">
-        <h2>Local</h2>
-        <p>{{ device.lanAddress }}</p>
+        <h2>Local Area Network (LAN)</h2>
+        <p>{{ 'https://' + device.lanAddress }}</p>
       </ion-label>
     </ion-item>
     <!-- Certificates -->
-    <ng-container *ngIf="device.cert && device.cert.cert">
-      <ion-item-divider>Certificates</ion-item-divider>
-      <ion-item button (click)="presentActionCert()">
-        <ion-icon slot="start" src="assets/svg/cert.svg"></ion-icon>
-        <ion-label class="ion-text-wrap">{{ device.cert.name }}</ion-label>
-      </ion-item>
-    </ng-container>
+    <ion-item-divider>SSL Certificates</ion-item-divider>
+    <ion-item button (click)="presentActionCert()">
+      <ion-icon slot="start" src="assets/svg/cert.svg"></ion-icon>
+      <ion-label class="ion-text-wrap">{{ device.cert.name }}</ion-label>
+    </ion-item>
   </ion-item-group>
 
 </ion-content>
