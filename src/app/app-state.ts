@@ -9,8 +9,8 @@ export interface Device {
   type: 'Embassy'
   productKey: string
   torAddress: string
-  lanAddress: string | null
-  cert: Cert | null
+  lanAddress: string
+  cert: Cert
 }
 
 export interface Cert {

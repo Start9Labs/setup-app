@@ -17,7 +17,7 @@ export class MockHttpService extends HttpService {
         //   message: 'privacy34kn4ez3y3nijweec6w4g54i3g54sdv7r5mr6soma3w4begyd.onion',
         //   salt: '',
         // },
-        // lanAddress: 'start9-12345678.local',
+        // lanAddress: 'start9-e6fgh23d.local',
         // certSig: {
         //   hmac: '',
         //   message: sampleCert,
@@ -36,7 +36,7 @@ export class MockHttpService extends HttpService {
           message: 'privacy34kn4ez3y3nijweec6w4g54i3g54sdv7r5mr6soma3w4begyd.onion',
           salt: '',
         },
-        lanAddress: 'start9-12345678.local',
+        lanAddress: 'start9-e6fgh23d.local',
         certSig: {
           hmac: '',
           message: sampleCert,
