@@ -2,11 +2,10 @@ import { Component } from '@angular/core'
 import { ToastController, AlertController, NavController, ActionSheetController } from '@ionic/angular'
 import { AppState, Device } from '../../app-state'
 import { ActivatedRoute } from '@angular/router'
-import { CertInstaller } from 'capacitor-cert-installer'
 
 import { Plugins } from '@capacitor/core'
 import { pauseFor } from '../register/register.page'
-const { Clipboard } = Plugins
+const { Clipboard, CertInstaller } = Plugins
 
 @Component({
   selector: 'device-show',
@@ -121,6 +120,8 @@ export class DeviceShowPage {
   }
 
   private async installCert (): Promise<void> {
+    console.log(`Plugins`)
+    console.log(Plugins)
     return CertInstaller.installCert({ value: this.device.cert.cert, name: this.device.cert.name })
   }
 }

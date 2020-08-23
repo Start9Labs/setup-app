@@ -24,15 +24,15 @@ export class ProcessResService {
     }
 
     // TODO uncomment when ssl is complete
-    // const cert = { cert: certSig.message, name: certName }
-    // if (!await this.hmacService.validateHmac(productKey, certSig.hmac, certSig.message, certSig.salt)) {
-    //   await this.presentAlertInvalidRes('ssl cert')
-    //   return false
-    // }
-    // await this.appState.addDevice(new Date(claimedAt), productKey, torAddress, lanAddress, cert)
+    const cert = { cert: certSig.message, name: certName }
+    if (!await this.hmacService.validateHmac(productKey, certSig.hmac, certSig.message, certSig.salt)) {
+      await this.presentAlertInvalidRes('ssl cert')
+      return false
+    }
+    await this.appState.addDevice(new Date(claimedAt), productKey, torAddress, lanAddress, cert)
 
     // TODO delete when ssl is complete
-    await this.appState.addDevice(new Date(claimedAt), productKey, torAddress, lanAddress, { } as any)
+    // await this.appState.addDevice(new Date(claimedAt), productKey, torAddress, lanAddress, { } as any)
     return true
   }
 

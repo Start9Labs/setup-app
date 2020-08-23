@@ -37,7 +37,7 @@ export function idFromProductKey (productKey: string): string {
 
 export type HostsResponse = { __: never } | RegisterResponse
 export function isAlreadyClaimed (h: HostsResponse): h is RegisterResponse {
-  return !!(h as any).claimedAt
+  return !!(h as any || { }).claimedAt
 }
 export interface RegisterResponse {
   claimedAt: string

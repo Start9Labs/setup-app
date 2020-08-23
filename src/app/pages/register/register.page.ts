@@ -4,6 +4,7 @@ import { HttpService, Method, RegisterResponse, RegisterRequest } from '../../se
 import { KEY_GEN, encode16, encodeObject, AES_CTR } from 'src/app/util/crypto'
 import { ActivatedRoute } from '@angular/router'
 import { ProcessResService } from 'src/app/services/process-res.service'
+import { traceDesc } from 'src/app/util/logging'
 
 @Component({
   selector: 'register',
@@ -106,10 +107,9 @@ export class RegisterPage {
           data: requestData,
         }),
         pauseFor(2000),
-      ])
+      ]).then(traceDesc('Register response'))
 
       loader.dismiss()
-
       if (await this.processRes.processRes(this.productKey, data)) {
         this.navCtrl.navigateRoot(['/devices', this.productKey], { queryParams: { fresh: true } })
       }
