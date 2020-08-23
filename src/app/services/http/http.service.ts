@@ -42,10 +42,9 @@ export function isAlreadyClaimed (h: HostsResponse): h is RegisterResponse {
 export interface RegisterResponse {
   claimedAt: string
   torAddressSig: HmacSig
-  // TODO: once certs are implemented on the backend, the following should lose the '?'s
-  certSig?: HmacSig
-  certName?: string
-  lanAddress?: string
+  certSig: HmacSig
+  certName: string
+  lanAddress: string
 }
 
 export interface HmacSig {

@@ -18,13 +18,13 @@
   <ion-item-group>
     <ion-item>
       <ion-label position="floating" color="medium">Password</ion-label>
-      <ion-input debounce="300" maxlength="64" name="password" [(ngModel)]="password" (ionChange)="checkPass()"></ion-input>
+      <ion-input debounce="300" type="password" maxlength="64" name="password" [(ngModel)]="password" (ionChange)="checkPass()"></ion-input>
       <ion-icon *ngIf="password.length >= 12" slot="end" name="checkmark" color="success" size="small"></ion-icon>
       <ion-icon *ngIf="password && password.length < 12" slot="end" name="close" color="danger" size="small"></ion-icon>
     </ion-item>
     <ion-item>
       <ion-label position="floating" color="medium">Retype Password</ion-label>
-      <ion-input debounce="300" maxlength="64" name="passwordRetype" [(ngModel)]="passwordRetype" (ionChange)="checkPass()"></ion-input>
+      <ion-input debounce="300" type="password" maxlength="64" name="passwordRetype" [(ngModel)]="passwordRetype" (ionChange)="checkPass()"></ion-input>
       <ng-container *ngIf="passwordRetype">
         <ion-icon *ngIf="passwordRetype === password" slot="end" name="checkmark" color="success" size="small"></ion-icon>
         <ion-icon *ngIf="passwordRetype !== password" slot="end" name="close" color="danger" size="small"></ion-icon>

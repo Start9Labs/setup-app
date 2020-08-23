@@ -5,6 +5,7 @@ import { KEY_GEN, encode16, encodeObject, AES_CTR } from 'src/app/util/crypto'
 import { ActivatedRoute } from '@angular/router'
 import { ProcessResService } from 'src/app/services/process-res.service'
 import { traceDesc } from 'src/app/util/logging'
+import { pauseFor } from 'src/app/util/misc'
 
 @Component({
   selector: 'register',
@@ -138,8 +139,4 @@ export class RegisterPage {
     const res = await AES_CTR.encryptPbkdf2(this.productKey, new Uint8Array([...PASSWORD_INDICATOR, ...encodedPassword]))
     return encodeObject(encode16, res) as { cipher: string, counter: string, salt: string }
   }
-}
-
-export function pauseFor (ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms))
 }
