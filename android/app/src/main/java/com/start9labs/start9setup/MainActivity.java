@@ -7,7 +7,7 @@ import com.getcapacitor.Plugin;
 
 import java.util.ArrayList;
 
-import com.getcapacitor.plugin.http.Http;
+import http.plugin.HttpPlugin;
 import com.start9labs.cert.CertInstaller;
 
 public class MainActivity extends BridgeActivity {
@@ -18,7 +18,7 @@ public class MainActivity extends BridgeActivity {
     // Initializes the Bridge
     this.init(savedInstanceState, new ArrayList<Class<? extends Plugin>>() {{
       // Additional plugins you've installed go here
-      add(Http.class);
+      add(HttpPlugin.class);
       add(CertInstaller.class);
     }});
   }

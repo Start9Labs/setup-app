@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core'
-import { HttpOptions, HttpResponse } from '@capacitor-community/http'
+// import { HttpOptions, HttpResponse } from '@capacitor-community/http'
+import { HttpPluginNativeImpl, HttpOptions, HttpResponse } from '@start9labs/capacitor-http'
 import { TypedHttpResponse, HttpService } from './http.service'
-
-import { Plugins } from '@capacitor/core'
-const { Http } = Plugins
 
 const version = require('../../../../package.json').version
 
@@ -18,7 +16,7 @@ export class LiveHttpService extends HttpService {
       'app-version': version,
     })
 
-    return Http.request(options).then((res: HttpResponse) => {
+    return HttpPluginNativeImpl.request(options).then((res: HttpResponse) => {
       const httpStatus = toHttpStatus(res.status)
       if (isError(httpStatus)) {
         const message = res.data ? `${res.data.code || 'SERVER_ERROR'}: ${res.data.message || 'unknown error'}` : httpStatus
