@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { AppState, Device } from '../../app-state'
+import { Store, Device } from '../../store'
 import { Observable } from 'rxjs'
 
 @Component({
@@ -11,10 +11,10 @@ export class DeviceListPage {
   devices$: Observable<Device[]>
 
   constructor (
-    private readonly appState: AppState,
+    private readonly store: Store,
   ) { }
 
   ngOnInit ( ) {
-    this.devices$ = this.appState.watchDevices()
+    this.devices$ = this.store.watchDevices()
   }
 }

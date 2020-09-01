@@ -21,7 +21,7 @@ export interface Cert {
 @Injectable({
   providedIn: 'root',
 })
-export class AppState {
+export class Store {
   $devices$: BehaviorSubject<Device[]> = new BehaviorSubject([])
   watchDevices (): Observable<Device[]> { return this.$devices$.asObservable() }
   peekDevices (): Device[] { return this.$devices$.getValue() }

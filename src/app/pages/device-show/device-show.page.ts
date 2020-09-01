@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { ToastController, AlertController, NavController, ActionSheetController } from '@ionic/angular'
-import { AppState, Device } from '../../app-state'
+import { Store, Device } from '../../store'
 import { ActivatedRoute } from '@angular/router'
 import { pauseFor } from '../../util/misc'
 
@@ -17,7 +17,7 @@ export class DeviceShowPage {
 
   constructor (
     private readonly navCtrl: NavController,
-    private readonly appState: AppState,
+    private readonly store: Store,
     private readonly route: ActivatedRoute,
     private readonly toastCtrl: ToastController,
     private readonly actionSheetCtrl: ActionSheetController,
@@ -26,7 +26,7 @@ export class DeviceShowPage {
 
   ngOnInit ( ) {
     const productKey = this.route.snapshot.paramMap.get('productKey')
-    this.device = this.appState.peekDevices().find(d => d.productKey === productKey)
+    this.device = this.store.peekDevices().find(d => d.productKey === productKey)
   }
 
   ionViewDidEnter () {
@@ -167,8 +167,8 @@ export class DeviceShowPage {
   }
 
   private async remove (): Promise<void> {
-    await this.appState.removeDevice(this.device.productKey)
-    if (this.appState.peekDevices().length) {
+    await this.store.removeDevice(this.device.productKey)
+    if (this.store.peekDevices().length) {
       await this.navCtrl.navigateRoot(['/devices'])
     } else {
       await this.navCtrl.navigateRoot(['/connect'])

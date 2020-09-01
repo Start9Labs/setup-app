@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { Plugins, NetworkStatus } from '@capacitor/core'
+import { Plugins, NetworkStatus, PluginListenerHandle } from '@capacitor/core'
 import { Observable, BehaviorSubject } from 'rxjs'
 import { Mutex } from 'async-mutex'
 
@@ -13,14 +13,15 @@ export class NetworkMonitor {
   private readonly networkStatus$ = new BehaviorSubject<NetworkStatus>({ connected: false, connectionType: 'none' })
   watchConnection (): Observable<NetworkStatus> { return this.networkStatus$.asObservable() }
   peekConnection (): NetworkStatus { return this.networkStatus$.getValue() }
+  private listener: PluginListenerHandle
   private previous: string | undefined
 
-  async init () {
+  async init (): Promise<void> {
     console.log('starting network listener')
 
     this.networkStatus$.next(await Network.getStatus())
 
-    Network.addListener('networkStatusChange', async (status) => {
+    this.listener = Network.addListener('networkStatusChange', async (status) => {
       await mutex.runExclusive(() => {
         const current = JSON.stringify(status)
 
@@ -31,5 +32,10 @@ export class NetworkMonitor {
         this.networkStatus$.next(status)
       })
     })
+  }
+
+  stop (): void {
+    this.networkStatus$.next({ connected: false, connectionType: 'none' })
+    this.listener.remove()
   }
 }

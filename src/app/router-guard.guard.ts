@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { CanActivate } from '@angular/router'
-import { AppState } from './app-state'
+import { Store } from './store'
 import { NavController } from '@ionic/angular'
 
 @Injectable({
@@ -9,11 +9,11 @@ import { NavController } from '@ionic/angular'
 export class RouterGuard implements CanActivate {
   constructor (
     private readonly navCtrl: NavController,
-    private readonly appState: AppState,
+    private readonly store: Store,
   ) { }
 
   canActivate (): boolean {
-    if (this.appState.peekDevices().length) {
+    if (this.store.peekDevices().length) {
       return true
     } else {
       this.navCtrl.navigateRoot(['/connect'])

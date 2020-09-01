@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { AlertController } from '@ionic/angular'
 import { HmacService } from 'src/app/services/hmac/hmac.service'
-import { AppState } from 'src/app/app-state'
+import { Store } from 'src/app/store'
 import { RegisterResponse } from './http/http.service'
 
 @Injectable({
@@ -10,7 +10,7 @@ import { RegisterResponse } from './http/http.service'
 export class ProcessResService {
   constructor (
     private readonly hmacService: HmacService,
-    private readonly appState: AppState,
+    private readonly store: Store,
     private readonly alertCtrl: AlertController,
   ) { }
 
@@ -28,7 +28,7 @@ export class ProcessResService {
       await this.presentAlertInvalidRes('ssl cert')
       return false
     }
-    await this.appState.addDevice(new Date(claimedAt), productKey, torAddress, lanAddress, cert)
+    await this.store.addDevice(new Date(claimedAt), productKey, torAddress, lanAddress, cert)
 
     return true
   }

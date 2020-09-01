@@ -1,10 +1,10 @@
 import { Component } from '@angular/core'
 import { NetworkMonitor } from './services/network.service'
-import { AppState } from './app-state'
-import { Plugins, StatusBarStyle } from '@capacitor/core'
+import { Store } from './store'
+import { Plugins, StatusBarStyle, AppState } from '@capacitor/core'
 import { ZeroconfMonitor } from './services/zeroconf/zeroconf.service'
 
-const { SplashScreen, StatusBar } = Plugins
+const { App, SplashScreen, StatusBar } = Plugins
 
 @Component({
   selector: 'app-root',
@@ -16,7 +16,7 @@ export class AppComponent {
   constructor (
     private readonly networkMonitor: NetworkMonitor,
     private readonly zeroconfMonitor: ZeroconfMonitor,
-    private readonly appState: AppState,
+    private readonly store: Store,
   ) {
     // set dark theme
     document.body.classList.toggle('dark', true)
@@ -26,16 +26,29 @@ export class AppComponent {
 
   async init (): Promise<void> {
     // load storage
-    await this.appState.load()
-    // start network monitor
-    await this.networkMonitor.init()
-    // start zeroconf
-    this.zeroconfMonitor.init()
+    await this.store.load()
+    // init monitors
+    await this.initMonitors()
+    // subscribe to app pause/resume event
+    App.addListener('appStateChange', async (state: AppState) => {
+      if (state.isActive) {
+        this.initMonitors()
+      } else {
+        this.networkMonitor.stop()
+      }
+    })
     // set StatusBar style
     StatusBar.setStyle({
       style: StatusBarStyle.Dark,
     })
     // dismiss SplashScreen
     SplashScreen.hide()
+  }
+
+  async initMonitors (): Promise<void> {
+    // start network monitor
+    await this.networkMonitor.init()
+    // start zeroconf
+    this.zeroconfMonitor.init()
   }
 }
