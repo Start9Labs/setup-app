@@ -32,7 +32,7 @@ export class AppComponent {
     // subscribe to app pause/resume event
     App.addListener('appStateChange', async (state: AppState) => {
       if (state.isActive) {
-        this.initMonitors()
+        await this.initMonitors()
       } else {
         this.networkMonitor.stop()
       }
@@ -49,6 +49,6 @@ export class AppComponent {
     // start network monitor
     await this.networkMonitor.init()
     // start zeroconf
-    this.zeroconfMonitor.init()
+    return this.zeroconfMonitor.init()
   }
 }

@@ -140,3 +140,4 @@ export class RegisterPage {
     return encodeObject(encode16, res) as { cipher: string, counter: string, salt: string }
   }
 }
+

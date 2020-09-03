@@ -10,10 +10,10 @@
 </ion-header>
 
 <ion-content class="ion-padding-top">
-
-  <ion-item *ngIf="error" style="margin-bottom: 16px;">
+  <div *ngIf="error" style="margin-bottom: 16px; padding: 3%;">
+    <div style="font-size: 17px; padding-bottom: 6%; font-style: italic;">Please take a screenshot and send this message to support@start9labs.com</div>
     <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
-  </ion-item>
+  </div>
 
   <ion-item-group>
     <ion-item>
