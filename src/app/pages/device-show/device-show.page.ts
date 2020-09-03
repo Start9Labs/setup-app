@@ -148,7 +148,7 @@ export class DeviceShowPage {
   async presentAlertRemove () {
     const alert = await this.alertCtrl.create({
       header: 'Confirm',
-      message: `Remove ${this.device.type} from Setup App?<br /><br />This action will have no affect on the ${this.device.type} itself.<br /><br />You can re-add this ${this.device.type} later using its Product Key.`,
+      message: `Remove ${this.device.type} from Setup App?<br /><br />This action will have no effect on the ${this.device.type} itself.<br /><br />You can re-add this ${this.device.type} later using its Product Key.`,
       buttons: [
         {
           text: 'Cancel',
