@@ -176,9 +176,11 @@ export class DeviceShowPage {
   }
 
   private async installCert (): Promise<void> {
-    console.log(`Plugins`)
-    console.log(Plugins)
-    return CertInstaller.installCert({ value: this.device.cert.cert, name: this.device.cert.name })
+    return CertInstaller.installCert({
+      value: this.device.cert.cert,
+      name: this.device.cert.name,
+      iosInstructionLink: '',
+    })
   }
 
   private async copyToClipboard (string: string): Promise<void> {
