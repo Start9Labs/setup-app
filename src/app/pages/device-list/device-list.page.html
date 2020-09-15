@@ -12,9 +12,10 @@
 <ion-content class="ion-padding">
 
   <ion-card button *ngFor="let device of devices$ | async" style="margin-bottom: 16px;" [routerLink]="['/devices', device.productKey]">
-    <ion-item>
+    <ion-item lines="none">
       <ion-label>
-        <h1>{{ device.type }}</h1>
+        <h2>{{ device.type }}</h2>
+        <br />
         <p>Claimed: {{ device.claimedAt | date: 'short' }}</p>
       </ion-label>
     </ion-item>

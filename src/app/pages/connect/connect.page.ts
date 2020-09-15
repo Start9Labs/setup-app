@@ -99,7 +99,7 @@ export class ConnectPage {
         {
           text: 'OK',
           handler: () => {
-            this.navCtrl.navigateRoot(['/devices', this.productKey], { queryParams: { fresh: true } })
+            this.navCtrl.navigateRoot(['/devices', this.productKey, 'success'])
           },
         },
       ],

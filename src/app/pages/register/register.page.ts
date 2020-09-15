@@ -60,7 +60,7 @@ export class RegisterPage {
     try {
       const [torPrivKey] = await Promise.all([
         KEY_GEN.tor().then(({ expandedSecretKey }) => expandedSecretKey),
-        pauseFor(2000),
+        pauseFor(2500),
       ])
 
       loader.message = '(2/3) Generating RSA private key for SSL Certificate'
@@ -68,7 +68,7 @@ export class RegisterPage {
 
       const [rsaPrivKey] = await Promise.all([
         KEY_GEN.rsa(),
-        pauseFor(2000),
+        pauseFor(2500),
       ])
 
       loader.message = '(3/3) Transferring encrypted data to Embassy'
@@ -107,12 +107,12 @@ export class RegisterPage {
           url: `http://${this.ip}:5959/v0/register`,
           data: requestData,
         }),
-        pauseFor(2000),
+        pauseFor(2500),
       ]).then(traceDesc('Register response'))
 
       loader.dismiss()
       if (await this.processRes.processRes(this.productKey, data)) {
-        this.navCtrl.navigateRoot(['/devices', this.productKey], { queryParams: { fresh: true } })
+        this.navCtrl.navigateRoot(['/devices', this.productKey, 'success'])
       }
     } catch (e) {
       console.error(e)

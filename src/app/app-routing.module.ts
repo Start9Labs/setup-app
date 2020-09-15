@@ -18,6 +18,10 @@ const routes: Routes = [
     loadChildren: () => import('./pages/device-show/device-show.module').then(m => m.DeviceShowPageModule),
   },
   {
+    path: 'devices/:productKey/success',
+    loadChildren: () => import('./pages/success/success.module').then(m => m.SuccessPageModule),
+  },
+  {
     path: 'connect',
     loadChildren: () => import('./pages/connect/connect.module').then(m => m.ConnectPageModule),
   },

@@ -25,18 +25,18 @@
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
 
-.alert-success {
-  --min-width: 75%;
-  --max-width: 75%;
-  .alert-title {
-    color: var(--ion-color-success) !important;
-  }
-}
 
 .alert-danger {
   color: var(--ion-color-danger) !important;
   & ion-icon {
     color: var(--ion-color-danger) !important;
+  }
+}
+
+.alert-primary {
+  color: var(--ion-color-primary) !important;
+  & ion-icon {
+    color: var(--ion-color-primary) !important;
   }
 }
 

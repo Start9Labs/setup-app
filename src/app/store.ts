@@ -9,13 +9,6 @@ export interface Device {
   type: 'Embassy'
   productKey: string
   torAddress: string
-  lanAddress: string
-  cert: Cert
-}
-
-export interface Cert {
-  name: string
-  cert: string
 }
 
 @Injectable({
@@ -31,15 +24,13 @@ export class Store {
     this.$devices$.next(devices || [])
   }
 
-  async addDevice (claimedAt: Date, productKey: string, torAddress: string, lanAddress: string, cert: Cert): Promise<void> {
+  async addDevice (claimedAt: Date, productKey: string, torAddress: string): Promise<void> {
     const devices = this.peekDevices().filter(d => d.productKey !== productKey)
     devices.push({
       claimedAt,
       type: 'Embassy',
       productKey,
       torAddress,
-      lanAddress,
-      cert,
     })
     await this.save(devices)
   }
