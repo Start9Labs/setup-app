@@ -27,7 +27,7 @@
     <!-- ios -->
     <ng-container *ngIf="plat === 'ios'">
       <ion-item-divider>iOS</ion-item-divider>
-      <ion-item href="https://apps.apple.com/us/app/consulate/id1528124570" target="_blank">
+      <ion-item lines="none" href="https://apps.apple.com/us/app/consulate/id1528124570" target="_blank">
         <ion-avatar slot="start">
           <img src="assets/png/consulate.png">
         </ion-avatar>
@@ -37,20 +37,20 @@
     <!-- android -->
     <ng-container *ngIf="plat === 'android'">
       <ion-item-divider>Android</ion-item-divider>
-      <ion-item href="https://play.google.com/store/apps/details?id=org.torproject.torbrowser&hl=en_US" target="_blank">
+      <ion-item lines="none" href="https://play.google.com/store/apps/details?id=org.torproject.torbrowser&hl=en_US" target="_blank">
         <ion-avatar slot="start">
           <img src="assets/png/tor.png">
         </ion-avatar>
-        <ion-label>Tor Browser</ion-label>
+        <ion-label>Tor Browser <ion-icon name="open-outline" class="tiny-icon"></ion-icon></ion-label>
       </ion-item>
     </ng-container>
     <!-- desktop/laptop -->
     <ion-item-divider class="borderless"></ion-item-divider>
     <ion-item-divider>Desktop</ion-item-divider>
-    <ion-item>
+    <ion-item lines="none">
       <!-- <ion-label class="ion-text-wrap"> -->
         <ol>
-          <li>Firefox (<a href="https://medium.com/@start9labs/setting-up-your-firefox-web-browser-to-handle-onion-urls-b805391726e4" target="_blank">SOCKS5 enabled <ion-icon name="open-outline" class="tiny-icon"></ion-icon></a>)</li>
+          <li>Firefox (<a href="https://medium.com/@start9labs/setting-up-your-firefox-web-browser-to-handle-onion-urls-b805391726e4" target="_blank">with SOCKS5 enabled <ion-icon name="open-outline" class="tiny-icon"></ion-icon></a>)</li>
           <li>Tor Browser</li>
           <li>Brave Browser</li>
         </ol>

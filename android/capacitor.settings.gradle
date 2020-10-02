@@ -4,3 +4,6 @@ project(':capacitor-android').projectDir = new File('../node_modules/@capacitor/
 
 include ':start9labs-capacitor-http'
 project(':start9labs-capacitor-http').projectDir = new File('../node_modules/@start9labs/capacitor-http/android')
+
+include ':capacitor-cert-installer'
+project(':capacitor-cert-installer').projectDir = new File('../node_modules/capacitor-cert-installer/android')

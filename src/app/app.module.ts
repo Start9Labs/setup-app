@@ -6,6 +6,7 @@ import { AppComponent } from './app.component'
 import { AppRoutingModule } from './app-routing.module'
 // native
 import { Zeroconf } from '@ionic-native/zeroconf/ngx'
+// services
 import { HttpService } from './services/http/http.service'
 import { HttpServiceFactory } from './services/http/http.service.factory'
 import { HmacService } from './services/hmac/hmac.service'

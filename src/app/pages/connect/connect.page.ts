@@ -47,7 +47,7 @@ export class ConnectPage {
       const id = idFromProductKey(this.productKey)
       ip = ip || this.getIP(id)
 
-      const expiration = modulateTime(new Date(), 5, 'minutes')
+      const expiration = modulateTime(new Date(), 1, 'days')
       const messagePlain = expiration.toISOString()
       const { hmac, salt } = await HMAC.sha256(this.productKey, messagePlain)
 
