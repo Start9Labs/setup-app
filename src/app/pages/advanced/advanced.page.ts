@@ -28,7 +28,7 @@ export class AdvancedPage {
   }
 
   async copyLAN (): Promise<void> {
-    this.clipboardService.copy(this.device.lanAddress)
+    this.clipboardService.copy('https://' + this.device.lanAddress)
   }
 
   async presentActionCert () {
