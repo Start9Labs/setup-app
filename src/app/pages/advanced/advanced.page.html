@@ -1,0 +1,51 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="['/devices', device.productKey]"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Advanced</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding-top">
+
+  <ion-item-group>
+    <ion-item lines="none">
+      <ion-label class="ion-text-wrap">
+        <p>In addition to Tor, you can also connect with your Embassy over SSL (https) on the Local Area Network (LAN).</p>
+        <br />
+        <p>Download and trust your Embassy's root Certificate Authority, then visit its ".local" URL from any browser while conncted to the LAN.</p>
+      </ion-label>
+    </ion-item>
+    <ion-item-divider></ion-item-divider>
+    <!-- @COMPAT 1.1.0 show LAN info if present -->
+    <ng-container *ngIf="device.cert && device.lanAddress;else missing">
+      <ion-item button (click)="presentActionCert()">
+        <ion-icon slot="start" src="assets/svg/cert.svg"></ion-icon>
+        <ion-label class="ion-text-wrap">
+          <p>Certificate</p>
+          <h2>{{ device.cert.name }}</h2>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-icon slot="start" name="wifi-outline" color="success"></ion-icon>
+        <ion-label class="ion-text-wrap">
+          <p>LAN Address</p>
+          <h2>{{ device.lanAddress }}</h2>
+        </ion-label>
+        <ion-button slot="end" fill="clear" (click)="copyLAN()">
+          <ion-icon slot="icon-only" name="copy-outline" color="primary"></ion-icon>
+        </ion-button>
+      </ion-item>
+    </ng-container>
+    <!-- @COMPAT 1.1.0 show message if LAN info missing -->
+    <ng-template #missing>
+      <ion-item>
+        <ion-label class="ion-text-wrap">
+          <p><ion-text color="warning">LAN info was not available when you set up this device. You can retreive it by claiming the device again. Simply return to the home page and click the "+" button.</ion-text></p>
+        </ion-label>
+      </ion-item>
+    </ng-template>
+  </ion-item-group>
+
+</ion-content>

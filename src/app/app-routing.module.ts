@@ -22,6 +22,10 @@ const routes: Routes = [
     loadChildren: () => import('./pages/success/success.module').then(m => m.SuccessPageModule),
   },
   {
+    path: 'devices/:productKey/advanced',
+    loadChildren: () => import('./pages/advanced/advanced.module').then(m => m.AdvancedPageModule),
+  },
+  {
     path: 'connect',
     loadChildren: () => import('./pages/connect/connect.module').then(m => m.ConnectPageModule),
   },

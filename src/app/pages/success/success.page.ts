@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { NavController, Platform } from '@ionic/angular'
+import { isPlatform, NavController } from '@ionic/angular'
 import { ClipboardService } from 'src/app/services/clipboard.service'
 import { Device, Store } from 'src/app/store'
 
@@ -17,12 +17,11 @@ export class SuccessPage {
     private readonly navCtrl: NavController,
     private readonly store: Store,
     private readonly route: ActivatedRoute,
-    private readonly platform: Platform,
     private readonly clipboardService: ClipboardService,
   ) { }
 
   ngOnInit ( ) {
-    this.plat = this.platform.is('ios') ? 'ios' : 'android'
+    this.plat = isPlatform('ios') ? 'ios' : 'android'
     const productKey = this.route.snapshot.paramMap.get('productKey')
     this.device = this.store.peekDevices().find(d => d.productKey === productKey)
   }

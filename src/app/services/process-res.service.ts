@@ -15,7 +15,7 @@ export class ProcessResService {
   ) { }
 
   async processRes (productKey: string, data: RegisterResponse): Promise<boolean> {
-    const { torAddressSig, claimedAt, certSig } = data
+    const { torAddressSig, claimedAt, certSig, certName, lanAddress } = data
 
     const torAddress = torAddressSig.message
     if (!await this.hmacService.validateHmac(productKey, torAddressSig.hmac, torAddress, torAddressSig.salt)) {
@@ -23,12 +23,13 @@ export class ProcessResService {
       return false
     }
 
+    const cert = { cert: certSig.message, name: certName }
     if (!await this.hmacService.validateHmac(productKey, certSig.hmac, certSig.message, certSig.salt)) {
       await this.presentAlertInvalidRes('ssl cert')
       return false
     }
 
-    await this.store.addDevice(new Date(claimedAt), productKey, torAddress)
+    await this.store.addDevice(new Date(claimedAt), productKey, torAddress, lanAddress, cert)
 
     return true
   }
