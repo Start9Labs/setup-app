@@ -24,5 +24,7 @@ In `src/app/config.ts`, set all mocks to `true`
 
 This launches the development server in your default browser with automatic reload enabled.
 
+The mock product key for mock claiming a mock Embassy is `aaaaaaaa`
+
 ### Building to device
 https://capacitor.ionicframework.com/docs/basics/building-your-app/
