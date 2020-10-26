@@ -23,7 +23,7 @@ const routes: Routes = [
   },
   {
     path: 'devices/:productKey/advanced',
-    loadChildren: () => import('./pages/advanced/advanced.module').then(m => m.AdvancedPageModule),
+    loadChildren: () => import('./pages/lan/lan.module').then(m => m.LANPageModule),
   },
   {
     path: 'connect',
