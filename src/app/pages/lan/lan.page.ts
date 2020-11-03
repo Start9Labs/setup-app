@@ -8,11 +8,11 @@ import { Plugins } from '@capacitor/core'
 const { CertInstaller } = Plugins
 
 @Component({
-  selector: 'advanced',
-  templateUrl: 'advanced.page.html',
-  styleUrls: ['advanced.page.scss'],
+  selector: 'lan',
+  templateUrl: 'lan.page.html',
+  styleUrls: ['lan.page.scss'],
 })
-export class AdvancedPage {
+export class LANPage {
   device: Device
 
   constructor (

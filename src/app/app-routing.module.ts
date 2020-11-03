@@ -22,8 +22,8 @@ const routes: Routes = [
     loadChildren: () => import('./pages/success/success.module').then(m => m.SuccessPageModule),
   },
   {
-    path: 'devices/:productKey/advanced',
-    loadChildren: () => import('./pages/advanced/advanced.module').then(m => m.AdvancedPageModule),
+    path: 'devices/:productKey/lan',
+    loadChildren: () => import('./pages/lan/lan.module').then(m => m.LANPageModule),
   },
   {
     path: 'connect',

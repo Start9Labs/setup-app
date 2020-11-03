@@ -25,31 +25,59 @@
   </div>
 
   <div *ngIf="segmentValue === 'basic'">
-    <ion-item-group style="margin-bottom: 20px;">
-      <ion-item>
-        <ion-label position="floating" color="medium">Product Key</ion-label>
-        <ion-input maxlength="8" name="productKey" [(ngModel)]="productKey"></ion-input>
-      </ion-item>
-    </ion-item-group>
-    <ion-button [disabled]="productKey.length !== 8" expand="block" fill="outline" (click)="connect()">
-      Connect
-    </ion-button>
+    <ion-item>
+      <ion-label position="floating" color="medium">Product Key</ion-label>
+      <ion-input maxlength="12" name="productKey" [(ngModel)]="productKey"></ion-input>
+    </ion-item>
+
+    <div class="ion-padding-top ion-padding-bottom">
+      <ion-button [disabled]="productKey.length !== 8 && productKey.length !== 12" expand="block" fill="outline" (click)="connect()">
+        Connect
+      </ion-button>
+    </div>
+
+    <ion-item>
+      <ion-label class="ion-text-wrap">
+        <h2><ion-text color="warning">Instructions</ion-text></h2>
+        <ul>
+          <li>Connect your Embassy to power and Ethernet. Embassy will chime when ready.</li>
+          <li><ion-text color="warning">Ensure your phone is connected to the same WiFi Network as your Embassy.</ion-text></li>
+          <li>Enter the Product Key located on bottom of Embassy.</li>
+        </ul>
+      </ion-label>
+    </ion-item>
   </div>
 
   <div *ngIf="segmentValue === 'advanced'">
-    <ion-item-group style="margin-bottom: 20px;">
+
+    <ion-item-group>
       <ion-item>
         <ion-label position="floating" color="medium">Product Key</ion-label>
-        <ion-input maxlength="8" name="productKey" [(ngModel)]="productKey"></ion-input>
+        <ion-input maxlength="12" name="productKey" [(ngModel)]="productKey"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label position="floating" color="medium">LAN IP Address</ion-label>
         <ion-input maxlength="70" name="host" [(ngModel)]="host"></ion-input>
       </ion-item>
     </ion-item-group>
-    <ion-button [disabled]="!host || !productKey || productKey.length < 8" expand="block" fill="outline" (click)="connectWithIp()">
-      Connect
-    </ion-button>
+
+    <div class="ion-padding-top ion-padding-bottom">
+      <ion-button [disabled]="!host || !productKey || (productKey.length !== 8 && productKey.length !== 12)" expand="block" fill="outline" (click)="connectWithIp()">
+        Connect
+      </ion-button>
+    </div>
+
+    <ion-item>
+      <ion-label class="ion-text-wrap">
+        <h2><ion-text color="warning">Advanced Setup</ion-text></h2>
+        <br />
+        <h2>(for routers that do not support mDNS)</h2>
+        <ul>
+          <li>On your desktop or laptop computer, navigate to your router configuration settings within the browser. This is usually an IP address such as 192.168.1.1. A simple Google search will usually reveal how to access the router configuration settings for a given make and model.</li>
+          <li>You should see an item labeled “start9labs”. Take note of the associated IP address and enter it into the “LAN IP Address” field above.</li>
+        </ul>
+      </ion-label>
+    </ion-item>
   </div>
 
 </ion-content>

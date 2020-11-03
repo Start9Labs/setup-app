@@ -50,6 +50,8 @@ export abstract class ZeroconfMonitor {
   protected handleServiceUpdate (result: ZeroconfResult): void {
     const { action, service } = result
 
+    service.name = service.name.split('-').slice(0, 2).join('-')
+
     // don't care about non-Start9 stuff
     if (!service.name.startsWith('start9-')) { return }
 
