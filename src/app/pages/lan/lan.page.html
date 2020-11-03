@@ -12,9 +12,11 @@
   <ion-item-group>
     <ion-item lines="none">
       <ion-label class="ion-text-wrap">
-        <p>In addition to Tor, you can also connect with your Embassy over SSL (https) on the Local Area Network (LAN).</p>
-        <br />
-        <p>Download and trust your Embassy's root Certificate Authority, then visit its ".local" URL from any browser while conncted to the LAN.</p>
+        <h5>In addition to Tor, you can communicate with your Embassy over SSL (https) while connected to the same Local Area Network (LAN). Connections over the LAN are significantly faster than Tor.</h5>
+        <ol>
+          <li>Download and trust your Embassy's Root Certificate Authority</li>
+          <li>Visit its LAN Address from the browser.</li>
+        </ol>
       </ion-label>
     </ion-item>
     <ion-item-divider></ion-item-divider>
@@ -23,7 +25,7 @@
       <ion-item button (click)="presentActionCert()">
         <ion-icon slot="start" src="assets/svg/cert.svg"></ion-icon>
         <ion-label class="ion-text-wrap">
-          <p>Certificate</p>
+          <p>Root Certificate Authority</p>
           <h2>{{ device.cert.name }}</h2>
         </ion-label>
       </ion-item>

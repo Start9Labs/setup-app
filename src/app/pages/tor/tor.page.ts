@@ -5,13 +5,14 @@ import { ClipboardService } from 'src/app/services/clipboard.service'
 import { Device, Store } from 'src/app/store'
 
 @Component({
-  selector: 'success',
-  templateUrl: 'success.page.html',
-  styleUrls: ['success.page.scss'],
+  selector: 'tor',
+  templateUrl: 'tor.page.html',
+  styleUrls: ['tor.page.scss'],
 })
-export class SuccessPage {
+export class TorPage {
   device: Device
   plat: 'ios' | 'android'
+  success: boolean
 
   constructor (
     private readonly navCtrl: NavController,
@@ -23,6 +24,7 @@ export class SuccessPage {
   ngOnInit ( ) {
     this.plat = isPlatform('ios') ? 'ios' : 'android'
     const productKey = this.route.snapshot.paramMap.get('productKey')
+    this.success = !!this.route.snapshot.queryParamMap.get('success')
     this.device = this.store.peekDevices().find(d => d.productKey === productKey)
   }
 
@@ -33,5 +35,4 @@ export class SuccessPage {
   async done (): Promise<void> {
     this.navCtrl.navigateRoot(['/devices', this.device.productKey])
   }
-
 }

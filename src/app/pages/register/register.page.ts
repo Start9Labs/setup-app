@@ -112,7 +112,7 @@ export class RegisterPage {
 
       loader.dismiss()
       if (await this.processRes.processRes(this.productKey, data)) {
-        this.navCtrl.navigateRoot(['/devices', this.productKey, 'success'])
+        this.navCtrl.navigateRoot(['/devices', this.productKey, 'tor'], { queryParams: { success: true } })
       }
     } catch (e) {
       console.error(e)
