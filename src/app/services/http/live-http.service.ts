@@ -23,7 +23,7 @@ export class LiveHttpService extends HttpService {
         status: e.status || e.statusCode || 0,
       }
 
-      throw new Error(JSON.stringify(eObj, (k,v) => v, '\t'))
+      throw new Error(JSON.stringify(eObj, (k, v) => v, '\t'))
     })
   }
 }

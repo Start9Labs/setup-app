@@ -31,8 +31,11 @@ export function getLanIP (zcs: ZeroconfService): string {
 }
 
 export function idFromProductKey (productKey: string): string {
+  if (productKey.length !== 8 && productKey.length !== 12) {
+    throw new Error('invalid product key')
+  }
   // sha256 hash is big endian
-  return CryptoJS.SHA256(productKey).toString(CryptoJS.enc.Hex).substr(0, 8)
+  return CryptoJS.SHA256(productKey).toString(CryptoJS.enc.Hex)
 }
 
 export type HostsResponse = { __: never } | RegisterResponse
