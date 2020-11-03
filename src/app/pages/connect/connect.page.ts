@@ -30,7 +30,7 @@ export class ConnectPage {
   }
 
   connectWithIp () {
-    if (!this.host || this.host === '') throw new Error('cannot connect without set host')
+    if (!this.host || this.host === '') throw new Error('Host/IP cannot be blank')
     this.connect(this.host)
   }
 
@@ -82,7 +82,7 @@ export class ConnectPage {
   private getIP (id: string): string {
     // get zeroconf service
     const zeroconfService = this.zeroconfMonitor.getService(id)
-    if (!zeroconfService) { throw new Error('Embassy not found on local network. Please check Product Key and ensure you phone is connected to WiFi.') }
+    if (!zeroconfService) { throw new Error('Embassy not found on local network. Please check the Product Key and ensure your phone is connected to WiFi.') }
 
     // get IP
     const ip = getLanIP(zeroconfService)
@@ -99,7 +99,7 @@ export class ConnectPage {
         {
           text: 'OK',
           handler: () => {
-            this.navCtrl.navigateRoot(['/devices', this.productKey, 'success'])
+            this.navCtrl.navigateRoot(['/devices', this.productKey, 'tor'], { queryParams: { success: true } })
           },
         },
       ],

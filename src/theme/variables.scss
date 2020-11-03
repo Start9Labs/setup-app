@@ -4,7 +4,7 @@
 /** Ionic CSS Variables **/
 :root {
   // --ion-safe-area-top: 26px;
-  --ion-font-family: 'Cutive Mono';
+  --ion-font-family: 'Open Sans';
   /** primary **/
   --ion-color-primary: #3880ff;
   --ion-color-primary-rgb: 56, 128, 255;
@@ -221,8 +221,22 @@ body.dark {
 }
 
 @font-face {
-  font-family: 'Cutive Mono';
+  font-family: 'Open Sans';
   font-style: normal;
   font-weight: normal;
-  src: url('../assets/fonts/cutive-mono/CutiveMono-Regular.ttf');
+  src: url('../assets/fonts/Open_Sans/OpenSans-Regular.ttf');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: bold;
+  src: url('../assets/fonts/Open_Sans/OpenSans-Bold.ttf');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: thin;
+  src: url('../assets/fonts/Open_Sans/OpenSans-Light.ttf');
 }
