@@ -12,11 +12,12 @@
   <ion-item-group>
     <ion-item lines="none">
       <ion-label class="ion-text-wrap">
-        <h5>In addition to Tor, you can communicate with your Embassy over SSL (https) while connected to the same Local Area Network (LAN). Connections over the LAN are significantly faster than Tor.</h5>
+        <h2>In addition to Tor, you can connect with your Embassy over the Local Area Network (LAN), which offers a faster experience.</h2>
         <ol>
-          <li>Download and trust your Embassy's Root Certificate Authority</li>
-          <li>Visit its LAN Address from the browser.</li>
+          <li>Download and trust your Embassy's Root Certificate Authority (below).</li>
+          <li>Visit your Embassy's LAN Address from the browser (below).</li>
         </ol>
+        <h2>You must be connected to the same LAN as your Embassy for this to work. View the complete instructions <a href="https://docs.start9labs.com/user-manuals/embassyos/general/secure-lan/mobile.html" target="_blank">here</a>.</h2>
       </ion-label>
     </ion-item>
     <ion-item-divider></ion-item-divider>
@@ -33,7 +34,7 @@
         <ion-icon slot="start" name="wifi-outline" color="success"></ion-icon>
         <ion-label class="ion-text-wrap">
           <p>LAN Address</p>
-          <h2>{{ device.lanAddress }}</h2>
+          <h2>https://{{ device.lanAddress }}</h2>
         </ion-label>
         <ion-button slot="end" fill="clear" (click)="copyLAN()">
           <ion-icon slot="icon-only" name="copy-outline" color="primary"></ion-icon>

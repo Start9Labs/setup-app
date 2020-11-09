@@ -33,6 +33,6 @@ export class TorPage {
   }
 
   async done (): Promise<void> {
-    this.navCtrl.navigateRoot(['/devices', this.device.productKey])
+    this.navCtrl.navigateRoot(['/devices'])
   }
 }
