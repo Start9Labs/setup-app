@@ -1,11 +1,12 @@
 import { Component } from '@angular/core'
-import { LoadingController, NavController } from '@ionic/angular'
+import { isPlatform, LoadingController, NavController } from '@ionic/angular'
 import { HttpService, Method, RegisterResponse, RegisterRequest } from '../../services/http/http.service'
 import { KEY_GEN, encode16, encodeObject, AES_CTR } from 'src/app/util/crypto'
 import { ActivatedRoute } from '@angular/router'
 import { ProcessResService } from 'src/app/services/process-res.service'
 import { traceDesc } from 'src/app/util/logging'
 import { pauseFor } from 'src/app/util/misc'
+import { Insomnia } from '@ionic-native/insomnia/ngx'
 
 @Component({
   selector: 'register',
@@ -26,6 +27,7 @@ export class RegisterPage {
     private readonly loadingCtrl: LoadingController,
     private readonly httpService: HttpService,
     private readonly processRes: ProcessResService,
+    private readonly insomnia: Insomnia,
   ) { }
 
   ngOnInit () {
@@ -34,9 +36,17 @@ export class RegisterPage {
   }
 
   checkPass (): boolean {
-    if ((this.password || this.passwordRetype) && this.password.length < 12) {
-      this.passwordError = 'Must be at least 12 characters'
-      return false
+    if (this.password || this.passwordRetype) {
+      if (this.password.length < 12) {
+        this.passwordError = 'Password must be at least 12 characters'
+        return false
+      } else if (this.password.length > 32) {
+        this.passwordError = 'Password must be 32 characters or less'
+        return false
+      } else {
+        this.passwordError = ''
+        return true
+      }
     } else if (this.password && this.passwordRetype && this.password !== this.passwordRetype) {
       this.passwordError = 'Passwords do not match'
       return false
@@ -101,6 +111,11 @@ export class RegisterPage {
         ...passwordData,
       }
 
+      // don't let phone fall asleep
+      if (isPlatform('cordova')) {
+        await this.insomnia.keepAwake()
+      }
+
       const [{ data }] = await Promise.all([
         this.httpService.request<RegisterResponse>({
           method: Method.POST,
@@ -118,6 +133,11 @@ export class RegisterPage {
       console.error(e)
       this.error = e.message
       loader.dismiss()
+    } finally {
+      // allow phone to sleep again
+      if (isPlatform('cordova')) {
+        this.insomnia.allowSleepAgain()
+      }
     }
   }
 

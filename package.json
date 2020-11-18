@@ -25,6 +25,7 @@
     "@angular/router": "^10.2.2",
     "@capacitor/core": "^2.4.2",
     "@ionic-native/core": "^5.29.0",
+    "@ionic-native/insomnia": "^5.29.0",
     "@ionic-native/zeroconf": "^5.29.0",
     "@ionic/angular": "^5.4.2",
     "@start9labs/capacitor-http": "0.1.2",
@@ -33,6 +34,7 @@
     "big-integer": "^1.6.48",
     "buffer": "^6.0.1",
     "capacitor-cert-installer": "file:../capacitor-cert-installer",
+    "cordova-plugin-insomnia": "^4.3.0",
     "cordova-plugin-zeroconf": "^1.4.0",
     "core-js": "^3.4.0",
     "crypto-js": "^4.0.0",
@@ -60,7 +62,8 @@
   },
   "cordova": {
     "plugins": {
-      "cordova-plugin-zeroconf": {}
+      "cordova-plugin-zeroconf": {},
+      "cordova-plugin-insomnia": {}
     }
   }
 }

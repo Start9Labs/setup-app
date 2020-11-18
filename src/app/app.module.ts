@@ -6,6 +6,7 @@ import { AppComponent } from './app.component'
 import { AppRoutingModule } from './app-routing.module'
 // native
 import { Zeroconf } from '@ionic-native/zeroconf/ngx'
+import { Insomnia } from '@ionic-native/insomnia/ngx'
 // services
 import { HttpService } from './services/http/http.service'
 import { HttpServiceFactory } from './services/http/http.service.factory'
@@ -24,6 +25,7 @@ import { NetworkMonitor } from './services/network.service'
     AppRoutingModule,
   ],
   providers: [
+    Insomnia,
     Zeroconf,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     { provide: HttpService, useFactory: HttpServiceFactory, deps: [] },
