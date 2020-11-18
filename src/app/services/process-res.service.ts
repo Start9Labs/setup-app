@@ -11,36 +11,28 @@ export class ProcessResService {
   constructor (
     private readonly hmacService: HmacService,
     private readonly store: Store,
-    private readonly alertCtrl: AlertController,
   ) { }
 
-  async processRes (productKey: string, data: RegisterResponse): Promise<boolean> {
+  async processRes (productKey: string, data: RegisterResponse): Promise<ProcessResResult> {
     const { torAddressSig, claimedAt, certSig, certName, lanAddress } = data
 
     const torAddress = torAddressSig.message
     if (!await this.hmacService.validateHmac(productKey, torAddressSig.hmac, torAddress, torAddressSig.salt)) {
-      await this.presentAlertInvalidRes('tor address')
-      return false
+      return ProcessResResult.InvalidTorAddress
     }
 
     const cert = { cert: certSig.message, name: certName }
     if (!await this.hmacService.validateHmac(productKey, certSig.hmac, certSig.message, certSig.salt)) {
-      await this.presentAlertInvalidRes('ssl cert')
-      return false
+      return ProcessResResult.InvalidSslCert
     }
 
     await this.store.addDevice(new Date(claimedAt), productKey, torAddress, lanAddress, cert)
-
-    return true
+    return ProcessResResult.AllGood
   }
+}
 
-  private async presentAlertInvalidRes (sigDescription: string) {
-    const alert = await this.alertCtrl.create({
-      header: 'Warning!',
-      message: `Unable to verify ${sigDescription} response from Embassy. It is possible you are experiencing a "Man in the Middle" attack, and you should contact support at support@start9labs.com.`,
-      buttons: ['OK'],
-    })
-
-    return alert.present()
-  }
+export enum ProcessResResult {
+  InvalidTorAddress,
+  InvalidSslCert,
+  AllGood,
 }

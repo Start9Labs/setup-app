@@ -112,7 +112,7 @@ export class ConnectPage {
 function modulateTime (ts: Date, count: number, unit: 'days' | 'hours' | 'minutes' | 'seconds' ) {
   const ms = inMs(count, unit)
   const toReturn = new Date(ts)
-  toReturn.setMilliseconds( toReturn.getMilliseconds() + ms)
+  toReturn.setMilliseconds(toReturn.getMilliseconds() + ms)
   return toReturn
 }
 

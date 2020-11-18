@@ -1,9 +1,9 @@
 import { Component } from '@angular/core'
-import { LoadingController, NavController } from '@ionic/angular'
+import { AlertController, LoadingController, NavController } from '@ionic/angular'
 import { HttpService, Method, RegisterResponse, RegisterRequest } from '../../services/http/http.service'
 import { KEY_GEN, encode16, encodeObject, AES_CTR } from 'src/app/util/crypto'
 import { ActivatedRoute } from '@angular/router'
-import { ProcessResService } from 'src/app/services/process-res.service'
+import { ProcessResResult, ProcessResService } from 'src/app/services/process-res.service'
 import { traceDesc } from 'src/app/util/logging'
 import { pauseFor } from 'src/app/util/misc'
 
@@ -26,6 +26,7 @@ export class RegisterPage {
     private readonly loadingCtrl: LoadingController,
     private readonly httpService: HttpService,
     private readonly processRes: ProcessResService,
+    private readonly alertCtrl: AlertController,
   ) { }
 
   ngOnInit () {
@@ -101,24 +102,42 @@ export class RegisterPage {
         ...passwordData,
       }
 
-      const [{ data }] = await Promise.all([
+      const [{ data, status }] = await Promise.all([
         this.httpService.request<RegisterResponse>({
           method: Method.POST,
           url: `http://${this.ip}:5959/v0/register`,
           data: requestData,
         }),
         pauseFor(2500),
-      ]).then(traceDesc('Register response'))
+      ])
 
       loader.dismiss()
-      if (await this.processRes.processRes(this.productKey, data)) {
-        this.navCtrl.navigateRoot(['/devices', this.productKey, 'tor'], { queryParams: { success: true } })
+
+      if (status === 209) {
+        return this.navCtrl.back()
+      }
+
+      const processedResult = await this.processRes.processRes(this.productKey, data)
+      switch (processedResult) {
+        case ProcessResResult.InvalidTorAddress: return this.presentAlertInvalidRes('tor address')
+        case ProcessResResult.InvalidSslCert: return this.presentAlertInvalidRes('ssl cert')
+        case ProcessResResult.AllGood: return this.navCtrl.navigateRoot(['/devices', this.productKey, 'tor'], { queryParams: { success: true } }).then(chill)
       }
     } catch (e) {
       console.error(e)
       this.error = e.message
       loader.dismiss()
     }
+  }
+
+  private async presentAlertInvalidRes (sigDescription: string): Promise<void> {
+    const alert = await this.alertCtrl.create({
+      header: 'Warning!',
+      message: `Unable to verify ${sigDescription} response from Embassy. It is possible you are experiencing a "Man in the Middle" attack, and you should contact support at support@start9labs.com.`,
+      buttons: ['OK'],
+    })
+
+    return alert.present()
   }
 
   private async encryptTorSecretKey (expandedSecretKey: Uint8Array): Promise<{ cipher: string, counter: string, salt: string }> {
@@ -141,3 +160,4 @@ export class RegisterPage {
   }
 }
 
+const chill = () => { }

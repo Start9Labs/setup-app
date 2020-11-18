@@ -3,6 +3,8 @@ import { NetworkMonitor } from './services/network.service'
 import { Store } from './store'
 import { Plugins, StatusBarStyle, AppState } from '@capacitor/core'
 import { ZeroconfMonitor } from './services/zeroconf/zeroconf.service'
+import { KEY_GEN } from './util/crypto'
+import * as forge from 'node-forge'
 
 const { App, SplashScreen, StatusBar } = Plugins
 
@@ -25,6 +27,9 @@ export class AppComponent {
   }
 
   async init (): Promise<void> {
+    window['tor'] = KEY_GEN.tor
+    window['rsa'] = KEY_GEN.rsa
+    window['privkeyToPem'] = forge.pki.privateKeyToPem
     // load storage
     await this.store.load()
     // init monitors
