@@ -19,8 +19,8 @@ export class LiveHttpService extends HttpService {
       console.error(`Http Exception`, e)
 
       const eObj = {
-        message: e.data || e.message || JSON.stringify(e),
-        status: e.status || e.statusCode || 0,
+        message: e.data || e.message || e.toString(),
+        status: e.status || e.statusCode || 'Network Error',
       }
 
       throw new Error(JSON.stringify(eObj, (k, v) => v, '\t'))
