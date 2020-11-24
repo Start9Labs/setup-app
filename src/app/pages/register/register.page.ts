@@ -43,17 +43,16 @@ export class RegisterPage {
       } else if (this.password.length > 32) {
         this.passwordError = 'Password must be 32 characters or less'
         return false
-      } else {
-        this.passwordError = ''
-        return true
       }
-    } else if (this.password && this.passwordRetype && this.password !== this.passwordRetype) {
+    }
+
+    if (this.password && this.passwordRetype && this.password !== this.passwordRetype) {
       this.passwordError = 'Passwords do not match'
       return false
-    } else {
-      this.passwordError = ''
-      return true
     }
+
+    this.passwordError = ''
+    return true
   }
 
   async register (): Promise<void> {

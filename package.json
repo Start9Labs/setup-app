@@ -11,24 +11,22 @@
     "build": "npm run postinstall && ionic build && npx cap sync",
     "ios": "npm run build && npx cap open ios",
     "android": "npm run build && npx cap open android",
-    "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e",
     "postinstall": "node patch_polyfills.js && cp -r node_modules/crypto-browserify node_modules/crypto && cp -r node_modules/stream-browserify node_modules/stream && cp -r node_modules/vm-browserify node_modules/vm"
   },
   "dependencies": {
-    "@angular/common": "^10.2.2",
-    "@angular/core": "^10.2.2",
-    "@angular/forms": "^10.2.2",
-    "@angular/platform-browser": "^10.2.2",
-    "@angular/platform-browser-dynamic": "^10.2.2",
-    "@angular/router": "^10.2.2",
+    "@angular/common": "^11.0.0",
+    "@angular/core": "^11.0.0",
+    "@angular/forms": "^11.0.0",
+    "@angular/platform-browser": "^11.0.0",
+    "@angular/platform-browser-dynamic": "^11.0.0",
+    "@angular/router": "^11.0.0",
+    "@capacitor-community/http": "^0.2.1",
     "@capacitor/core": "^2.4.2",
     "@ionic-native/core": "^5.29.0",
     "@ionic-native/insomnia": "^5.29.0",
     "@ionic-native/zeroconf": "^5.29.0",
     "@ionic/angular": "^5.4.2",
-    "@start9labs/capacitor-http": "0.1.2",
     "async-mutex": "^0.2.0",
     "base32.js": "^0.1.0",
     "big-integer": "^1.6.48",
@@ -46,10 +44,10 @@
     "zone.js": "^0.11.3"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^0.1002.0",
-    "@angular/cli": "^10.2.0",
-    "@angular/compiler": "^10.2.2",
-    "@angular/compiler-cli": "^10.2.2",
+    "@angular-devkit/build-angular": "^0.1100.0",
+    "@angular/cli": "^11.0.0",
+    "@angular/compiler": "^11.0.0",
+    "@angular/compiler-cli": "^11.0.0",
     "@capacitor/android": "^2.4.2",
     "@capacitor/cli": "^2.4.2",
     "@capacitor/ios": "^2.4.2",
@@ -58,7 +56,7 @@
     "codelyzer": "^6.0.1",
     "ts-node": "^9.0.0",
     "tslint": "^6.1.2",
-    "typescript": "^4.0.5"
+    "typescript": "4.0.5"
   },
   "cordova": {
     "plugins": {
