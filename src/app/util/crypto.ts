@@ -1,7 +1,3 @@
-import * as base32 from 'base32.js'
-import * as h from 'js-sha3'
-import * as elliptic from 'elliptic'
-const ED25519 = elliptic.eddsa('ed25519')
 import * as forge from 'node-forge'
 
 type AES_CTR = {
@@ -117,22 +113,9 @@ async function pbkdf2 (secretKey: string, algorithm: AesKeyAlgorithm | HmacKeyGe
 export const encode16 = (buffer: Uint8Array) => buffer.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '')
 export const decode16 = hexString => new Uint8Array(hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)))
 
-function encode32 (buffer: Uint8Array): string {
-  const b32encoder = new base32.Encoder({ type: 'rfc4648' })
-  return b32encoder.write(buffer).finalize()
-}
-
 function encodeUtf8 (str: string): Uint8Array {
   const encoder = new TextEncoder()
   return encoder.encode(str)
-}
-
-export async function getPubKey (privKey: Uint8Array): Promise<Uint8Array> {
-  return Uint8Array.from(ED25519.keyFromSecret(privKey.slice(0, 32)).getPublic())
-}
-
-export const cryptoUtils = {
-  encode16, decode16, getPubKey, onionFromPubkey,
 }
 
 // onion_address = base32(PUBKEY | CHECKSUM | VERSION) + ".onion"
@@ -142,45 +125,47 @@ export const cryptoUtils = {
 //   - VERSION is an one byte version field (default value '\x03')
 //   - ".onion checksum" is a constant string
 //   - CHECKSUM is truncated to two bytes before inserting it in onion_address
-export function onionFromPubkey (pk: Uint8Array): string {
-  const hasher = h.sha3_256.create()
-  hasher.update('.onion checksum')
-  hasher.update(pk)
-  hasher.update([3])
 
-  const checksum = new Uint8Array(hasher.arrayBuffer().slice(0, 2))
-  const version = [3]
-  const id = new Uint8Array([...pk, ...checksum, ...version])
-  return (new base32.Encoder({ type: 'rfc4648' }).write(id).finalize()) + '.onion'
-}
+// export function onionFromPubkey (pk: Uint8Array): string {
+//   const hasher = h.sha3_256.create()
+//   hasher.update('.onion checksum')
+//   hasher.update(pk)
+//   hasher.update([3])
 
-const PKEY_LENGTH = 32
-export function onionToPubkey (onion: string): ArrayBuffer {
-  const s = onion.split('.')[0].toUpperCase()
+//   const checksum = new Uint8Array(hasher.arrayBuffer().slice(0, 2))
+//   const version = [3]
+//   const id = new Uint8Array([...pk, ...checksum, ...version])
+//   return (new base32.Encoder({ type: 'rfc4648' }).write(id).finalize()) + '.onion'
+// }
 
-  const decoded = new Uint8Array(new base32.Decoder({ type: 'rfc4648', lc: true }).write(s).finalize())
+// const PKEY_LENGTH = 32
 
-  if (decoded.byteLength > 35) {
-      throw new Error('Invalid base32 length.')
-  }
-  if (decoded[34] !== 3) {
-      throw new Error('Invalid version')
-  }
-  const pubkey = decoded.slice(0, PKEY_LENGTH)
+// export function onionToPubkey (onion: string): ArrayBuffer {
+//   const s = onion.split('.')[0].toUpperCase()
 
-  const hasher = h.sha3_256.create()
-  hasher.update('.onion checksum')
-  hasher.update(pubkey)
-  hasher.update([3])
+//   const decoded = new Uint8Array(new base32.Decoder({ type: 'rfc4648', lc: true }).write(s).finalize())
 
-  const checksum = new Uint8Array(hasher.arrayBuffer().slice(0, 2))
-  const oldChecksum = decoded.slice(PKEY_LENGTH, PKEY_LENGTH + 2 )
+//   if (decoded.byteLength > 35) {
+//       throw new Error('Invalid base32 length.')
+//   }
+//   if (decoded[34] !== 3) {
+//       throw new Error('Invalid version')
+//   }
+//   const pubkey = decoded.slice(0, PKEY_LENGTH)
 
-  if (!checksum.every( (x, i) => x === oldChecksum[i] )) {
-      throw new Error ('Invalid checksum')
-  }
-  return pubkey
-}
+//   const hasher = h.sha3_256.create()
+//   hasher.update('.onion checksum')
+//   hasher.update(pubkey)
+//   hasher.update([3])
+
+//   const checksum = new Uint8Array(hasher.arrayBuffer().slice(0, 2))
+//   const oldChecksum = decoded.slice(PKEY_LENGTH, PKEY_LENGTH + 2 )
+
+//   if (!checksum.every( (x, i) => x === oldChecksum[i] )) {
+//       throw new Error ('Invalid checksum')
+//   }
+//   return pubkey
+// }
 
 export function encodeObject (encoder: (u: Uint8Array) => string, object: { [key: string]: Uint8Array }): { [key: string]: string } {
   const toReturn = { }

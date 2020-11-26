@@ -4,8 +4,6 @@ import { Store } from './store'
 import { Plugins, StatusBarStyle, AppState } from '@capacitor/core'
 import { ZeroconfMonitor } from './services/zeroconf/zeroconf.service'
 
-import '@capacitor-community/http'
-
 const { App, SplashScreen, StatusBar } = Plugins
 
 @Component({

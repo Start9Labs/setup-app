@@ -1,6 +1,5 @@
-import { HttpOptions, HttpResponse } from '@capacitor-community/http'
+import { HttpOptions, HttpResponse } from 'start9labs-capacitor-http'
 import { ZeroconfService } from '@ionic-native/zeroconf/ngx'
-import * as CryptoJS from 'crypto-js'
 
 export abstract class HttpService {
   abstract request<T> (opt: HttpOptions): Promise<TypedHttpResponse<T>>
