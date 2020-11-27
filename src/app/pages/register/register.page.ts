@@ -19,6 +19,8 @@ export class RegisterPage {
   passwordRetype = ''
   error = ''
   passwordError = ''
+  unmasked1 = false
+  unmasked2 = false
 
   constructor (
     private readonly route: ActivatedRoute,
@@ -33,6 +35,14 @@ export class RegisterPage {
   ngOnInit () {
     this.ip = this.route.snapshot.queryParamMap.get('ip')
     this.productKey = this.route.snapshot.queryParamMap.get('productKey')
+  }
+
+  toggleMask (field: 1 | 2) {
+    if (field === 1) {
+      this.unmasked1 = !this.unmasked1
+    } else if (field === 2) {
+      this.unmasked2 = !this.unmasked2
+    }
   }
 
   checkPass (): boolean {

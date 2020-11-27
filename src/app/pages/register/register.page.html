@@ -17,18 +17,22 @@
 
   <ion-item-group>
     <ion-item>
-      <ion-label position="floating" color="medium">Password</ion-label>
-      <ion-input debounce="300" type="password" maxlength="64" name="password" [(ngModel)]="password" (ionChange)="checkPass()"></ion-input>
-      <ion-icon *ngIf="password.length >= 12" slot="end" name="checkmark" color="success" size="small"></ion-icon>
-      <ion-icon *ngIf="password && password.length < 12" slot="end" name="close" color="danger" size="small"></ion-icon>
+      <ion-icon slot="start" [color]="unmasked1 ? 'danger' : 'primary'" (click)="toggleMask(1)" [name]="unmasked1 ? 'eye-off-outline' : 'eye-outline'" size="small"></ion-icon>
+      <ion-input [type]="unmasked1 ? 'text' : 'password'" debounce="500" type="password" maxlength="64" name="password" placeholder="Password" [(ngModel)]="password" (ionChange)="checkPass()"></ion-input>
+      <div slot="end">
+        <ion-icon *ngIf="password.length >= 12" name="checkmark" color="success" size="small"></ion-icon>
+        <ion-icon *ngIf="password && password.length < 12" name="close" color="danger" size="small"></ion-icon>
+      </div>
     </ion-item>
     <ion-item>
-      <ion-label position="floating" color="medium">Retype Password</ion-label>
-      <ion-input debounce="300" type="password" maxlength="64" name="passwordRetype" [(ngModel)]="passwordRetype" (ionChange)="checkPass()"></ion-input>
-      <ng-container *ngIf="passwordRetype">
-        <ion-icon *ngIf="passwordRetype === password" slot="end" name="checkmark" color="success" size="small"></ion-icon>
-        <ion-icon *ngIf="passwordRetype !== password" slot="end" name="close" color="danger" size="small"></ion-icon>
-      </ng-container>
+      <ion-icon slot="start" [color]="unmasked2 ? 'danger' : 'primary'" (click)="toggleMask(2)" [name]="unmasked2 ? 'eye-off-outline' : 'eye-outline'" size="small"></ion-icon>
+      <ion-input [disabled]="password.length < 12" [type]="unmasked2 ? 'text' : 'password'" debounce="500" type="password" maxlength="64" name="passwordRetype" placeholder="Retype Password" [(ngModel)]="passwordRetype" (ionChange)="checkPass()"></ion-input>
+      <div slot="end">
+        <ng-container *ngIf="passwordRetype">
+          <ion-icon *ngIf="passwordRetype === password" name="checkmark" color="success" size="small"></ion-icon>
+          <ion-icon *ngIf="passwordRetype !== password" name="close" color="danger" size="small"></ion-icon>
+        </ng-container>
+      </div>
     </ion-item>
     <ion-item-divider class="borderless"><ion-text *ngIf="passwordError" color="danger">{{ passwordError }}</ion-text></ion-item-divider>
   </ion-item-group>
