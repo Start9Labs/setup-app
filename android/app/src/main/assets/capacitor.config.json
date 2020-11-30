@@ -5,6 +5,11 @@
   "npmClient": "npm",
   "webDir": "www",
   "cordova": {},
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": false
+    }
+  },
   "server": {
     "iosScheme": "ionic"
   }
