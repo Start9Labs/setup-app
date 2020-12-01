@@ -16,10 +16,7 @@ export class LiveHttpService extends HttpService {
     })
 
     try {
-      console.log('**REQ**', options)
-      const res = await HttpPluginNativeImpl.request(options)
-      console.log('**RES**', res)
-      return res
+      return HttpPluginNativeImpl.request(options)
     } catch (e) {
       console.error(`Http Exception`, e)
 

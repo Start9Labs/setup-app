@@ -61,8 +61,6 @@ export class ConnectPage {
         },
       })
 
-      console.log('**RES**', res)
-
       const { data } = res
 
       loader.dismiss()
