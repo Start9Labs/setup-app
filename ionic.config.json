@@ -1,8 +1,5 @@
 {
-  "name": "Start9 Setup App",
-  "integrations": {
-    "cordova": {},
-    "capacitor": {}
-  },
+  "name": "New Ionic App",
+  "integrations": {},
   "type": "angular"
 }

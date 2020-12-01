@@ -29,14 +29,14 @@
     "@types/crypto-js": "^4.0.1",
     "async-mutex": "^0.2.0",
     "buffer": "^6.0.1",
-    "capacitor-cert-installer": "file:../capacitor-cert-installer",
+    "capacitor-cert-installer": "file:../capacitor/capacitor-cert-installer",
     "cordova-plugin-insomnia": "^4.3.0",
     "cordova-plugin-zeroconf": "^1.4.0",
     "core-js": "^3.4.0",
     "crypto-js": "^4.0.0",
     "node-forge": "^0.10.0",
     "rxjs": "^6.5.0",
-    "start9labs-capacitor-http": "file:../capacitor-http",
+    "start9labs-capacitor-http": "file:../capacitor/capacitor-http",
     "zone.js": "^0.11.3"
   },
   "devDependencies": {
