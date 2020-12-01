@@ -22,7 +22,7 @@ export class LiveHttpService extends HttpService {
       console.error(`Http Exception`, e)
 
       const eObj = {
-        message: e.data || e.message || e.toString(),
+        message: e.toString(),
         status: e.status || e.statusCode || 'Network Error',
       }
 
