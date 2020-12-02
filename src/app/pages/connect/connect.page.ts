@@ -51,7 +51,7 @@ export class ConnectPage {
       const messagePlain = expiration.toISOString()
       const { hmac, salt } = await HMAC.sha256(this.productKey, messagePlain)
 
-      const { data } = await this.httpService.request<HostsResponse>({
+      const res = await this.httpService.request<HostsResponse>({
         method: Method.GET,
         url: `http://${ip}:5959/v0/hosts`,
         params: {
@@ -60,6 +60,8 @@ export class ConnectPage {
           salt: encode16(salt),
         },
       })
+
+      const { data } = res
 
       loader.dismiss()
 

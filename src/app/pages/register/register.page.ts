@@ -19,6 +19,8 @@ export class RegisterPage {
   passwordRetype = ''
   error = ''
   passwordError = ''
+  unmasked1 = false
+  unmasked2 = false
 
   constructor (
     private readonly route: ActivatedRoute,
@@ -35,6 +37,14 @@ export class RegisterPage {
     this.productKey = this.route.snapshot.queryParamMap.get('productKey')
   }
 
+  toggleMask (field: 1 | 2) {
+    if (field === 1) {
+      this.unmasked1 = !this.unmasked1
+    } else if (field === 2) {
+      this.unmasked2 = !this.unmasked2
+    }
+  }
+
   checkPass (): boolean {
     if (this.password || this.passwordRetype) {
       if (this.password.length < 12) {
@@ -43,17 +53,16 @@ export class RegisterPage {
       } else if (this.password.length > 32) {
         this.passwordError = 'Password must be 32 characters or less'
         return false
-      } else {
-        this.passwordError = ''
-        return true
       }
-    } else if (this.password && this.passwordRetype && this.password !== this.passwordRetype) {
+    }
+
+    if (this.password && this.passwordRetype && this.password !== this.passwordRetype) {
       this.passwordError = 'Passwords do not match'
       return false
-    } else {
-      this.passwordError = ''
-      return true
     }
+
+    this.passwordError = ''
+    return true
   }
 
   async register (): Promise<void> {

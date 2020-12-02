@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { HttpOptions, HttpResponse } from '@start9labs/capacitor-http'
+import { HttpOptions, HttpResponse } from 'start9labs-capacitor-http'
 import { HttpService, TypedHttpResponse } from './http.service'
 
 const version = require('../../../../package.json').version

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { HttpPluginNativeImpl, HttpOptions } from '@start9labs/capacitor-http'
+import { HttpOptions, HttpPluginNativeImpl } from 'start9labs-capacitor-http'
 import { TypedHttpResponse, HttpService } from './http.service'
 
 const version = require('../../../../package.json').version
@@ -15,7 +15,10 @@ export class LiveHttpService extends HttpService {
       'app-version': version,
     })
 
-    return HttpPluginNativeImpl.request(options).catch(e => {
+    try {
+      const res = await HttpPluginNativeImpl.request(options)
+      return res
+    } catch (e) {
       console.error(`Http Exception`, e)
 
       const eObj = {
@@ -24,6 +27,6 @@ export class LiveHttpService extends HttpService {
       }
 
       throw new Error(JSON.stringify(eObj, (k, v) => v, '\t'))
-    })
+    }
   }
 }

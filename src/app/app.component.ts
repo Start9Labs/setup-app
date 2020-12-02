@@ -42,13 +42,15 @@ export class AppComponent {
       style: StatusBarStyle.Dark,
     })
     // dismiss SplashScreen
-    SplashScreen.hide()
+    setTimeout(() => {
+      SplashScreen.hide()
+    }, 400)
   }
 
   async initMonitors (): Promise<void> {
     // start network monitor
     await this.networkMonitor.init()
     // start zeroconf
-    return this.zeroconfMonitor.init()
+    this.zeroconfMonitor.init()
   }
 }

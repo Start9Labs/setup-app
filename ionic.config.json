@@ -1,5 +1,5 @@
 {
-  "name": "Start9 Setup App",
+  "name": "Setup App",
   "integrations": {
     "cordova": {},
     "capacitor": {}
