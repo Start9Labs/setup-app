@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core'
-import { AlertController } from '@ionic/angular'
 import { HmacService } from 'src/app/services/hmac/hmac.service'
 import { Store } from 'src/app/store'
 import { RegisterResponse } from './http/http.service'
