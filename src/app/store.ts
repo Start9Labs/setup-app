@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core'
 import { BehaviorSubject, Observable } from 'rxjs'
+import { idFromProductKey } from './services/http/http.service'
 
 import { Plugins } from '@capacitor/core'
 const { Storage } = Plugins
@@ -7,6 +8,7 @@ const { Storage } = Plugins
 export interface Device {
   claimedAt: Date
   type: 'Embassy'
+  label: string
   productKey: string
   torAddress: string
   lanAddress: string
@@ -29,6 +31,7 @@ export class Store {
   async load (): Promise<void> {
     const devices = JSON.parse((await Storage.get({ key: 'devices' })).value)
     this.$devices$.next(devices || [])
+    console.log(this.peekDevices())
   }
 
   async addDevice (claimedAt: Date, productKey: string, torAddress: string, lanAddress: string, cert: Cert): Promise<void> {
@@ -36,11 +39,19 @@ export class Store {
     devices.push({
       claimedAt,
       type: 'Embassy',
+      label: `Embassy:${idFromProductKey(productKey)}`,
       productKey,
       torAddress,
       lanAddress,
       cert,
     })
+    await this.save(devices)
+  }
+
+  async updateDevice (productKey: string, label: string): Promise<void> {
+    const devices = this.peekDevices()
+    const device = devices.find(d => d.productKey === productKey)
+    device.label = label
     await this.save(devices)
   }
 
