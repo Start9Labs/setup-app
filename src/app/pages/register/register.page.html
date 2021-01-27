@@ -36,7 +36,7 @@
     </ion-item>
     <ion-item-divider class="borderless"><ion-text *ngIf="passwordError" color="danger">{{ passwordError }}</ion-text></ion-item-divider>
   </ion-item-group>
-  <ion-button [disabled]="password.length < 12 || password.length > 32 || password !== passwordRetype" expand="block" fill="outline" (click)="register()">
+  <ion-button [disabled]="password.length < 12 || password.length > 64 || password !== passwordRetype" expand="block" fill="outline" (click)="register()">
     Finish
   </ion-button>
 
