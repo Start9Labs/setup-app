@@ -50,8 +50,8 @@ export class RegisterPage {
       if (this.password.length < 12) {
         this.passwordError = 'Password must be at least 12 characters'
         return false
-      } else if (this.password.length > 32) {
-        this.passwordError = 'Password must be 32 characters or less'
+      } else if (this.password.length > 64) {
+        this.passwordError = 'Password must be 64 characters or less'
         return false
       }
     }
