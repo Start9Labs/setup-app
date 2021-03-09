@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { ActionSheetController } from '@ionic/angular'
+import { ActionSheetController, isPlatform } from '@ionic/angular'
 import { ClipboardService } from 'src/app/services/clipboard.service'
 import { Device, Store } from 'src/app/store'
 
@@ -14,6 +14,7 @@ const { CertInstaller } = Plugins
 })
 export class LANPage {
   device: Device
+  isAndroid: boolean
 
   constructor (
     private readonly store: Store,
@@ -24,6 +25,8 @@ export class LANPage {
 
   ngOnInit ( ) {
     const productKey = this.route.snapshot.paramMap.get('productKey')
+    this.isAndroid = isPlatform('android')
+    console.log(this.isAndroid)
     this.device = this.store.peekDevices().find(d => d.productKey === productKey)
   }
 

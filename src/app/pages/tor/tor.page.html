@@ -19,15 +19,20 @@
 
   <ion-item-group>
     <!-- info -->
-    <ion-item lines="none">
+    <ion-item *ngIf="success">
       <ion-label class="ion-text-wrap">
-        <h5>Your Embassy is now available as a private website on the private Internet. Visit your Embassy's unique Tor Address (below) from any Tor-enabled Browser.</h5>
+        <h2>Your Embassy is available as a private website on the private Internet. To use your Embassy, visit its unique Tor Address (below) from any Tor-enabled Browser.</h2>
       </ion-label>
     </ion-item>
-    <ion-item lines="none" class="ion-padding-bottom">
+    <ion-item-divider>Tor Address</ion-item-divider>
+    <ion-item>
       <ion-label class="ion-text-wrap">
-        <h2><a (click)="copyTor()">{{ device.torAddress }} <ion-icon name="copy-outline" class="tiny-icon"></ion-icon></a></h2>
+        {{ device.torAddress }}
+        <!-- <h2><a (click)="copyTor()">{{ device.torAddress }} <ion-icon name="copy-outline" class="tiny-icon"></ion-icon></a></h2> -->
       </ion-label>
+      <ion-button slot="end" fill="clear" (click)="copyTor()">
+        <ion-icon slot="icon-only" name="copy-outline" color="primary"></ion-icon>
+      </ion-button>
     </ion-item>
     <p style="padding-left: 12px;"><ion-text color="warning">Recommended Browsers</ion-text></p>
     <!-- ios -->
@@ -65,7 +70,7 @@
     </ion-item>
   </ion-item-group>
   <ol>
-    <li><ion-text color="medium">Firefox requires additional configuration. Follow these <a href="https://medium.com/@start9labs/setting-up-your-firefox-web-browser-to-handle-onion-urls-b805391726e4" target="_blank">instructions <ion-icon name="open-outline" class="tiny-icon"></ion-icon></a></ion-text></li>
+    <li><ion-text color="medium">Firefox requires additional configuration. Follow these <a href="https://docs.start9labs.com/misc-guides/tor-firefox/index.html" target="_blank">instructions <ion-icon name="open-outline" class="tiny-icon"></ion-icon></a></ion-text></li>
     <li><ion-text color="medium">Brave only works when using Tor Tabs.</ion-text></li>
   </ol>
 

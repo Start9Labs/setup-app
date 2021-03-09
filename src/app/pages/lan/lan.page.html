@@ -10,15 +10,30 @@
 <ion-content class="ion-padding-top">
 
   <ion-item-group>
+    <ng-container *ngIf="isAndroid">
+      <ion-item lines="none">
+        <ion-label class="ion-text-wrap">
+          <h2><ion-text color="warning">Android Users</ion-text></h2>
+          <br />
+          <h2>Due to <a style="text-decoration: none;" href="https://issuetracker.google.com/issues/140786115" target="_blank">this issue</a> with the Android operating system, Android devices currently cannot resolve .local addresses. Please express your anger to Google.</h2>
+        </ion-label>
+      </ion-item>
+      <ion-item-divider></ion-item-divider>
+    </ng-container>
+
     <ion-item lines="none">
       <ion-label class="ion-text-wrap">
-        <h5>In addition to Tor, you can connect with your Embassy over the Local Area Network (LAN), which offers a faster experience.</h5>
+        <h2>Connecting to your Embassy over the Local Area Network (LAN) offers two benefits:</h2>
         <ol>
-          <li><h5>Download and trust your Embassy's Root Certificate Authority.</h5></li>
-          <li><h5>Visit your Embassy's LAN Address from the browser.</h5></li>
+          <li>It is super fast</li>
+          <li>It is a fallback in case the Tor network is experiencing connectivity issues</li>
         </ol>
-        <h5>You must be connected to the same LAN as your Embassy for this to work. View the complete instructions <a href="https://docs.start9labs.com/user-manuals/embassyos/general/secure-lan/mobile.html" target="_blank">here</a>.</h5>
       </ion-label>
+    </ion-item>
+    <ion-item>
+      <ion-button slot="start" fill="clear" href="https://docs.start9labs.com/user-manual/general/lan-setup" target="_blank">
+        View Instructions
+      </ion-button>
     </ion-item>
     <ion-item-divider></ion-item-divider>
     <!-- @COMPAT 1.1.0 show LAN info if present -->
