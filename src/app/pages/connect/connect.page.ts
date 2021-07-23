@@ -28,7 +28,16 @@ export class ConnectPage {
     this.error = ''
   }
 
-  async register (): Promise<void> {
+  handleInput (): void {
+    // validate product key
+    // validate ip (if present)
+    this.error = ''
+  }
+
+  async submit (): Promise<void> {
+    // validate product key
+    // validate ip (if present)
+
     this.error = ''
 
     const loader = await this.loadingCtrl.create({
@@ -71,6 +80,7 @@ export class ConnectPage {
 
     } catch (e) {
       console.error(e)
+      this.error = e.message
     } finally {
       loader.dismiss()
     }

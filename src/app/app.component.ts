@@ -3,7 +3,6 @@ import { NetworkMonitor } from './services/network.service'
 import { Plugins, StatusBarStyle, AppState } from '@capacitor/core'
 import { ZeroconfMonitor } from './services/zeroconf/zeroconf.service'
 import { isPlatform, NavController } from '@ionic/angular'
-import { Router } from '@angular/router'
 
 const { App, SplashScreen, StatusBar } = Plugins
 
@@ -20,7 +19,7 @@ export class AppComponent {
     private readonly zeroconfMonitor: ZeroconfMonitor,
   ) {
     // set dark theme
-    document.body.classList.toggle('dark', true)
+    // document.body.classList.toggle('dark', true)
     if (isPlatform('capacitor')) {
       // init native app
       this.initNative()
