@@ -1,89 +1,84 @@
 import { Component } from '@angular/core'
-import { LoadingController, NavController, AlertController } from '@ionic/angular'
-import { getLanIP, idFromProductKey, HttpService, Method, HostsResponse, isAlreadyClaimed } from '../../services/http/http.service'
-import { encode16, HMAC } from 'src/app/util/crypto'
+import { LoadingController, NavController, AlertController, isPlatform } from '@ionic/angular'
+import { getLanIP, RpcService, idFromProductKey, RegisterResponse } from '../../services/rpc.service'
+import { decryptTorAddress, encryptTorKey, generateTorKey } from 'src/app/util/crypto.util'
 import { ZeroconfMonitor } from 'src/app/services/zeroconf/zeroconf.service'
-import { ProcessResService } from 'src/app/services/process-res.service'
+import { Store } from 'src/app/services/store.service'
 
 @Component({
   selector: 'connect',
   templateUrl: 'connect.page.html',
-  styleUrls: ['connect.page.scss'],
 })
 export class ConnectPage {
+  segmentValue: 'basic' | 'advanced' = 'basic'
   error = ''
   productKey = ''
-  host = ''
-  segmentValue: 'basic' | 'advanced' = 'basic'
+  ip = ''
 
   constructor (
     private readonly navCtrl: NavController,
     private readonly loadingCtrl: LoadingController,
     private readonly zeroconfMonitor: ZeroconfMonitor,
-    private readonly httpService: HttpService,
+    private readonly rpcService: RpcService,
     private readonly alertCtrl: AlertController,
-    private readonly processRes: ProcessResService,
+    private readonly store: Store,
   ) { }
 
   segmentChanged (): void {
     this.error = ''
   }
 
-  connectWithIp () {
-    if (!this.host || this.host === '') throw new Error('Host/IP cannot be blank')
-    this.connect(this.host)
-  }
-
-  async connect (ip?: string): Promise<void> {
+  async register (): Promise<void> {
     this.error = ''
 
     const loader = await this.loadingCtrl.create({
+      message: 'Creating Tor private key...',
       spinner: 'lines',
       cssClass: 'loader',
     })
     await loader.present()
 
     try {
-      const id = idFromProductKey(this.productKey)
-      ip = ip || this.getIP(id)
+      const torKey = await generateTorKey()
+      const { cipher, counter, salt } = await encryptTorKey(torKey, this.productKey)
+      const encodedPrivKey = counter + salt + cipher
+      // const encodedPrivKey = base32.encode(counter + salt + cipher)
 
-      const expiration = modulateTime(new Date(), 1, 'days')
-      const messagePlain = expiration.toISOString()
-      const { hmac, salt } = await HMAC.sha256(this.productKey, messagePlain)
+      let host = this.ip
 
-      const res = await this.httpService.request<HostsResponse>({
-        method: Method.GET,
-        url: `http://${ip}:5959/v0/hosts`,
-        params: {
-          hmac: encode16(hmac),
-          message: messagePlain,
-          salt: encode16(salt),
+      if (!host) {
+        host = isPlatform('capacitor') ? this.getIP() : this.getLanAddress()
+      }
+
+      const { torAddress, claimed } = await this.rpcService.rpcRequest<RegisterResponse>({
+        method: 'POST',
+        url: `http://${host}:5959`,
+        data: {
+          method: 'server.register',
+          params: { privKey: encodedPrivKey },
         },
       })
 
-      const { data } = res
-
-      loader.dismiss()
-
-      if (isAlreadyClaimed(data)) {
-        if (await this.processRes.processRes(this.productKey, data)) {
-          return this.presentAlertAlreadyRegistered()
-        }
-      } else {
-        this.navCtrl.navigateForward(['/register'], {
-          queryParams: { ip, productKey: this.productKey },
-        })
+      try {
+        this.store.torAddress = await decryptTorAddress(torAddress, this.productKey)
+        this.store.claimed = claimed
+      } catch (e) {
+        await this.presentAlertInvalidRes(e)
+        throw e
       }
+
+      this.navCtrl.navigateForward(['/complete'])
+
     } catch (e) {
       console.error(e)
-      this.error = e.message
+    } finally {
       loader.dismiss()
     }
   }
 
-  private getIP (id: string): string {
+  private getIP (): string {
     // get zeroconf service
-    const zeroconfService = this.zeroconfMonitor.getService(id)
+    const zeroconfService = this.zeroconfMonitor.getService(this.productKey)
     if (!zeroconfService) { throw new Error('Embassy not found on local network. Please check the Product Key and ensure your phone is connected to WiFi.') }
 
     // get IP
@@ -93,36 +88,18 @@ export class ConnectPage {
     return ip
   }
 
-  private async presentAlertAlreadyRegistered () {
+  private getLanAddress (): string {
+    const id = idFromProductKey(this.productKey)
+    return `start9-${id}.local`
+  }
+
+  private async presentAlertInvalidRes (e: any): Promise<void> {
     const alert = await this.alertCtrl.create({
-      header: 'Warning',
-      message: 'Embassy is already setup. If you have never set up this Embassy, it means the device may be compromised, and you should contact support.',
-      buttons: [
-        {
-          text: 'OK',
-          handler: () => {
-            this.navCtrl.navigateRoot(['/devices', this.productKey, 'tor'], { queryParams: { success: true } })
-          },
-        },
-      ],
+      header: 'Error!',
+      message: `Unable to decrypt Tor address. ${e.message}. Please contact support at support@start9labs.com.`,
+      buttons: ['OK'],
     })
 
     return alert.present()
-  }
-}
-
-function modulateTime (ts: Date, count: number, unit: 'days' | 'hours' | 'minutes' | 'seconds' ) {
-  const ms = inMs(count, unit)
-  const toReturn = new Date(ts)
-  toReturn.setMilliseconds(toReturn.getMilliseconds() + ms)
-  return toReturn
-}
-
-function inMs ( count: number, unit: 'days' | 'hours' | 'minutes' | 'seconds' ) {
-  switch (unit){
-    case 'seconds' : return count * 1000
-    case 'minutes' : return inMs(count * 60, 'seconds')
-    case 'hours' : return inMs(count * 60, 'minutes')
-    case 'days' : return inMs(count * 24, 'hours')
   }
 }

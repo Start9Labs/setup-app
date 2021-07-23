@@ -13,7 +13,7 @@ export class LiveZeroconfMonitor extends ZeroconfMonitor {
   ) { super(platform, zeroconf, networkMonitor) }
 
   async start (): Promise<void> {
-    if (!this.platform.is('ios') && !this.platform.is('android')) { return }
+    if (!this.platform.is('capacitor')) { return }
 
     console.log('starting zeroconf monitor')
 

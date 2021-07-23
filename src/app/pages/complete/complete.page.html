@@ -1,17 +1,6 @@
 <ion-header>
-  <ion-toolbar *ngIf="!success">
-    <ion-buttons slot="start">
-      <ion-back-button [defaultHref]="['/devices', device.productKey]"></ion-back-button>
-    </ion-buttons>
-    <ion-title>Tor</ion-title>
-  </ion-toolbar>
-  <ion-toolbar *ngIf="success">
+  <ion-toolbar>
     <ion-title><ion-text color="success">Success!</ion-text></ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="done()" color="primary">
-        Done
-      </ion-button>
-    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -19,16 +8,15 @@
 
   <ion-item-group>
     <!-- info -->
-    <ion-item *ngIf="success">
+    <ion-item>
       <ion-label class="ion-text-wrap">
-        <h2>Your Embassy is available as a private website on the private Internet. To use your Embassy, visit its unique Tor Address (below) from any Tor-enabled Browser.</h2>
+        <h2>Your Embassy is now a private website on the private Internet. To use your Embassy, visit its unique Tor Address (below) from any Tor-enabled Browser.</h2>
       </ion-label>
     </ion-item>
     <ion-item-divider>Tor Address</ion-item-divider>
     <ion-item>
       <ion-label class="ion-text-wrap">
-        {{ device.torAddress }}
-        <!-- <h2><a (click)="copyTor()">{{ device.torAddress }} <ion-icon name="copy-outline" class="tiny-icon"></ion-icon></a></h2> -->
+        {{ store.torAddress }}
       </ion-label>
       <ion-button slot="end" fill="clear" (click)="copyTor()">
         <ion-icon slot="icon-only" name="copy-outline" color="primary"></ion-icon>

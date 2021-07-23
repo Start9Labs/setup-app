@@ -1,8 +1,9 @@
 import { Component } from '@angular/core'
 import { NetworkMonitor } from './services/network.service'
-import { Store } from './store'
 import { Plugins, StatusBarStyle, AppState } from '@capacitor/core'
 import { ZeroconfMonitor } from './services/zeroconf/zeroconf.service'
+import { isPlatform, NavController } from '@ionic/angular'
+import { Router } from '@angular/router'
 
 const { App, SplashScreen, StatusBar } = Plugins
 
@@ -14,19 +15,20 @@ const { App, SplashScreen, StatusBar } = Plugins
 export class AppComponent {
 
   constructor (
+    private readonly navCtrl: NavController,
     private readonly networkMonitor: NetworkMonitor,
     private readonly zeroconfMonitor: ZeroconfMonitor,
-    private readonly store: Store,
   ) {
     // set dark theme
     document.body.classList.toggle('dark', true)
-    // init app
-    this.init()
+    if (isPlatform('capacitor')) {
+      // init native app
+      this.initNative()
+    }
+    this.navCtrl.navigateRoot(['/connect'])
   }
 
-  async init (): Promise<void> {
-    // load storage
-    await this.store.load()
+  async initNative (): Promise<void> {
     // init monitors
     await this.initMonitors()
     // subscribe to app pause/resume event

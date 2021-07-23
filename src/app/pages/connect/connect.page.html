@@ -33,7 +33,7 @@
     </ion-item>
 
     <div class="ion-padding-top ion-padding-bottom">
-      <ion-button [disabled]="productKey.length !== 8 && productKey.length !== 12" expand="block" fill="outline" (click)="connect()">
+      <ion-button [disabled]="productKey.length !== 8 && productKey.length !== 12" expand="block" fill="outline" (click)="register()">
         Connect
       </ion-button>
     </div>
@@ -61,12 +61,12 @@
       </ion-item>
       <ion-item>
         <ion-label position="floating" color="medium">LAN IP Address</ion-label>
-        <ion-input maxlength="70" name="host" [(ngModel)]="host"></ion-input>
+        <ion-input maxlength="70" name="ip" [(ngModel)]="ip"></ion-input>
       </ion-item>
     </ion-item-group>
 
     <div class="ion-padding-top ion-padding-bottom">
-      <ion-button [disabled]="!host || (productKey.length !== 8 && productKey.length !== 12)" expand="block" fill="outline" (click)="connectWithIp()">
+      <ion-button [disabled]="!host || (productKey.length !== 8 && productKey.length !== 12)" expand="block" fill="outline" (click)="register()">
         Connect
       </ion-button>
     </div>
