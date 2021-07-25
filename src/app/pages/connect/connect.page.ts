@@ -1,5 +1,5 @@
 import { Component } from '@angular/core'
-import { LoadingController, NavController, AlertController, isPlatform } from '@ionic/angular'
+import { LoadingController, NavController, AlertController, isPlatform, getPlatforms } from '@ionic/angular'
 import { getLanIP, RpcService, idFromProductKey, RegisterResponse } from '../../services/rpc.service'
 import { decryptTorAddress, encryptTorKey, generateTorKey } from 'src/app/util/crypto.util'
 import { ZeroconfMonitor } from 'src/app/services/zeroconf/zeroconf.service'
@@ -8,12 +8,13 @@ import { Store } from 'src/app/services/store.service'
 @Component({
   selector: 'connect',
   templateUrl: 'connect.page.html',
+  styleUrls: ['connect.page.scss'],
 })
 export class ConnectPage {
-  segmentValue: 'basic' | 'advanced' = 'basic'
-  error = ''
+  isWebAndroid = false
   productKey = ''
   ip = ''
+  error = ''
 
   constructor (
     private readonly navCtrl: NavController,
@@ -24,8 +25,9 @@ export class ConnectPage {
     private readonly store: Store,
   ) { }
 
-  segmentChanged (): void {
-    this.error = ''
+  ngOnInit () {
+    console.log(getPlatforms())
+    this.isWebAndroid = isPlatform('android') && !isPlatform('capacitor')
   }
 
   handleInput (): void {
@@ -84,6 +86,33 @@ export class ConnectPage {
     } finally {
       loader.dismiss()
     }
+  }
+
+  async presentPromptIp (): Promise<void> {
+    const alert = await this.alertCtrl.create({
+      header: 'Embassy IP Address',
+      message: 'In your router settings, find the device named “start9-[ID]”. Take note of the associated IP address and enter it here.',
+      inputs: [
+        {
+          name: 'ip',
+          type: 'tel',
+          placeholder: 'IP Address: ex 192.168.0.1',
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        }, {
+          text: 'Ok',
+          handler: ({ ip }) => {
+            this.ip = ip
+          },
+        },
+      ],
+    })
+
+    return alert.present()
   }
 
   private getIP (): string {
