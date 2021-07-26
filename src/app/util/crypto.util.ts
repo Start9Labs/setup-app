@@ -5,7 +5,7 @@ export async function encryptTorKey (torKey: Uint8Array, productKey: string): Pr
 }
 
 export async function decryptTorAddress (encryptedTorAddr: string, productKey: string): Promise<string> {
-  return 'blablabla.onion'
+  return 'http://privacy34kn4ez3y3nijweec6w4g54i3g54sdv7r5mr6soma3w4begyd.onion/'
   // const decoded = encryptedTorAddr
   // // const decoded = base32.decode(encryptedTorAddr) as string
   // const counter = new TextEncoder().encode(decoded.slice(0, 16))

@@ -1,10 +1,10 @@
 import { Component } from '@angular/core'
 import { NetworkMonitor } from './services/network.service'
-import { Plugins, StatusBarStyle, AppState } from '@capacitor/core'
 import { ZeroconfMonitor } from './services/zeroconf/zeroconf.service'
 import { isPlatform, NavController } from '@ionic/angular'
-
-const { App, SplashScreen, StatusBar } = Plugins
+import { App, AppState } from '@capacitor/app'
+import { SplashScreen } from '@capacitor/splash-screen'
+import { StatusBar, Style } from '@capacitor/status-bar'
 
 @Component({
   selector: 'app-root',
@@ -40,7 +40,7 @@ export class AppComponent {
     })
     // set StatusBar style
     StatusBar.setStyle({
-      style: StatusBarStyle.Dark,
+      style: Style.Dark,
     })
     // dismiss SplashScreen
     setTimeout(() => {

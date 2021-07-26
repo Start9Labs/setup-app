@@ -13,7 +13,7 @@ export class CompletePage {
   constructor (
     private readonly navCtrl: NavController,
     private readonly toastCtrl: ToastController,
-    private readonly store: Store,
+    public readonly store: Store,
   ) { }
 
   async copyTor (): Promise<void> {
