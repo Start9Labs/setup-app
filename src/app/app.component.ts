@@ -24,7 +24,7 @@ export class AppComponent {
       // init native app
       this.initNative()
     }
-    this.navCtrl.navigateRoot(['/connect'])
+    // this.navCtrl.navigateRoot(['/connect'])
   }
 
   async initNative (): Promise<void> {

@@ -1,4 +1,20 @@
-.tiny-icon {
-  height: 12px;
-  width: 12px;
+ion-card-title {
+  margin-top: 24px;
+  font-family: 'Montserrat';
+  font-size: x-large;
+  --color: var(--ion-color-light);
+}
+
+.desc-item {
+  --border-radius: 4px;
+  --border-style: solid;
+  --border-width: 1px;
+  --border-color: var(--ion-color-light);
+}
+
+.browser-section {
+  --background: rgb(222, 222, 222);
+  border-top: solid;
+  border-width: 1px;
+  border-color: var(--ion-color-medium);
 }

@@ -4,6 +4,7 @@ import { getLanIP, RpcService, idFromProductKey, RegisterResponse } from '../../
 import { decryptTorAddress, encryptTorKey, generateTorKey } from 'src/app/util/crypto.util'
 import { ZeroconfMonitor } from 'src/app/services/zeroconf/zeroconf.service'
 import { Store } from 'src/app/services/store.service'
+import { pauseFor } from 'src/app/util/misc.util'
 
 @Component({
   selector: 'connect',
@@ -14,6 +15,7 @@ export class ConnectPage {
   isWebAndroid = false
   productKey = ''
   ip = ''
+  url = ''
   error = ''
 
   constructor (
@@ -31,58 +33,44 @@ export class ConnectPage {
   }
 
   handleInput (): void {
-    // validate product key
-    // validate ip (if present)
+    // @TODO validate product key
     this.error = ''
   }
 
   async submit (): Promise<void> {
-    // validate product key
-    // validate ip (if present)
-
     this.error = ''
 
+    try {
+      // @TODO validate product key
+
+      let host = this.ip
+      if (!host) {
+        host = isPlatform('capacitor') ? this.getIP() : this.getLanAddress()
+      }
+      this.url = `http://${host}:5959`
+    } catch (e) {
+      this.error = e.message
+      return
+    }
+
     const loader = await this.loadingCtrl.create({
-      message: 'Creating Tor private key...',
+      message: 'Connecting to Embassy...',
       spinner: 'lines',
       cssClass: 'loader',
     })
     await loader.present()
 
     try {
-      const torKey = await generateTorKey()
-      const { cipher, counter, salt } = await encryptTorKey(torKey, this.productKey)
-      const encodedPrivKey = counter + salt + cipher
-      // const encodedPrivKey = base32.encode(counter + salt + cipher)
-
-      let host = this.ip
-
-      if (!host) {
-        host = isPlatform('capacitor') ? this.getIP() : this.getLanAddress()
-      }
-
-      const { torAddress, claimed } = await this.rpcService.rpcRequest<RegisterResponse>({
-        method: 'POST',
-        url: `http://${host}:5959`,
-        data: {
-          method: 'server.register',
-          params: { privKey: encodedPrivKey },
-        },
-      })
-
-      try {
-        this.store.torAddress = await decryptTorAddress(torAddress, this.productKey)
-        this.store.claimed = claimed
-      } catch (e) {
-        await this.presentAlertInvalidRes(e)
-        throw e
-      }
-
+      await this.echo()
+      loader.message = 'Transferring private key'
+      const { torAddress, claimed } = await this.register()
+      loader.message = 'Verifying Tor address...'
+      this.store.torAddress = await this.verify(torAddress)
+      this.store.claimed = claimed
       this.navCtrl.navigateForward(['/complete'])
-
+      this.reset()
     } catch (e) {
-      console.error(e)
-      this.error = e.message
+      this.presentAlertError(e.header || 'Error', e.message)
     } finally {
       loader.dismiss()
     }
@@ -115,6 +103,62 @@ export class ConnectPage {
     return alert.present()
   }
 
+  private async echo (): Promise<void> {
+    await pauseFor(1000)
+    try {
+      await Promise.all([
+        this.rpcService.rpcRequest<RegisterResponse>({
+          method: 'POST',
+          url: this.url,
+          data: {
+            method: 'server.echo',
+            params: { },
+          },
+        }),
+        pauseFor(1000),
+      ])
+    } catch (e) {
+      const message = 'Please make sure you are connected to the same network as your Embassy, check the product key, and try again.'
+      throw new SetupError('Not Found', message)
+    }
+  }
+
+  private async register (): Promise<RegisterResponse> {
+    await pauseFor(1000)
+    try {
+      const torKey = await generateTorKey()
+      const { cipher, counter, salt } = await encryptTorKey(torKey, this.productKey)
+      const encodedPrivKey = counter + salt + cipher
+      // const encodedPrivKey = base32.encode(counter + salt + cipher)
+
+      const [torAddr] = await Promise.all([
+        this.rpcService.rpcRequest<RegisterResponse>({
+          method: 'POST',
+          url: this.url,
+          data: {
+            method: 'server.register',
+            params: { privKey: encodedPrivKey },
+          },
+        }),
+        pauseFor(1000),
+      ])
+      return torAddr
+    } catch (e) {
+      throw new SetupError('Registration Error', e.message)
+    }
+  }
+
+  private async verify (encryptedTorAddre: string): Promise<string> {
+    await pauseFor(2000)
+    try {
+      return decryptTorAddress(encryptedTorAddre, this.productKey)
+    } catch (e) {
+      const header = 'Address Verification Failed'
+      const message = `Unable to decrypt Tor address. ${e.message}. Please contact support at support@start9labs.com.`
+      throw new SetupError(header, message)
+    }
+  }
+
   private getIP (): string {
     // get zeroconf service
     const zeroconfService = this.zeroconfMonitor.getService(this.productKey)
@@ -132,13 +176,25 @@ export class ConnectPage {
     return `start9-${id}.local`
   }
 
-  private async presentAlertInvalidRes (e: any): Promise<void> {
+  private async presentAlertError (header: string, message: string): Promise<void> {
     const alert = await this.alertCtrl.create({
-      header: 'Error!',
-      message: `Unable to decrypt Tor address. ${e.message}. Please contact support at support@start9labs.com.`,
+      header,
+      message,
       buttons: ['OK'],
+      cssClass: 'alert-error',
     })
 
     return alert.present()
   }
+
+  private reset (): void {
+    this.productKey = ''
+    this.ip = ''
+    this.error = ''
+  }
+}
+
+function SetupError (header: string, message: string): void {
+  this.header = header
+  this.message = message
 }
