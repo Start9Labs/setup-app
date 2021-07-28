@@ -3,7 +3,7 @@ import { Zeroconf, ZeroconfResult, ZeroconfService } from '@ionic-native/zerocon
 import { Subscription, Observable, ReplaySubject } from 'rxjs'
 import { Platform } from '@ionic/angular'
 import { NetworkMonitor } from '../network.service'
-import { NetworkStatus } from '@capacitor/core'
+import { ConnectionStatus } from '@capacitor/network'
 
 @Injectable({
   providedIn: 'root',
@@ -31,7 +31,7 @@ export abstract class ZeroconfMonitor {
     return this.services[`start9-${serverId}`]
   }
 
-  protected handleNetworkChange (network: NetworkStatus): void {
+  protected handleNetworkChange (network: ConnectionStatus): void {
     this.stop()
     if (network.connectionType === 'wifi') {
       this.start()

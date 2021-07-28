@@ -6,15 +6,12 @@ import { AppComponent } from './app.component'
 import { AppRoutingModule } from './app-routing.module'
 // native
 import { Zeroconf } from '@ionic-native/zeroconf/ngx'
-import { Insomnia } from '@ionic-native/insomnia/ngx'
 // services
-import { HttpService } from './services/http/http.service'
-import { HttpServiceFactory } from './services/http/http.service.factory'
-import { HmacService } from './services/hmac/hmac.service'
-import { HmacServiceFactory } from './services/hmac/hmac.service.factory'
-import { ZeroconfMonitorFactory } from './services/zeroconf/zeroconf.service.factory'
+import { RpcService } from './services/rpc.service'
 import { ZeroconfMonitor } from './services/zeroconf/zeroconf.service'
 import { NetworkMonitor } from './services/network.service'
+// factories
+import { ZeroconfMonitorFactory } from './services/zeroconf/zeroconf.service.factory'
 
 @NgModule({
   declarations: [AppComponent],
@@ -25,11 +22,9 @@ import { NetworkMonitor } from './services/network.service'
     AppRoutingModule,
   ],
   providers: [
-    Insomnia,
     Zeroconf,
+    RpcService,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    { provide: HttpService, useFactory: HttpServiceFactory, deps: [] },
-    { provide: HmacService, useFactory: HmacServiceFactory, deps: [] },
     { provide: ZeroconfMonitor, useFactory: ZeroconfMonitorFactory, deps: [Platform, Zeroconf, NetworkMonitor] },
   ],
   bootstrap: [AppComponent],

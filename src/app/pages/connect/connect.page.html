@@ -1,87 +1,74 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button></ion-back-button>
-    </ion-buttons>
-    <ion-title>Setup</ion-title>
-  </ion-toolbar>
-  <!-- segment -->
-  <ion-toolbar>
-    <ion-segment [(ngModel)]="segmentValue" (ionChange)="segmentChanged()">
-      <ion-segment-button value="basic">
-        <ion-label>Basic</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="advanced">
-        <ion-label>Advanced</ion-label>
-      </ion-segment-button>
-    </ion-segment>
-  </ion-toolbar>
-</ion-header>
+<ion-content color="light">
+  <ion-grid style="padding-top: 32px; height: 100%; max-width: 540px;">
+    <ion-row class="ion-align-items-center" style="height: 100%;">
+      <ion-col class="ion-text-center">
 
-<ion-content class="ion-padding-top">
+        <div style="padding-bottom: 32px;">
+          <img src="assets/png/logo.png" style="max-width: 240px;" />
+        </div>
 
-  <ion-item *ngIf="error" style="margin-bottom: 16px">
-    <ion-label>
-      <ion-text class="ion-text-wrap" color="danger">{{ error }}</ion-text>
-    </ion-label>
-  </ion-item>
+        <ion-card>
+          <ion-card-header class="ion-text-center" style="padding-bottom: 8px;">
+            <ion-card-title>Claim your Embassy</ion-card-title>
+          </ion-card-header>
 
-  <div *ngIf="segmentValue === 'basic'">
-    <ion-item>
-      <ion-label position="floating" color="medium">Product Key</ion-label>
-      <ion-input maxlength="12" name="productKey" [(ngModel)]="productKey"></ion-input>
-    </ion-item>
+          <ion-card-content class="ion-margin">
+            <form (submit)="submit()" style="margin-bottom: 12px;">
+              <ion-item-group>
+                <p class="input-label">Product Key</p>
+                <ion-item>
+                  <ion-icon slot="start" name="key-outline" style="margin-right: 16px;"></ion-icon>
+                  <ion-input clearInput maxlength="12" name="productKey" [(ngModel)]="productKey" (ngModelChange)="handleInput()"></ion-input>
+                </ion-item>
+                <div class="ion-text-left">
+                  <p *ngIf="ip" style="display: inline-block; vertical-align: middle; padding-top: 4px;">
+                    <ion-text color="light">Targeting IP: <b>{{ ip }}</b></ion-text>
+                    <ion-button style="display: inline-block; vertical-align: middle;" size="small" color="light" fill="clear" (click)="ip = ''">
+                      <ion-icon style="font-size: small;" slot="icon-only" name="close-outline"></ion-icon>
+                    </ion-button>
+                  </p>
+                  <p *ngIf="isWebAndroid" style="padding-top: 4px"><ion-text color="danger">Android device detected. Android does not support <code>.local</code> domain resolution. If you choose to continue, you must <a style="text-decoration: underline; cursor: pointer;" (click)="presentPromptIp()">enter your Embassy IP address manually</a>.</ion-text></p>
+                  <p *ngIf="error" style="padding-top: 4px"><ion-text color="danger">{{ error }}</ion-text></p>
+                </div>
+              </ion-item-group>
+              <ion-button class="claim-button" type="submit" expand="block">
+                <span style="font-size: larger; font-weight: bold;">Claim</span>
+              </ion-button>
+            </form>
+          </ion-card-content>
 
-    <div class="ion-padding-top ion-padding-bottom">
-      <ion-button [disabled]="productKey.length !== 8 && productKey.length !== 12" expand="block" fill="outline" (click)="connect()">
-        Connect
-      </ion-button>
-    </div>
+          <ion-card-header class="card-footer">
+            <ion-item lines="none">
+              <ion-label class="ion-text-wrap">
+                <p>Open source, client-side, Javascript tool for generating a random ed25519 private key. Your Product Key acts as a one-time password (OTP), used to discover your Embassy on the Local Area Network and to encrypt the generated key for secure transfer.</p>
+                <br />
+                <p>Old router? <a style="text-decoration: underline; cursor: pointer;" (click)="presentPromptIp()">Enter your Embassy IP address manually</a>.</p>
+                <br />
+                <p>Check out the <a href="https://docs.start9.com/user-manual/initial-setup.html#claim-your-embassy" target="_blank">instructions</a>.</p>
+              </ion-label>
+            </ion-item>
+          </ion-card-header>
+        </ion-card>
 
-    <ion-item>
-      <ion-label class="ion-text-wrap">
-        <h2><ion-text color="warning">Instructions</ion-text></h2>
-        <ul>
-          <li>Connect Embassy to power and Ethernet.</li>
-          <li>Embassy will make two noises: first a "bep", and then "chime" when ready.</li>
-          <li><ion-text color="warning">Ensure your phone is connected to the same WiFi Network as Embassy.</ion-text></li>
-          <li>Enter the Product Key located on bottom of Embassy.</li>
-        </ul>
-        <h2>Please refer to the <a href="https://docs.start9labs.com/user-manual/initial-setup.html#claim-your-embassy" style="text-decoration: none;" target="_blank">docs</a> for solutions to common issues.</h2>
-      </ion-label>
-    </ion-item>
-  </div>
+        <div style="margin-top: 30px;">
+          <a style="color: var(--ion-color-dark);" href="https://github.com/Start9Labs/setup-app" target="_blank">Source Code</a>
+          &nbsp;
+          <a style="color: var(--ion-color-dark);" href="https://github.com/Start9Labs/setup-app/archive/refs/tags/v1.2.2.zip" download>(Zip)</a>
+        </div>
 
-  <div *ngIf="segmentValue === 'advanced'">
+        <div class="divider"></div>
 
-    <ion-item-group>
-      <ion-item>
-        <ion-label position="floating" color="medium">Product Key</ion-label>
-        <ion-input maxlength="12" name="productKey" [(ngModel)]="productKey"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="floating" color="medium">LAN IP Address</ion-label>
-        <ion-input maxlength="70" name="host" [(ngModel)]="host"></ion-input>
-      </ion-item>
-    </ion-item-group>
-
-    <div class="ion-padding-top ion-padding-bottom">
-      <ion-button [disabled]="!host || (productKey.length !== 8 && productKey.length !== 12)" expand="block" fill="outline" (click)="connectWithIp()">
-        Connect
-      </ion-button>
-    </div>
-
-    <ion-item>
-      <ion-label class="ion-text-wrap">
-        <h2><ion-text color="warning">Advanced Setup</ion-text></h2>
-        <br />
-        <h2>(for routers that do not support mDNS)</h2>
-        <ul>
-          <li>On your desktop or laptop computer, navigate to your router configuration settings within the browser. This is usually an IP address such as 192.168.1.1. A simple Google search will usually reveal how to access the router configuration settings for a given make and model.</li>
-          <li>You should see an item labeled “start9-[ID]”. Take note of the associated IP address and enter it into the “LAN IP Address” field above.</li>
-        </ul>
-      </ion-label>
-    </ion-item>
-  </div>
-
+        <div class="footer">
+          <p style="margin-bottom: 30px;">Contact/Community</p>
+          <ion-icon name="logo-youtube"></ion-icon>
+          <ion-icon name="paper-plane"></ion-icon>
+          <ion-icon name="mail"></ion-icon>
+          <ion-icon name="logo-github"></ion-icon>
+          <ion-icon name="logo-twitter"></ion-icon>
+          <ion-icon name="logo-mastodon"></ion-icon>
+          <ion-icon name="logo-medium"></ion-icon>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

@@ -1,18 +1,18 @@
 import { Injectable } from '@angular/core'
-import { Plugins, NetworkStatus, PluginListenerHandle } from '@capacitor/core'
 import { Observable, BehaviorSubject } from 'rxjs'
 import { Mutex } from 'async-mutex'
+import { ConnectionStatus, Network } from '@capacitor/network'
+import { PluginListenerHandle } from '@capacitor/core'
 
-const { Network } = Plugins
 const mutex = new Mutex()
 
 @Injectable({
   providedIn: 'root',
 })
 export class NetworkMonitor {
-  private readonly networkStatus$ = new BehaviorSubject<NetworkStatus>({ connected: false, connectionType: 'none' })
-  watchConnection (): Observable<NetworkStatus> { return this.networkStatus$.asObservable() }
-  peekConnection (): NetworkStatus { return this.networkStatus$.getValue() }
+  private readonly networkStatus$ = new BehaviorSubject<ConnectionStatus>({ connected: false, connectionType: 'none' })
+  watchConnection (): Observable<ConnectionStatus> { return this.networkStatus$.asObservable() }
+  peekConnection (): ConnectionStatus { return this.networkStatus$.getValue() }
   private listener: PluginListenerHandle
   private previous: string | undefined
 

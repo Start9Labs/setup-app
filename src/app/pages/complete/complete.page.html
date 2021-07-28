@@ -1,0 +1,100 @@
+<ion-content color="light">
+  <ion-grid style="padding-top: 32px; height: 100%; max-width: 540px;">
+    <ion-row class="ion-align-items-center" style="height: 100%;">
+      <ion-col class="ion-text-center">
+
+        <div style="padding-bottom: 32px;">
+          <img src="assets/png/success-check.png" style="max-width: 90px;" />
+        </div>
+
+        <ion-card>
+          <ion-card-header class="ion-text-center">
+            <ion-card-title>Embassy Tor Address</ion-card-title>
+          </ion-card-header>
+
+          <ion-card-content>
+            <ion-item-group>
+              <ion-item lines="none">
+                <ion-label class="ion-text-wrap">
+                  {{ store.torAddress }}
+                </ion-label>
+                <ion-button slot="end" fill="clear" (click)="copyTor()">
+                  <ion-icon slot="icon-only" name="copy-outline" color="primary"></ion-icon>
+                </ion-button>
+              </ion-item>
+            </ion-item-group>
+
+          </ion-card-content>
+
+          <ion-card-header class="browser-section">
+            <ion-item class="desc-item" lines="none">
+              <ion-label lines="none" class="ion-text-wrap">
+                Your Embassy is now a private website on the private Internet. To use your Embassy, visit the above Tor address from any Tor-enabled Browser.
+              </ion-label>
+            </ion-item>
+
+            <ion-card-title class="ion-margin-bottom">Recommended Browsers</ion-card-title>
+            <ion-item-group>
+              <ion-item-divider>iOS</ion-item-divider>
+              <ion-item>
+                <ion-avatar slot="start">
+                  <img src="assets/png/consulate.png">
+                </ion-avatar>
+                <ion-label>Start9 Consulate</ion-label>
+              </ion-item>
+              <ion-item-divider>Android</ion-item-divider>
+              <ion-item>
+                <ion-avatar slot="start">
+                  <img src="assets/png/firefox.png">
+                </ion-avatar>
+                <ion-label>Firefox<sup>1</sup></ion-label>
+              </ion-item>
+              <ion-item>
+                <ion-avatar slot="start">
+                  <img src="assets/png/tor.png">
+                </ion-avatar>
+                <ion-label>Tor Browser</ion-label>
+              </ion-item>
+              <ion-item-divider>Desktop</ion-item-divider>
+              <ion-item>
+                <ion-avatar slot="start">
+                  <img src="assets/png/firefox.png">
+                </ion-avatar>
+                <ion-label>Firefox<sup>1</sup></ion-label>
+              </ion-item>
+              <ion-item>
+                <ion-avatar slot="start">
+                  <img src="assets/png/tor.png">
+                </ion-avatar>
+                <ion-label>Tor Browser</ion-label>
+              </ion-item>
+              <ion-item>
+                <ion-avatar slot="start">
+                  <img src="assets/png/brave.png">
+                </ion-avatar>
+                <ion-label>Brave<sup>2</sup></ion-label>
+              </ion-item>
+            </ion-item-group>
+            <ol>
+              <li><ion-text color="medium">Firefox requires additional configuration. Follow these <a href="https://docs.start9labs.com/misc-guides/tor-firefox/index.html" target="_blank">instructions</a></ion-text></li>
+              <li><ion-text color="medium">Brave only works when using Tor Tabs.</ion-text></li>
+            </ol>
+          </ion-card-header>
+        </ion-card>
+
+        <div class="divider"></div>
+
+        <div class="footer">
+          <p style="margin-bottom: 30px;">Contact/Community</p>
+          <ion-icon name="logo-youtube"></ion-icon>
+          <ion-icon name="paper-plane"></ion-icon>
+          <ion-icon name="mail"></ion-icon>
+          <ion-icon name="logo-github"></ion-icon>
+          <ion-icon name="logo-twitter"></ion-icon>
+          <ion-icon name="logo-mastodon"></ion-icon>
+          <ion-icon name="logo-medium"></ion-icon>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
