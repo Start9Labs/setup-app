@@ -148,7 +148,7 @@ export class RegisterPage {
       }
     } catch (e) {
       console.error(e)
-      this.error = e.message
+      this.error = 'Failed to generate enough randomness for private key generation. This is a rare but known issue that will be fixed in EmbassyOS 0.3.0. Please unplug your device, plug it back in, and start over from scratch. That should resolve the issue.'
       loader.dismiss()
     } finally {
       // allow phone to sleep again
